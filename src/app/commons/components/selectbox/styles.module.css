@@ -1,0 +1,298 @@
+/* Container */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  position: relative;
+}
+
+/* Label */
+.label {
+  display: flex;
+  align-items: center;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.labelText {
+  display: flex;
+  align-items: center;
+}
+
+.required {
+  margin-left: 4px;
+}
+
+/* Light Theme - Label */
+.theme-light .label {
+  color: #030712;
+}
+
+.theme-light .required {
+  color: #dd2e2e;
+}
+
+/* Dark Theme - Label */
+.theme-dark .label {
+  color: #ffffff;
+}
+
+.theme-dark .required {
+  color: #f55c5c;
+}
+
+/* Selectbox Wrapper */
+.selectboxWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Base Selectbox */
+.selectbox {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
+  box-sizing: border-box;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.selectbox:disabled,
+.selectbox.disabled {
+  cursor: not-allowed;
+}
+
+.selectboxContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.selectboxChildren {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.selectboxText {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.placeholder {
+  color: #9ca3af;
+}
+
+.chevron {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+  color: currentColor;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* Light Theme - Selectbox */
+.theme-light .selectbox {
+  background-color: #f3f4f6;
+  color: #323944;
+  border: 1px solid transparent;
+}
+
+.theme-light .selectbox.variant-primary {
+  background-color: #f3f4f6;
+  border-color: transparent;
+}
+
+.theme-light .selectbox.variant-hover,
+.theme-light .selectbox.state-hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.theme-light .selectbox.variant-active,
+.theme-light .selectbox.state-active {
+  background-color: #f3f4f6;
+  border-color: #39ac99;
+}
+
+.theme-light .selectbox.variant-filled,
+.theme-light .selectbox.state-filled {
+  background-color: #f3f4f6;
+  color: #030712;
+}
+
+.theme-light .selectbox.variant-danger,
+.theme-light .selectbox.state-error {
+  background-color: #f3f4f6;
+  border-color: #dd2e2e;
+  color: #030712;
+}
+
+.theme-light .selectbox.variant-disabled,
+.theme-light .selectbox.state-disabled,
+.theme-light .selectbox.disabled {
+  background-color: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Dark Theme - Selectbox */
+.theme-dark .selectbox {
+  background-color: #161c24;
+  color: #9ca3af;
+  border: 1px solid transparent;
+}
+
+.theme-dark .selectbox.variant-primary {
+  background-color: #161c24;
+  border-color: transparent;
+}
+
+.theme-dark .selectbox.variant-hover,
+.theme-dark .selectbox.state-hover {
+  background-color: #161c24;
+  border-color: #9ca3af;
+}
+
+.theme-dark .selectbox.variant-active,
+.theme-dark .selectbox.state-active {
+  background-color: #161c24;
+  border-color: #5ffce2;
+}
+
+.theme-dark .selectbox.variant-filled,
+.theme-dark .selectbox.state-filled {
+  background-color: #161c24;
+  color: #ffffff;
+}
+
+.theme-dark .selectbox.variant-danger,
+.theme-dark .selectbox.state-error {
+  background-color: #161c24;
+  border-color: #f55c5c;
+  color: #ffffff;
+}
+
+.theme-dark .selectbox.variant-disabled,
+.theme-dark .selectbox.state-disabled,
+.theme-dark .selectbox.disabled {
+  background-color: #161c24;
+  color: #323944;
+  cursor: not-allowed;
+}
+
+/* Dropdown */
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 4px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  max-height: 304px;
+  overflow-y: auto;
+}
+
+/* Light Theme - Dropdown */
+.theme-light .dropdown {
+  background-color: #ffffff;
+  border: 1px solid #f3f4f6;
+}
+
+/* Dark Theme - Dropdown */
+.theme-dark .dropdown {
+  background-color: #030712;
+  border: 1px solid #323944;
+}
+
+/* Dropdown Item */
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16.8px;
+  transition: background-color 0.15s;
+}
+
+.dropdownItem:hover {
+  background-color: rgba(127, 253, 232, 0.12);
+}
+
+.dropdownItem.selected {
+  background-color: rgba(127, 253, 232, 0.12);
+}
+
+/* Light Theme - Dropdown Item */
+.theme-light .dropdownItem {
+  color: #030712;
+}
+
+/* Dark Theme - Dropdown Item */
+.theme-dark .dropdownItem {
+  color: #ffffff;
+}
+
+/* Additional Information */
+.additionalInfo {
+  display: flex;
+  align-items: center;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.additionalInfoText {
+  display: flex;
+  align-items: center;
+}
+
+/* Light Theme - Additional Info */
+.theme-light .additionalInfo {
+  color: #323944;
+}
+
+.theme-light .additionalInfo.error {
+  color: #dd2e2e;
+}
+
+/* Dark Theme - Additional Info */
+.theme-dark .additionalInfo {
+  color: #9ca3af;
+}
+
+.theme-dark .additionalInfo.error {
+  color: #f55c5c;
+}

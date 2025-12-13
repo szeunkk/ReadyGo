@@ -1,0 +1,51 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @02-wireframe.mdc
+            - @03-ui.mdc
+
+==============================================
+
+조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: ytywkz9e)
+조건-피그마) 참고할 공통컴포넌트 노드ID(dark-mode-selectbox): 2130:36282
+조건-피그마) 참고할 공통컴포넌트 노드ID(dark-mode-option-group): 2130:36785
+조건-피그마) 참고할 공통컴포넌트 노드ID(light-mode-selectbox): 2155:3638
+조건-피그마) 참고할 공통컴포넌트 노드ID(light-mode-option-group): 2155:3487
+
+조건-파일경로) 구현될 TSX 파일경로: src/commons/components/selectbox/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/commons/components/selectbox/styles.module.css
+
+==============================================
+
+핵심요구사항) MCP를 연동하여 피그마의 디자인을 그대로 소스코드로 구현할 것.
+
+핵심요구사항) 다음 조건을 모두 만족하는 완전한 variant 시스템을 구현할 것.
+            - variant: 'primary' | 'hover' | 'active' | 'filled' | 'danger' | 'disabled'
+            - state: 'default' | 'hover' | 'filled' | 'error' | 'disabled'
+            - theme: 'light' | 'dark'
+
+핵심요구사항) selectbox 클릭 시 option-group이 드롭다운 형식으로 표시되도록 구현할 것.
+            - selectbox 클릭 시 option-group이 나타나도록 구현
+            - 아이템 클릭 시 해당 아이템이 선택되도록 구현
+            - 드롭다운이 열리고 닫히는 애니메이션 및 상태 관리 구현
+
+핵심요구사항) Label과 Additional information는 props로 관리할 것.
+            - props를 통해 Label과 Additional information을 전달받아 표시
+
+핵심요구사항) selectbox의 아이콘과 텍스트는 children으로 유연하게 관리할 것.
+            - 아이콘과 텍스트를 children으로 받아서 자유롭게 배치 가능하도록 구현
+            - gap 속성을 사용하여 아이콘과 텍스트 사이의 공간을 조절할 수 있도록 구현
+
+핵심요구사항) option-group의 아이템 갯수는 props로 유동적으로 관리할 것.
+            - items?: Array<{ id: string; value: React.ReactNode }> 형태로 props로 전달
+            - 아이템 갯수에 따라 동적으로 렌더링되도록 구현
+
+핵심요구사항) option-group 안의 텍스트와 아이콘은 children으로 유동적으로 관리할 것.
+            - 각 option 아이템의 텍스트와 아이콘을 children으로 받아서 유연하게 배치
+            - 각 아이템의 children을 통해 아이콘과 텍스트를 자유롭게 구성 가능하도록 구현
+
+
