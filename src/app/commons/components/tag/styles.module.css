@@ -1,0 +1,80 @@
+/* Base Tag Styles */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  box-sizing: border-box;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Light Theme - Rectangle Style */
+.theme-light.style-rectangle {
+  background-color: #e5e7eb;
+  color: #4b5563;
+  border-radius: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Light Theme - Duotone Style */
+.theme-light.style-duotone {
+  background-color: rgba(127, 253, 232, 0.12);
+  border: 1px solid #39ac99;
+  color: #39ac99;
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Light Theme - Circle Style */
+.theme-light.style-circle {
+  background-color: transparent;
+  border: 1px solid #d1d5db;
+  color: #030712;
+  border-radius: 99999px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Dark Theme - Rectangle Style */
+.theme-dark.style-rectangle {
+  background-color: #4b5563;
+  color: #e5e7eb;
+  border-radius: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Dark Theme - Duotone Style */
+.theme-dark.style-duotone {
+  background-color: rgba(127, 253, 232, 0.12);
+  border: 1px solid #5ffce2;
+  color: #5ffce2;
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Dark Theme - Circle Style */
+.theme-dark.style-circle {
+  background-color: transparent;
+  border: 1px solid #6b7280;
+  color: #ffffff;
+  border-radius: 99999px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
