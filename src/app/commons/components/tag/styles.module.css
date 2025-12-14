@@ -30,7 +30,7 @@
 
 /* Light Theme - Duotone Style */
 .theme-light.style-duotone {
-  background-color: rgba(127, 253, 232, 0.12);
+  background-color: color-mix(in srgb, var(--color-teal-400) 12%, transparent);
   border: 1px solid var(--color-teal-700);
   color: var(--color-teal-700);
   border-radius: 8px;
@@ -59,7 +59,7 @@
 
 /* Dark Theme - Duotone Style */
 .theme-dark.style-duotone {
-  background-color: rgba(127, 253, 232, 0.12);
+  background-color: color-mix(in srgb, var(--color-teal-400) 12%, transparent);
   border: 1px solid var(--color-teal-500);
   color: var(--color-teal-500);
   border-radius: 8px;
@@ -76,6 +76,3 @@
   padding-left: 8px;
   padding-right: 8px;
 }
-
-
-
