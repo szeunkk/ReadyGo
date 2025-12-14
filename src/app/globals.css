@@ -15,6 +15,34 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
+  /* Color Tokens - Base */
+  --color-base-black: #000000;
+  --color-base-white: #ffffff;
+
+  /* Color Tokens - Teal/Brand */
+  --color-teal-300: #94fdec;
+  --color-teal-500: #5ffce2;
+  --color-teal-600: #56e5ce;
+  --color-teal-700: #43b3a0;
+  --color-brand-600: #56e5ce;
+  --color-brand-700: #43b3a0;
+
+  /* Color Tokens - Gray/Neutral */
+  --color-gray-100: #f3f4f6;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #030712;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-500: #6b7280;
+  --color-neutral-600: #4b5563;
+  --color-neutral-700: #374151;
+  --color-neutral-900: #030712;
+
   /* Typography - Desktop */
   --typo-heading-4xl-font-size: 48px;
   --typo-heading-4xl-line-height: 52px;
@@ -67,6 +95,7 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --color-gray-900: #161c24;
   }
 }
 
