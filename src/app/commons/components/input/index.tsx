@@ -109,7 +109,7 @@ export default function Input({
         <div className={labelClasses} style={{ gap: `${gap}px` }}>
           {labelIcon && (
             <Image
-              src={`/icons/size=${iconSize}.svg`}
+              src={`/icons/${labelIcon}`}
               alt=""
               width={iconSize}
               height={iconSize}
@@ -124,7 +124,7 @@ export default function Input({
         <div className={styles.inputContent} style={{ gap: `${gap}px` }}>
           {iconLeft && (
             <Image
-              src={`/icons/size=${iconSize}.svg`}
+              src={`/icons/${iconLeft}`}
               alt=""
               width={iconSize}
               height={iconSize}
@@ -144,7 +144,7 @@ export default function Input({
           </div>
           {iconRight && (
             <Image
-              src={`/icons/size=${iconSize}.svg`}
+              src={`/icons/${iconRight}`}
               alt=""
               width={iconSize}
               height={iconSize}
@@ -157,7 +157,7 @@ export default function Input({
         <div className={additionalInfoClasses} style={{ gap: `${gap}px` }}>
           {additionalInfoIcon && (
             <Image
-              src={`/icons/size=${iconSize}.svg`}
+              src={`/icons/${additionalInfoIcon}`}
               alt=""
               width={iconSize}
               height={iconSize}
@@ -170,6 +170,5 @@ export default function Input({
     </div>
   );
 }
-
 
 
