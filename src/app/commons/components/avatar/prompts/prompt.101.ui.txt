@@ -10,7 +10,7 @@
 
 ==============================================
 
-조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: n29tr2xu)
+조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: zuvbibno)
 조건-피그마) 참고할 공통컴포넌트 노드ID(avatar-circle): 2128:6118
 조건-피그마) 참고할 공통컴포넌트 노드ID(status-circle): 2126:5926
 조건-피그마) 참고할 공통컴포넌트 노드ID(dark-mode): 2128:6120
@@ -23,6 +23,8 @@
 
 기존히스토리-참고만) MCP를 연동하여 피그마의 디자인을 그대로 소스코드로 구현할 것.
 
+기존히스토리-참고만) 하드코딩된 색상 및 폰트 값을 절대 사용하지 말 것. 반드시 global.css에 정의된 CSS 변수(상수 토큰)를 사용할 것.
+
 기존히스토리-참고만) 다음 조건을 모두 만족하는 완전한 variant 시스템을 구현할 것.
             - size: 's' | 'm' | 'L'
             - status: 'online' | 'away' | 'ban' | 'offline'
@@ -34,4 +36,77 @@
 
 ==============================================
 
-핵심요구사항) 하드코딩된 색상 및 폰트 값을 절대 사용하지 말 것. 반드시 global.css에 정의된 CSS 변수(상수 토큰)를 사용할 것.
+기존히스토리-참고만)  컴포넌트 목적
+
+원형 아바타 이미지 + 우측 하단에 온라인/오프라인 상태 점(Status Dot)을 표시하는 공통 컴포넌트.
+리스트/채팅/프로필 어디서든 재사용 가능해야 함.
+
+
+Props 설계
+
+- src: string (아바타 이미지 URL)
+- alt?: string
+- size?: 's' | 'm' | 'L' (기본 md)
+- isOnline?: boolean (기본 false)
+- showStatus?: boolean (기본 true)
+- className?: string (wrapper 확장용)
+- statusRingColor?: string (상태 점 테두리 색상, 기본은 다크 배경용 색)
+
+
+레이아웃/포지셔닝 핵심 (중요)
+
+"빨간 박스로 표시된 상태 점" 위치는 아바타 원의 우측 하단(4~5시 방향) 외곽에 걸치게 배치해야 함.
+
+px 하드코딩으로 "left/top 몇 px" 같은 방식 금지. 사이즈가 바뀌어도 같은 시각적 위치를 유지해야 함.
+
+구현 방식:
+- Wrapper를 position: relative
+- Status Dot을 position: absolute; right: 0; bottom: 0;
+- Dot이 원 밖으로 살짝 나가도록 transform: translate(25%, 25%) 적용
+
+Dot 크기는 아바타 크기에 비례하게(약 18~22%) 설정. (Tailwind면 w-[22%] 같은 방식, CSS면 width: 22%)
+
+
+Status Dot 스타일
+
+- 원형(dot): border-radius: 9999px / rounded-full
+- Dot 테두리(중요): 배경/아바타와 구분되도록 2px 이상 stroke 필요
+- props로 statusRingColor?: string 추가해서 외부에서 링 컬러를 바꿀 수 있게 해줘(기본은 다크 배경용 색).
+
+
+구현 디테일
+
+- 이미지가 없거나 로드 실패 시 fallback(이니셜 또는 기본 아이콘) 처리.
+- size에 따라 wrapper의 px 크기만 바뀌고, dot은 % 기반으로 자동 스케일되게.
+  예: s=32, m=48, l=64 (원하면 조정 가능)
+- 접근성: 이미지 alt, 상태 점은 aria-label로 online/offline 의미 제공.
+
+
+최종 결과물
+
+- Avatar.tsx 컴포넌트 코드
+- 사용 예시 코드 2~3개 (s/m/L, online/offline, showStatus false)
+- 핵심 포지셔닝(absolute + translate + % sizing) 주석으로 설명
+
+이 요구사항대로 코드를 생성하고, 특히 "상태 점 위치가 항상 동일하게 보이도록" 비율 기반 배치가 제대로 동작하게 구현해줘.
+
+==============================================
+
+핵심요구사항) 
+
+- Avatar border 두께:
+  - size 'L'일 때: border solid 3px
+  - size 'm', 's'일 때: border solid 2px
+
+- StatusDot border 두께:
+  - 기본(online, away, ban 상태): 모든 사이즈에서 border solid 2px
+  - status 'offline'인 경우:
+    - size 'L'일 때: border solid 5px
+    - size 'm'일 때: border solid 3.5px
+    - size 's'일 때: border solid 2.5px
+
+- StatusDot 위치:
+  - StatusDot의 원의 중심이 avatar circle의 반지름과 겹치도록 위치시켜야 함
+  - 즉, StatusDot의 중심점이 avatar 원의 외곽선(반지름 위치)에 정확히 위치하도록 배치
+  - 피그마 디자인과 정확히 일치하도록 구현할 것
+
