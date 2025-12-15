@@ -3,12 +3,11 @@
   display: flex;
   align-items: center;
   border: none;
-  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
-    sans-serif;
+  font-family: inherit;
   font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 19.09375px;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
   transition: background-color 0.2s, border-color 0.2s, color 0.2s;
   box-sizing: border-box;
   height: 48px;
@@ -85,33 +84,32 @@
 
 /* Dark Theme */
 .theme-dark {
-  background-color: #161c24;
-  color: #9ca3af;
+  background-color: var(--color-neutral-800);
+  color: var(--color-neutral-400);
 }
 
 .theme-dark .inputField {
-  color: #9ca3af;
+  color: var(--color-neutral-400);
 }
 
 .theme-dark .inputField::placeholder {
-  color: #9ca3af;
+  color: var(--color-neutral-400);
   opacity: 0.6;
 }
 
 /* Light Theme */
 .theme-light {
-  background-color: #f3f4f6;
-  color: #323944;
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-700);
 }
 
 .theme-light .inputField {
-  color: #323944;
+  color: var(--color-neutral-700);
 }
 
 .theme-light .inputField::placeholder {
-  color: #323944;
+  color: var(--color-neutral-700);
   opacity: 0.6;
 }
-
 
 

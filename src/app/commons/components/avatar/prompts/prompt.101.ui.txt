@@ -10,23 +10,28 @@
 
 ==============================================
 
-조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: nx01r2t4)
-조건-피그마) 참고할 공통컴포넌트 노드ID: 2075:52720
+조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: n29tr2xu)
+조건-피그마) 참고할 공통컴포넌트 노드ID(avatar-circle): 2128:6118
+조건-피그마) 참고할 공통컴포넌트 노드ID(status-circle): 2126:5926
+조건-피그마) 참고할 공통컴포넌트 노드ID(dark-mode): 2128:6120
+조건-피그마) 참고할 공통컴포넌트 노드ID(light-mode): 2291:3735
 
-조건-파일경로) 구현될 TSX 파일경로: src/commons/components/button/index.tsx
-조건-파일경로) 구현될 CSS 파일경로: src/commons/components/button/styles.module.css
+조건-파일경로) 구현될 TSX 파일경로: src/commons/components/avatar/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/commons/components/avatar/styles.module.css
 
 ==============================================
 
-핵심요구사항) MCP를 연동하여 피그마의 디자인을 그대로 소스코드로 구현할 것.
+기존히스토리-참고만) MCP를 연동하여 피그마의 디자인을 그대로 소스코드로 구현할 것.
 
-핵심요구사항) 다음 조건을 모두 만족하는 완전한 variant 시스템을 구현할 것.
-            - variant: 'primary' | 'secondary' | 'outline' | 'ghost'
-            - size: 's' | 'm'
-            - state: 'default' | 'hover' | 'disabled'
-            - shape: 'round' | 'rectangle'
+기존히스토리-참고만) 다음 조건을 모두 만족하는 완전한 variant 시스템을 구현할 것.
+            - size: 's' | 'm' | 'L'
+            - status: 'online' | 'away' | 'ban' | 'offline'
             - theme: 'light' | 'dark'
 
-핵심요구사항) 아이콘과 텍스트는 props가 아닌 children으로 받아서 유연하게 배치할 것.
-            - 아이콘과 텍스트를 children으로 받아서 자유롭게 배치 가능하도록 구현
-            - gap 속성을 사용하여 아이콘과 텍스트 사이의 공간을 조절할 수 있도록 구현
+기존히스토리-참고만) 아바타 이미지는 유동적으로 변경 가능하도록 구현할 것. 이미지 경로를 props로 받아 동적으로 렌더링할 수 있어야 함.
+
+기존히스토리-참고만) 아바타 이미지가 있는 경우를 구현할 것. 기본값으로 public/images/bird.svg를 사용하여 구현할 것.
+
+==============================================
+
+핵심요구사항) 하드코딩된 색상 및 폰트 값을 절대 사용하지 말 것. 반드시 global.css에 정의된 CSS 변수(상수 토큰)를 사용할 것.

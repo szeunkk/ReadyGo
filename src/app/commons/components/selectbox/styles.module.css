@@ -4,19 +4,17 @@
   flex-direction: column;
   gap: 8px;
   width: 100%;
-  position: relative;
 }
 
 /* Label */
 .label {
   display: flex;
   align-items: center;
-  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
-    sans-serif;
+  font-family: inherit;
   font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 18px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
 }
 
 .labelText {
@@ -30,20 +28,20 @@
 
 /* Light Theme - Label */
 .theme-light .label {
-  color: #030712;
+  color: var(--color-neutral-900);
 }
 
 .theme-light .required {
-  color: #dd2e2e;
+  color: var(--color-danger-600);
 }
 
 /* Dark Theme - Label */
 .theme-dark .label {
-  color: #ffffff;
+  color: var(--color-base-white);
 }
 
 .theme-dark .required {
-  color: #f55c5c;
+  color: var(--color-danger-400);
 }
 
 /* Selectbox Wrapper */
@@ -62,12 +60,11 @@
   padding: 0 16px;
   border-radius: 12px;
   cursor: pointer;
-  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
-    sans-serif;
+  font-family: inherit;
   font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 20px;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
   box-sizing: border-box;
   transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
@@ -97,7 +94,7 @@
 }
 
 .placeholder {
-  color: #9ca3af;
+  color: var(--color-neutral-400);
 }
 
 .chevron {
@@ -114,91 +111,91 @@
 
 /* Light Theme - Selectbox */
 .theme-light .selectbox {
-  background-color: #f3f4f6;
-  color: #323944;
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-700);
   border: 1px solid transparent;
 }
 
 .theme-light .selectbox.variant-primary {
-  background-color: #f3f4f6;
+  background-color: var(--color-neutral-100);
   border-color: transparent;
 }
 
 .theme-light .selectbox.variant-hover,
 .theme-light .selectbox.state-hover {
-  background-color: #f3f4f6;
-  border-color: #9ca3af;
+  background-color: var(--color-neutral-100);
+  border-color: var(--color-neutral-400);
 }
 
 .theme-light .selectbox.variant-active,
 .theme-light .selectbox.state-active {
-  background-color: #f3f4f6;
-  border-color: #39ac99;
+  background-color: var(--color-neutral-100);
+  border-color: var(--color-brand-700);
 }
 
 .theme-light .selectbox.variant-filled,
 .theme-light .selectbox.state-filled {
-  background-color: #f3f4f6;
-  color: #030712;
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-900);
 }
 
 .theme-light .selectbox.variant-danger,
 .theme-light .selectbox.state-error {
-  background-color: #f3f4f6;
-  border-color: #dd2e2e;
-  color: #030712;
+  background-color: var(--color-neutral-100);
+  border-color: var(--color-danger-600);
+  color: var(--color-neutral-900);
 }
 
 .theme-light .selectbox.variant-disabled,
 .theme-light .selectbox.state-disabled,
 .theme-light .selectbox.disabled {
-  background-color: #d1d5db;
-  color: #9ca3af;
+  background-color: var(--color-neutral-300);
+  color: var(--color-neutral-400);
   cursor: not-allowed;
 }
 
 /* Dark Theme - Selectbox */
 .theme-dark .selectbox {
-  background-color: #161c24;
-  color: #9ca3af;
+  background-color: var(--color-neutral-900);
+  color: var(--color-neutral-400);
   border: 1px solid transparent;
 }
 
 .theme-dark .selectbox.variant-primary {
-  background-color: #161c24;
+  background-color: var(--color-neutral-900);
   border-color: transparent;
 }
 
 .theme-dark .selectbox.variant-hover,
 .theme-dark .selectbox.state-hover {
-  background-color: #161c24;
-  border-color: #9ca3af;
+  background-color: var(--color-neutral-900);
+  border-color: var(--color-neutral-400);
 }
 
 .theme-dark .selectbox.variant-active,
 .theme-dark .selectbox.state-active {
-  background-color: #161c24;
-  border-color: #5ffce2;
+  background-color: var(--color-neutral-900);
+  border-color: var(--color-brand-500);
 }
 
 .theme-dark .selectbox.variant-filled,
 .theme-dark .selectbox.state-filled {
-  background-color: #161c24;
-  color: #ffffff;
+  background-color: var(--color-neutral-900);
+  color: var(--color-base-white);
 }
 
 .theme-dark .selectbox.variant-danger,
 .theme-dark .selectbox.state-error {
-  background-color: #161c24;
-  border-color: #f55c5c;
-  color: #ffffff;
+  background-color: var(--color-neutral-900);
+  border-color: var(--color-danger-400);
+  color: var(--color-base-white);
 }
 
 .theme-dark .selectbox.variant-disabled,
 .theme-dark .selectbox.state-disabled,
 .theme-dark .selectbox.disabled {
-  background-color: #161c24;
-  color: #323944;
+  background-color: var(--color-neutral-900);
+  color: var(--color-neutral-700);
   cursor: not-allowed;
 }
 
@@ -210,22 +207,22 @@
   margin-top: 4px;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px var(--color-shadow-default),
+    0 2px 4px -1px var(--color-shadow-subtle);
   max-height: 304px;
   overflow-y: auto;
 }
 
 /* Light Theme - Dropdown */
 .theme-light .dropdown {
-  background-color: #ffffff;
-  border: 1px solid #f3f4f6;
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-neutral-100);
 }
 
 /* Dark Theme - Dropdown */
 .theme-dark .dropdown {
-  background-color: #030712;
-  border: 1px solid #323944;
+  background-color: var(--color-neutral-900);
+  border: 1px solid var(--color-neutral-700);
 }
 
 /* Dropdown Item */
@@ -235,43 +232,41 @@
   min-height: 36px;
   padding: 8px 16px;
   cursor: pointer;
-  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
-    sans-serif;
+  font-family: inherit;
   font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 16.8px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
   transition: background-color 0.15s;
 }
 
 .dropdownItem:hover {
-  background-color: rgba(127, 253, 232, 0.12);
+  background-color: color-mix(in srgb, var(--color-brand-400) 12%, transparent);
 }
 
 .dropdownItem.selected {
-  background-color: rgba(127, 253, 232, 0.12);
+  background-color: color-mix(in srgb, var(--color-brand-400) 12%, transparent);
 }
 
 /* Light Theme - Dropdown Item */
 .theme-light .dropdownItem {
-  color: #030712;
+  color: var(--color-neutral-900);
 }
 
 /* Dark Theme - Dropdown Item */
 .theme-dark .dropdownItem {
-  color: #ffffff;
+  color: var(--color-base-white);
 }
 
 /* Additional Information */
 .additionalInfo {
   display: flex;
   align-items: center;
-  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
-    sans-serif;
+  font-family: inherit;
   font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 16px;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
 }
 
 .additionalInfoText {
@@ -281,21 +276,20 @@
 
 /* Light Theme - Additional Info */
 .theme-light .additionalInfo {
-  color: #323944;
+  color: var(--color-neutral-700);
 }
 
 .theme-light .additionalInfo.error {
-  color: #dd2e2e;
+  color: var(--color-danger-600);
 }
 
 /* Dark Theme - Additional Info */
 .theme-dark .additionalInfo {
-  color: #9ca3af;
+  color: var(--color-neutral-400);
 }
 
 .theme-dark .additionalInfo.error {
-  color: #f55c5c;
+  color: var(--color-danger-400);
 }
-
 
 
