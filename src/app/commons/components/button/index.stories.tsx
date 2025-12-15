@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import Image from "next/image";
 import Button from "./index";
 
 const meta = {
@@ -406,6 +407,29 @@ export const SizeAndShapeCombinations: Story = {
   },
 };
 
-
-
-
+export const WithIcon: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+      <Button variant="primary">
+        <Image src="/icons/size=20.svg" width={20} height={20} alt="icon" />
+        텍스트
+      </Button>
+      <Button variant="primary" size="s">
+        <Image src="/icons/size=16.svg" width={16} height={16} alt="icon" />
+        텍스트
+      </Button>
+      <Button variant="secondary">
+        <Image src="/icons/size=20.svg" width={20} height={20} alt="icon" />
+        아이콘과 텍스트
+      </Button>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "아이콘과 텍스트를 함께 사용할 수 있습니다. 아이콘은 children으로 전달되며, content 클래스의 gap 속성으로 간격이 조절됩니다.",
+      },
+    },
+  },
+};
