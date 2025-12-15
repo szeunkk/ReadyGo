@@ -15,6 +15,181 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
+  /* Base Colors */
+  --color-base-black: #000000;
+  --color-base-white: #ffffff;
+
+  /* Teal Colors (Brand) */
+  --color-teal-50: #effffc;
+  --color-teal-100: #cdfef6;
+  --color-teal-200: #b5fef2;
+  --color-teal-300: #94fdec;
+  --color-teal-400: #7ffde8;
+  --color-teal-500: #5ffce2;
+  --color-teal-600: #56e5ce;
+  --color-teal-700: #43b3a0;
+  --color-teal-800: #348b7c;
+  --color-teal-900: #286a5f;
+
+  /* Red Colors (Danger) */
+  --color-red-50: #feebeb;
+  --color-red-100: #fbc0c0;
+  --color-red-200: #f9a1a1;
+  --color-red-300: #f77676;
+  --color-red-400: #f55c5c;
+  --color-red-500: #f33333;
+  --color-red-600: #dd2e2e;
+  --color-red-700: #ad2424;
+  --color-red-800: #861c1c;
+  --color-red-900: #661515;
+
+  /* Blue Colors (Info) */
+  --color-blue-50: #ebf3fe;
+  --color-blue-100: #c2d8fc;
+  --color-blue-200: #a5c6fb;
+  --color-blue-300: #7cabf9;
+  --color-blue-400: #629bf8;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #3676e0;
+  --color-blue-700: #2a5caf;
+  --color-blue-800: #204887;
+  --color-blue-900: #193767;
+
+  /* Gray Colors (Neutral) */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #030712;
+
+  /* Green Colors (Success) */
+  --color-green-50: #ecfcf2;
+  --color-green-100: #c5f7d7;
+  --color-green-200: #a9f3c4;
+  --color-green-300: #81eea9;
+  --color-green-400: #69ea98;
+  --color-green-500: #43e57e;
+  --color-green-600: #3dd073;
+  --color-green-700: #30a359;
+  --color-green-800: #257e45;
+  --color-green-900: #1c6035;
+
+  /* Yellow Colors (Warning) */
+  --color-yellow-50: #fff9e7;
+  --color-yellow-100: #ffebb5;
+  --color-yellow-200: #ffe291;
+  --color-yellow-300: #ffd45e;
+  --color-yellow-400: #ffcc3f;
+  --color-yellow-500: #ffbf0f;
+  --color-yellow-600: #e8ae0e;
+  --color-yellow-700: #b5880b;
+  --color-yellow-800: #8c6908;
+  --color-yellow-900: #6b5006;
+
+  /* Semantic Colors - Brand */
+  --color-brand-50: var(--color-teal-50);
+  --color-brand-100: var(--color-teal-100);
+  --color-brand-200: var(--color-teal-200);
+  --color-brand-400: var(--color-teal-400);
+  --color-brand-500: var(--color-teal-500);
+  --color-brand-600: var(--color-teal-600);
+  --color-brand-700: var(--color-teal-700);
+  --color-brand-800: var(--color-teal-800);
+  --color-brand-900: var(--color-teal-900);
+
+  /* Semantic Colors - Danger */
+  --color-danger-50: var(--color-red-50);
+  --color-danger-100: var(--color-red-100);
+  --color-danger-300: var(--color-red-300);
+  --color-danger-400: var(--color-red-400);
+  --color-danger-500: var(--color-red-500);
+  --color-danger-600: var(--color-red-600);
+  --color-danger-700: var(--color-red-700);
+  --color-danger-800: var(--color-red-800);
+
+  /* Semantic Colors - Info */
+  --color-info-50: var(--color-blue-50);
+  --color-info-100: var(--color-blue-100);
+  --color-info-200: var(--color-blue-200);
+  --color-info-300: var(--color-blue-300);
+  --color-info-400: var(--color-blue-400);
+  --color-info-600: var(--color-blue-600);
+  --color-info-700: var(--color-blue-700);
+  --color-info-800: var(--color-blue-800);
+
+  /* Semantic Colors - Neutral */
+  --color-neutral-50: var(--color-gray-50);
+  --color-neutral-100: var(--color-gray-100);
+  --color-neutral-200: var(--color-gray-200);
+  --color-neutral-300: var(--color-gray-300);
+  --color-neutral-400: var(--color-gray-400);
+  --color-neutral-500: var(--color-gray-500);
+  --color-neutral-600: var(--color-gray-600);
+  --color-neutral-700: var(--color-gray-700);
+  --color-neutral-800: var(--color-gray-800);
+  --color-neutral-900: var(--color-gray-900);
+
+  /* Semantic Colors - Success */
+  --color-success-50: var(--color-green-50);
+  --color-success-100: var(--color-green-100);
+  --color-success-200: var(--color-green-200);
+  --color-success-300: var(--color-green-300);
+  --color-success-400: var(--color-green-400);
+  --color-success-600: var(--color-green-600);
+  --color-success-700: var(--color-green-700);
+  --color-success-800: var(--color-green-800);
+
+  /* Semantic Colors - Warning */
+  --color-warning-50: var(--color-yellow-50);
+  --color-warning-100: var(--color-yellow-100);
+  --color-warning-200: var(--color-yellow-200);
+  --color-warning-300: var(--color-yellow-300);
+  --color-warning-400: var(--color-yellow-400);
+  --color-warning-600: var(--color-yellow-600);
+  --color-warning-700: var(--color-yellow-700);
+  --color-warning-800: var(--color-yellow-800);
+
+  /* Shadow Colors - Light Mode */
+  --color-shadow-light-subtle: #0000001f;
+  --color-shadow-light-default: #00000029;
+  --color-shadow-light-bold: #00000033;
+  --color-shadow-light-bolder: #0000003d;
+
+  /* Shadow Colors - Dark Mode */
+  --color-shadow-dark-subtle: #00000033;
+  --color-shadow-dark-default: #0000003d;
+  --color-shadow-dark-bold: #00000047;
+  --color-shadow-dark-bolder: #00000052;
+
+  /* Shadow Colors (Mode-aware) */
+  --color-shadow-subtle: var(--color-shadow-light-subtle);
+  --color-shadow-default: var(--color-shadow-light-default);
+  --color-shadow-bold: var(--color-shadow-light-bold);
+  --color-shadow-bolder: var(--color-shadow-light-bolder);
+
+  /* Transparent Colors - Light Mode */
+  --color-transparent-light-12: #0000001f;
+  --color-transparent-light-16: #00000029;
+  --color-transparent-light-20: #00000033;
+  --color-transparent-light-24: #0000003d;
+
+  /* Transparent Colors - Dark Mode */
+  --color-transparent-dark-20: #00000033;
+  --color-transparent-dark-24: #0000003d;
+  --color-transparent-dark-28: #00000047;
+  --color-transparent-dark-32: #00000052;
+
+  /* Transparent Colors (Mode-aware) */
+  --color-transparent-12: var(--color-transparent-light-12);
+  --color-transparent-16: var(--color-transparent-light-16);
+  --color-transparent-20: var(--color-transparent-light-20);
+  --color-transparent-24: var(--color-transparent-light-24);
+
   /* Typography - Desktop */
   --typo-heading-4xl-font-size: 48px;
   --typo-heading-4xl-line-height: 52px;
@@ -67,6 +242,18 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+
+    /* Shadow Colors (Mode-aware) - Dark Mode */
+    --color-shadow-subtle: var(--color-shadow-dark-subtle);
+    --color-shadow-default: var(--color-shadow-dark-default);
+    --color-shadow-bold: var(--color-shadow-dark-bold);
+    --color-shadow-bolder: var(--color-shadow-dark-bolder);
+
+    /* Transparent Colors (Mode-aware) - Dark Mode */
+    --color-transparent-12: var(--color-transparent-dark-20);
+    --color-transparent-16: var(--color-transparent-dark-24);
+    --color-transparent-20: var(--color-transparent-dark-20);
+    --color-transparent-24: var(--color-transparent-dark-24);
   }
 }
 
