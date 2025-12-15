@@ -22,7 +22,7 @@
   width: 20px;
   height: 20px;
   border-radius: 4px;
-  border: 1px solid transparent;
+  border: 1.5px solid transparent;
   box-sizing: border-box;
 }
 
@@ -60,32 +60,32 @@
 /* Status: Unselected */
 .status-unselected.state-default {
   background-color: var(--color-base-white);
-  border: 1px solid var(--color-neutral-300);
+  border: 1.5px solid var(--color-neutral-300);
 }
 
 .status-unselected.state-hover {
   background-color: var(--color-base-white);
-  border: 1px solid var(--color-neutral-400);
+  border: 1.5px solid var(--color-neutral-400);
 }
 
 .status-unselected.state-press {
   background-color: var(--color-base-white);
-  border: 1px solid var(--color-neutral-500);
+  border: 1.5px solid var(--color-neutral-500);
 }
 
 .status-unselected.state-focus {
   background-color: var(--color-base-white);
-  border: 1px solid var(--color-brand-700);
+  border: 1.5px solid var(--color-brand-700);
 }
 
 .status-unselected.state-disabled {
   background-color: var(--color-neutral-200);
-  border: 1px solid var(--color-neutral-400);
+  border: 1.5px solid var(--color-neutral-400);
 }
 
 .status-unselected.state-error {
   background-color: var(--color-base-white);
-  border: 1px solid var(--color-danger-600);
+  border: 1.5px solid var(--color-danger-600);
 }
 
 /* Status: Selected */
@@ -127,16 +127,16 @@
 
 .status-selected.state-disabled {
   background-color: var(--color-neutral-200);
-  border: 1px solid var(--color-neutral-400);
+  border: 1.5px solid var(--color-neutral-400);
 }
 
 .status-selected.state-disabled .icon {
-  color: var(--color-base-white);
+  color: var(--color-neutral-400);
 }
 
 .status-selected.state-error {
   background-color: var(--color-base-white);
-  border: 1px solid var(--color-danger-600);
+  border: 1.5px solid var(--color-danger-600);
 }
 
 .status-selected.state-error .icon {
@@ -182,16 +182,16 @@
 
 .status-partial.state-disabled {
   background-color: var(--color-neutral-200);
-  border: 1px solid var(--color-neutral-400);
+  border: 1.5px solid var(--color-neutral-400);
 }
 
 .status-partial.state-disabled .icon {
-  color: var(--color-base-white);
+  color: var(--color-neutral-400);
 }
 
 .status-partial.state-error {
   background-color: var(--color-base-white);
-  border: 1px solid var(--color-danger-600);
+  border: 1.5px solid var(--color-danger-600);
 }
 
 .status-partial.state-error .icon {
@@ -248,5 +248,3 @@
 .label:active .status-partial.state-default {
   background-color: var(--color-brand-800);
 }
-
-

@@ -106,7 +106,7 @@ Status Dot 스타일
     - size 's'일 때: border solid 2.5px
 
 - StatusDot 위치:
-  - StatusDot의 원의 중심이 avatar circle의 반지름과 겹치도록 위치시켜야 함
+  - StatusDot의 원의 중심이 avatar circle의 border solio 중심과 겹치도록 위치시켜야 함
   - 즉, StatusDot의 중심점이 avatar 원의 외곽선(반지름 위치)에 정확히 위치하도록 배치
   - 피그마 디자인과 정확히 일치하도록 구현할 것
 

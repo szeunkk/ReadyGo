@@ -59,7 +59,7 @@ export default function Radio({
         }`}>
         <span className={radioClasses}>
           {actualStatus === "selected" && (
-            <span className={styles.indicator}></span>
+            <span className={styles.indicator} />
           )}
         </span>
       </div>

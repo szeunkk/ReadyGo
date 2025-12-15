@@ -399,7 +399,3 @@ export const WithLabels: Story = {
     },
   },
 };
-
-
-
-

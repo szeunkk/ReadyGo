@@ -10,7 +10,7 @@
 
 ==============================================
 
-조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: ytywkz9e)
+조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: zrromiit)
 조건-피그마) 참고할 공통컴포넌트 노드ID: 2130:36112
 
 조건-파일경로) 구현될 TSX 파일경로: src/commons/components/checkbox/index.tsx
@@ -25,5 +25,11 @@
             - state: 'default' | 'hover' | 'press' | 'focus' | 'disabled' | 'error'
 ==============================================
 
-핵심요구사항) 하드코딩된 색상 및 폰트 값을 절대 사용하지 말 것. 반드시 global.css에 정의된 CSS 변수(상수 토큰)를 사용할 것.
+기존히스토리-참고만) 하드코딩된 색상 및 폰트 값을 절대 사용하지 말 것. 반드시 global.css에 정의된 CSS 변수(상수 토큰)를 사용할 것.
 
+==============================================
+
+핵심요구사항)  - 모든 체크박스의 border를 solid 1px에서 1.5px로 수정할 것
+            - disabled 상태일 때 체크박스 안쪽 아이콘의 색상을 피그마 디자인(노드ID: 2130:36119)을 참고하여 수정할 것
+            - index.tsx에서 status prop으로 체크박스 선택여부를 관리하므로 checked, indeterminate prop을 제거할 것
+            - disabled는 state prop에서 관리하므로 disabled prop을 제거할 것

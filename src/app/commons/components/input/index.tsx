@@ -59,21 +59,43 @@ export default function Input({
 
   // variant와 state를 기반으로 실제 적용할 클래스 결정
   const getVariantClass = () => {
-    if (isDisabled) return "disabled";
-    if (state === "error" || variant === "danger") return "danger";
-    if (state === "filled" || variant === "filled") return "filled";
-    if (state === "active" || variant === "active") return "active";
-    if (state === "hover" || variant === "hover") return "hover";
-    if (variant === "secondary") return "secondary";
+    if (isDisabled) {
+      return "disabled";
+    }
+    if (state === "error" || variant === "danger") {
+      return "danger";
+    }
+    if (state === "filled" || variant === "filled") {
+      return "filled";
+    }
+    if (state === "active" || variant === "active") {
+      return "active";
+    }
+    if (state === "hover" || variant === "hover") {
+      return "hover";
+    }
+    if (variant === "secondary") {
+      return "secondary";
+    }
     return "primary";
   };
 
   const getStateClass = () => {
-    if (isDisabled) return "disabled";
-    if (state === "error") return "error";
-    if (state === "filled") return "filled";
-    if (state === "active") return "active";
-    if (state === "hover") return "hover";
+    if (isDisabled) {
+      return "disabled";
+    }
+    if (state === "error") {
+      return "error";
+    }
+    if (state === "filled") {
+      return "filled";
+    }
+    if (state === "active") {
+      return "active";
+    }
+    if (state === "hover") {
+      return "hover";
+    }
     return "Default";
   };
 

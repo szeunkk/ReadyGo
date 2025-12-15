@@ -34,7 +34,20 @@
             - gap 속성을 사용하여 아이콘과 텍스트 사이의 공간을 조절할 수 있도록 구현
             - 아이콘은 public 경로에 있는 size=14~40.svg 파일을 사용하여 구현할 것
             - 아이콘의 위치와 종류는 props로 제어 가능하도록 구현
+
 ==============================================
 
-핵심요구사항) 하드코딩된 색상 및 폰트 값을 절대 사용하지 말 것. 반드시 global.css에 정의된 CSS 변수(상수 토큰)를 사용할 것.
+기존히스토리-참고만) 하드코딩된 색상 및 폰트 값을 절대 사용하지 말 것. 반드시 global.css에 정의된 CSS 변수(상수 토큰)를 사용할 것.
 
+==============================================
+
+핵심요구사항) variant에 Primary, Secondary를 제외한 모든 variant(hover, active, filled, danger, disabled)에는 border-radius: 8px를 적용할 것.
+            - Primary variant는 border-radius: 12px를 유지
+            - Secondary variant는 border-radius: 8px를 유지
+            - 나머지 variant들(hover, active, filled, danger, disabled)에도 border-radius: 8px를 명시적으로 추가할 것
+
+핵심요구사항) 아이콘이 들어간 케이스는 public/icons 디렉토리에 있는 파일명 규칙을 참고하여 구현할 것.
+            - public/icons 디렉토리에는 size=14.svg, size=16.svg, size=20.svg, size=24.svg, size=32.svg, size=40.svg 형태로 아이콘이 존재함
+            - iconSize prop에 따라 해당하는 아이콘 파일을 사용하도록 구현할 것
+            - 예: iconSize가 20인 경우 /icons/size=20.svg 경로를 사용
+            - iconLeft, iconRight, labelIcon, additionalInfoIcon props를 사용할 때 모두 이 규칙을 따를 것

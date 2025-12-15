@@ -199,7 +199,7 @@ export const StyleAndThemeMatrix: Story = {
         <div style={{ fontWeight: "bold" }}>Style / Theme</div>
         <div style={{ fontWeight: "bold" }}>Light</div>
         <div style={{ fontWeight: "bold" }}>Dark</div>
-        <div></div>
+        <div />
       </div>
       <div
         style={{
@@ -219,7 +219,7 @@ export const StyleAndThemeMatrix: Story = {
             Rectangle
           </Tag>
         </div>
-        <div></div>
+        <div />
       </div>
       <div
         style={{
@@ -239,7 +239,7 @@ export const StyleAndThemeMatrix: Story = {
             Duotone
           </Tag>
         </div>
-        <div></div>
+        <div />
       </div>
       <div
         style={{
@@ -259,7 +259,7 @@ export const StyleAndThemeMatrix: Story = {
             Circle
           </Tag>
         </div>
-        <div></div>
+        <div />
       </div>
     </div>
   ),

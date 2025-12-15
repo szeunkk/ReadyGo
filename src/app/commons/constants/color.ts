@@ -6,92 +6,92 @@
 
 // Base Colors
 export const base = {
-  black: "#000000",
-  white: "#FFFFFF",
+  black: '#000000',
+  white: '#FFFFFF',
 } as const;
 
 // Teal Colors (Brand)
 export const teal = {
-  50: "#EFFFFC",
-  100: "#CDFEF6",
-  200: "#B5FEF2",
-  300: "#94FDEC",
-  400: "#7FFDE8",
-  500: "#5FFCE2",
-  600: "#56E5CE",
-  700: "#43B3A0",
-  800: "#348B7C",
-  900: "#286A5F",
+  50: '#EFFFFC',
+  100: '#CDFEF6',
+  200: '#B5FEF2',
+  300: '#94FDEC',
+  400: '#7FFDE8',
+  500: '#5FFCE2',
+  600: '#56E5CE',
+  700: '#43B3A0',
+  800: '#348B7C',
+  900: '#286A5F',
 } as const;
 
 // Red Colors (Danger)
 export const red = {
-  50: "#FEEBEB",
-  100: "#FBC0C0",
-  200: "#F9A1A1",
-  300: "#F77676",
-  400: "#F55C5C",
-  500: "#F33333",
-  600: "#DD2E2E",
-  700: "#AD2424",
-  800: "#861C1C",
-  900: "#661515",
+  50: '#FEEBEB',
+  100: '#FBC0C0',
+  200: '#F9A1A1',
+  300: '#F77676',
+  400: '#F55C5C',
+  500: '#F33333',
+  600: '#DD2E2E',
+  700: '#AD2424',
+  800: '#861C1C',
+  900: '#661515',
 } as const;
 
 // Blue Colors (Info)
 export const blue = {
-  50: "#EBF3FE",
-  100: "#C2D8FC",
-  200: "#A5C6FB",
-  300: "#7CABF9",
-  400: "#629BF8",
-  500: "#3B82F6",
-  600: "#3676E0",
-  700: "#2A5CAF",
-  800: "#204887",
-  900: "#193767",
+  50: '#EBF3FE',
+  100: '#C2D8FC',
+  200: '#A5C6FB',
+  300: '#7CABF9',
+  400: '#629BF8',
+  500: '#3B82F6',
+  600: '#3676E0',
+  700: '#2A5CAF',
+  800: '#204887',
+  900: '#193767',
 } as const;
 
 // Gray Colors (Neutral)
 export const gray = {
-  50: "#F9FAFB",
-  100: "#F3F4F6",
-  200: "#E5E7EB",
-  300: "#D1D5DB",
-  400: "#9CA3AF",
-  500: "#6B7280",
-  600: "#4B5563",
-  700: "#374151",
-  800: "#1F2937",
-  900: "#030712",
+  50: '#F9FAFB',
+  100: '#F3F4F6',
+  200: '#E5E7EB',
+  300: '#D1D5DB',
+  400: '#A9AFB9',
+  500: '#747982',
+  600: '#353A42',
+  700: '#31323A',
+  800: '#11121C',
+  900: '#030712',
 } as const;
 
 // Green Colors (Success)
 export const green = {
-  50: "#ECFCF2",
-  100: "#C5F7D7",
-  200: "#A9F3C4",
-  300: "#81EEA9",
-  400: "#69EA98",
-  500: "#43E57E",
-  600: "#3DD073",
-  700: "#30A359",
-  800: "#257E45",
-  900: "#1C6035",
+  50: '#ECFCF2',
+  100: '#C5F7D7',
+  200: '#A9F3C4',
+  300: '#81EEA9',
+  400: '#69EA98',
+  500: '#43E57E',
+  600: '#3DD073',
+  700: '#30A359',
+  800: '#257E45',
+  900: '#1C6035',
 } as const;
 
 // Yellow Colors (Warning)
 export const yellow = {
-  50: "#FFF9E7",
-  100: "#FFEBB5",
-  200: "#FFE291",
-  300: "#FFD45E",
-  400: "#FFCC3F",
-  500: "#FFBF0F",
-  600: "#E8AE0E",
-  700: "#B5880B",
-  800: "#8C6908",
-  900: "#6B5006",
+  50: '#FFF9E7',
+  100: '#FFEBB5',
+  200: '#FFE291',
+  300: '#FFD45E',
+  400: '#FFCC3F',
+  500: '#FFBF0F',
+  600: '#E8AE0E',
+  700: '#B5880B',
+  800: '#8C6908',
+  900: '#6B5006',
 } as const;
 
 // Semantic Colors - Brand
@@ -169,20 +169,196 @@ export const warning = {
   800: yellow[800],
 } as const;
 
-// Shadow Colors - Light Mode
-export const shadowLight = {
-  subtle: "#0000001F", // color/transparent/12
-  default: "#00000029", // color/transparent/16
-  bold: "#00000033", // color/transparent/20
-  bolder: "#0000003D", // color/transparent/24
+// Semantic Colors - Background
+export const bg = {
+  light: {
+    default: base.white,
+    secondary: gray[50],
+    tertiary: gray[100],
+    disabled: gray[200],
+    danger: red[50],
+    dangerSubtle: red[100],
+    info: blue[50],
+    infoSubtle: blue[100],
+    success: green[50],
+    successSubtle: green[100],
+    warning: yellow[50],
+    warningSubtle: yellow[100],
+    interactivePrimary: brand[50],
+    interactivePrimaryHover: brand[100],
+    interactivePrimaryPressed: brand[200],
+    interactiveSecondary: gray[50],
+    interactiveSecondaryHover: gray[100],
+    interactiveSecondaryPressed: gray[200],
+  },
+  dark: {
+    default: gray[900],
+    secondary: gray[800],
+    tertiary: gray[700],
+    disabled: gray[600],
+    danger: red[900],
+    dangerSubtle: red[800],
+    info: blue[900],
+    infoSubtle: blue[800],
+    success: green[900],
+    successSubtle: green[800],
+    warning: yellow[900],
+    warningSubtle: yellow[800],
+    interactivePrimary: brand[900],
+    interactivePrimaryHover: brand[800],
+    interactivePrimaryPressed: brand[700],
+    interactiveSecondary: gray[800],
+    interactiveSecondaryHover: gray[700],
+    interactiveSecondaryPressed: gray[600],
+  },
 } as const;
 
-// Shadow Colors - Dark Mode
+// Semantic Colors - Border
+export const border = {
+  light: {
+    primary: gray[300],
+    secondary: gray[100],
+    disabled: gray[400],
+    danger: danger[600],
+    dangerSubtle: danger[100],
+    info: info[600],
+    infoSubtle: info[100],
+    success: success[600],
+    successSubtle: success[100],
+    warning: warning[600],
+    warningSubtle: warning[100],
+    focusRing: brand[600],
+    interactivePrimary: brand[700],
+    interactivePrimaryHover: brand[800],
+    interactivePrimaryPressed: brand[900],
+    interactiveSecondary: gray[400],
+    interactiveSecondaryHover: gray[500],
+    interactiveSecondaryPressed: gray[600],
+  },
+  dark: {
+    primary: gray[500],
+    secondary: gray[700],
+    disabled: gray[700],
+    danger: danger[400],
+    dangerSubtle: danger[700],
+    info: info[400],
+    infoSubtle: info[700],
+    success: success[400],
+    successSubtle: success[700],
+    warning: warning[400],
+    warningSubtle: warning[700],
+    focusRing: brand[400],
+    interactivePrimary: brand[500],
+    interactivePrimaryHover: brand[200],
+    interactivePrimaryPressed: brand[100],
+    interactiveSecondary: gray[400],
+    interactiveSecondaryHover: gray[300],
+    interactiveSecondaryPressed: gray[100],
+  },
+} as const;
+
+// Semantic Colors - Icon
+export const icon = {
+  light: {
+    primary: gray[900],
+    secondary: gray[700],
+    disabled: gray[400],
+    danger: danger[600],
+    info: info[600],
+    success: success[600],
+    warning: warning[600],
+    interactivePrimary: brand[700],
+    interactivePrimaryHover: brand[800],
+    interactivePrimaryPressed: brand[900],
+    interactiveSecondary: gray[700],
+    interactiveSecondaryHover: gray[800],
+    interactiveSecondaryPressed: gray[900],
+    interactiveInverse: base.white,
+    interactiveVisited: brand[700],
+  },
+  dark: {
+    primary: base.white,
+    secondary: gray[400],
+    disabled: gray[700],
+    danger: danger[400],
+    info: info[400],
+    success: success[400],
+    warning: warning[400],
+    interactivePrimary: brand[500],
+    interactivePrimaryHover: brand[200],
+    interactivePrimaryPressed: brand[100],
+    interactiveSecondary: gray[400],
+    interactiveSecondaryHover: gray[300],
+    interactiveSecondaryPressed: gray[100],
+    interactiveInverse: base.black,
+    interactiveVisited: brand[400],
+  },
+} as const;
+
+// Semantic Colors - Text
+export const text = {
+  light: {
+    primary: gray[900],
+    secondary: gray[700],
+    tertiary: gray[600],
+    disabled: gray[400],
+    danger: danger[600],
+    dangerBold: red[700],
+    info: info[600],
+    infoBold: info[700],
+    success: success[600],
+    successBold: success[700],
+    warning: warning[600],
+    warningBold: warning[800],
+    interactivePrimary: brand[700],
+    interactivePrimaryHover: brand[800],
+    interactivePrimaryPressed: brand[900],
+    interactiveSecondary: gray[700],
+    interactiveSecondaryHover: gray[800],
+    interactiveSecondaryPressed: gray[900],
+    interactiveInverse: base.white,
+    interactiveSelected: brand[600],
+    interactiveVisited: brand[700],
+  },
+  dark: {
+    primary: base.white,
+    secondary: gray[100],
+    tertiary: gray[200],
+    disabled: gray[700],
+    danger: danger[400],
+    dangerBold: red[200],
+    info: info[400],
+    infoBold: info[200],
+    success: success[400],
+    successBold: success[200],
+    warning: warning[400],
+    warningBold: warning[200],
+    interactivePrimary: brand[500],
+    interactivePrimaryHover: brand[200],
+    interactivePrimaryPressed: brand[100],
+    interactiveSecondary: gray[400],
+    interactiveSecondaryHover: gray[300],
+    interactiveSecondaryPressed: gray[100],
+    interactiveInverse: base.black,
+    interactiveSelected: brand[500],
+    interactiveVisited: brand[400],
+  },
+} as const;
+
+// Shadow Colors - Light Mode (teal-400 based)
+export const shadowLight = {
+  subtle: '#7FFDE81F', // color/transparent/12 -> teal-400 12%
+  default: '#7FFDE829', // color/transparent/16 -> teal-400 16%
+  bold: '#7FFDE833', // color/transparent/20 -> teal-400 20%
+  bolder: '#7FFDE83D', // color/transparent/24 -> teal-400 24%
+} as const;
+
+// Shadow Colors - Dark Mode (teal-400 based)
 export const shadowDark = {
-  subtle: "#00000033", // color/transparent/20
-  default: "#0000003D", // color/transparent/24
-  bold: "#00000047", // color/transparent/28
-  bolder: "#00000052", // color/transparent/32
+  subtle: '#7FFDE833', // color/transparent/20 -> teal-400 20%
+  default: '#7FFDE83D', // color/transparent/24 -> teal-400 24%
+  bold: '#7FFDE847', // color/transparent/28 -> teal-400 28%
+  bolder: '#7FFDE852', // color/transparent/32 -> teal-400 32%
 } as const;
 
 // Shadow Colors (Mode-aware)
@@ -193,18 +369,18 @@ export const shadow = {
 
 // Transparent Colors - Light Mode
 export const transparentLight = {
-  12: "#0000001F",
-  16: "#00000029",
-  20: "#00000033",
-  24: "#0000003D",
+  12: '#0000001F',
+  16: '#00000029',
+  20: '#00000033',
+  24: '#0000003D',
 } as const;
 
 // Transparent Colors - Dark Mode
 export const transparentDark = {
-  20: "#00000033",
-  24: "#0000003D",
-  28: "#00000047",
-  32: "#00000052",
+  20: '#00000033',
+  24: '#0000003D',
+  28: '#00000047',
+  32: '#00000052',
 } as const;
 
 // Transparent Colors (Mode-aware)
@@ -230,6 +406,10 @@ export const light = {
   warning,
   shadow: shadowLight,
   transparent: transparentLight,
+  bg: bg.light,
+  border: border.light,
+  icon: icon.light,
+  text: text.light,
 } as const;
 
 export const dark = {
@@ -248,6 +428,10 @@ export const dark = {
   warning,
   shadow: shadowDark,
   transparent: transparentDark,
+  bg: bg.dark,
+  border: border.dark,
+  icon: icon.dark,
+  text: text.dark,
 } as const;
 
 // Color Tokens Export
@@ -267,6 +451,10 @@ export const color = {
   warning,
   shadow,
   transparent,
+  bg,
+  border,
+  icon,
+  text,
   light,
   dark,
 } as const;
@@ -287,6 +475,10 @@ export type SuccessColor = typeof success;
 export type WarningColor = typeof warning;
 export type ShadowColor = typeof shadow;
 export type TransparentColor = typeof transparent;
+export type BgColor = typeof bg;
+export type BorderColor = typeof border;
+export type IconColor = typeof icon;
+export type TextColor = typeof text;
 export type LightColor = typeof light;
 export type DarkColor = typeof dark;
 export type ColorToken = typeof color;
