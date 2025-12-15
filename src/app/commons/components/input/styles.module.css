@@ -12,12 +12,12 @@
   display: flex;
   align-items: center;
   border: none;
-  font-family: var(--font-pretendard, "Pretendard"), -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
   font-style: normal;
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typo-body-lg-font-size);
-  line-height: var(--typo-body-lg-line-height);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
   transition: background-color 0.2s, border-color 0.2s, color 0.2s;
   box-sizing: border-box;
   height: 48px;
@@ -77,12 +77,12 @@
   align-items: center;
   gap: 4px;
   height: 18px;
-  font-family: var(--font-pretendard, "Pretendard"), -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
   font-style: normal;
-  font-weight: var(--font-weight-medium);
-  font-size: var(--typo-body-md-font-size);
-  line-height: var(--typo-body-md-line-height);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 18px;
 }
 
 .labelIcon {
@@ -95,7 +95,7 @@
 }
 
 .required {
-  color: var(--color-danger-400);
+  color: #f55c5c;
   margin-left: 0;
 }
 
@@ -105,12 +105,12 @@
   align-items: center;
   gap: 4px;
   height: 16px;
-  font-family: var(--font-pretendard, "Pretendard"), -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
   font-style: normal;
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typo-body-sm-font-size);
-  line-height: var(--typo-body-sm-line-height);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
 }
 
 .additionalInfoIcon {
@@ -124,9 +124,9 @@
 
 /* Dark Theme - Primary Variant */
 .theme-dark.variant-primary {
-  background-color: var(--color-neutral-800);
+  background-color: #161c24;
   border-radius: 12px;
-  color: var(--color-base-white);
+  color: #ffffff;
 }
 
 .theme-dark.variant-primary.state-Default {
@@ -135,118 +135,118 @@
 
 .theme-dark.variant-primary.state-hover,
 .theme-dark.variant-hover {
-  background-color: var(--color-neutral-800);
-  border: 1px solid var(--color-neutral-400);
+  background-color: #161c24;
+  border: 1px solid #9ca3af;
 }
 
 .theme-dark.variant-primary.state-active,
 .theme-dark.variant-active {
-  background-color: var(--color-neutral-800);
-  border: 1px solid var(--color-brand-500);
+  background-color: #161c24;
+  border: 1px solid #5ffce2;
 }
 
 .theme-dark.variant-primary.state-filled,
 .theme-dark.variant-filled {
-  background-color: var(--color-neutral-800);
+  background-color: #161c24;
   border: none;
-  color: var(--color-base-white);
+  color: #ffffff;
 }
 
 .theme-dark.variant-primary.state-error,
 .theme-dark.variant-danger {
-  background-color: var(--color-neutral-800);
-  border: 1px solid var(--color-danger-400);
-  color: var(--color-base-white);
+  background-color: #161c24;
+  border: 1px solid #f55c5c;
+  color: #ffffff;
 }
 
 .theme-dark.variant-primary.state-disabled,
 .theme-dark.variant-disabled,
 .theme-dark.disabled {
-  background-color: var(--color-neutral-800);
+  background-color: #161c24;
   border: none;
-  color: var(--color-neutral-700);
+  color: #323944;
 }
 
 .theme-dark.variant-primary.state-disabled .inputField,
 .theme-dark.variant-disabled .inputField,
 .theme-dark.disabled .inputField {
-  color: var(--color-neutral-700);
+  color: #323944;
 }
 
 .theme-dark.variant-primary.state-disabled .inputField::placeholder,
 .theme-dark.variant-disabled .inputField::placeholder,
 .theme-dark.disabled .inputField::placeholder {
-  color: var(--color-neutral-700);
+  color: #323944;
 }
 
 /* Dark Theme - Secondary Variant */
 .theme-dark.variant-secondary {
   background-color: transparent;
-  border: 1px solid var(--color-neutral-500);
+  border: 1px solid #6b7280;
   border-radius: 8px;
-  color: var(--color-base-white);
+  color: #ffffff;
 }
 
 .theme-dark.variant-secondary.state-Default {
-  border-color: var(--color-neutral-500);
+  border-color: #6b7280;
 }
 
 .theme-dark.variant-secondary.state-hover {
-  background-color: var(--color-neutral-800);
-  border-color: var(--color-neutral-400);
+  background-color: #161c24;
+  border-color: #9ca3af;
 }
 
 .theme-dark.variant-secondary.state-active {
-  border-color: var(--color-brand-500);
+  border-color: #5ffce2;
 }
 
 .theme-dark.variant-secondary.state-filled {
-  border-color: var(--color-neutral-500);
-  color: var(--color-base-white);
+  border-color: #6b7280;
+  color: #ffffff;
 }
 
 .theme-dark.variant-secondary.state-error {
-  border-color: var(--color-danger-400);
-  color: var(--color-base-white);
+  border-color: #f55c5c;
+  color: #ffffff;
 }
 
 .theme-dark.variant-secondary.state-disabled {
-  background-color: var(--color-neutral-800);
-  border-color: var(--color-neutral-700);
-  color: var(--color-neutral-700);
+  background-color: #161c24;
+  border-color: #323944;
+  color: #323944;
 }
 
 .theme-dark.variant-secondary.state-disabled .inputField {
-  color: var(--color-neutral-700);
+  color: #323944;
 }
 
 .theme-dark.variant-secondary.state-disabled .inputField::placeholder {
-  color: var(--color-neutral-700);
+  color: #323944;
 }
 
 /* Dark Theme - Label */
 .theme-dark .label {
-  color: var(--color-base-white);
+  color: #ffffff;
 }
 
 .theme-dark .required {
-  color: var(--color-danger-400);
+  color: #f55c5c;
 }
 
 /* Dark Theme - Additional Info */
 .theme-dark .additionalInfo {
-  color: var(--color-neutral-400);
+  color: #9ca3af;
 }
 
 .theme-dark .additionalInfo.error {
-  color: var(--color-danger-400);
+  color: #f55c5c;
 }
 
 /* Light Theme - Primary Variant */
 .theme-light.variant-primary {
-  background-color: var(--color-neutral-100);
+  background-color: #f3f4f6;
   border-radius: 12px;
-  color: var(--color-neutral-900);
+  color: #030712;
 }
 
 .theme-light.variant-primary.state-Default {
@@ -255,111 +255,112 @@
 
 .theme-light.variant-primary.state-hover,
 .theme-light.variant-hover {
-  background-color: var(--color-neutral-100);
-  border: 1px solid var(--color-neutral-400);
+  background-color: #f3f4f6;
+  border: 1px solid #9ca3af;
 }
 
 .theme-light.variant-primary.state-active,
 .theme-light.variant-active {
-  background-color: var(--color-neutral-100);
-  border: 1px solid var(--color-brand-700);
+  background-color: #f3f4f6;
+  border: 1px solid #39ac99;
 }
 
 .theme-light.variant-primary.state-filled,
 .theme-light.variant-filled {
-  background-color: var(--color-neutral-100);
+  background-color: #f3f4f6;
   border: none;
-  color: var(--color-neutral-900);
+  color: #030712;
 }
 
 .theme-light.variant-primary.state-error,
 .theme-light.variant-danger {
-  background-color: var(--color-neutral-100);
-  border: 1px solid var(--color-danger-600);
-  color: var(--color-neutral-900);
+  background-color: #f3f4f6;
+  border: 1px solid #dd2e2e;
+  color: #030712;
 }
 
 .theme-light.variant-primary.state-disabled,
 .theme-light.variant-disabled,
 .theme-light.disabled {
-  background-color: var(--color-neutral-300);
+  background-color: #d1d5db;
   border: none;
-  color: var(--color-neutral-400);
+  color: #9ca3af;
 }
 
 .theme-light.variant-primary.state-disabled .inputField,
 .theme-light.variant-disabled .inputField,
 .theme-light.disabled .inputField {
-  color: var(--color-neutral-400);
+  color: #9ca3af;
 }
 
 .theme-light.variant-primary.state-disabled .inputField::placeholder,
 .theme-light.variant-disabled .inputField::placeholder,
 .theme-light.disabled .inputField::placeholder {
-  color: var(--color-neutral-400);
+  color: #9ca3af;
 }
 
 /* Light Theme - Secondary Variant */
 .theme-light.variant-secondary {
   background-color: transparent;
-  border: 1px solid var(--color-neutral-300);
+  border: 1px solid #d1d5db;
   border-radius: 8px;
-  color: var(--color-neutral-900);
+  color: #030712;
 }
 
 .theme-light.variant-secondary.state-Default {
-  border-color: var(--color-neutral-300);
+  border-color: #d1d5db;
 }
 
 .theme-light.variant-secondary.state-hover {
-  background-color: var(--color-neutral-100);
-  border-color: var(--color-neutral-400);
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
 }
 
 .theme-light.variant-secondary.state-active {
-  border-color: var(--color-brand-700);
+  border-color: #39ac99;
 }
 
 .theme-light.variant-secondary.state-filled {
-  border-color: var(--color-neutral-300);
-  color: var(--color-neutral-900);
+  border-color: #d1d5db;
+  color: #030712;
 }
 
 .theme-light.variant-secondary.state-error {
-  border-color: var(--color-danger-600);
-  color: var(--color-neutral-900);
+  border-color: #dd2e2e;
+  color: #030712;
 }
 
 .theme-light.variant-secondary.state-disabled {
-  background-color: var(--color-neutral-300);
-  border-color: var(--color-neutral-400);
-  color: var(--color-neutral-400);
+  background-color: #d1d5db;
+  border-color: #9ca3af;
+  color: #9ca3af;
 }
 
 .theme-light.variant-secondary.state-disabled .inputField {
-  color: var(--color-neutral-400);
+  color: #9ca3af;
 }
 
 .theme-light.variant-secondary.state-disabled .inputField::placeholder {
-  color: var(--color-neutral-400);
+  color: #9ca3af;
 }
 
 /* Light Theme - Label */
 .theme-light .label {
-  color: var(--color-neutral-900);
+  color: #030712;
 }
 
 .theme-light .required {
-  color: var(--color-danger-600);
+  color: #dd2e2e;
 }
 
 /* Light Theme - Additional Info */
 .theme-light .additionalInfo {
-  color: var(--color-neutral-700);
+  color: #323944;
 }
 
 .theme-light .additionalInfo.error {
-  color: var(--color-danger-600);
+  color: #dd2e2e;
 }
+
 
 

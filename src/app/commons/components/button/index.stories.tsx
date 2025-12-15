@@ -407,5 +407,3 @@ export const SizeAndShapeCombinations: Story = {
 };
 
 
-
-

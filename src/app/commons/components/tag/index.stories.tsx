@@ -358,5 +358,3 @@ export const CompleteExample: Story = {
 };
 
 
-
-

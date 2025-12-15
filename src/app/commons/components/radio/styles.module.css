@@ -27,7 +27,7 @@
 }
 
 .radioWrapper.hasFocusRing {
-  border-color: var(--color-info-500);
+  border-color: #005aeb;
 }
 
 .radio {
@@ -54,74 +54,74 @@
   width: 6px;
   height: 6px;
   border-radius: 99999px;
-  background-color: var(--color-base-white);
+  background-color: #ffffff;
   display: block;
   flex-shrink: 0;
 }
 
 /* Status: Unselected */
 .status-unselected.state-default {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-neutral-300);
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
 }
 
 .status-unselected.state-hover {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-neutral-400);
+  background-color: #ffffff;
+  border: 1px solid #9ca3af;
 }
 
 .status-unselected.state-press {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-neutral-500);
+  background-color: #ffffff;
+  border: 1px solid #6b7280;
 }
 
 .status-unselected.state-focus {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-brand-700);
+  background-color: #ffffff;
+  border: 1px solid #39ac99;
 }
 
 .status-unselected.state-disabled {
-  background-color: var(--color-neutral-200);
-  border: 1px solid var(--color-neutral-400);
+  background-color: #e5e7eb;
+  border: 1px solid #9ca3af;
 }
 
 .status-unselected.state-error {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-danger-500);
+  background-color: #ffffff;
+  border: 1px solid #da0000;
 }
 
 /* Status: Selected */
 .status-selected.state-default {
-  background-color: var(--color-brand-700);
+  background-color: #39ac99;
   border: none;
 }
 
 .status-selected.state-hover {
-  background-color: var(--color-brand-800);
+  background-color: #36817c;
   border: none;
 }
 
 .status-selected.state-press {
-  background-color: var(--color-brand-900);
+  background-color: #265b5b;
   border: none;
 }
 
 .status-selected.state-focus {
-  background-color: var(--color-brand-700);
+  background-color: #39ac99;
   border: none;
 }
 
 .status-selected.state-disabled {
-  background-color: var(--color-neutral-200);
+  background-color: #e5e7eb;
   border: none;
 }
 
 .status-selected.state-disabled .indicator {
-  background-color: var(--color-base-white);
+  background-color: #ffffff;
 }
 
 .status-selected.state-error {
-  background-color: var(--color-danger-500);
+  background-color: #da0000;
   border: none;
 }
 
@@ -131,12 +131,12 @@
 }
 
 .label:hover .status-unselected.state-default {
-  background-color: var(--color-base-white);
-  border-color: var(--color-neutral-400);
+  background-color: #ffffff;
+  border-color: #9ca3af;
 }
 
 .label:hover .status-selected.state-default {
-  background-color: var(--color-brand-800);
+  background-color: #36817c;
 }
 
 /* Focus state */
@@ -145,11 +145,11 @@
 }
 
 .input:focus-visible ~ .radioWrapper .status-unselected.state-default {
-  border-color: var(--color-brand-700);
+  border-color: #39ac99;
 }
 
 .input:focus-visible ~ .radioWrapper .status-selected.state-default {
-  background-color: var(--color-brand-700);
+  background-color: #39ac99;
 }
 
 /* Focus ring is controlled by state prop, not focus-visible */
@@ -160,11 +160,12 @@
 }
 
 .label:active .status-unselected.state-default {
-  border-color: var(--color-neutral-500);
+  border-color: #6b7280;
 }
 
 .label:active .status-selected.state-default {
-  background-color: var(--color-brand-900);
+  background-color: #265b5b;
 }
+
 
 
