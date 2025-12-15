@@ -1,0 +1,46 @@
+# 의존성
+node_modules
+.next
+out
+build
+dist
+
+# 캐시
+.cache
+.parcel-cache
+.turbo
+
+# 환경 변수
+.env
+.env.*
+!.env.example
+
+# 로그
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 빌드 결과물
+coverage
+.nyc_output
+*.tsbuildinfo
+
+# Storybook
+storybook-static
+
+# 패키지 관리
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Supabase
+.supabase
+supabase/types/database.types.ts
+
+# 기타
+*.min.js
+*.min.css
+public/
+

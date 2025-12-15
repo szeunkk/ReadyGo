@@ -1,0 +1,35 @@
+# 의존성
+node_modules
+.next
+out
+build
+dist
+
+# 캐시
+.cache
+
+# 환경 변수
+.env
+.env.*
+
+# Storybook
+storybook-static
+.storybook
+
+# 타입 정의
+*.d.ts
+supabase/types/
+
+# 설정 파일
+next.config.mjs
+postcss.config.mjs
+tailwind.config.ts
+vitest.config.ts
+
+# 빌드 결과물
+coverage
+.nyc_output
+
+# 기타
+public/
+
