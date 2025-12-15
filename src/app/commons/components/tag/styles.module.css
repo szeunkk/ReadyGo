@@ -1,0 +1,80 @@
+/* Base Tag Styles */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  font-family: inherit;
+  font-style: normal;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  box-sizing: border-box;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Light Theme - Rectangle Style */
+.theme-light.style-rectangle {
+  background-color: var(--color-gray-200);
+  color: var(--color-gray-600);
+  border-radius: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Light Theme - Duotone Style */
+.theme-light.style-duotone {
+  background-color: color-mix(in srgb, var(--color-teal-400) 12%, transparent);
+  border: 1px solid var(--color-teal-700);
+  color: var(--color-teal-700);
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Light Theme - Circle Style */
+.theme-light.style-circle {
+  background-color: transparent;
+  border: 1px solid var(--color-gray-300);
+  color: var(--color-gray-900);
+  border-radius: 99999px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Dark Theme - Rectangle Style */
+.theme-dark.style-rectangle {
+  background-color: var(--color-gray-600);
+  color: var(--color-gray-200);
+  border-radius: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Dark Theme - Duotone Style */
+.theme-dark.style-duotone {
+  background-color: color-mix(in srgb, var(--color-teal-400) 12%, transparent);
+  border: 1px solid var(--color-teal-500);
+  color: var(--color-teal-500);
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Dark Theme - Circle Style */
+.theme-dark.style-circle {
+  background-color: transparent;
+  border: 1px solid var(--color-gray-500);
+  color: var(--color-base-white);
+  border-radius: 99999px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+

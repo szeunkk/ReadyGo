@@ -1,0 +1,365 @@
+/* Base Container Styles */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Base Input Styles */
+.input {
+  display: flex;
+  align-items: center;
+  border: none;
+  font-family: var(--font-pretendard, "Pretendard"), -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  font-style: normal;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  box-sizing: border-box;
+  height: 48px;
+  padding: 0;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.inputContent {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding-left: 17px;
+  padding-right: 17px;
+}
+
+.inputTextContainer {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 0;
+}
+
+.inputField {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
+  width: 100%;
+}
+
+.inputField::placeholder {
+  color: inherit;
+  opacity: 0.6;
+}
+
+.inputIcon {
+  flex-shrink: 0;
+}
+
+.cursor {
+  color: inherit;
+  opacity: 0.6;
+}
+
+/* Label Styles */
+.label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 18px;
+  font-family: var(--font-pretendard, "Pretendard"), -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  font-style: normal;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+}
+
+.labelIcon {
+  flex-shrink: 0;
+}
+
+.labelText {
+  display: flex;
+  align-items: center;
+}
+
+.required {
+  color: var(--color-danger-400);
+  margin-left: 0;
+}
+
+/* Additional Info Styles */
+.additionalInfo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 16px;
+  font-family: var(--font-pretendard, "Pretendard"), -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  font-style: normal;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+}
+
+.additionalInfoIcon {
+  flex-shrink: 0;
+}
+
+.additionalInfoText {
+  display: flex;
+  align-items: center;
+}
+
+/* Dark Theme - Primary Variant */
+.theme-dark.variant-primary {
+  background-color: var(--color-neutral-800);
+  border-radius: 12px;
+  color: var(--color-base-white);
+}
+
+.theme-dark.variant-primary.state-Default {
+  border: none;
+}
+
+.theme-dark.variant-primary.state-hover,
+.theme-dark.variant-hover {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-neutral-400);
+}
+
+.theme-dark.variant-primary.state-active,
+.theme-dark.variant-active {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-brand-500);
+}
+
+.theme-dark.variant-primary.state-filled,
+.theme-dark.variant-filled {
+  background-color: var(--color-neutral-800);
+  border: none;
+  color: var(--color-base-white);
+}
+
+.theme-dark.variant-primary.state-error,
+.theme-dark.variant-danger {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-danger-400);
+  color: var(--color-base-white);
+}
+
+.theme-dark.variant-primary.state-disabled,
+.theme-dark.variant-disabled,
+.theme-dark.disabled {
+  background-color: var(--color-neutral-800);
+  border: none;
+  color: var(--color-neutral-700);
+}
+
+.theme-dark.variant-primary.state-disabled .inputField,
+.theme-dark.variant-disabled .inputField,
+.theme-dark.disabled .inputField {
+  color: var(--color-neutral-700);
+}
+
+.theme-dark.variant-primary.state-disabled .inputField::placeholder,
+.theme-dark.variant-disabled .inputField::placeholder,
+.theme-dark.disabled .inputField::placeholder {
+  color: var(--color-neutral-700);
+}
+
+/* Dark Theme - Secondary Variant */
+.theme-dark.variant-secondary {
+  background-color: transparent;
+  border: 1px solid var(--color-neutral-500);
+  border-radius: 8px;
+  color: var(--color-base-white);
+}
+
+.theme-dark.variant-secondary.state-Default {
+  border-color: var(--color-neutral-500);
+}
+
+.theme-dark.variant-secondary.state-hover {
+  background-color: var(--color-neutral-800);
+  border-color: var(--color-neutral-400);
+}
+
+.theme-dark.variant-secondary.state-active {
+  border-color: var(--color-brand-500);
+}
+
+.theme-dark.variant-secondary.state-filled {
+  border-color: var(--color-neutral-500);
+  color: var(--color-base-white);
+}
+
+.theme-dark.variant-secondary.state-error {
+  border-color: var(--color-danger-400);
+  color: var(--color-base-white);
+}
+
+.theme-dark.variant-secondary.state-disabled {
+  background-color: var(--color-neutral-800);
+  border-color: var(--color-neutral-700);
+  color: var(--color-neutral-700);
+}
+
+.theme-dark.variant-secondary.state-disabled .inputField {
+  color: var(--color-neutral-700);
+}
+
+.theme-dark.variant-secondary.state-disabled .inputField::placeholder {
+  color: var(--color-neutral-700);
+}
+
+/* Dark Theme - Label */
+.theme-dark .label {
+  color: var(--color-base-white);
+}
+
+.theme-dark .required {
+  color: var(--color-danger-400);
+}
+
+/* Dark Theme - Additional Info */
+.theme-dark .additionalInfo {
+  color: var(--color-neutral-400);
+}
+
+.theme-dark .additionalInfo.error {
+  color: var(--color-danger-400);
+}
+
+/* Light Theme - Primary Variant */
+.theme-light.variant-primary {
+  background-color: var(--color-neutral-100);
+  border-radius: 12px;
+  color: var(--color-neutral-900);
+}
+
+.theme-light.variant-primary.state-Default {
+  border: none;
+}
+
+.theme-light.variant-primary.state-hover,
+.theme-light.variant-hover {
+  background-color: var(--color-neutral-100);
+  border: 1px solid var(--color-neutral-400);
+}
+
+.theme-light.variant-primary.state-active,
+.theme-light.variant-active {
+  background-color: var(--color-neutral-100);
+  border: 1px solid var(--color-brand-700);
+}
+
+.theme-light.variant-primary.state-filled,
+.theme-light.variant-filled {
+  background-color: var(--color-neutral-100);
+  border: none;
+  color: var(--color-neutral-900);
+}
+
+.theme-light.variant-primary.state-error,
+.theme-light.variant-danger {
+  background-color: var(--color-neutral-100);
+  border: 1px solid var(--color-danger-600);
+  color: var(--color-neutral-900);
+}
+
+.theme-light.variant-primary.state-disabled,
+.theme-light.variant-disabled,
+.theme-light.disabled {
+  background-color: var(--color-neutral-300);
+  border: none;
+  color: var(--color-neutral-400);
+}
+
+.theme-light.variant-primary.state-disabled .inputField,
+.theme-light.variant-disabled .inputField,
+.theme-light.disabled .inputField {
+  color: var(--color-neutral-400);
+}
+
+.theme-light.variant-primary.state-disabled .inputField::placeholder,
+.theme-light.variant-disabled .inputField::placeholder,
+.theme-light.disabled .inputField::placeholder {
+  color: var(--color-neutral-400);
+}
+
+/* Light Theme - Secondary Variant */
+.theme-light.variant-secondary {
+  background-color: transparent;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: 8px;
+  color: var(--color-neutral-900);
+}
+
+.theme-light.variant-secondary.state-Default {
+  border-color: var(--color-neutral-300);
+}
+
+.theme-light.variant-secondary.state-hover {
+  background-color: var(--color-neutral-100);
+  border-color: var(--color-neutral-400);
+}
+
+.theme-light.variant-secondary.state-active {
+  border-color: var(--color-brand-700);
+}
+
+.theme-light.variant-secondary.state-filled {
+  border-color: var(--color-neutral-300);
+  color: var(--color-neutral-900);
+}
+
+.theme-light.variant-secondary.state-error {
+  border-color: var(--color-danger-600);
+  color: var(--color-neutral-900);
+}
+
+.theme-light.variant-secondary.state-disabled {
+  background-color: var(--color-neutral-300);
+  border-color: var(--color-neutral-400);
+  color: var(--color-neutral-400);
+}
+
+.theme-light.variant-secondary.state-disabled .inputField {
+  color: var(--color-neutral-400);
+}
+
+.theme-light.variant-secondary.state-disabled .inputField::placeholder {
+  color: var(--color-neutral-400);
+}
+
+/* Light Theme - Label */
+.theme-light .label {
+  color: var(--color-neutral-900);
+}
+
+.theme-light .required {
+  color: var(--color-danger-600);
+}
+
+/* Light Theme - Additional Info */
+.theme-light .additionalInfo {
+  color: var(--color-neutral-700);
+}
+
+.theme-light .additionalInfo.error {
+  color: var(--color-danger-600);
+}
+
+
