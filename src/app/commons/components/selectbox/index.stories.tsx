@@ -1,86 +1,59 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import Selectbox from "./index";
+import type { Meta, StoryObj } from '@storybook/react';
+import React from 'react';
+import Selectbox from './index';
 
 const meta = {
-  title: "Commons/Components/Selectbox",
+  title: 'Commons/Components/Selectbox',
   component: Selectbox,
   parameters: {
-    layout: "centered",
+    layout: 'centered',
     docs: {
       description: {
         component:
-          "셀렉트박스 컴포넌트입니다. variant, state, theme 등의 속성을 통해 다양한 스타일을 적용할 수 있습니다.",
+          '셀렉트박스 컴포넌트입니다. variant, state, theme 등의 속성을 통해 다양한 상태를 표현할 수 있습니다.',
       },
     },
   },
-  tags: ["autodocs"],
+  tags: ['autodocs'],
   argTypes: {
     variant: {
-      control: "select",
-      options: ["primary", "hover", "active", "filled", "danger", "disabled"],
-      description: "셀렉트박스의 변형 스타일",
+      control: 'select',
+      options: ['primary', 'hover', 'active', 'filled', 'danger', 'disabled'],
+      description: '셀렉트박스의 variant',
       table: {
-        type: { summary: "SelectboxVariant" },
-        defaultValue: { summary: "primary" },
+        type: { summary: 'SelectboxVariant' },
+        defaultValue: { summary: 'primary' },
       },
     },
     state: {
-      control: "select",
-      options: ["default", "hover", "filled", "error", "disabled"],
-      description: "셀렉트박스의 상태",
+      control: 'select',
+      options: ['default', 'hover', 'filled', 'error', 'disabled'],
+      description: '셀렉트박스의 상태',
       table: {
-        type: { summary: "SelectboxState" },
-        defaultValue: { summary: "default" },
+        type: { summary: 'SelectboxState' },
+        defaultValue: { summary: 'default' },
       },
     },
     theme: {
-      control: "select",
-      options: ["light", "dark"],
-      description: "셀렉트박스의 테마",
+      control: 'select',
+      options: ['light', 'dark'],
+      description: '셀렉트박스의 테마',
       table: {
-        type: { summary: "SelectboxTheme" },
-        defaultValue: { summary: "light" },
+        type: { summary: 'SelectboxTheme' },
+        defaultValue: { summary: 'light' },
       },
     },
     label: {
-      control: "text",
-      description: "셀렉트박스 라벨",
+      control: 'text',
+      description: '셀렉트박스의 라벨',
     },
     additionalInfo: {
-      control: "text",
-      description: "셀렉트박스 추가 정보",
-    },
-    required: {
-      control: { type: "boolean" },
-      description: "필수 선택 여부",
-      table: {
-        type: { summary: "boolean" },
-        defaultValue: { summary: "false" },
-      },
-    },
-    placeholder: {
-      control: "text",
-      description: "플레이스홀더 텍스트",
-    },
-    gap: {
-      control: { type: "number" },
-      description: "요소 간 간격",
-      table: {
-        type: { summary: "number" },
-        defaultValue: { summary: "4" },
-      },
+      control: 'text',
+      description: '셀렉트박스의 추가 정보',
     },
     disabled: {
-      control: { type: "boolean" },
-      description: "셀렉트박스 비활성화 여부",
-      table: {
-        type: { summary: "boolean" },
-        defaultValue: { summary: "false" },
-      },
-    },
-    value: {
-      control: "text",
-      description: "선택된 값의 ID",
+      control: 'boolean',
+      description: '셀렉트박스의 비활성화 여부',
     },
   },
 } satisfies Meta<typeof Selectbox>;
@@ -89,132 +62,132 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const defaultItems = [
-  { id: "1", value: "옵션 1" },
-  { id: "2", value: "옵션 2" },
-  { id: "3", value: "옵션 3" },
-  { id: "4", value: "옵션 4" },
-  { id: "5", value: "옵션 5" },
+  { id: '1', value: '옵션 1' },
+  { id: '2', value: '옵션 2' },
+  { id: '3', value: '옵션 3' },
+  { id: '4', value: '옵션 4' },
 ];
 
 // 기본 스토리
 export const Default: Story = {
   args: {
+    variant: 'primary',
+    state: 'default',
     items: defaultItems,
-    placeholder: "선택하세요",
+  },
+};
+
+// Label과 Additional Info가 있는 스토리
+export const WithLabelAndInfo: Story = {
+  args: {
+    variant: 'primary',
+    state: 'default',
+    label: '선택하세요',
+    additionalInfo: '원하는 옵션을 선택해주세요',
+    items: defaultItems,
   },
 };
 
 // Variant 스토리
-export const Primary: Story = {
+export const VariantPrimary: Story = {
   args: {
-    variant: "primary",
+    variant: 'primary',
+    state: 'default',
     items: defaultItems,
-    placeholder: "Primary Selectbox",
   },
 };
 
-export const Hover: Story = {
+export const VariantHover: Story = {
   args: {
-    variant: "hover",
+    variant: 'hover',
+    state: 'default',
     items: defaultItems,
-    placeholder: "Hover Selectbox",
   },
 };
 
-export const Active: Story = {
+export const VariantActive: Story = {
   args: {
-    variant: "active",
+    variant: 'active',
+    state: 'default',
     items: defaultItems,
-    placeholder: "Active Selectbox",
   },
 };
 
-export const Filled: Story = {
+export const VariantFilled: Story = {
   args: {
-    variant: "filled",
+    variant: 'filled',
+    state: 'default',
     items: defaultItems,
-    value: "1",
-    placeholder: "Filled Selectbox",
   },
 };
 
-export const Danger: Story = {
+export const VariantDanger: Story = {
   args: {
-    variant: "danger",
+    variant: 'danger',
+    state: 'default',
     items: defaultItems,
-    placeholder: "Danger Selectbox",
   },
 };
 
-export const Disabled: Story = {
+export const VariantDisabled: Story = {
   args: {
-    variant: "disabled",
+    variant: 'disabled',
     items: defaultItems,
-    placeholder: "Disabled Selectbox",
   },
 };
 
 // State 스토리
-export const DefaultState: Story = {
+export const StateDefault: Story = {
   args: {
-    state: "default",
+    variant: 'primary',
+    state: 'default',
     items: defaultItems,
-    placeholder: "Default State",
   },
 };
 
-export const HoverState: Story = {
+export const StateHover: Story = {
   args: {
-    state: "hover",
+    variant: 'primary',
+    state: 'hover',
     items: defaultItems,
-    placeholder: "Hover State",
   },
 };
 
-export const FilledState: Story = {
+export const StateFilled: Story = {
   args: {
-    state: "filled",
+    variant: 'primary',
+    state: 'filled',
     items: defaultItems,
-    value: "2",
-    placeholder: "Filled State",
   },
 };
 
-export const ErrorState: Story = {
+export const StateError: Story = {
   args: {
-    state: "error",
+    variant: 'primary',
+    state: 'error',
     items: defaultItems,
-    placeholder: "Error State",
   },
 };
 
-export const DisabledState: Story = {
+export const StateDisabled: Story = {
   args: {
-    state: "disabled",
+    variant: 'primary',
+    state: 'disabled',
     items: defaultItems,
-    placeholder: "Disabled State",
-  },
-};
-
-export const DisabledProp: Story = {
-  args: {
-    disabled: true,
-    items: defaultItems,
-    placeholder: "Disabled Prop",
   },
 };
 
 // Theme 스토리
 export const LightTheme: Story = {
   args: {
-    theme: "light",
-    variant: "primary",
+    theme: 'light',
+    variant: 'primary',
+    state: 'default',
     items: defaultItems,
-    placeholder: "Light Theme",
   },
   decorators: [
     (Story) => (
-      <div style={{ padding: "20px", backgroundColor: "#ffffff" }}>
+      <div style={{ padding: '20px', backgroundColor: '#ffffff' }}>
         <Story />
       </div>
     ),
@@ -223,83 +196,140 @@ export const LightTheme: Story = {
 
 export const DarkTheme: Story = {
   args: {
-    theme: "dark",
-    variant: "primary",
+    theme: 'dark',
+    variant: 'primary',
+    state: 'default',
     items: defaultItems,
-    placeholder: "Dark Theme",
   },
   decorators: [
     (Story) => (
-      <div style={{ padding: "20px", backgroundColor: "#030712" }}>
+      <div style={{ padding: '20px', backgroundColor: '#030712' }}>
         <Story />
       </div>
     ),
   ],
 };
 
-// Label 스토리
-export const WithLabel: Story = {
+// Children을 사용한 스토리
+export const WithChildren: Story = {
   args: {
-    label: "선택",
+    variant: 'primary',
+    state: 'default',
     items: defaultItems,
-    placeholder: "선택하세요",
+    children: (
+      <>
+        <span>아이콘</span>
+        <span>선택된 값</span>
+      </>
+    ),
   },
 };
 
-export const WithRequiredLabel: Story = {
+// 아이콘이 있는 아이템 스토리
+export const WithIconItems: Story = {
   args: {
-    label: "필수 선택",
-    required: true,
-    items: defaultItems,
-    placeholder: "선택하세요",
+    variant: 'primary',
+    state: 'default',
+    items: [
+      {
+        id: '1',
+        value: (
+          <>
+            <span>📁</span> <span>폴더 1</span>
+          </>
+        ),
+      },
+      {
+        id: '2',
+        value: (
+          <>
+            <span>📁</span> <span>폴더 2</span>
+          </>
+        ),
+      },
+      {
+        id: '3',
+        value: (
+          <>
+            <span>📁</span> <span>폴더 3</span>
+          </>
+        ),
+      },
+    ],
   },
 };
 
-// AdditionalInfo 스토리
-export const WithAdditionalInfo: Story = {
+// 선택된 아이템이 있는 스토리
+export const WithSelectedItem: Story = {
   args: {
-    label: "선택 필드",
-    additionalInfo: "추가 정보를 표시합니다",
+    variant: 'primary',
+    state: 'default',
     items: defaultItems,
-    placeholder: "선택하세요",
+    selectedItemId: '2',
   },
 };
 
-export const WithErrorInfo: Story = {
+// 많은 아이템이 있는 스토리
+export const WithManyItems: Story = {
   args: {
-    label: "선택 필드",
-    state: "error",
-    additionalInfo: "오류 메시지가 표시됩니다",
-    items: defaultItems,
-    placeholder: "선택하세요",
+    variant: 'primary',
+    state: 'default',
+    label: '많은 옵션',
+    items: Array.from({ length: 20 }, (_, i) => ({
+      id: `${i + 1}`,
+      value: `옵션 ${i + 1}`,
+    })),
   },
 };
 
 // 조합 스토리
 export const AllVariants: Story = {
   render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      <Selectbox variant="primary" items={defaultItems} placeholder="Primary" />
-      <Selectbox variant="hover" items={defaultItems} placeholder="Hover" />
-      <Selectbox variant="active" items={defaultItems} placeholder="Active" />
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        width: '300px',
+      }}
+    >
+      <Selectbox
+        variant="primary"
+        state="default"
+        items={defaultItems}
+        label="Primary"
+      />
+      <Selectbox
+        variant="hover"
+        state="default"
+        items={defaultItems}
+        label="Hover"
+      />
+      <Selectbox
+        variant="active"
+        state="default"
+        items={defaultItems}
+        label="Active"
+      />
       <Selectbox
         variant="filled"
+        state="default"
         items={defaultItems}
-        value="1"
-        placeholder="Filled"
+        label="Filled"
       />
-      <Selectbox variant="danger" items={defaultItems} placeholder="Danger" />
       <Selectbox
-        variant="disabled"
+        variant="danger"
+        state="default"
         items={defaultItems}
-        placeholder="Disabled"
+        label="Danger"
       />
+      <Selectbox variant="disabled" items={defaultItems} label="Disabled" />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: "모든 variant 타입을 한 번에 확인할 수 있습니다.",
+        story: '모든 variant 타입을 한 번에 확인할 수 있습니다.',
       },
     },
   },
@@ -307,23 +337,50 @@ export const AllVariants: Story = {
 
 export const AllStates: Story = {
   render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      <Selectbox state="default" items={defaultItems} placeholder="Default" />
-      <Selectbox state="hover" items={defaultItems} placeholder="Hover" />
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        width: '300px',
+      }}
+    >
       <Selectbox
+        variant="primary"
+        state="default"
+        items={defaultItems}
+        label="Default"
+      />
+      <Selectbox
+        variant="primary"
+        state="hover"
+        items={defaultItems}
+        label="Hover"
+      />
+      <Selectbox
+        variant="primary"
         state="filled"
         items={defaultItems}
-        value="2"
-        placeholder="Filled"
+        label="Filled"
       />
-      <Selectbox state="error" items={defaultItems} placeholder="Error" />
-      <Selectbox state="disabled" items={defaultItems} placeholder="Disabled" />
+      <Selectbox
+        variant="primary"
+        state="error"
+        items={defaultItems}
+        label="Error"
+      />
+      <Selectbox
+        variant="primary"
+        state="disabled"
+        items={defaultItems}
+        label="Disabled"
+      />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: "모든 state 타입을 한 번에 확인할 수 있습니다.",
+        story: '모든 state 타입을 한 번에 확인할 수 있습니다.',
       },
     },
   },
@@ -333,55 +390,41 @@ export const LightThemeVariants: Story = {
   render: () => (
     <div
       style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "12px",
-        padding: "20px",
-        backgroundColor: "#ffffff",
-      }}>
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+        padding: '20px',
+        backgroundColor: '#ffffff',
+        width: '300px',
+      }}
+    >
       <Selectbox
         theme="light"
         variant="primary"
+        state="default"
         items={defaultItems}
-        placeholder="Primary"
-      />
-      <Selectbox
-        theme="light"
-        variant="hover"
-        items={defaultItems}
-        placeholder="Hover"
+        label="Primary"
       />
       <Selectbox
         theme="light"
         variant="active"
+        state="filled"
         items={defaultItems}
-        placeholder="Active"
-      />
-      <Selectbox
-        theme="light"
-        variant="filled"
-        items={defaultItems}
-        value="1"
-        placeholder="Filled"
+        label="Active Filled"
       />
       <Selectbox
         theme="light"
         variant="danger"
+        state="error"
         items={defaultItems}
-        placeholder="Danger"
-      />
-      <Selectbox
-        theme="light"
-        variant="disabled"
-        items={defaultItems}
-        placeholder="Disabled"
+        label="Danger Error"
       />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: "Light 테마의 모든 variant를 확인할 수 있습니다.",
+        story: 'Light 테마의 다양한 variant와 state 조합을 확인할 수 있습니다.',
       },
     },
   },
@@ -391,425 +434,71 @@ export const DarkThemeVariants: Story = {
   render: () => (
     <div
       style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "12px",
-        padding: "20px",
-        backgroundColor: "#030712",
-      }}>
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+        padding: '20px',
+        backgroundColor: '#030712',
+        width: '300px',
+      }}
+    >
       <Selectbox
         theme="dark"
         variant="primary"
+        state="default"
         items={defaultItems}
-        placeholder="Primary"
-      />
-      <Selectbox
-        theme="dark"
-        variant="hover"
-        items={defaultItems}
-        placeholder="Hover"
+        label="Primary"
       />
       <Selectbox
         theme="dark"
         variant="active"
+        state="filled"
         items={defaultItems}
-        placeholder="Active"
-      />
-      <Selectbox
-        theme="dark"
-        variant="filled"
-        items={defaultItems}
-        value="1"
-        placeholder="Filled"
+        label="Active Filled"
       />
       <Selectbox
         theme="dark"
         variant="danger"
+        state="error"
         items={defaultItems}
-        placeholder="Danger"
-      />
-      <Selectbox
-        theme="dark"
-        variant="disabled"
-        items={defaultItems}
-        placeholder="Disabled"
+        label="Danger Error"
       />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: "Dark 테마의 모든 variant를 확인할 수 있습니다.",
+        story: 'Dark 테마의 다양한 variant와 state 조합을 확인할 수 있습니다.',
       },
     },
   },
 };
 
-export const CompleteExample: Story = {
-  render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        <Selectbox
-          label="카테고리"
-          required
-          items={defaultItems}
-          placeholder="카테고리를 선택하세요"
-          theme="light"
-        />
-        <Selectbox
-          label="상태"
-          required
-          state="error"
-          additionalInfo="올바른 값을 선택해주세요"
-          items={defaultItems}
-          placeholder="상태를 선택하세요"
-          theme="light"
-        />
-        <Selectbox
-          label="우선순위"
-          items={defaultItems}
-          value="1"
-          placeholder="우선순위를 선택하세요"
-          theme="light"
-        />
-        <Selectbox
-          label="비활성화된 선택"
-          disabled
-          items={defaultItems}
-          placeholder="선택할 수 없습니다"
-          theme="light"
-        />
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        <Selectbox
-          label="카테고리"
-          required
-          items={defaultItems}
-          placeholder="카테고리를 선택하세요"
-          theme="dark"
-        />
-        <Selectbox
-          label="상태"
-          required
-          state="error"
-          additionalInfo="올바른 값을 선택해주세요"
-          items={defaultItems}
-          placeholder="상태를 선택하세요"
-          theme="dark"
-        />
-        <Selectbox
-          label="우선순위"
-          items={defaultItems}
-          value="1"
-          placeholder="우선순위를 선택하세요"
-          theme="dark"
-        />
-        <Selectbox
-          label="비활성화된 선택"
-          disabled
-          items={defaultItems}
-          placeholder="선택할 수 없습니다"
-          theme="dark"
-        />
-      </div>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: "실제 사용 예시로 다양한 속성을 조합한 경우입니다.",
-      },
-    },
-  },
+// Interactive 스토리
+const InteractiveSelectbox = () => {
+  const [selectedId, setSelectedId] = React.useState<string | undefined>('2');
+
+  return (
+    <Selectbox
+      variant="primary"
+      state="default"
+      items={defaultItems}
+      selectedItemId={selectedId}
+      onSelect={setSelectedId}
+      label="인터랙티브 셀렉트박스"
+      additionalInfo="아이템을 선택하면 상태가 업데이트됩니다"
+    />
+  );
 };
 
-export const VariantAndStateMatrix: Story = {
-  render: () => (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "16px",
-      }}>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(6, 1fr)",
-          gap: "16px",
-          alignItems: "center",
-        }}>
-        <div style={{ fontWeight: "bold" }}>Variant / State</div>
-        <div style={{ fontWeight: "bold" }}>Default</div>
-        <div style={{ fontWeight: "bold" }}>Hover</div>
-        <div style={{ fontWeight: "bold" }}>Filled</div>
-        <div style={{ fontWeight: "bold" }}>Error</div>
-        <div style={{ fontWeight: "bold" }}>Disabled</div>
-      </div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(6, 1fr)",
-          gap: "16px",
-          alignItems: "center",
-        }}>
-        <div style={{ fontWeight: "bold" }}>Primary</div>
-        <Selectbox
-          variant="primary"
-          state="default"
-          items={defaultItems}
-          placeholder=""
-        />
-        <Selectbox
-          variant="primary"
-          state="hover"
-          items={defaultItems}
-          placeholder=""
-        />
-        <Selectbox
-          variant="primary"
-          state="filled"
-          items={defaultItems}
-          value="1"
-          placeholder=""
-        />
-        <Selectbox
-          variant="primary"
-          state="error"
-          items={defaultItems}
-          placeholder=""
-        />
-        <Selectbox
-          variant="primary"
-          state="disabled"
-          items={defaultItems}
-          placeholder=""
-        />
-      </div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(6, 1fr)",
-          gap: "16px",
-          alignItems: "center",
-        }}>
-        <div style={{ fontWeight: "bold" }}>Hover</div>
-        <Selectbox
-          variant="hover"
-          state="default"
-          items={defaultItems}
-          placeholder=""
-        />
-        <Selectbox
-          variant="hover"
-          state="hover"
-          items={defaultItems}
-          placeholder=""
-        />
-        <Selectbox
-          variant="hover"
-          state="filled"
-          items={defaultItems}
-          value="1"
-          placeholder=""
-        />
-        <Selectbox
-          variant="hover"
-          state="error"
-          items={defaultItems}
-          placeholder=""
-        />
-        <Selectbox
-          variant="hover"
-          state="disabled"
-          items={defaultItems}
-          placeholder=""
-        />
-      </div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(6, 1fr)",
-          gap: "16px",
-          alignItems: "center",
-        }}>
-        <div style={{ fontWeight: "bold" }}>Active</div>
-        <Selectbox
-          variant="active"
-          state="default"
-          items={defaultItems}
-          placeholder=""
-        />
-        <Selectbox
-          variant="active"
-          state="hover"
-          items={defaultItems}
-          placeholder=""
-        />
-        <Selectbox
-          variant="active"
-          state="filled"
-          items={defaultItems}
-          value="1"
-          placeholder=""
-        />
-        <Selectbox
-          variant="active"
-          state="error"
-          items={defaultItems}
-          placeholder=""
-        />
-        <Selectbox
-          variant="active"
-          state="disabled"
-          items={defaultItems}
-          placeholder=""
-        />
-      </div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(6, 1fr)",
-          gap: "16px",
-          alignItems: "center",
-        }}>
-        <div style={{ fontWeight: "bold" }}>Filled</div>
-        <Selectbox
-          variant="filled"
-          state="default"
-          items={defaultItems}
-          value="1"
-          placeholder=""
-        />
-        <Selectbox
-          variant="filled"
-          state="hover"
-          items={defaultItems}
-          value="1"
-          placeholder=""
-        />
-        <Selectbox
-          variant="filled"
-          state="filled"
-          items={defaultItems}
-          value="1"
-          placeholder=""
-        />
-        <Selectbox
-          variant="filled"
-          state="error"
-          items={defaultItems}
-          value="1"
-          placeholder=""
-        />
-        <Selectbox
-          variant="filled"
-          state="disabled"
-          items={defaultItems}
-          value="1"
-          placeholder=""
-        />
-      </div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(6, 1fr)",
-          gap: "16px",
-          alignItems: "center",
-        }}>
-        <div style={{ fontWeight: "bold" }}>Danger</div>
-        <Selectbox
-          variant="danger"
-          state="default"
-          items={defaultItems}
-          placeholder=""
-        />
-        <Selectbox
-          variant="danger"
-          state="hover"
-          items={defaultItems}
-          placeholder=""
-        />
-        <Selectbox
-          variant="danger"
-          state="filled"
-          items={defaultItems}
-          value="1"
-          placeholder=""
-        />
-        <Selectbox
-          variant="danger"
-          state="error"
-          items={defaultItems}
-          placeholder=""
-        />
-        <Selectbox
-          variant="danger"
-          state="disabled"
-          items={defaultItems}
-          placeholder=""
-        />
-      </div>
-    </div>
-  ),
+export const Interactive: Story = {
+  render: () => <InteractiveSelectbox />,
   parameters: {
     docs: {
       description: {
         story:
-          "모든 variant와 state의 조합을 한눈에 확인할 수 있는 매트릭스입니다.",
+          '실제로 동작하는 셀렉트박스입니다. 아이템을 선택하면 상태가 업데이트됩니다.',
       },
     },
   },
 };
-
-export const WithManyItems: Story = {
-  render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      <Selectbox
-        label="많은 옵션이 있는 셀렉트박스"
-        items={Array.from({ length: 20 }, (_, i) => ({
-          id: `${i + 1}`,
-          value: `옵션 ${i + 1}`,
-        }))}
-        placeholder="옵션을 선택하세요"
-      />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: "많은 옵션이 있을 때 드롭다운 스크롤이 작동하는지 확인합니다.",
-      },
-    },
-  },
-};
-
-export const WithCustomChildren: Story = {
-  render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      <Selectbox
-        label="커스텀 자식 요소"
-        items={defaultItems}
-        placeholder="선택하세요">
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span>🎨</span>
-          <span>커스텀 표시</span>
-        </div>
-      </Selectbox>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "children prop을 사용하여 커스텀 자식 요소를 표시할 수 있습니다.",
-      },
-    },
-  },
-};
-
-
-
-
-
-
-

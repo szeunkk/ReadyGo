@@ -1,4 +1,4 @@
-/* Container */
+/* Base Container Styles */
 .container {
   display: flex;
   flex-direction: column;
@@ -6,293 +6,536 @@
   width: 100%;
 }
 
-/* Label */
 .label {
-  display: flex;
-  align-items: center;
-  font-family: inherit;
-  font-style: normal;
-  font-weight: var(--font-weight-medium);
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-medium-font-weight);
+  color: var(--color-text-primary);
 }
 
-.labelText {
-  display: flex;
-  align-items: center;
+.additionalInfo {
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  color: var(--color-text-secondary);
 }
 
-.required {
-  margin-left: 4px;
-}
-
-/* Light Theme - Label */
-.theme-light .label {
-  color: var(--color-neutral-900);
-}
-
-.theme-light .required {
-  color: var(--color-danger-600);
-}
-
-/* Dark Theme - Label */
-.theme-dark .label {
-  color: var(--color-base-white);
-}
-
-.theme-dark .required {
-  color: var(--color-danger-400);
-}
-
-/* Selectbox Wrapper */
 .selectboxWrapper {
-  display: flex;
-  flex-direction: column;
+  position: relative;
   width: 100%;
 }
 
-/* Base Selectbox */
+/* Base Selectbox Styles */
 .selectbox {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 48px;
-  padding: 0 16px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-family: inherit;
-  font-style: normal;
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typo-body-lg-font-size);
-  line-height: var(--typo-body-lg-line-height);
-  box-sizing: border-box;
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
-}
-
-.selectbox:disabled,
-.selectbox.disabled {
-  cursor: not-allowed;
-}
-
-.selectboxContent {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  background-color: var(--color-base-white);
+  cursor: pointer;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  font-weight: var(--font-weight-regular);
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  box-sizing: border-box;
+  text-align: left;
 }
 
-.selectboxChildren {
+.selectbox:disabled {
+  cursor: not-allowed;
+}
+
+.selectbox.disabled {
+  cursor: not-allowed;
+}
+
+.content {
   display: flex;
   align-items: center;
+  gap: 8px;
   flex: 1;
+  min-width: 0;
 }
 
-.selectboxText {
-  display: flex;
-  align-items: center;
-  flex: 1;
+.selectedValue {
+  color: var(--color-text-primary);
 }
 
-.placeholder {
-  color: var(--color-neutral-400);
-}
-
-.chevron {
-  width: 20px;
-  height: 20px;
+.arrow {
   flex-shrink: 0;
-  transition: transform 0.2s;
-  color: currentColor;
+  width: 16px;
+  height: 16px;
+  color: var(--color-icon-secondary);
+  transition: transform 0.2s, color 0.2s;
 }
 
-.chevronOpen {
+.arrowOpen {
   transform: rotate(180deg);
 }
 
-/* Light Theme - Selectbox */
-.theme-light .selectbox {
-  background-color: var(--color-neutral-100);
-  color: var(--color-neutral-700);
-  border: 1px solid transparent;
+/* Light Theme - Variant: Primary */
+.theme-light.variant-primary.state-default {
+  background-color: var(--color-base-white);
+  border-color: var(--color-border-primary);
+  color: var(--color-text-primary);
 }
 
-.theme-light .selectbox.variant-primary {
-  background-color: var(--color-neutral-100);
-  border-color: transparent;
+.theme-light.variant-primary.state-default:hover:not(:disabled) {
+  background-color: var(--color-base-white);
+  border-color: var(--color-border-interactive-secondary-hover);
 }
 
-.theme-light .selectbox.variant-hover,
-.theme-light .selectbox.state-hover {
-  background-color: var(--color-neutral-100);
-  border-color: var(--color-neutral-400);
+.theme-light.variant-primary.state-hover {
+  background-color: var(--color-base-white);
+  border-color: var(--color-border-interactive-secondary-hover);
+  color: var(--color-text-primary);
 }
 
-.theme-light .selectbox.variant-active,
-.theme-light .selectbox.state-active {
-  background-color: var(--color-neutral-100);
-  border-color: var(--color-brand-700);
+.theme-light.variant-primary.state-filled {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border-primary);
+  color: var(--color-text-primary);
 }
 
-.theme-light .selectbox.variant-filled,
-.theme-light .selectbox.state-filled {
-  background-color: var(--color-neutral-100);
-  color: var(--color-neutral-900);
+.theme-light.variant-primary.state-error {
+  background-color: var(--color-base-white);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-primary);
 }
 
-.theme-light .selectbox.variant-danger,
-.theme-light .selectbox.state-error {
-  background-color: var(--color-neutral-100);
-  border-color: var(--color-danger-600);
-  color: var(--color-neutral-900);
+.theme-light.variant-primary.state-disabled {
+  background-color: var(--color-bg-disabled);
+  border-color: var(--color-border-disabled);
+  color: var(--color-text-disabled);
 }
 
-.theme-light .selectbox.variant-disabled,
-.theme-light .selectbox.state-disabled,
-.theme-light .selectbox.disabled {
-  background-color: var(--color-neutral-300);
-  color: var(--color-neutral-400);
+.theme-light.variant-primary.state-disabled .arrow {
+  color: var(--color-icon-disabled);
+}
+
+.theme-light.variant-primary.open {
+  border-color: var(--color-border-focus-ring);
+}
+
+/* Light Theme - Variant: Hover */
+.theme-light.variant-hover.state-default {
+  background-color: var(--color-base-white);
+  border-color: var(--color-border-interactive-secondary-hover);
+  color: var(--color-text-primary);
+}
+
+.theme-light.variant-hover.state-hover {
+  background-color: var(--color-bg-interactive-secondary-hover);
+  border-color: var(--color-border-interactive-secondary-hover);
+  color: var(--color-text-primary);
+}
+
+.theme-light.variant-hover.state-filled {
+  background-color: var(--color-bg-interactive-secondary-hover);
+  border-color: var(--color-border-interactive-secondary-hover);
+  color: var(--color-text-primary);
+}
+
+.theme-light.variant-hover.state-error {
+  background-color: var(--color-base-white);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-primary);
+}
+
+.theme-light.variant-hover.state-disabled {
+  background-color: var(--color-bg-disabled);
+  border-color: var(--color-border-disabled);
+  color: var(--color-text-disabled);
+}
+
+/* Light Theme - Variant: Active */
+.theme-light.variant-active.state-default {
+  background-color: var(--color-base-white);
+  border-color: var(--color-border-interactive-primary);
+  color: var(--color-text-primary);
+}
+
+.theme-light.variant-active.state-hover {
+  background-color: var(--color-base-white);
+  border-color: var(--color-border-interactive-primary-hover);
+  color: var(--color-text-primary);
+}
+
+.theme-light.variant-active.state-filled {
+  background-color: var(--color-bg-interactive-primary);
+  border-color: var(--color-border-interactive-primary);
+  color: var(--color-text-interactive-primary);
+}
+
+.theme-light.variant-active.state-error {
+  background-color: var(--color-base-white);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-primary);
+}
+
+.theme-light.variant-active.state-disabled {
+  background-color: var(--color-bg-disabled);
+  border-color: var(--color-border-disabled);
+  color: var(--color-text-disabled);
+}
+
+.theme-light.variant-active.open {
+  border-color: var(--color-border-interactive-primary);
+}
+
+/* Light Theme - Variant: Filled */
+.theme-light.variant-filled.state-default {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border-primary);
+  color: var(--color-text-primary);
+}
+
+.theme-light.variant-filled.state-hover {
+  background-color: var(--color-bg-interactive-secondary-hover);
+  border-color: var(--color-border-interactive-secondary-hover);
+  color: var(--color-text-primary);
+}
+
+.theme-light.variant-filled.state-filled {
+  background-color: var(--color-bg-interactive-secondary-hover);
+  border-color: var(--color-border-interactive-secondary-hover);
+  color: var(--color-text-primary);
+}
+
+.theme-light.variant-filled.state-error {
+  background-color: var(--color-bg-danger-subtle);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-primary);
+}
+
+.theme-light.variant-filled.state-disabled {
+  background-color: var(--color-bg-disabled);
+  border-color: var(--color-border-disabled);
+  color: var(--color-text-disabled);
+}
+
+/* Light Theme - Variant: Danger */
+.theme-light.variant-danger.state-default {
+  background-color: var(--color-base-white);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-primary);
+}
+
+.theme-light.variant-danger.state-hover {
+  background-color: var(--color-base-white);
+  border-color: var(--color-danger-700);
+  color: var(--color-text-primary);
+}
+
+.theme-light.variant-danger.state-filled {
+  background-color: var(--color-bg-danger-subtle);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-danger);
+}
+
+.theme-light.variant-danger.state-error {
+  background-color: var(--color-bg-danger-subtle);
+  border-color: var(--color-border-danger);
+  color: var(--color-text-danger);
+}
+
+.theme-light.variant-danger.state-disabled {
+  background-color: var(--color-bg-disabled);
+  border-color: var(--color-border-disabled);
+  color: var(--color-text-disabled);
+}
+
+/* Light Theme - Variant: Disabled */
+.theme-light.variant-disabled {
+  background-color: var(--color-bg-disabled);
+  border-color: var(--color-border-disabled);
+  color: var(--color-text-disabled);
   cursor: not-allowed;
 }
 
-/* Dark Theme - Selectbox */
-.theme-dark .selectbox {
-  background-color: var(--color-neutral-900);
-  color: var(--color-neutral-400);
-  border: 1px solid transparent;
+.theme-light.variant-disabled .arrow {
+  color: var(--color-icon-disabled);
 }
 
-.theme-dark .selectbox.variant-primary {
-  background-color: var(--color-neutral-900);
-  border-color: transparent;
+/* Dark Theme - Variant: Primary */
+.theme-dark.variant-primary.state-default {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-border-dark-primary);
+  color: var(--color-text-dark-primary);
 }
 
-.theme-dark .selectbox.variant-hover,
-.theme-dark .selectbox.state-hover {
-  background-color: var(--color-neutral-900);
-  border-color: var(--color-neutral-400);
+.theme-dark.variant-primary.state-default:hover:not(:disabled) {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-border-dark-interactive-secondary-hover);
 }
 
-.theme-dark .selectbox.variant-active,
-.theme-dark .selectbox.state-active {
-  background-color: var(--color-neutral-900);
-  border-color: var(--color-brand-500);
+.theme-dark.variant-primary.state-hover {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-border-dark-interactive-secondary-hover);
+  color: var(--color-text-dark-primary);
 }
 
-.theme-dark .selectbox.variant-filled,
-.theme-dark .selectbox.state-filled {
-  background-color: var(--color-neutral-900);
-  color: var(--color-base-white);
+.theme-dark.variant-primary.state-filled {
+  background-color: var(--color-bg-dark-secondary);
+  border-color: var(--color-border-dark-primary);
+  color: var(--color-text-dark-primary);
 }
 
-.theme-dark .selectbox.variant-danger,
-.theme-dark .selectbox.state-error {
-  background-color: var(--color-neutral-900);
-  border-color: var(--color-danger-400);
-  color: var(--color-base-white);
+.theme-dark.variant-primary.state-error {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-border-dark-danger);
+  color: var(--color-text-dark-primary);
 }
 
-.theme-dark .selectbox.variant-disabled,
-.theme-dark .selectbox.state-disabled,
-.theme-dark .selectbox.disabled {
-  background-color: var(--color-neutral-900);
-  color: var(--color-neutral-700);
+.theme-dark.variant-primary.state-disabled {
+  background-color: var(--color-bg-dark-disabled);
+  border-color: var(--color-border-dark-disabled);
+  color: var(--color-text-dark-disabled);
+}
+
+.theme-dark.variant-primary.state-disabled .arrow {
+  color: var(--color-icon-dark-disabled);
+}
+
+.theme-dark.variant-primary.open {
+  border-color: var(--color-border-dark-focus-ring);
+}
+
+/* Dark Theme - Variant: Hover */
+.theme-dark.variant-hover.state-default {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-border-dark-interactive-secondary-hover);
+  color: var(--color-text-dark-primary);
+}
+
+.theme-dark.variant-hover.state-hover {
+  background-color: var(--color-bg-dark-interactive-secondary-hover);
+  border-color: var(--color-border-dark-interactive-secondary-hover);
+  color: var(--color-text-dark-primary);
+}
+
+.theme-dark.variant-hover.state-filled {
+  background-color: var(--color-bg-dark-interactive-secondary-hover);
+  border-color: var(--color-border-dark-interactive-secondary-hover);
+  color: var(--color-text-dark-primary);
+}
+
+.theme-dark.variant-hover.state-error {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-border-dark-danger);
+  color: var(--color-text-dark-primary);
+}
+
+.theme-dark.variant-hover.state-disabled {
+  background-color: var(--color-bg-dark-disabled);
+  border-color: var(--color-border-dark-disabled);
+  color: var(--color-text-dark-disabled);
+}
+
+/* Dark Theme - Variant: Active */
+.theme-dark.variant-active.state-default {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-border-dark-interactive-primary);
+  color: var(--color-text-dark-primary);
+}
+
+.theme-dark.variant-active.state-hover {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-border-dark-interactive-primary-hover);
+  color: var(--color-text-dark-primary);
+}
+
+.theme-dark.variant-active.state-filled {
+  background-color: var(--color-bg-dark-interactive-primary);
+  border-color: var(--color-border-dark-interactive-primary);
+  color: var(--color-text-dark-interactive-primary);
+}
+
+.theme-dark.variant-active.state-error {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-border-dark-danger);
+  color: var(--color-text-dark-primary);
+}
+
+.theme-dark.variant-active.state-disabled {
+  background-color: var(--color-bg-dark-disabled);
+  border-color: var(--color-border-dark-disabled);
+  color: var(--color-text-dark-disabled);
+}
+
+.theme-dark.variant-active.open {
+  border-color: var(--color-border-dark-interactive-primary);
+}
+
+/* Dark Theme - Variant: Filled */
+.theme-dark.variant-filled.state-default {
+  background-color: var(--color-bg-dark-secondary);
+  border-color: var(--color-border-dark-primary);
+  color: var(--color-text-dark-primary);
+}
+
+.theme-dark.variant-filled.state-hover {
+  background-color: var(--color-bg-dark-interactive-secondary-hover);
+  border-color: var(--color-border-dark-interactive-secondary-hover);
+  color: var(--color-text-dark-primary);
+}
+
+.theme-dark.variant-filled.state-filled {
+  background-color: var(--color-bg-dark-interactive-secondary-hover);
+  border-color: var(--color-border-dark-interactive-secondary-hover);
+  color: var(--color-text-dark-primary);
+}
+
+.theme-dark.variant-filled.state-error {
+  background-color: var(--color-bg-dark-danger-subtle);
+  border-color: var(--color-border-dark-danger);
+  color: var(--color-text-dark-danger);
+}
+
+.theme-dark.variant-filled.state-disabled {
+  background-color: var(--color-bg-dark-disabled);
+  border-color: var(--color-border-dark-disabled);
+  color: var(--color-text-dark-disabled);
+}
+
+/* Dark Theme - Variant: Danger */
+.theme-dark.variant-danger.state-default {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-border-dark-danger);
+  color: var(--color-text-dark-primary);
+}
+
+.theme-dark.variant-danger.state-hover {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-danger-300);
+  color: var(--color-text-dark-primary);
+}
+
+.theme-dark.variant-danger.state-filled {
+  background-color: var(--color-bg-dark-danger-subtle);
+  border-color: var(--color-border-dark-danger);
+  color: var(--color-text-dark-danger);
+}
+
+.theme-dark.variant-danger.state-error {
+  background-color: var(--color-bg-dark-danger-subtle);
+  border-color: var(--color-border-dark-danger);
+  color: var(--color-text-dark-danger);
+}
+
+.theme-dark.variant-danger.state-disabled {
+  background-color: var(--color-bg-dark-disabled);
+  border-color: var(--color-border-dark-disabled);
+  color: var(--color-text-dark-disabled);
+}
+
+/* Dark Theme - Variant: Disabled */
+.theme-dark.variant-disabled {
+  background-color: var(--color-bg-dark-disabled);
+  border-color: var(--color-border-dark-disabled);
+  color: var(--color-text-dark-disabled);
   cursor: not-allowed;
 }
 
-/* Dropdown */
+.theme-dark.variant-disabled .arrow {
+  color: var(--color-icon-dark-disabled);
+}
+
+/* Dropdown Styles */
 .dropdown {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin-top: 4px;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: var(--color-base-white);
+  border: 1.5px solid var(--color-border-primary);
   border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px -1px var(--color-shadow-default),
-    0 2px 4px -1px var(--color-shadow-subtle);
-  max-height: 304px;
+  box-shadow: 0 4px 12px var(--color-shadow-default);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+  max-height: 300px;
   overflow-y: auto;
 }
 
-/* Light Theme - Dropdown */
-.theme-light .dropdown {
+.dropdownOpen {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Light Theme Dropdown */
+.theme-light.dropdown {
   background-color: var(--color-base-white);
-  border: 1px solid var(--color-neutral-100);
+  border-color: var(--color-border-primary);
 }
 
-/* Dark Theme - Dropdown */
-.theme-dark .dropdown {
-  background-color: var(--color-neutral-900);
-  border: 1px solid var(--color-neutral-700);
+/* Dark Theme Dropdown */
+.theme-dark.dropdown {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-border-dark-primary);
 }
 
-/* Dropdown Item */
-.dropdownItem {
+/* Option List Styles */
+.optionList {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+}
+
+.optionItem {
   display: flex;
   align-items: center;
-  min-height: 36px;
-  padding: 8px 16px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 8px;
   cursor: pointer;
-  font-family: inherit;
-  font-style: normal;
-  font-weight: var(--font-weight-medium);
-  font-size: var(--typo-body-md-font-size);
-  line-height: var(--typo-body-md-line-height);
-  transition: background-color 0.15s;
-}
-
-.dropdownItem:hover {
-  background-color: color-mix(in srgb, var(--color-brand-400) 12%, transparent);
-}
-
-.dropdownItem.selected {
-  background-color: color-mix(in srgb, var(--color-brand-400) 12%, transparent);
-}
-
-/* Light Theme - Dropdown Item */
-.theme-light .dropdownItem {
-  color: var(--color-neutral-900);
-}
-
-/* Dark Theme - Dropdown Item */
-.theme-dark .dropdownItem {
-  color: var(--color-base-white);
-}
-
-/* Additional Information */
-.additionalInfo {
-  display: flex;
-  align-items: center;
-  font-family: inherit;
-  font-style: normal;
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
   font-weight: var(--font-weight-regular);
-  font-size: var(--typo-body-sm-font-size);
-  line-height: var(--typo-body-sm-line-height);
+  transition: background-color 0.2s, color 0.2s;
+  color: var(--color-text-primary);
 }
 
-.additionalInfoText {
-  display: flex;
-  align-items: center;
+/* Light Theme Option Item */
+.theme-light.optionItem {
+  color: var(--color-text-primary);
 }
 
-/* Light Theme - Additional Info */
-.theme-light .additionalInfo {
-  color: var(--color-neutral-700);
+.theme-light.optionItem:hover {
+  background-color: var(--color-bg-interactive-secondary-hover);
 }
 
-.theme-light .additionalInfo.error {
-  color: var(--color-danger-600);
+.theme-light.optionItemSelected {
+  background-color: var(--color-bg-interactive-primary);
+  color: var(--color-text-interactive-primary);
 }
 
-/* Dark Theme - Additional Info */
-.theme-dark .additionalInfo {
-  color: var(--color-neutral-400);
+.theme-light.optionItemSelected:hover {
+  background-color: var(--color-bg-interactive-primary-hover);
 }
 
-.theme-dark .additionalInfo.error {
-  color: var(--color-danger-400);
+/* Dark Theme Option Item */
+.theme-dark.optionItem {
+  color: var(--color-text-dark-primary);
 }
 
+.theme-dark.optionItem:hover {
+  background-color: var(--color-bg-dark-interactive-secondary-hover);
+}
 
+.theme-dark.optionItemSelected {
+  background-color: var(--color-bg-dark-interactive-primary);
+  color: var(--color-text-dark-interactive-primary);
+}
 
-
-
+.theme-dark.optionItemSelected:hover {
+  background-color: var(--color-bg-dark-interactive-primary-hover);
+}

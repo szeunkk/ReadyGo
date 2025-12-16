@@ -19,8 +19,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   border: 1.5px solid transparent;
   box-sizing: border-box;
@@ -35,8 +35,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   box-sizing: border-box;
   border: 1.5px solid transparent;
@@ -53,8 +53,8 @@
 }
 
 .dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background-color: currentColor;
   flex-shrink: 0;
@@ -63,125 +63,125 @@
 /* Light Theme - Status: Unselected */
 .theme-light.status-unselected.state-default {
   background-color: var(--color-base-white);
-  border-color: var(--color-gray-300);
+  border: 1.5px solid var(--color-gray-300);
 }
 
 .theme-light.status-unselected.state-hover {
   background-color: var(--color-base-white);
-  border-color: var(--color-gray-400);
+  border: 1.5px solid var(--color-gray-400);
 }
 
 .theme-light.status-unselected.state-press {
   background-color: var(--color-base-white);
-  border-color: var(--color-gray-500);
+  border: 1.5px solid var(--color-gray-500);
 }
 
 .theme-light.status-unselected.state-focus {
   background-color: var(--color-base-white);
-  border-color: var(--color-brand-700);
+  border: 1.5px solid var(--color-brand-700);
 }
 
 .theme-light.status-unselected.state-disabled {
   background-color: var(--color-gray-200);
-  border-color: var(--color-gray-400);
+  border: 1.5px solid var(--color-gray-400);
 }
 
 .theme-light.status-unselected.state-error {
   background-color: var(--color-base-white);
-  border-color: var(--color-danger-600);
+  border: 1.5px solid var(--color-danger-600);
 }
 
 /* Light Theme - Status: Selected */
 .theme-light.status-selected.state-default {
-  background-color: var(--color-base-white);
+  background-color: var(--color-brand-700);
   border-color: var(--color-brand-700);
-  color: var(--color-brand-700);
+  color: var(--color-base-white);
 }
 
 .theme-light.status-selected.state-hover {
-  background-color: var(--color-base-white);
+  background-color: var(--color-brand-800);
   border-color: var(--color-brand-800);
-  color: var(--color-brand-800);
+  color: var(--color-base-white);
 }
 
 .theme-light.status-selected.state-press {
-  background-color: var(--color-base-white);
+  background-color: var(--color-brand-900);
   border-color: var(--color-brand-900);
-  color: var(--color-brand-900);
+  color: var(--color-base-white);
 }
 
 .theme-light.status-selected.state-focus {
-  background-color: var(--color-base-white);
+  background-color: var(--color-brand-700);
   border-color: var(--color-brand-700);
-  color: var(--color-brand-700);
+  color: var(--color-base-white);
 }
 
 .theme-light.status-selected.state-disabled {
   background-color: var(--color-gray-200);
   border-color: var(--color-gray-200);
-  color: var(--color-gray-400);
+  color: var(--color-base-white);
 }
 
 .theme-light.status-selected.state-error {
-  background-color: var(--color-base-white);
+  background-color: var(--color-danger-600);
   border-color: var(--color-danger-600);
-  color: var(--color-danger-600);
+  color: var(--color-base-white);
 }
 
 /* Dark Theme - Status: Unselected */
 .theme-dark.status-unselected.state-default {
   background-color: var(--color-gray-900);
-  border-color: var(--color-gray-500);
+  border: 1.5px solid var(--color-gray-500);
 }
 
 .theme-dark.status-unselected.state-hover {
   background-color: var(--color-gray-800);
-  border-color: var(--color-gray-400);
+  border: 1.5px solid var(--color-gray-400);
 }
 
 .theme-dark.status-unselected.state-press {
   background-color: var(--color-gray-700);
-  border-color: var(--color-gray-500);
+  border: 1.5px solid var(--color-gray-500);
 }
 
 .theme-dark.status-unselected.state-focus {
   background-color: var(--color-gray-900);
-  border-color: var(--color-brand-400);
+  border: 1.5px solid var(--color-brand-400);
 }
 
 .theme-dark.status-unselected.state-disabled {
   background-color: var(--color-gray-600);
-  border-color: var(--color-gray-700);
+  border: 1.5px solid var(--color-gray-700);
 }
 
 .theme-dark.status-unselected.state-error {
   background-color: var(--color-gray-900);
-  border-color: var(--color-danger-400);
+  border: 1.5px solid var(--color-danger-400);
 }
 
 /* Dark Theme - Status: Selected */
 .theme-dark.status-selected.state-default {
-  background-color: var(--color-gray-900);
+  background-color: var(--color-bg-primary);
   border-color: var(--color-brand-500);
-  color: var(--color-brand-500);
+  color: var(--color-base-white);
 }
 
 .theme-dark.status-selected.state-hover {
-  background-color: var(--color-gray-900);
+  background-color: var(--color-bg-primary);
   border-color: var(--color-brand-600);
-  color: var(--color-brand-600);
+  color: var(--color-base-white);
 }
 
 .theme-dark.status-selected.state-press {
-  background-color: var(--color-gray-900);
+  background-color: var(--color-bg-primary);
   border-color: var(--color-brand-700);
-  color: var(--color-brand-700);
+  color: var(--color-base-white);
 }
 
 .theme-dark.status-selected.state-focus {
-  background-color: var(--color-gray-900);
+  background-color: var(--color-bg-primary);
   border-color: var(--color-brand-500);
-  color: var(--color-brand-500);
+  color: var(--color-base-white);
 }
 
 .theme-dark.status-selected.state-disabled {
@@ -191,32 +191,32 @@
 }
 
 .theme-dark.status-selected.state-error {
-  background-color: var(--color-gray-900);
+  background-color: var(--color-bg-primary);
   border-color: var(--color-danger-400);
-  color: var(--color-danger-400);
+  color: var(--color-base-white);
 }
 
 /* Hover state (when not explicitly set) */
 .label:hover .theme-light.status-unselected.state-default {
   background-color: var(--color-base-white);
-  border-color: var(--color-gray-400);
+  border: 1.5px solid var(--color-gray-400);
 }
 
 .label:hover .theme-light.status-selected.state-default {
-  background-color: var(--color-base-white);
+  background-color: var(--color-brand-800);
   border-color: var(--color-brand-800);
-  color: var(--color-brand-800);
+  color: var(--color-base-white);
 }
 
 .label:hover .theme-dark.status-unselected.state-default {
   background-color: var(--color-gray-800);
-  border-color: var(--color-gray-400);
+  border: 1.5px solid var(--color-gray-400);
 }
 
 .label:hover .theme-dark.status-selected.state-default {
-  background-color: var(--color-gray-900);
+  background-color: var(--color-bg-primary);
   border-color: var(--color-brand-600);
-  color: var(--color-brand-600);
+  color: var(--color-base-white);
 }
 
 /* Focus state */
@@ -227,46 +227,46 @@
 .input:focus-visible
   ~ .radioWrapper
   .theme-light.status-unselected.state-default {
-  border-color: var(--color-brand-700);
+  border: 1.5px solid var(--color-brand-700);
 }
 
 .input:focus-visible
   ~ .radioWrapper
   .theme-light.status-selected.state-default {
-  background-color: var(--color-base-white);
+  background-color: var(--color-brand-700);
   border-color: var(--color-brand-700);
-  color: var(--color-brand-700);
+  color: var(--color-base-white);
 }
 
 .input:focus-visible
   ~ .radioWrapper
   .theme-dark.status-unselected.state-default {
-  border-color: var(--color-brand-400);
+  border: 1.5px solid var(--color-brand-400);
 }
 
 .input:focus-visible ~ .radioWrapper .theme-dark.status-selected.state-default {
-  background-color: var(--color-gray-900);
+  background-color: var(--color-bg-primary);
   border-color: var(--color-brand-500);
-  color: var(--color-brand-500);
+  color: var(--color-base-white);
 }
 
 /* Active/Press state */
 .label:active .theme-light.status-unselected.state-default {
-  border-color: var(--color-gray-500);
+  border: 1.5px solid var(--color-gray-500);
 }
 
 .label:active .theme-light.status-selected.state-default {
-  background-color: var(--color-base-white);
+  background-color: var(--color-brand-900);
   border-color: var(--color-brand-900);
-  color: var(--color-brand-900);
+  color: var(--color-base-white);
 }
 
 .label:active .theme-dark.status-unselected.state-default {
-  border-color: var(--color-gray-500);
+  border: 1.5px solid var(--color-gray-500);
 }
 
 .label:active .theme-dark.status-selected.state-default {
-  background-color: var(--color-gray-900);
+  background-color: var(--color-bg-primary);
   border-color: var(--color-brand-700);
-  color: var(--color-brand-700);
+  color: var(--color-base-white);
 }
