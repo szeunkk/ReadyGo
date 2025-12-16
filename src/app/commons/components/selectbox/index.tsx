@@ -3,13 +3,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './styles.module.css';
 
-export type SelectboxVariant =
-  | 'primary'
-  | 'hover'
-  | 'active'
-  | 'filled'
-  | 'danger'
-  | 'disabled';
 export type SelectboxState =
   | 'default'
   | 'hover'
@@ -18,52 +11,42 @@ export type SelectboxState =
   | 'disabled';
 export type SelectboxTheme = 'light' | 'dark';
 
-export interface SelectboxOption {
+export interface SelectboxItem {
   id: string;
   value: React.ReactNode;
+  label?: string;
 }
 
 export interface SelectboxProps {
-  variant?: SelectboxVariant;
   state?: SelectboxState;
   theme?: SelectboxTheme;
-  label?: string;
-  additionalInfo?: string;
-  placeholder?: string;
-  items?: SelectboxOption[];
+  label?: string | React.ReactNode;
+  additionalInfo?: string | React.ReactNode;
+  items?: SelectboxItem[];
   selectedId?: string;
-  onSelect?: (id: string) => void;
-  className?: string;
+  onSelect?: (item: SelectboxItem) => void;
   children?: React.ReactNode;
-  gap?: number;
+  className?: string;
 }
 
 export default function Selectbox({
-  variant = 'primary',
   state = 'default',
   theme = 'light',
   label,
   additionalInfo,
-  placeholder = '선택하세요',
   items = [],
   selectedId,
   onSelect,
-  className = '',
   children,
-  gap = 8,
+  className = '',
 }: SelectboxProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [internalSelectedId, setInternalSelectedId] = useState<
-    string | undefined
-  >(selectedId);
+  const [internalState, setInternalState] = useState<SelectboxState>(state);
   const selectboxRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const isDisabled = state === 'disabled' || variant === 'disabled';
-
-  useEffect(() => {
-    setInternalSelectedId(selectedId);
-  }, [selectedId]);
+  const isDisabled = state === 'disabled';
+  const selectedItem = items.find((item) => item.id === selectedId);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -86,106 +69,184 @@ export default function Selectbox({
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    setInternalState(state);
+  }, [state]);
+
+  const handleMouseEnter = () => {
+    if (!isDisabled && internalState === 'default') {
+      setInternalState('hover');
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isDisabled && internalState === 'hover') {
+      setInternalState('default');
+    }
+  };
+
   const handleSelectboxClick = () => {
     if (!isDisabled) {
       setIsOpen(!isOpen);
+      if (!isOpen && internalState === 'default') {
+        setInternalState('filled');
+      }
     }
   };
 
-  const handleOptionClick = (id: string) => {
-    setInternalSelectedId(id);
-    setIsOpen(false);
-    if (onSelect) {
-      onSelect(id);
+  const handleItemClick = (item: SelectboxItem) => {
+    if (!isDisabled) {
+      onSelect?.(item);
+      setIsOpen(false);
+      setInternalState('filled');
     }
   };
 
-  const selectedItem = items.find((item) => item.id === internalSelectedId);
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (isDisabled) {
+      return;
+    }
+
+    switch (event.key) {
+      case 'Enter':
+      case ' ':
+        event.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+          setInternalState('filled');
+        }
+        break;
+      case 'Escape':
+        if (isOpen) {
+          setIsOpen(false);
+        }
+        break;
+      case 'ArrowDown':
+        event.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+          setInternalState('filled');
+        }
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        if (isOpen) {
+          setIsOpen(false);
+        }
+        break;
+    }
+  };
 
   const selectboxClasses = [
     styles.selectbox,
-    styles[`variant-${variant}`],
-    styles[`state-${state}`],
+    styles[`state-${internalState}`],
     styles[`theme-${theme}`],
     isDisabled && styles.disabled,
+    isOpen && styles.open,
     className,
   ]
     .filter(Boolean)
     .join(' ');
 
-  const dropdownClasses = [styles.dropdown, styles[`theme-${theme}`]]
+  const dropdownClasses = [
+    styles.dropdown,
+    styles[`theme-${theme}`],
+    isOpen && styles.open,
+  ]
     .filter(Boolean)
     .join(' ');
 
   return (
-    <div className={styles.wrapper}>
-      {label && (
-        <label className={styles.label}>
-          {label}
-          {additionalInfo && (
-            <span className={styles.additionalInfo}>{additionalInfo}</span>
-          )}
-        </label>
+    <div className={styles.container}>
+      {label && <div className={styles.label}>{label}</div>}
+      {additionalInfo && (
+        <div className={styles.additionalInfo}>{additionalInfo}</div>
       )}
-      <div className={styles.selectboxContainer} ref={selectboxRef}>
+      <div className={styles.selectboxWrapper} ref={selectboxRef}>
         <button
           type="button"
           className={selectboxClasses}
           onClick={handleSelectboxClick}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onKeyDown={handleKeyDown}
           disabled={isDisabled}
-          style={{ gap: `${gap}px` }}
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
+          aria-label={label ? String(label) : 'Selectbox'}
         >
-          <span className={styles.content}>
+          <div className={styles.content}>
             {children || (
               <span className={styles.text}>
-                {selectedItem ? selectedItem.value : placeholder}
+                {selectedItem?.value || '선택하세요'}
               </span>
             )}
-          </span>
-          <span className={styles.icon}>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className={isOpen ? styles.iconRotated : ''}
-            >
-              <path
-                d="M4 6L8 10L12 6"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
+          </div>
+          <svg
+            className={styles.arrowIcon}
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 6L8 10L12 6"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </button>
-        {isOpen && items.length > 0 && (
-          <div className={dropdownClasses} ref={dropdownRef}>
-            <div className={styles.optionGroup}>
-              {items.map((item) => {
-                const isSelected = item.id === internalSelectedId;
-                const optionClasses = [
-                  styles.option,
-                  isSelected && styles.selected,
-                  styles[`theme-${theme}`],
-                ]
-                  .filter(Boolean)
-                  .join(' ');
-
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    className={optionClasses}
-                    onClick={() => handleOptionClick(item.id)}
-                  >
-                    {item.value}
-                  </button>
-                );
-              })}
-            </div>
+        {items.length > 0 && (
+          <div
+            className={dropdownClasses}
+            ref={dropdownRef}
+            role="listbox"
+            aria-label="Options"
+          >
+            {items.map((item) => {
+              const isSelected = item.id === selectedId;
+              return (
+                <div
+                  key={item.id}
+                  className={[styles.optionItem, isSelected && styles.selected]
+                    .filter(Boolean)
+                    .join(' ')}
+                  onClick={() => handleItemClick(item)}
+                  role="option"
+                  aria-selected={isSelected}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleItemClick(item);
+                    }
+                  }}
+                >
+                  {isSelected && (
+                    <svg
+                      className={styles.checkIcon}
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M13 4L6 11L3 8"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                  <div className={styles.optionContent}>{item.value}</div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

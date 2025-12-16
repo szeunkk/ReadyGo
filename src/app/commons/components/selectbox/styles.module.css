@@ -1,505 +1,317 @@
-/* Base Wrapper Styles */
-.wrapper {
+/* Container */
+.container {
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 100%;
 }
 
+/* Label */
 .label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--typo-body-md-medium-font-weight);
   color: var(--color-text-primary);
 }
 
+/* Additional Info */
 .additionalInfo {
   font-size: var(--typo-body-sm-font-size);
   line-height: var(--typo-body-sm-line-height);
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--typo-body-sm-font-weight);
   color: var(--color-text-secondary);
 }
 
-/* Selectbox Container */
-.selectboxContainer {
+/* Selectbox Wrapper */
+.selectboxWrapper {
   display: flex;
   flex-direction: column;
   width: 100%;
 }
 
-/* Base Selectbox Styles */
+/* Selectbox Base */
 .selectbox {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  min-height: 44px;
   padding: 12px 16px;
   border: 1.5px solid transparent;
-  border-radius: 12px;
-  background-color: transparent;
+  border-radius: 8px;
+  background-color: var(--color-base-white);
   cursor: pointer;
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui,
-    sans-serif;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  box-sizing: border-box;
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--typo-body-md-font-weight);
   color: var(--color-text-primary);
-  box-sizing: border-box;
-  text-align: left;
+  gap: 8px;
 }
 
 .selectbox:disabled {
   cursor: not-allowed;
 }
 
+.selectbox.disabled {
+  cursor: not-allowed;
+}
+
+/* Content */
 .content {
   display: flex;
   align-items: center;
   flex: 1;
-  min-width: 0;
+  gap: 8px;
 }
 
 .text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  flex: 1;
 }
 
-.icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Arrow Icon */
+.arrowIcon {
   flex-shrink: 0;
+  width: 16px;
+  height: 16px;
   color: var(--color-icon-secondary);
+  transition: transform 0.2s;
 }
 
-.iconRotated {
+.selectbox.open .arrowIcon {
   transform: rotate(180deg);
 }
 
-/* Dropdown Styles */
+/* Dropdown */
 .dropdown {
-  display: flex;
+  display: none;
   flex-direction: column;
-  margin-top: 4px;
   width: 100%;
-}
-
-.optionGroup {
-  display: flex;
-  flex-direction: column;
-  border-radius: 12px;
-  border: 1.5px solid transparent;
-  overflow: hidden;
+  margin-top: 4px;
+  border-radius: 8px;
+  border: 1.5px solid var(--color-border-primary);
+  background-color: var(--color-bg-default);
   box-shadow: 0 4px 12px var(--color-shadow-default);
+  overflow: hidden;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
-.option {
+.dropdown.open {
+  display: flex;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Option Item */
+.optionItem {
   display: flex;
   align-items: center;
-  width: 100%;
+  gap: 12px;
   padding: 12px 16px;
-  border: none;
-  background-color: transparent;
   cursor: pointer;
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui,
-    sans-serif;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid var(--color-border-secondary);
+}
+
+.optionItem:last-child {
+  border-bottom: none;
+}
+
+.optionItem:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.optionItem.selected {
+  background-color: var(--color-bg-interactive-primary);
+}
+
+/* Check Icon */
+.checkIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: var(--color-icon-interactive-primary);
+}
+
+/* Option Content */
+.optionContent {
+  flex: 1;
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--typo-body-md-font-weight);
   color: var(--color-text-primary);
-  text-align: left;
-  box-sizing: border-box;
 }
 
-.option:not(:last-child) {
-  border-bottom: 1px solid transparent;
-}
-
-.option:hover {
-  background-color: var(--color-bg-interactive-secondary);
-}
-
-.option.selected {
-  background-color: var(--color-bg-interactive-primary);
-  color: var(--color-text-interactive-primary);
-  font-weight: var(--font-weight-medium);
-}
-
-/* Light Theme - Primary Variant */
-.theme-light.variant-primary.state-default {
+/* Light Theme - State: Default */
+.theme-light.state-default {
   background-color: var(--color-base-white);
-  border-color: var(--color-border-primary);
+  border-color: var(--color-gray-300);
   color: var(--color-text-primary);
 }
 
-.theme-light.variant-primary.state-default:hover:not(:disabled) {
-  background-color: var(--color-bg-interactive-secondary);
-  border-color: var(--color-border-interactive-secondary);
-}
-
-.theme-light.variant-primary.state-hover {
-  background-color: var(--color-bg-interactive-secondary);
-  border-color: var(--color-border-interactive-secondary);
-}
-
-.theme-light.variant-primary.state-filled {
-  background-color: var(--color-bg-secondary);
-  border-color: var(--color-border-primary);
-  color: var(--color-text-primary);
-}
-
-.theme-light.variant-primary.state-error {
+.theme-light.state-default:hover {
   background-color: var(--color-base-white);
-  border-color: var(--color-border-danger);
+  border-color: var(--color-gray-400);
+}
+
+/* Light Theme - State: Hover */
+.theme-light.state-hover {
+  background-color: var(--color-base-white);
+  border-color: var(--color-gray-400);
   color: var(--color-text-primary);
 }
 
-.theme-light.variant-primary.state-disabled,
-.theme-light.variant-primary.variant-disabled {
-  background-color: var(--color-bg-disabled);
-  border-color: var(--color-border-disabled);
+/* Light Theme - State: Filled */
+.theme-light.state-filled {
+  background-color: var(--color-base-white);
+  border-color: var(--color-gray-300);
+  color: var(--color-text-primary);
+}
+
+.theme-light.state-filled:hover {
+  background-color: var(--color-base-white);
+  border-color: var(--color-gray-400);
+}
+
+/* Light Theme - State: Error */
+.theme-light.state-error {
+  background-color: var(--color-base-white);
+  border-color: var(--color-danger-600);
+  color: var(--color-text-primary);
+}
+
+.theme-light.state-error:hover {
+  background-color: var(--color-base-white);
+  border-color: var(--color-danger-600);
+}
+
+/* Light Theme - State: Disabled */
+.theme-light.state-disabled {
+  background-color: var(--color-gray-200);
+  border-color: var(--color-gray-400);
   color: var(--color-text-disabled);
   cursor: not-allowed;
 }
 
-/* Light Theme - Hover Variant */
-.theme-light.variant-hover.state-default {
-  background-color: var(--color-bg-interactive-secondary);
-  border-color: var(--color-border-interactive-secondary);
-  color: var(--color-text-primary);
+.theme-light.state-disabled .arrowIcon {
+  color: var(--color-icon-disabled);
 }
 
-.theme-light.variant-hover.state-hover {
-  background-color: var(--color-bg-interactive-secondary-hover);
-  border-color: var(--color-border-interactive-secondary-hover);
-}
-
-.theme-light.variant-hover.state-filled {
-  background-color: var(--color-bg-secondary);
-  border-color: var(--color-border-primary);
-}
-
-.theme-light.variant-hover.state-error {
-  background-color: var(--color-bg-interactive-secondary);
-  border-color: var(--color-border-danger);
-}
-
-.theme-light.variant-hover.state-disabled {
-  background-color: var(--color-bg-disabled);
-  border-color: var(--color-border-disabled);
-  color: var(--color-text-disabled);
-}
-
-/* Light Theme - Active Variant */
-.theme-light.variant-active.state-default {
-  background-color: var(--color-bg-interactive-primary);
-  border-color: var(--color-border-interactive-primary);
-  color: var(--color-text-interactive-primary);
-}
-
-.theme-light.variant-active.state-hover {
-  background-color: var(--color-bg-interactive-primary-hover);
-  border-color: var(--color-border-interactive-primary-hover);
-}
-
-.theme-light.variant-active.state-filled {
-  background-color: var(--color-bg-interactive-primary);
-  border-color: var(--color-border-interactive-primary);
-}
-
-.theme-light.variant-active.state-error {
-  background-color: var(--color-bg-interactive-primary);
-  border-color: var(--color-border-danger);
-}
-
-.theme-light.variant-active.state-disabled {
-  background-color: var(--color-bg-disabled);
-  border-color: var(--color-border-disabled);
-  color: var(--color-text-disabled);
-}
-
-/* Light Theme - Filled Variant */
-.theme-light.variant-filled.state-default {
-  background-color: var(--color-bg-secondary);
-  border-color: var(--color-border-primary);
-  color: var(--color-text-primary);
-}
-
-.theme-light.variant-filled.state-hover {
-  background-color: var(--color-bg-tertiary);
-  border-color: var(--color-border-interactive-secondary);
-}
-
-.theme-light.variant-filled.state-filled {
-  background-color: var(--color-bg-secondary);
-  border-color: var(--color-border-primary);
-}
-
-.theme-light.variant-filled.state-error {
-  background-color: var(--color-bg-secondary);
-  border-color: var(--color-border-danger);
-}
-
-.theme-light.variant-filled.state-disabled {
-  background-color: var(--color-bg-disabled);
-  border-color: var(--color-border-disabled);
-  color: var(--color-text-disabled);
-}
-
-/* Light Theme - Danger Variant */
-.theme-light.variant-danger.state-default {
-  background-color: var(--color-base-white);
-  border-color: var(--color-border-danger);
-  color: var(--color-text-danger);
-}
-
-.theme-light.variant-danger.state-hover {
-  background-color: var(--color-bg-danger-subtle);
-  border-color: var(--color-border-danger);
-}
-
-.theme-light.variant-danger.state-filled {
-  background-color: var(--color-bg-danger);
-  border-color: var(--color-border-danger);
-}
-
-.theme-light.variant-danger.state-error {
-  background-color: var(--color-base-white);
-  border-color: var(--color-border-danger);
-  color: var(--color-text-danger);
-}
-
-.theme-light.variant-danger.state-disabled {
-  background-color: var(--color-bg-disabled);
-  border-color: var(--color-border-disabled);
-  color: var(--color-text-disabled);
-}
-
-/* Light Theme - Disabled Variant */
-.theme-light.variant-disabled {
-  background-color: var(--color-bg-disabled);
-  border-color: var(--color-border-disabled);
-  color: var(--color-text-disabled);
-  cursor: not-allowed;
-}
-
-/* Light Theme - Option Group */
-.theme-light .optionGroup {
-  background-color: var(--color-base-white);
-  border-color: var(--color-border-primary);
-}
-
-.theme-light .option {
-  color: var(--color-text-primary);
-}
-
-.theme-light .option:hover {
-  background-color: var(--color-bg-interactive-secondary);
-}
-
-.theme-light .option.selected {
-  background-color: var(--color-bg-interactive-primary);
-  color: var(--color-text-interactive-primary);
-}
-
-.theme-light .option:not(:last-child) {
-  border-bottom-color: var(--color-border-secondary);
-}
-
-/* Dark Theme - Primary Variant */
-.theme-dark.variant-primary.state-default {
-  background-color: var(--color-gray-900);
-  border-color: var(--color-border-dark-primary);
-  color: var(--color-text-dark-primary);
-}
-
-.theme-dark.variant-primary.state-default:hover:not(:disabled) {
-  background-color: var(--color-bg-dark-interactive-secondary);
-  border-color: var(--color-border-dark-interactive-secondary);
-}
-
-.theme-dark.variant-primary.state-hover {
-  background-color: var(--color-bg-dark-interactive-secondary);
-  border-color: var(--color-border-dark-interactive-secondary);
-}
-
-.theme-dark.variant-primary.state-filled {
-  background-color: var(--color-bg-dark-secondary);
-  border-color: var(--color-border-dark-primary);
-  color: var(--color-text-dark-primary);
-}
-
-.theme-dark.variant-primary.state-error {
-  background-color: var(--color-gray-900);
-  border-color: var(--color-border-dark-danger);
-  color: var(--color-text-dark-primary);
-}
-
-.theme-dark.variant-primary.state-disabled,
-.theme-dark.variant-primary.variant-disabled {
-  background-color: var(--color-bg-dark-disabled);
-  border-color: var(--color-border-dark-disabled);
-  color: var(--color-text-dark-disabled);
-  cursor: not-allowed;
-}
-
-/* Dark Theme - Hover Variant */
-.theme-dark.variant-hover.state-default {
-  background-color: var(--color-bg-dark-interactive-secondary);
-  border-color: var(--color-border-dark-interactive-secondary);
-  color: var(--color-text-dark-primary);
-}
-
-.theme-dark.variant-hover.state-hover {
-  background-color: var(--color-bg-dark-interactive-secondary-hover);
-  border-color: var(--color-border-dark-interactive-secondary-hover);
-}
-
-.theme-dark.variant-hover.state-filled {
-  background-color: var(--color-bg-dark-secondary);
-  border-color: var(--color-border-dark-primary);
-}
-
-.theme-dark.variant-hover.state-error {
-  background-color: var(--color-bg-dark-interactive-secondary);
-  border-color: var(--color-border-dark-danger);
-}
-
-.theme-dark.variant-hover.state-disabled {
-  background-color: var(--color-bg-dark-disabled);
-  border-color: var(--color-border-dark-disabled);
-  color: var(--color-text-dark-disabled);
-}
-
-/* Dark Theme - Active Variant */
-.theme-dark.variant-active.state-default {
-  background-color: var(--color-bg-dark-interactive-primary);
-  border-color: var(--color-border-dark-interactive-primary);
-  color: var(--color-text-dark-interactive-primary);
-}
-
-.theme-dark.variant-active.state-hover {
-  background-color: var(--color-bg-dark-interactive-primary-hover);
-  border-color: var(--color-border-dark-interactive-primary-hover);
-}
-
-.theme-dark.variant-active.state-filled {
-  background-color: var(--color-bg-dark-interactive-primary);
-  border-color: var(--color-border-dark-interactive-primary);
-}
-
-.theme-dark.variant-active.state-error {
-  background-color: var(--color-bg-dark-interactive-primary);
-  border-color: var(--color-border-dark-danger);
-}
-
-.theme-dark.variant-active.state-disabled {
-  background-color: var(--color-bg-dark-disabled);
-  border-color: var(--color-border-dark-disabled);
-  color: var(--color-text-dark-disabled);
-}
-
-/* Dark Theme - Filled Variant */
-.theme-dark.variant-filled.state-default {
-  background-color: var(--color-bg-dark-secondary);
-  border-color: var(--color-border-dark-primary);
-  color: var(--color-text-dark-primary);
-}
-
-.theme-dark.variant-filled.state-hover {
-  background-color: var(--color-bg-dark-tertiary);
-  border-color: var(--color-border-dark-interactive-secondary);
-}
-
-.theme-dark.variant-filled.state-filled {
-  background-color: var(--color-bg-dark-secondary);
-  border-color: var(--color-border-dark-primary);
-}
-
-.theme-dark.variant-filled.state-error {
-  background-color: var(--color-bg-dark-secondary);
-  border-color: var(--color-border-dark-danger);
-}
-
-.theme-dark.variant-filled.state-disabled {
-  background-color: var(--color-bg-dark-disabled);
-  border-color: var(--color-border-dark-disabled);
-  color: var(--color-text-dark-disabled);
-}
-
-/* Dark Theme - Danger Variant */
-.theme-dark.variant-danger.state-default {
-  background-color: var(--color-gray-900);
-  border-color: var(--color-border-dark-danger);
-  color: var(--color-text-dark-danger);
-}
-
-.theme-dark.variant-danger.state-hover {
-  background-color: var(--color-bg-dark-danger-subtle);
-  border-color: var(--color-border-dark-danger);
-}
-
-.theme-dark.variant-danger.state-filled {
-  background-color: var(--color-bg-dark-danger);
-  border-color: var(--color-border-dark-danger);
-}
-
-.theme-dark.variant-danger.state-error {
-  background-color: var(--color-gray-900);
-  border-color: var(--color-border-dark-danger);
-  color: var(--color-text-dark-danger);
-}
-
-.theme-dark.variant-danger.state-disabled {
-  background-color: var(--color-bg-dark-disabled);
-  border-color: var(--color-border-dark-disabled);
-  color: var(--color-text-dark-disabled);
-}
-
-/* Dark Theme - Disabled Variant */
-.theme-dark.variant-disabled {
-  background-color: var(--color-bg-dark-disabled);
-  border-color: var(--color-border-dark-disabled);
-  color: var(--color-text-dark-disabled);
-  cursor: not-allowed;
-}
-
-/* Dark Theme - Option Group */
-.theme-dark .optionGroup {
-  background-color: var(--color-gray-900);
-  border-color: var(--color-border-dark-primary);
-}
-
-.theme-dark .option {
-  color: var(--color-text-dark-primary);
-}
-
-.theme-dark .option:hover {
-  background-color: var(--color-bg-dark-interactive-secondary);
-}
-
-.theme-dark .option.selected {
-  background-color: var(--color-bg-dark-interactive-primary);
-  color: var(--color-text-dark-interactive-primary);
-}
-
-.theme-dark .option:not(:last-child) {
-  border-bottom-color: var(--color-border-dark-secondary);
-}
-
-/* Focus State */
-.selectbox:focus-visible {
+/* Light Theme - Focus State */
+.theme-light.state-default:focus-visible,
+.theme-light.state-hover:focus-visible,
+.theme-light.state-filled:focus-visible {
   outline: none;
+  border-color: var(--color-brand-700);
 }
 
-.theme-light.variant-primary.state-default:focus-visible {
-  border-color: var(--color-border-focus-ring);
+.theme-light.state-error:focus-visible {
+  outline: none;
+  border-color: var(--color-danger-600);
 }
 
-.theme-dark.variant-primary.state-default:focus-visible {
-  border-color: var(--color-border-dark-focus-ring);
+/* Dark Theme - State: Default */
+.theme-dark.state-default {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-gray-500);
+  color: var(--color-text-primary);
+}
+
+.theme-dark.state-default:hover {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-gray-400);
+}
+
+/* Dark Theme - State: Hover */
+.theme-dark.state-hover {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-gray-400);
+  color: var(--color-text-primary);
+}
+
+/* Dark Theme - State: Filled */
+.theme-dark.state-filled {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-gray-500);
+  color: var(--color-text-primary);
+}
+
+.theme-dark.state-filled:hover {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-gray-400);
+}
+
+/* Dark Theme - State: Error */
+.theme-dark.state-error {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-danger-400);
+  color: var(--color-text-primary);
+}
+
+.theme-dark.state-error:hover {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-danger-400);
+}
+
+/* Dark Theme - State: Disabled */
+.theme-dark.state-disabled {
+  background-color: var(--color-gray-600);
+  border-color: var(--color-gray-700);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+.theme-dark.state-disabled .arrowIcon {
+  color: var(--color-icon-disabled);
+}
+
+/* Dark Theme - Focus State */
+.theme-dark.state-default:focus-visible,
+.theme-dark.state-hover:focus-visible,
+.theme-dark.state-filled:focus-visible {
+  outline: none;
+  border-color: var(--color-brand-400);
+}
+
+.theme-dark.state-error:focus-visible {
+  outline: none;
+  border-color: var(--color-danger-400);
+}
+
+/* Dark Theme Dropdown */
+.theme-dark .dropdown {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-gray-500);
+}
+
+.theme-dark .optionItem {
+  border-bottom-color: var(--color-gray-700);
+}
+
+.theme-dark .optionItem:hover {
+  background-color: var(--color-gray-800);
+}
+
+.theme-dark .optionItem.selected {
+  background-color: var(--color-bg-interactive-primary);
+}
+
+.theme-dark .optionContent {
+  color: var(--color-text-primary);
+}
+
+.theme-dark .checkIcon {
+  color: var(--color-icon-interactive-primary);
 }
