@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import styles from './styles.module.css';
 import { HTMLAttributes } from 'react';
-import TierTag from '../tierTag';
+import TierTag from '../tier-tag';
 import Icon from '../icon';
 import { TierType } from '../../constants/tierType.enum';
 import { AnimalType, getAnimalTypeMeta } from '../../constants/animalType.enum';
