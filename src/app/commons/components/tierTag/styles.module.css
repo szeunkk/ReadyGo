@@ -39,13 +39,13 @@
 /* Light Theme - All Tiers */
 .theme-light {
   background-color: transparent;
-  border: 1px solid var(--color-text-light-interactive-secondary);
-  color: var(--color-border-light-interactive-secondary);
+  border: 1px solid var(--color-border-secondary);
+  color: var(--color-border-interactive-secondary);
 }
 
 /* Dark Theme - All Tiers */
 .theme-dark {
   background-color: transparent;
   border: 1px solid var(--color-text-dark-interactive-secondary);
-  color: var(--color-border-dark-interactive-secondary);
+  color: var(--color-text-dark-interactive-secondary);
 }
