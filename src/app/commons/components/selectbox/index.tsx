@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import React, { useState, useRef, useEffect } from "react";
-import styles from "./styles.module.css";
+import React, { useState, useRef, useEffect } from 'react';
+import styles from './styles.module.css';
 
 export type SelectboxVariant =
-  | "primary"
-  | "hover"
-  | "active"
-  | "filled"
-  | "danger"
-  | "disabled";
+  | 'primary'
+  | 'hover'
+  | 'active'
+  | 'filled'
+  | 'danger'
+  | 'disabled';
 export type SelectboxState =
-  | "default"
-  | "hover"
-  | "filled"
-  | "error"
-  | "disabled";
-export type SelectboxTheme = "light" | "dark";
+  | 'default'
+  | 'hover'
+  | 'filled'
+  | 'error'
+  | 'disabled';
+export type SelectboxTheme = 'light' | 'dark';
 
 export interface SelectboxItem {
   id: string;
@@ -41,9 +41,9 @@ export interface SelectboxProps {
 }
 
 export default function Selectbox({
-  variant = "primary",
-  state = "default",
-  theme = "light",
+  variant = 'primary',
+  state = 'default',
+  theme = 'light',
   label,
   additionalInfo,
   required = false,
@@ -51,9 +51,9 @@ export default function Selectbox({
   items = [],
   value,
   onChange,
-  placeholder = "Placeholder",
+  placeholder = 'Placeholder',
   gap = 4,
-  className = "",
+  className = '',
   disabled,
 }: SelectboxProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -61,7 +61,7 @@ export default function Selectbox({
   const selectboxRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const isDisabled = disabled || state === "disabled" || variant === "disabled";
+  const isDisabled = disabled || state === 'disabled' || variant === 'disabled';
 
   // 외부 클릭 감지
   useEffect(() => {
@@ -77,11 +77,11 @@ export default function Selectbox({
     };
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
 
@@ -108,20 +108,38 @@ export default function Selectbox({
 
   // variant와 state를 기반으로 실제 적용할 클래스 결정
   const getVariantClass = () => {
-    if (isDisabled) return "disabled";
-    if (state === "error" || variant === "danger") return "danger";
-    if (state === "filled" || variant === "filled") return "filled";
-    if (variant === "active") return "active";
-    if (state === "hover" || variant === "hover") return "hover";
-    return "primary";
+    if (isDisabled) {
+      return 'disabled';
+    }
+    if (state === 'error' || variant === 'danger') {
+      return 'danger';
+    }
+    if (state === 'filled' || variant === 'filled') {
+      return 'filled';
+    }
+    if (variant === 'active') {
+      return 'active';
+    }
+    if (state === 'hover' || variant === 'hover') {
+      return 'hover';
+    }
+    return 'primary';
   };
 
   const getStateClass = () => {
-    if (isDisabled) return "disabled";
-    if (state === "error") return "error";
-    if (state === "filled") return "filled";
-    if (state === "hover") return "hover";
-    return "default";
+    if (isDisabled) {
+      return 'disabled';
+    }
+    if (state === 'error') {
+      return 'error';
+    }
+    if (state === 'filled') {
+      return 'filled';
+    }
+    if (state === 'hover') {
+      return 'hover';
+    }
+    return 'default';
   };
 
   const actualVariant = getVariantClass();
@@ -137,19 +155,19 @@ export default function Selectbox({
     className,
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   const labelClasses = [styles.label, styles[`theme-${theme}`]]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   const additionalInfoClasses = [
     styles.additionalInfo,
     styles[`theme-${theme}`],
-    (actualState === "error" || actualVariant === "danger") && styles.error,
+    (actualState === 'error' || actualVariant === 'danger') && styles.error,
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   const selectedItem = items.find((item) => item.id === selectedId);
   const displayValue = selectedItem ? selectedItem.value : null;
@@ -170,27 +188,30 @@ export default function Selectbox({
           role="button"
           tabIndex={isDisabled ? -1 : 0}
           aria-expanded={isOpen}
-          aria-haspopup="listbox">
+          aria-haspopup="listbox"
+        >
           <div className={styles.selectboxContent} style={{ gap: `${gap}px` }}>
             {children ? (
               <div className={styles.selectboxChildren}>{children}</div>
             ) : (
               <span
                 className={`${styles.selectboxText} ${
-                  !displayValue ? styles.placeholder : ""
-                }`}>
+                  !displayValue ? styles.placeholder : ''
+                }`}
+              >
                 {displayValue || placeholder}
               </span>
             )}
             <svg
               className={`${styles.chevron} ${
-                isOpen ? styles.chevronOpen : ""
+                isOpen ? styles.chevronOpen : ''
               }`}
               width="20"
               height="20"
               viewBox="0 0 20 20"
               fill="none"
-              xmlns="http://www.w3.org/2000/svg">
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path
                 d="M5 7.5L10 12.5L15 7.5"
                 stroke="currentColor"
@@ -204,16 +225,18 @@ export default function Selectbox({
         {isOpen && items.length > 0 && (
           <div
             ref={dropdownRef}
-            className={`${styles.dropdown} ${styles[`theme-${theme}`]}`}>
+            className={`${styles.dropdown} ${styles[`theme-${theme}`]}`}
+          >
             {items.map((item) => (
               <div
                 key={item.id}
                 className={`${styles.dropdownItem} ${
-                  selectedId === item.id ? styles.selected : ""
+                  selectedId === item.id ? styles.selected : ''
                 }`}
                 onClick={() => handleItemClick(item.id)}
                 role="option"
-                aria-selected={selectedId === item.id}>
+                aria-selected={selectedId === item.id}
+              >
                 {item.value}
               </div>
             ))}
@@ -228,8 +251,4 @@ export default function Selectbox({
     </div>
   );
 }
-
-
-
-
 

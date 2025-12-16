@@ -1,3 +1,87 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    // ✅ const 쓰기, let 지양
+    "prefer-const": "error",
+
+    // ✅ 화살표 함수 사용
+    "prefer-arrow-callback": ["error", { "allowNamedFunctions": false }],
+    "func-style": ["error", "expression", { "allowArrowFunctions": true }],
+
+    // ✅ 구조 분해 할당 사용
+    "prefer-destructuring": [
+      "error",
+      {
+        "array": true,
+        "object": true
+      },
+      {
+        "enforceForRenamedProperties": false
+      }
+    ],
+
+    // ✅ 템플릿 리터럴 사용하기
+    "prefer-template": "error",
+
+    // ✅ 사용한 console.log() 지우기
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+
+    // ✅ truthy, falsy 간단하게 체크
+    "no-unneeded-ternary": "error",
+
+    // ✅ CamelCase 쓰기
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "variable",
+        "format": ["camelCase", "PascalCase", "UPPER_CASE"],
+        "leadingUnderscore": "allow"
+      },
+      {
+        "selector": "function",
+        "format": ["camelCase", "PascalCase"]
+      },
+      {
+        "selector": "typeLike",
+        "format": ["PascalCase"]
+      }
+    ],
+
+    // ✅ 사용하지 않는 변수 경고
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+
+    // ✅ any 타입 사용 경고
+    "@typescript-eslint/no-explicit-any": "warn",
+
+    // ✅ for 루프 대신 map, filter 권장
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "ForStatement",
+        "message": "for 문 대신 map(), filter(), reduce() 등의 배열 메서드를 사용하세요."
+      },
+      {
+        "selector": "ForInStatement",
+        "message": "for...in 대신 Object.keys(), Object.values(), Object.entries()를 사용하세요."
+      }
+    ],
+
+    // React/Next.js 관련
+    "react/jsx-curly-brace-presence": [
+      "error",
+      { "props": "never", "children": "never" }
+    ],
+    "react/self-closing-comp": "error",
+
+    // 코드 품질
+    "no-var": "error",
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+    "curly": ["error", "all"]
+  }
 }
