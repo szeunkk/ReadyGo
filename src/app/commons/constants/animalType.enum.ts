@@ -57,7 +57,7 @@ export enum AnimalType {
 export type AnimalTypeMeta = {
   label: string;
   group: AnimalGroup;
-  description: string;
+  description: string[];
   dominantTraits: TraitKey[];
   secondaryTraits: TraitKey[];
   avoidTraits: TraitKey[];
@@ -76,7 +76,7 @@ export const animalTypeMeta = {
   [AnimalType.wolf]: {
     label: '늑대',
     group: AnimalGroup.attack,
-    description: '타고난 리더, 팀을 이끄는 카리스마와 강한 주도력',
+    description: ['타고난 리더', '팀을 이끄는 카리스마와 강한 주도력'],
     dominantTraits: ['exploration', 'leadership'],
     secondaryTraits: ['cooperation', 'social'],
     avoidTraits: ['strategy'],
@@ -88,7 +88,7 @@ export const animalTypeMeta = {
   [AnimalType.tiger]: {
     label: '호랑이',
     group: AnimalGroup.attack,
-    description: '혼자서 판을 깨는 공격수, 빠르고 과감한 돌파형 플레이어',
+    description: ['혼자서 판을 깨는 공격수', '빠르고 과감한 돌파형 플레이어'],
     dominantTraits: ['exploration'],
     secondaryTraits: ['leadership'],
     avoidTraits: ['cooperation', 'strategy', 'social'],
@@ -100,7 +100,7 @@ export const animalTypeMeta = {
   [AnimalType.hawk]: {
     label: '매',
     group: AnimalGroup.attack,
-    description: '한 방을 노리는 정밀 딜러, 침착한 판단과 정확한 타이밍',
+    description: ['한 방을 노리는 정밀 딜러', '침착한 판단과 정확한 타이밍'],
     dominantTraits: ['strategy'],
     secondaryTraits: ['exploration'],
     avoidTraits: ['cooperation', 'leadership', 'social'],
@@ -114,7 +114,7 @@ export const animalTypeMeta = {
   [AnimalType.owl]: {
     label: '올빼미',
     group: AnimalGroup.strategy,
-    description: '전체 판을 읽는 전략가, 운영으로 승리를 설계하는 타입',
+    description: ['전체 판을 읽는 전략가', '운영으로 승리를 설계하는 타입'],
     dominantTraits: ['strategy'],
     secondaryTraits: ['leadership'],
     avoidTraits: ['cooperation', 'exploration', 'social'],
@@ -126,7 +126,7 @@ export const animalTypeMeta = {
   [AnimalType.fox]: {
     label: '여우',
     group: AnimalGroup.strategy,
-    description: '센스로 흐름을 뒤집는 전략가, 눈치와 심리전에 강한 플레이',
+    description: ['센스로 흐름을 뒤집는 전략가', '눈치와 심리전에 강한 플레이'],
     dominantTraits: ['strategy'],
     secondaryTraits: ['cooperation', 'exploration', 'social'],
     avoidTraits: ['leadership'],
@@ -138,7 +138,7 @@ export const animalTypeMeta = {
   [AnimalType.hedgehog]: {
     label: '고슴도치',
     group: AnimalGroup.strategy,
-    description: '혼자 공략을 파는 연구가, 최적화에 진심인 분석형 플레이어',
+    description: ['혼자 공략을 파는 연구가', '최적화에 진심인 분석형 플레이어'],
     dominantTraits: ['strategy'],
     secondaryTraits: ['exploration'],
     avoidTraits: ['cooperation', 'leadership', 'social'],
@@ -150,7 +150,7 @@ export const animalTypeMeta = {
   [AnimalType.raven]: {
     label: '까마귀',
     group: AnimalGroup.strategy,
-    description: '상대 패턴을 읽는 관찰자, 계산적인 예측 플레이의 달인',
+    description: ['상대 패턴을 읽는 관찰자', '계산적인 예측 플레이의 달인'],
     dominantTraits: ['strategy'],
     secondaryTraits: ['cooperation'],
     avoidTraits: ['exploration', 'leadership', 'social'],
@@ -164,7 +164,7 @@ export const animalTypeMeta = {
   [AnimalType.bear]: {
     label: '곰',
     group: AnimalGroup.support,
-    description: '팀을 지켜주는 버팀목, 안정적인 보호와 든든한 팀플레이',
+    description: ['팀을 지켜주는 버팀목', '안정적인 보호와 든든한 팀플레이'],
     dominantTraits: ['cooperation'],
     secondaryTraits: ['strategy', 'leadership', 'social'],
     avoidTraits: ['exploration'],
@@ -176,7 +176,7 @@ export const animalTypeMeta = {
   [AnimalType.deer]: {
     label: '사슴',
     group: AnimalGroup.support,
-    description: '차분하게 흐름을 잇는 힐러, 편안한 분위기의 안정형 플레이',
+    description: ['차분하게 흐름을 잇는 힐러', '편안한 분위기의 안정형 플레이'],
     dominantTraits: ['cooperation'],
     secondaryTraits: ['social'],
     avoidTraits: ['exploration', 'strategy', 'leadership'],
@@ -188,7 +188,7 @@ export const animalTypeMeta = {
   [AnimalType.koala]: {
     label: '코알라',
     group: AnimalGroup.support,
-    description: '편하게 즐기는 감성러, 웃으면서 게임하는 캐주얼 타입',
+    description: ['편하게 즐기는 감성러', '웃으면서 게임하는 캐주얼 타입'],
     dominantTraits: ['social'],
     secondaryTraits: ['cooperation'],
     avoidTraits: ['exploration', 'strategy', 'leadership'],
@@ -202,7 +202,7 @@ export const animalTypeMeta = {
   [AnimalType.dog]: {
     label: '강아지',
     group: AnimalGroup.social,
-    description: '팀 분위기 메이커, 케미와 소통으로 판을 살리는 타입',
+    description: ['팀 분위기 메이커', '케미와 소통으로 판을 살리는 타입'],
     dominantTraits: ['cooperation', 'social'],
     secondaryTraits: ['exploration', 'leadership'],
     avoidTraits: ['strategy'],
@@ -214,7 +214,7 @@ export const animalTypeMeta = {
   [AnimalType.dolphin]: {
     label: '돌고래',
     group: AnimalGroup.social,
-    description: '텐션을 끌어올리는 파티러, 함께할수록 즐거운 플레이어',
+    description: ['텐션을 끌어올리는 파티러', '함께할수록 즐거운 플레이어'],
     dominantTraits: ['cooperation', 'social'],
     secondaryTraits: ['exploration'],
     avoidTraits: ['strategy', 'leadership'],
@@ -226,7 +226,7 @@ export const animalTypeMeta = {
   [AnimalType.panda]: {
     label: '판다',
     group: AnimalGroup.social,
-    description: '누구와도 잘 맞는 균형형, 편안하게 함께할 수 있는 타입',
+    description: ['누구와도 잘 맞는 균형형', '편안하게 함께할 수 있는 타입'],
     dominantTraits: ['cooperation', 'social'],
     secondaryTraits: ['strategy'],
     avoidTraits: ['exploration', 'leadership'],
@@ -238,7 +238,7 @@ export const animalTypeMeta = {
   [AnimalType.rabbit]: {
     label: '토끼',
     group: AnimalGroup.social,
-    description: '밝고 빠른 소셜러, 분위기를 가볍게 만드는 친화력 타입',
+    description: ['밝고 빠른 소셜러', '분위기를 가볍게 만드는 친화력 타입'],
     dominantTraits: ['social'],
     secondaryTraits: ['cooperation', 'exploration'],
     avoidTraits: ['strategy', 'leadership'],
@@ -252,7 +252,7 @@ export const animalTypeMeta = {
   [AnimalType.leopard]: {
     label: '표범',
     group: AnimalGroup.lone,
-    description: '승부에 집중하는 몰입형 플레이어, 성능과 결과 중심',
+    description: ['승부에 집중하는 몰입형 플레이어', '성능과 결과 중심'],
     dominantTraits: ['exploration'],
     secondaryTraits: ['strategy', 'leadership'],
     avoidTraits: ['cooperation', 'social'],
@@ -264,7 +264,7 @@ export const animalTypeMeta = {
   [AnimalType.cat]: {
     label: '고양이',
     group: AnimalGroup.lone,
-    description: '혼자 깊게 파고드는 고독한 전략가, 루트를 만드는 플레이',
+    description: ['혼자 깊게 파고드는 고독한 전략가', '루트를 만드는 플레이'],
     dominantTraits: ['strategy'],
     secondaryTraits: ['exploration'],
     avoidTraits: ['cooperation', 'leadership', 'social'],
