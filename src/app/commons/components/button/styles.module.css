@@ -62,7 +62,7 @@
 
 .theme-light.variant-primary:hover:not(:disabled),
 .theme-light.variant-primary.state-hover:not(:disabled) {
-  background-color: var(--color-brand-700);
+  background-color: var(--color-brand-300);
 }
 
 .theme-light.variant-primary:disabled,

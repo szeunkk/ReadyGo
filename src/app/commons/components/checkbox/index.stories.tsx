@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "체크박스 컴포넌트입니다. status, state, checked, indeterminate 등의 속성을 통해 다양한 상태를 표현할 수 있습니다.",
+          "체크박스 컴포넌트입니다. status와 state 속성을 통해 다양한 상태를 표현할 수 있습니다.",
       },
     },
   },
@@ -32,30 +32,6 @@ const meta = {
         defaultValue: { summary: "default" },
       },
     },
-    checked: {
-      control: { type: "boolean" },
-      description: "체크박스 선택 여부",
-      table: {
-        type: { summary: "boolean" },
-        defaultValue: { summary: "false" },
-      },
-    },
-    indeterminate: {
-      control: { type: "boolean" },
-      description: "체크박스 부분 선택 여부 (indeterminate 상태)",
-      table: {
-        type: { summary: "boolean" },
-        defaultValue: { summary: "false" },
-      },
-    },
-    disabled: {
-      control: { type: "boolean" },
-      description: "체크박스 비활성화 여부",
-      table: {
-        type: { summary: "boolean" },
-        defaultValue: { summary: "false" },
-      },
-    },
   },
 } satisfies Meta<typeof Checkbox>;
 
@@ -65,7 +41,7 @@ type Story = StoryObj<typeof meta>;
 // 기본 스토리
 export const Default: Story = {
   args: {
-    checked: false,
+    status: "unselected",
   },
 };
 
@@ -73,21 +49,18 @@ export const Default: Story = {
 export const Unselected: Story = {
   args: {
     status: "unselected",
-    checked: false,
   },
 };
 
 export const Selected: Story = {
   args: {
     status: "selected",
-    checked: true,
   },
 };
 
 export const Partial: Story = {
   args: {
     status: "partial",
-    indeterminate: true,
   },
 };
 
@@ -96,7 +69,6 @@ export const UnselectedDefault: Story = {
   args: {
     status: "unselected",
     state: "default",
-    checked: false,
   },
 };
 
@@ -104,7 +76,6 @@ export const UnselectedHover: Story = {
   args: {
     status: "unselected",
     state: "hover",
-    checked: false,
   },
 };
 
@@ -112,7 +83,6 @@ export const UnselectedPress: Story = {
   args: {
     status: "unselected",
     state: "press",
-    checked: false,
   },
 };
 
@@ -120,7 +90,6 @@ export const UnselectedFocus: Story = {
   args: {
     status: "unselected",
     state: "focus",
-    checked: false,
   },
 };
 
@@ -128,7 +97,6 @@ export const UnselectedDisabled: Story = {
   args: {
     status: "unselected",
     state: "disabled",
-    checked: false,
   },
 };
 
@@ -136,7 +104,6 @@ export const UnselectedError: Story = {
   args: {
     status: "unselected",
     state: "error",
-    checked: false,
   },
 };
 
@@ -145,7 +112,6 @@ export const SelectedDefault: Story = {
   args: {
     status: "selected",
     state: "default",
-    checked: true,
   },
 };
 
@@ -153,7 +119,6 @@ export const SelectedHover: Story = {
   args: {
     status: "selected",
     state: "hover",
-    checked: true,
   },
 };
 
@@ -161,7 +126,6 @@ export const SelectedPress: Story = {
   args: {
     status: "selected",
     state: "press",
-    checked: true,
   },
 };
 
@@ -169,7 +133,6 @@ export const SelectedFocus: Story = {
   args: {
     status: "selected",
     state: "focus",
-    checked: true,
   },
 };
 
@@ -177,7 +140,6 @@ export const SelectedDisabled: Story = {
   args: {
     status: "selected",
     state: "disabled",
-    checked: true,
   },
 };
 
@@ -185,7 +147,6 @@ export const SelectedError: Story = {
   args: {
     status: "selected",
     state: "error",
-    checked: true,
   },
 };
 
@@ -194,7 +155,6 @@ export const PartialDefault: Story = {
   args: {
     status: "partial",
     state: "default",
-    indeterminate: true,
   },
 };
 
@@ -202,7 +162,6 @@ export const PartialHover: Story = {
   args: {
     status: "partial",
     state: "hover",
-    indeterminate: true,
   },
 };
 
@@ -210,7 +169,6 @@ export const PartialPress: Story = {
   args: {
     status: "partial",
     state: "press",
-    indeterminate: true,
   },
 };
 
@@ -218,7 +176,6 @@ export const PartialFocus: Story = {
   args: {
     status: "partial",
     state: "focus",
-    indeterminate: true,
   },
 };
 
@@ -226,7 +183,6 @@ export const PartialDisabled: Story = {
   args: {
     status: "partial",
     state: "disabled",
-    indeterminate: true,
   },
 };
 
@@ -234,15 +190,14 @@ export const PartialError: Story = {
   args: {
     status: "partial",
     state: "error",
-    indeterminate: true,
   },
 };
 
 // Disabled prop 스토리
 export const DisabledProp: Story = {
   args: {
-    disabled: true,
-    checked: true,
+    state: "disabled",
+    status: "selected",
   },
 };
 
@@ -250,9 +205,9 @@ export const DisabledProp: Story = {
 export const AllStatuses: Story = {
   render: () => (
     <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-      <Checkbox status="unselected" checked={false} />
-      <Checkbox status="selected" checked={true} />
-      <Checkbox status="partial" indeterminate={true} />
+      <Checkbox status="unselected" />
+      <Checkbox status="selected" />
+      <Checkbox status="partial" />
     </div>
   ),
   parameters: {
@@ -267,12 +222,12 @@ export const AllStatuses: Story = {
 export const AllStatesUnselected: Story = {
   render: () => (
     <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-      <Checkbox status="unselected" state="default" checked={false} />
-      <Checkbox status="unselected" state="hover" checked={false} />
-      <Checkbox status="unselected" state="press" checked={false} />
-      <Checkbox status="unselected" state="focus" checked={false} />
-      <Checkbox status="unselected" state="disabled" checked={false} />
-      <Checkbox status="unselected" state="error" checked={false} />
+      <Checkbox status="unselected" state="default" />
+      <Checkbox status="unselected" state="hover" />
+      <Checkbox status="unselected" state="press" />
+      <Checkbox status="unselected" state="focus" />
+      <Checkbox status="unselected" state="disabled" />
+      <Checkbox status="unselected" state="error" />
     </div>
   ),
   parameters: {
@@ -287,12 +242,12 @@ export const AllStatesUnselected: Story = {
 export const AllStatesSelected: Story = {
   render: () => (
     <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-      <Checkbox status="selected" state="default" checked={true} />
-      <Checkbox status="selected" state="hover" checked={true} />
-      <Checkbox status="selected" state="press" checked={true} />
-      <Checkbox status="selected" state="focus" checked={true} />
-      <Checkbox status="selected" state="disabled" checked={true} />
-      <Checkbox status="selected" state="error" checked={true} />
+      <Checkbox status="selected" state="default" />
+      <Checkbox status="selected" state="hover" />
+      <Checkbox status="selected" state="press" />
+      <Checkbox status="selected" state="focus" />
+      <Checkbox status="selected" state="disabled" />
+      <Checkbox status="selected" state="error" />
     </div>
   ),
   parameters: {
@@ -307,12 +262,12 @@ export const AllStatesSelected: Story = {
 export const AllStatesPartial: Story = {
   render: () => (
     <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-      <Checkbox status="partial" state="default" indeterminate={true} />
-      <Checkbox status="partial" state="hover" indeterminate={true} />
-      <Checkbox status="partial" state="press" indeterminate={true} />
-      <Checkbox status="partial" state="focus" indeterminate={true} />
-      <Checkbox status="partial" state="disabled" indeterminate={true} />
-      <Checkbox status="partial" state="error" indeterminate={true} />
+      <Checkbox status="partial" state="default" />
+      <Checkbox status="partial" state="hover" />
+      <Checkbox status="partial" state="press" />
+      <Checkbox status="partial" state="focus" />
+      <Checkbox status="partial" state="disabled" />
+      <Checkbox status="partial" state="error" />
     </div>
   ),
   parameters: {
@@ -355,12 +310,12 @@ export const StatusAndStateMatrix: Story = {
           alignItems: "center",
         }}>
         <div style={{ fontWeight: "bold" }}>Unselected</div>
-        <Checkbox status="unselected" state="default" checked={false} />
-        <Checkbox status="unselected" state="hover" checked={false} />
-        <Checkbox status="unselected" state="press" checked={false} />
-        <Checkbox status="unselected" state="focus" checked={false} />
-        <Checkbox status="unselected" state="disabled" checked={false} />
-        <Checkbox status="unselected" state="error" checked={false} />
+        <Checkbox status="unselected" state="default" />
+        <Checkbox status="unselected" state="hover" />
+        <Checkbox status="unselected" state="press" />
+        <Checkbox status="unselected" state="focus" />
+        <Checkbox status="unselected" state="disabled" />
+        <Checkbox status="unselected" state="error" />
       </div>
       <div
         style={{
@@ -370,12 +325,12 @@ export const StatusAndStateMatrix: Story = {
           alignItems: "center",
         }}>
         <div style={{ fontWeight: "bold" }}>Selected</div>
-        <Checkbox status="selected" state="default" checked={true} />
-        <Checkbox status="selected" state="hover" checked={true} />
-        <Checkbox status="selected" state="press" checked={true} />
-        <Checkbox status="selected" state="focus" checked={true} />
-        <Checkbox status="selected" state="disabled" checked={true} />
-        <Checkbox status="selected" state="error" checked={true} />
+        <Checkbox status="selected" state="default" />
+        <Checkbox status="selected" state="hover" />
+        <Checkbox status="selected" state="press" />
+        <Checkbox status="selected" state="focus" />
+        <Checkbox status="selected" state="disabled" />
+        <Checkbox status="selected" state="error" />
       </div>
       <div
         style={{
@@ -385,12 +340,12 @@ export const StatusAndStateMatrix: Story = {
           alignItems: "center",
         }}>
         <div style={{ fontWeight: "bold" }}>Partial</div>
-        <Checkbox status="partial" state="default" indeterminate={true} />
-        <Checkbox status="partial" state="hover" indeterminate={true} />
-        <Checkbox status="partial" state="press" indeterminate={true} />
-        <Checkbox status="partial" state="focus" indeterminate={true} />
-        <Checkbox status="partial" state="disabled" indeterminate={true} />
-        <Checkbox status="partial" state="error" indeterminate={true} />
+        <Checkbox status="partial" state="default" />
+        <Checkbox status="partial" state="hover" />
+        <Checkbox status="partial" state="press" />
+        <Checkbox status="partial" state="focus" />
+        <Checkbox status="partial" state="disabled" />
+        <Checkbox status="partial" state="error" />
       </div>
     </div>
   ),
@@ -413,15 +368,15 @@ export const WithLabels: Story = {
         gap: "12px",
       }}>
       <label style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-        <Checkbox checked={false} />
+        <Checkbox status="unselected" />
         <span>옵션 1</span>
       </label>
       <label style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-        <Checkbox checked={true} />
+        <Checkbox status="selected" />
         <span>옵션 2</span>
       </label>
       <label style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-        <Checkbox indeterminate={true} />
+        <Checkbox status="partial" />
         <span>옵션 3 (부분 선택)</span>
       </label>
       <label
@@ -431,7 +386,7 @@ export const WithLabels: Story = {
           alignItems: "center",
           opacity: 0.5,
         }}>
-        <Checkbox disabled={true} checked={true} />
+        <Checkbox status="selected" state="disabled" />
         <span>옵션 4 (비활성화)</span>
       </label>
     </div>
@@ -444,7 +399,4 @@ export const WithLabels: Story = {
     },
   },
 };
-
-
-
 

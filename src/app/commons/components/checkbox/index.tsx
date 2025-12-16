@@ -14,31 +14,25 @@ export type CheckboxState =
   | "error";
 
 export interface CheckboxProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "checked"> {
+  extends Omit<
+    InputHTMLAttributes<HTMLInputElement>,
+    "type" | "checked" | "disabled"
+  > {
   status?: CheckboxStatus;
   state?: CheckboxState;
-  checked?: boolean;
-  indeterminate?: boolean;
 }
 
 export default function Checkbox({
-  status,
+  status = "unselected",
   state = "default",
-  checked = false,
-  indeterminate = false,
   className = "",
-  disabled,
   ...props
 }: CheckboxProps) {
-  const isDisabled = disabled || state === "disabled";
-
-  // status를 checked와 indeterminate로부터 결정
-  const actualStatus: CheckboxStatus =
-    status || (indeterminate ? "partial" : checked ? "selected" : "unselected");
+  const isDisabled = state === "disabled";
 
   const checkboxClasses = [
     styles.checkbox,
-    styles[`status-${actualStatus}`],
+    styles[`status-${status}`],
     styles[`state-${state}`],
     isDisabled && styles.disabled,
     className,
@@ -50,9 +44,10 @@ export default function Checkbox({
 
   React.useEffect(() => {
     if (inputRef.current) {
-      inputRef.current.indeterminate = indeterminate;
+      inputRef.current.indeterminate = status === "partial";
+      inputRef.current.checked = status === "selected";
     }
-  }, [indeterminate]);
+  }, [status]);
 
   return (
     <label className={styles.label}>
@@ -60,19 +55,18 @@ export default function Checkbox({
         ref={inputRef}
         type="checkbox"
         className={styles.input}
-        checked={checked}
+        checked={status === "selected"}
         disabled={isDisabled}
         {...props}
       />
       <div
         className={`${styles.checkboxWrapper} ${
-          state === "focus" &&
-          (actualStatus === "selected" || actualStatus === "partial")
+          state === "focus" && (status === "selected" || status === "partial")
             ? styles.hasFocusRing
             : ""
         }`}>
         <span className={checkboxClasses}>
-          {actualStatus === "selected" && (
+          {status === "selected" && (
             <svg
               className={styles.icon}
               width="12"
@@ -89,7 +83,7 @@ export default function Checkbox({
               />
             </svg>
           )}
-          {actualStatus === "partial" && (
+          {status === "partial" && (
             <svg
               className={styles.icon}
               width="12"
@@ -110,8 +104,3 @@ export default function Checkbox({
     </label>
   );
 }
-
-
-
-
-
