@@ -27,7 +27,7 @@
 }
 
 .radioWrapper.hasFocusRing {
-  border-color: var(--color-border-focus-ring);
+  border-color: var(--color-brand-600);
 }
 
 .radio {
@@ -60,83 +60,93 @@
 }
 
 /* Status: Unselected */
+/* 피그마 디자인 매핑: fill=#ffffff, stroke=#d1d5db (gray-300) */
 .status-unselected.state-default {
-  background-color: var(--color-bg-default);
-  border: 1px solid var(--color-border-primary);
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-gray-300);
 }
 
+/* 피그마 디자인 매핑: fill=#ffffff, stroke=#a9afb9 (gray-400) */
 .status-unselected.state-hover {
-  background-color: var(--color-bg-default);
-  border: 1px solid var(--color-border-interactive-secondary);
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-gray-400);
 }
 
+/* 피그마 디자인 매핑: fill=#ffffff, stroke=#747982 (gray-500) */
 .status-unselected.state-press {
-  background-color: var(--color-bg-default);
-  border: 1px solid var(--color-border-interactive-secondary-pressed);
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-gray-500);
 }
 
+/* 피그마 디자인 매핑: fill=#ffffff, stroke=#43b3a0 (brand-700) */
 .status-unselected.state-focus {
-  background-color: var(--color-bg-default);
-  border: 1px solid var(--color-border-interactive-primary);
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-brand-700);
 }
 
+/* 피그마 디자인 매핑: fill=#e5e7eb (gray-200), stroke=#a9afb9 (gray-400) */
 .status-unselected.state-disabled {
-  background-color: var(--color-bg-disabled);
-  border: 1px solid var(--color-border-disabled);
+  background-color: var(--color-gray-200);
+  border: 1px solid var(--color-gray-400);
 }
 
+/* 피그마 디자인 매핑: fill=#ffffff, stroke=#dd2e2e (red-600) */
 .status-unselected.state-error {
-  background-color: var(--color-bg-default);
-  border: 1px solid var(--color-border-danger);
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-danger-600);
 }
 
 /* Status: Selected */
+/* 피그마 디자인 매핑: fill=#43b3a0 (brand-700), indicator=#ffffff */
 .status-selected.state-default {
-  background-color: var(--color-icon-interactive-primary);
-  border: none;
+  background-color: var(--color-brand-700);
+  border: 1px solid var(--color-brand-700);
 }
 
+/* 피그마 디자인 매핑: fill=#348b7c (brand-800), indicator=#ffffff */
 .status-selected.state-hover {
-  background-color: var(--color-icon-interactive-primary-hover);
-  border: none;
+  background-color: var(--color-brand-800);
+  border: 1px solid var(--color-brand-800);
 }
 
+/* 피그마 디자인 매핑: fill=#286a5f (brand-900), indicator=#ffffff */
 .status-selected.state-press {
-  background-color: var(--color-icon-interactive-primary-pressed);
-  border: none;
+  background-color: var(--color-brand-900);
+  border: 1px solid var(--color-brand-900);
 }
 
+/* 피그마 디자인 매핑: fill=#43b3a0 (brand-700), indicator=#ffffff */
 .status-selected.state-focus {
-  background-color: var(--color-icon-interactive-primary);
-  border: none;
+  background-color: var(--color-brand-700);
+  border: 1px solid var(--color-brand-700);
 }
 
+/* 피그마 디자인 매핑: fill=#e5e7eb (gray-200), indicator=#ffffff */
 .status-selected.state-disabled {
   background-color: var(--color-bg-disabled);
-  border: none;
+  border: 1px solid var(--color-bg-disabled);
 }
 
 .status-selected.state-disabled .indicator {
   background-color: var(--color-icon-interactive-inverse);
 }
 
+/* 피그마 디자인 매핑: fill=#dd2e2e (red-600), indicator=#ffffff */
 .status-selected.state-error {
-  background-color: var(--color-icon-danger);
-  border: none;
+  background-color: var(--color-danger-600);
+  border: 1px solid var(--color-danger-600);
 }
 
 /* Hover state (when not explicitly set) */
-.label:hover .radio:not(.disabled):not(.state-disabled) {
-  /* Only apply hover if state is default */
-}
 
 .label:hover .status-unselected.state-default {
-  background-color: var(--color-bg-default);
-  border-color: var(--color-border-interactive-secondary);
+  background-color: var(--color-base-white);
+  border-color: var(--color-gray-400);
 }
 
 .label:hover .status-selected.state-default {
-  background-color: var(--color-icon-interactive-primary-hover);
+  background-color: var(--color-brand-800);
+  border-color: var(--color-brand-800);
 }
 
 /* Focus state */
@@ -145,24 +155,23 @@
 }
 
 .input:focus-visible ~ .radioWrapper .status-unselected.state-default {
-  border-color: var(--color-border-interactive-primary);
+  border-color: var(--color-brand-700);
 }
 
 .input:focus-visible ~ .radioWrapper .status-selected.state-default {
-  background-color: var(--color-icon-interactive-primary);
+  background-color: var(--color-brand-700);
+  border-color: var(--color-brand-700);
 }
 
 /* Focus ring is controlled by state prop, not focus-visible */
 
 /* Active/Press state */
-.label:active .radio:not(.disabled):not(.state-disabled) {
-  /* Only apply press if state is default */
-}
 
 .label:active .status-unselected.state-default {
-  border-color: var(--color-border-interactive-secondary-pressed);
+  border-color: var(--color-gray-500);
 }
 
 .label:active .status-selected.state-default {
-  background-color: var(--color-icon-interactive-primary-pressed);
+  background-color: var(--color-brand-900);
+  border-color: var(--color-brand-900);
 }

@@ -10,7 +10,7 @@
 
 ==============================================
 
-조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: s1dcu1ct)
+조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: di1wn2od)
 조건-피그마) 참고할 공통컴포넌트 노드ID: 2130:36245
 
 조건-파일경로) 구현될 TSX 파일경로: src/commons/components/radio/index.tsx
@@ -30,7 +30,7 @@
 
 ==============================================
 
-핵심요구사항) 노드ID를 참고하여 globals.css에 있는 시멘틱 색상 토큰을 이용해서 색상 수정할 것.
-            조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: hrwj1gor)
+핵심요구사항) 채널ID와 노드ID를 참고하여 피그마 디자인 색상과 globals.css의 시멘틱 토큰을 매핑해 CSS를 업데이트할 것.
+            조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: di1wn2od)
             조건-피그마) 참고할 공통컴포넌트 노드ID: 2130:36245
 
