@@ -1,0 +1,40 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @02-wireframe.mdc
+            - @03-ui.mdc
+
+==============================================
+
+조건-피그마) 활용할MCP: FigmaMCP
+조건-피그마) 참고할 공통컴포넌트 노드ID(my-dark): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2361-43384&m=dev
+조건-피그마) 참고할 공통컴포넌트 노드ID(user-dark): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2361-60410&m=dev
+
+조건-피그마) 참고할 공통컴포넌트 노드ID(my-light): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2428-18100&m=dev
+조건-피그마) 참고할 공통컴포넌트 노드ID(user-light): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2428-18175&m=dev
+
+
+조건-파일경로) 구현될 TSX 파일경로: src/commons/components/animalCard/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/commons/components/animalCard/styles.module.css
+
+==============================================
+
+핵심요구사항) Figma MCP를 연동하여 피그마의 모든 속성과 변형을 확인하여 해당 컴포넌트들을 구현할 것.
+
+핵심요구사항) 다음 조건을 모두 만족하는 완전한 variant 시스템을 구현할 것.
+            - property: 'my' | 'user'
+
+핵심요구사항) animal description의 경우 animalType.enum.ts의 enum type을 import하여 비교 및 참조할 것.
+
+핵심요구사항) animal image의 경우, animalType.enum.ts의 imageM과 background.png 파일을 활용하여 구현할 것.
+
+핵심요구사항) tierTag의 경우, 공통컴포넌트의 tierTag를 활용하여 구현할 것.
+
+핵심요구사항) 각 피그마의 padding, margin, gap, opacity 등 모든 CSS 요소의 속성과 변형을 확인하여 피그마와 정확하게 동일하게 구현할 것.
+            - animalCard는 독립적인 컴포넌트이므로, 다른 컴포넌트를 비교하여 구현하는 것이 아닌, figma와 비교하면서 구현할 것.
+
+핵심요구사항) 추후 dark, light 모드에 대응할 수 있도록 피그마와 동일한 interactive 색상 토큰을 사용하여 구현할 것.
