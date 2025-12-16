@@ -161,27 +161,27 @@
 
 /* Dark Theme - Status: Selected */
 .theme-dark.status-selected.state-default {
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-brand-500);
   border-color: var(--color-brand-500);
-  color: var(--color-base-white);
+  color: var(--color-base-black);
 }
 
 .theme-dark.status-selected.state-hover {
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-brand-600);
   border-color: var(--color-brand-600);
-  color: var(--color-base-white);
+  color: var(--color-base-black);
 }
 
 .theme-dark.status-selected.state-press {
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-brand-700);
   border-color: var(--color-brand-700);
-  color: var(--color-base-white);
+  color: var(--color-base-black);
 }
 
 .theme-dark.status-selected.state-focus {
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-brand-500);
   border-color: var(--color-brand-500);
-  color: var(--color-base-white);
+  color: var(--color-base-black);
 }
 
 .theme-dark.status-selected.state-disabled {
@@ -191,9 +191,9 @@
 }
 
 .theme-dark.status-selected.state-error {
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-danger-400);
   border-color: var(--color-danger-400);
-  color: var(--color-base-white);
+  color: var(--color-base-black);
 }
 
 /* Hover state (when not explicitly set) */
@@ -205,7 +205,7 @@
 .label:hover .theme-light.status-selected.state-default {
   background-color: var(--color-brand-800);
   border-color: var(--color-brand-800);
-  color: var(--color-base-white);
+  color: var(--color-base-black);
 }
 
 .label:hover .theme-dark.status-unselected.state-default {
@@ -214,9 +214,9 @@
 }
 
 .label:hover .theme-dark.status-selected.state-default {
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-brand-600);
   border-color: var(--color-brand-600);
-  color: var(--color-base-white);
+  color: var(--color-base-black);
 }
 
 /* Focus state */
@@ -245,7 +245,7 @@
 }
 
 .input:focus-visible ~ .radioWrapper .theme-dark.status-selected.state-default {
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-brand-500);
   border-color: var(--color-brand-500);
   color: var(--color-base-white);
 }
@@ -266,7 +266,7 @@
 }
 
 .label:active .theme-dark.status-selected.state-default {
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-brand-700);
   border-color: var(--color-brand-700);
   color: var(--color-base-white);
 }
