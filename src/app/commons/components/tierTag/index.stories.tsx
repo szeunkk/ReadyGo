@@ -39,6 +39,27 @@ export const LightBronze: Story = {
     tier: TierType.bronze,
     theme: 'light',
   },
+  // #region agent log
+  play: async () => {
+    fetch('http://127.0.0.1:7242/ingest/29c7f2c2-61fa-414f-962c-84e088badf45', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'index.stories.tsx:37',
+        message: 'LightBronze story args',
+        data: {
+          tier: TierType.bronze,
+          tierValue: String(TierType.bronze),
+          theme: 'light',
+        },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'pre-fix',
+        hypothesisId: 'D',
+      }),
+    }).catch(() => {});
+  },
+  // #endregion
 };
 
 export const LightSilver: Story = {
@@ -184,6 +205,10 @@ export const DarkChampion: Story = {
 
 // All Tiers in Light Theme
 export const AllTiersLight: Story = {
+  args: {
+    tier: TierType.bronze,
+    theme: 'light',
+  },
   render: () => (
     <div
       style={{
@@ -206,6 +231,10 @@ export const AllTiersLight: Story = {
 
 // All Tiers in Dark Theme
 export const AllTiersDark: Story = {
+  args: {
+    tier: TierType.bronze,
+    theme: 'dark',
+  },
   render: () => (
     <div
       style={{
