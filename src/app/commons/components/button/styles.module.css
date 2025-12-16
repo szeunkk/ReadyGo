@@ -140,13 +140,13 @@
 
 .theme-dark.variant-primary:disabled,
 .theme-dark.variant-primary.state-disabled {
-  background-color: var(--color-neutral-900);
+  background-color: var(--color-neutral-800);
   color: var(--color-neutral-700);
 }
 
 /* Dark Theme - Secondary Variant */
 .theme-dark.variant-secondary {
-  background-color: var(--color-neutral-700);
+  background-color: var(--color-neutral-600);
   color: var(--color-neutral-100);
 }
 
@@ -157,20 +157,20 @@
 
 .theme-dark.variant-secondary:disabled,
 .theme-dark.variant-secondary.state-disabled {
-  background-color: var(--color-neutral-900);
+  background-color: var(--color-neutral-800);
   color: var(--color-neutral-700);
 }
 
 /* Dark Theme - Outline Variant */
 .theme-dark.variant-outline {
-  background-color: var(--color-neutral-900);
+  background-color: transparent;
   border: 1px solid var(--color-neutral-400);
   color: var(--color-neutral-400);
 }
 
 .theme-dark.variant-outline:hover:not(:disabled),
 .theme-dark.variant-outline.state-hover:not(:disabled) {
-  background-color: var(--color-neutral-900);
+  background-color: transparent;
   border-color: var(--color-neutral-400);
   color: var(--color-neutral-400);
 }
