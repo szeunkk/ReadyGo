@@ -5,7 +5,7 @@
   justify-content: center;
   border: none;
   cursor: pointer;
-  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui,
     sans-serif;
   font-style: normal;
   font-weight: var(--font-weight-medium);
@@ -62,7 +62,7 @@
 
 .theme-light.variant-primary:hover:not(:disabled),
 .theme-light.variant-primary.state-hover:not(:disabled) {
-  background-color: var(--color-brand-300);
+  background-color: var(--color-brand-700);
 }
 
 .theme-light.variant-primary:disabled,
@@ -73,13 +73,13 @@
 
 /* Light Theme - Secondary Variant */
 .theme-light.variant-secondary {
-  background-color: var(--color-neutral-500);
+  background-color: var(--color-neutral-300);
   color: var(--color-neutral-900);
 }
 
 .theme-light.variant-secondary:hover:not(:disabled),
 .theme-light.variant-secondary.state-hover:not(:disabled) {
-  background-color: var(--color-neutral-700);
+  background-color: var(--color-neutral-400);
 }
 
 .theme-light.variant-secondary:disabled,
@@ -140,13 +140,13 @@
 
 .theme-dark.variant-primary:disabled,
 .theme-dark.variant-primary.state-disabled {
-  background-color: var(--color-neutral-800);
+  background-color: var(--color-neutral-900);
   color: var(--color-neutral-700);
 }
 
 /* Dark Theme - Secondary Variant */
 .theme-dark.variant-secondary {
-  background-color: var(--color-neutral-600);
+  background-color: var(--color-neutral-700);
   color: var(--color-neutral-100);
 }
 
@@ -157,7 +157,7 @@
 
 .theme-dark.variant-secondary:disabled,
 .theme-dark.variant-secondary.state-disabled {
-  background-color: var(--color-neutral-800);
+  background-color: var(--color-neutral-900);
   color: var(--color-neutral-700);
 }
 
