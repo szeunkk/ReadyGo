@@ -21,7 +21,7 @@
 
 /* Light Theme - Rectangle Style */
 .theme-light.style-rectangle {
-  background-color: var(--color-bg-light-tertiary);
+  background-color: var(--color-gray-200);
   color: var(--color-text-light-tertiary);
   border-radius: 4px;
   padding-left: 8px;
