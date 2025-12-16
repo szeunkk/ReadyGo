@@ -128,4 +128,3 @@ export const getTierRank = (type: TierType): number => {
 export const compareTiers = (a: TierType, b: TierType): number => {
   return getTierRank(b) - getTierRank(a);
 };
-
