@@ -18,7 +18,7 @@ export type SelectboxState =
   | 'disabled';
 export type SelectboxTheme = 'light' | 'dark';
 
-export interface SelectboxItem {
+export interface SelectboxOption {
   id: string;
   value: React.ReactNode;
 }
@@ -29,12 +29,13 @@ export interface SelectboxProps {
   theme?: SelectboxTheme;
   label?: string;
   additionalInfo?: string;
-  items?: SelectboxItem[];
-  selectedItemId?: string;
-  onSelect?: (itemId: string) => void;
+  placeholder?: string;
+  items?: SelectboxOption[];
+  selectedId?: string;
+  onSelect?: (id: string) => void;
   className?: string;
   children?: React.ReactNode;
-  disabled?: boolean;
+  gap?: number;
 }
 
 export default function Selectbox({
@@ -43,30 +44,27 @@ export default function Selectbox({
   theme = 'light',
   label,
   additionalInfo,
+  placeholder = '선택하세요',
   items = [],
-  selectedItemId,
+  selectedId,
   onSelect,
   className = '',
   children,
-  disabled = false,
+  gap = 8,
 }: SelectboxProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalSelectedId, setInternalSelectedId] = useState<
     string | undefined
-  >(selectedItemId);
+  >(selectedId);
   const selectboxRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const isDisabled = disabled || state === 'disabled' || variant === 'disabled';
+  const isDisabled = state === 'disabled' || variant === 'disabled';
 
-  // 외부에서 selectedItemId가 변경되면 내부 상태도 업데이트
   useEffect(() => {
-    if (selectedItemId !== undefined) {
-      setInternalSelectedId(selectedItemId);
-    }
-  }, [selectedItemId]);
+    setInternalSelectedId(selectedId);
+  }, [selectedId]);
 
-  // 외부 클릭 감지하여 드롭다운 닫기
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -94,11 +92,11 @@ export default function Selectbox({
     }
   };
 
-  const handleItemClick = (itemId: string) => {
-    setInternalSelectedId(itemId);
+  const handleOptionClick = (id: string) => {
+    setInternalSelectedId(id);
     setIsOpen(false);
     if (onSelect) {
-      onSelect(itemId);
+      onSelect(id);
     }
   };
 
@@ -110,85 +108,84 @@ export default function Selectbox({
     styles[`state-${state}`],
     styles[`theme-${theme}`],
     isDisabled && styles.disabled,
-    isOpen && styles.open,
     className,
   ]
     .filter(Boolean)
     .join(' ');
 
-  const dropdownClasses = [
-    styles.dropdown,
-    styles[`theme-${theme}`],
-    isOpen && styles.dropdownOpen,
-  ]
+  const dropdownClasses = [styles.dropdown, styles[`theme-${theme}`]]
     .filter(Boolean)
     .join(' ');
 
   return (
-    <div className={styles.container}>
-      {label && <label className={styles.label}>{label}</label>}
-      {additionalInfo && (
-        <div className={styles.additionalInfo}>{additionalInfo}</div>
+    <div className={styles.wrapper}>
+      {label && (
+        <label className={styles.label}>
+          {label}
+          {additionalInfo && (
+            <span className={styles.additionalInfo}>{additionalInfo}</span>
+          )}
+        </label>
       )}
-      <div className={styles.selectboxWrapper} ref={selectboxRef}>
+      <div className={styles.selectboxContainer} ref={selectboxRef}>
         <button
           type="button"
           className={selectboxClasses}
           onClick={handleSelectboxClick}
           disabled={isDisabled}
-          aria-expanded={isOpen}
-          aria-haspopup="listbox"
+          style={{ gap: `${gap}px` }}
         >
-          <div className={styles.content}>
-            {selectedItem ? (
-              <span className={styles.selectedValue}>{selectedItem.value}</span>
-            ) : (
-              children
+          <span className={styles.content}>
+            {children || (
+              <span className={styles.text}>
+                {selectedItem ? selectedItem.value : placeholder}
+              </span>
             )}
-          </div>
-          <svg
-            className={`${styles.arrow} ${isOpen ? styles.arrowOpen : ''}`}
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M4 6L8 10L12 6"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          </span>
+          <span className={styles.icon}>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className={isOpen ? styles.iconRotated : ''}
+            >
+              <path
+                d="M4 6L8 10L12 6"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
         </button>
         {isOpen && items.length > 0 && (
           <div className={dropdownClasses} ref={dropdownRef}>
-            <ul className={styles.optionList} role="listbox">
+            <div className={styles.optionGroup}>
               {items.map((item) => {
                 const isSelected = item.id === internalSelectedId;
-                const itemClasses = [
-                  styles.optionItem,
-                  isSelected && styles.optionItemSelected,
+                const optionClasses = [
+                  styles.option,
+                  isSelected && styles.selected,
                   styles[`theme-${theme}`],
                 ]
                   .filter(Boolean)
                   .join(' ');
 
                 return (
-                  <li
+                  <button
                     key={item.id}
-                    className={itemClasses}
-                    role="option"
-                    aria-selected={isSelected}
-                    onClick={() => handleItemClick(item.id)}
+                    type="button"
+                    className={optionClasses}
+                    onClick={() => handleOptionClick(item.id)}
                   >
                     {item.value}
-                  </li>
+                  </button>
                 );
               })}
-            </ul>
+            </div>
           </div>
         )}
       </div>
