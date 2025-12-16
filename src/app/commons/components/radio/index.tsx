@@ -12,32 +12,32 @@ export type RadioState =
   | 'focus'
   | 'disabled'
   | 'error';
+export type RadioTheme = 'light' | 'dark';
 
 export interface RadioProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'checked'> {
+  extends Omit<
+    InputHTMLAttributes<HTMLInputElement>,
+    'type' | 'checked' | 'disabled'
+  > {
   status?: RadioStatus;
   state?: RadioState;
-  checked?: boolean;
+  theme?: RadioTheme;
 }
 
 export default function Radio({
-  status,
+  status = 'unselected',
   state = 'default',
-  checked = false,
+  theme = 'light',
   className = '',
-  disabled,
   ...props
 }: RadioProps) {
-  const isDisabled = disabled || state === 'disabled';
-
-  // status를 checked로부터 결정
-  const actualStatus: RadioStatus =
-    status || (checked ? 'selected' : 'unselected');
+  const isDisabled = state === 'disabled';
 
   const radioClasses = [
     styles.radio,
-    styles[`status-${actualStatus}`],
+    styles[`status-${status}`],
     styles[`state-${state}`],
+    styles[`theme-${theme}`],
     isDisabled && styles.disabled,
     className,
   ]
@@ -49,8 +49,8 @@ export default function Radio({
       <input
         type="radio"
         className={styles.input}
-        checked={checked}
         disabled={isDisabled}
+        checked={status === 'selected'}
         {...props}
       />
       <div
@@ -59,12 +59,9 @@ export default function Radio({
         }`}
       >
         <span className={radioClasses}>
-          {actualStatus === 'selected' && <span className={styles.indicator} />}
+          {status === 'selected' && <span className={styles.dot} />}
         </span>
       </div>
     </label>
   );
 }
-
-
-

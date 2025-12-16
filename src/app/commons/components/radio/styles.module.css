@@ -21,24 +21,26 @@
   justify-content: center;
   width: 20px;
   height: 20px;
-  border-radius: 99999px;
-  border: 1px solid transparent;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
   box-sizing: border-box;
+  transition: border-color 0.2s;
 }
 
 .radioWrapper.hasFocusRing {
-  border-color: var(--color-brand-600);
+  border-color: var(--color-border-focus-ring);
 }
 
 .radio {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
-  border-radius: 99999px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
   box-sizing: border-box;
-  transition: background-color 0.2s, border-color 0.2s;
+  border: 1.5px solid transparent;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
   flex-shrink: 0;
 }
 
@@ -50,103 +52,171 @@
   cursor: not-allowed;
 }
 
-.indicator {
-  width: 6px;
-  height: 6px;
-  border-radius: 99999px;
-  background-color: var(--color-icon-interactive-inverse);
-  display: block;
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
   flex-shrink: 0;
 }
 
-/* Status: Unselected */
-/* 피그마 디자인 매핑: fill=#ffffff, stroke=#d1d5db (gray-300) */
-.status-unselected.state-default {
+/* Light Theme - Status: Unselected */
+.theme-light.status-unselected.state-default {
   background-color: var(--color-base-white);
-  border: 1px solid var(--color-gray-300);
+  border-color: var(--color-gray-300);
 }
 
-/* 피그마 디자인 매핑: fill=#ffffff, stroke=#a9afb9 (gray-400) */
-.status-unselected.state-hover {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-gray-400);
-}
-
-/* 피그마 디자인 매핑: fill=#ffffff, stroke=#747982 (gray-500) */
-.status-unselected.state-press {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-gray-500);
-}
-
-/* 피그마 디자인 매핑: fill=#ffffff, stroke=#43b3a0 (brand-700) */
-.status-unselected.state-focus {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-brand-700);
-}
-
-/* 피그마 디자인 매핑: fill=#e5e7eb (gray-200), stroke=#a9afb9 (gray-400) */
-.status-unselected.state-disabled {
-  background-color: var(--color-gray-200);
-  border: 1px solid var(--color-gray-400);
-}
-
-/* 피그마 디자인 매핑: fill=#ffffff, stroke=#dd2e2e (red-600) */
-.status-unselected.state-error {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-danger-600);
-}
-
-/* Status: Selected */
-/* 피그마 디자인 매핑: fill=#43b3a0 (brand-700), indicator=#ffffff */
-.status-selected.state-default {
-  background-color: var(--color-brand-700);
-  border: 1px solid var(--color-brand-700);
-}
-
-/* 피그마 디자인 매핑: fill=#348b7c (brand-800), indicator=#ffffff */
-.status-selected.state-hover {
-  background-color: var(--color-brand-800);
-  border: 1px solid var(--color-brand-800);
-}
-
-/* 피그마 디자인 매핑: fill=#286a5f (brand-900), indicator=#ffffff */
-.status-selected.state-press {
-  background-color: var(--color-brand-900);
-  border: 1px solid var(--color-brand-900);
-}
-
-/* 피그마 디자인 매핑: fill=#43b3a0 (brand-700), indicator=#ffffff */
-.status-selected.state-focus {
-  background-color: var(--color-brand-700);
-  border: 1px solid var(--color-brand-700);
-}
-
-/* 피그마 디자인 매핑: fill=#e5e7eb (gray-200), indicator=#ffffff */
-.status-selected.state-disabled {
-  background-color: var(--color-bg-disabled);
-  border: 1px solid var(--color-bg-disabled);
-}
-
-.status-selected.state-disabled .indicator {
-  background-color: var(--color-icon-interactive-inverse);
-}
-
-/* 피그마 디자인 매핑: fill=#dd2e2e (red-600), indicator=#ffffff */
-.status-selected.state-error {
-  background-color: var(--color-danger-600);
-  border: 1px solid var(--color-danger-600);
-}
-
-/* Hover state (when not explicitly set) */
-
-.label:hover .status-unselected.state-default {
+.theme-light.status-unselected.state-hover {
   background-color: var(--color-base-white);
   border-color: var(--color-gray-400);
 }
 
-.label:hover .status-selected.state-default {
-  background-color: var(--color-brand-800);
+.theme-light.status-unselected.state-press {
+  background-color: var(--color-base-white);
+  border-color: var(--color-gray-500);
+}
+
+.theme-light.status-unselected.state-focus {
+  background-color: var(--color-base-white);
+  border-color: var(--color-brand-700);
+}
+
+.theme-light.status-unselected.state-disabled {
+  background-color: var(--color-gray-200);
+  border-color: var(--color-gray-400);
+}
+
+.theme-light.status-unselected.state-error {
+  background-color: var(--color-base-white);
+  border-color: var(--color-danger-600);
+}
+
+/* Light Theme - Status: Selected */
+.theme-light.status-selected.state-default {
+  background-color: var(--color-base-white);
+  border-color: var(--color-brand-700);
+  color: var(--color-brand-700);
+}
+
+.theme-light.status-selected.state-hover {
+  background-color: var(--color-base-white);
   border-color: var(--color-brand-800);
+  color: var(--color-brand-800);
+}
+
+.theme-light.status-selected.state-press {
+  background-color: var(--color-base-white);
+  border-color: var(--color-brand-900);
+  color: var(--color-brand-900);
+}
+
+.theme-light.status-selected.state-focus {
+  background-color: var(--color-base-white);
+  border-color: var(--color-brand-700);
+  color: var(--color-brand-700);
+}
+
+.theme-light.status-selected.state-disabled {
+  background-color: var(--color-gray-200);
+  border-color: var(--color-gray-200);
+  color: var(--color-gray-400);
+}
+
+.theme-light.status-selected.state-error {
+  background-color: var(--color-base-white);
+  border-color: var(--color-danger-600);
+  color: var(--color-danger-600);
+}
+
+/* Dark Theme - Status: Unselected */
+.theme-dark.status-unselected.state-default {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-gray-500);
+}
+
+.theme-dark.status-unselected.state-hover {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-gray-400);
+}
+
+.theme-dark.status-unselected.state-press {
+  background-color: var(--color-gray-700);
+  border-color: var(--color-gray-500);
+}
+
+.theme-dark.status-unselected.state-focus {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-brand-400);
+}
+
+.theme-dark.status-unselected.state-disabled {
+  background-color: var(--color-gray-600);
+  border-color: var(--color-gray-700);
+}
+
+.theme-dark.status-unselected.state-error {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-danger-400);
+}
+
+/* Dark Theme - Status: Selected */
+.theme-dark.status-selected.state-default {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-brand-500);
+  color: var(--color-brand-500);
+}
+
+.theme-dark.status-selected.state-hover {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-brand-600);
+  color: var(--color-brand-600);
+}
+
+.theme-dark.status-selected.state-press {
+  background-color: var(--color-gray-700);
+  border-color: var(--color-brand-700);
+  color: var(--color-brand-700);
+}
+
+.theme-dark.status-selected.state-focus {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-brand-500);
+  color: var(--color-brand-500);
+}
+
+.theme-dark.status-selected.state-disabled {
+  background-color: var(--color-gray-600);
+  border-color: var(--color-gray-600);
+  color: var(--color-gray-700);
+}
+
+.theme-dark.status-selected.state-error {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-danger-400);
+  color: var(--color-danger-400);
+}
+
+/* Hover state (when not explicitly set) */
+.label:hover .theme-light.status-unselected.state-default {
+  background-color: var(--color-base-white);
+  border-color: var(--color-gray-400);
+}
+
+.label:hover .theme-light.status-selected.state-default {
+  background-color: var(--color-base-white);
+  border-color: var(--color-brand-800);
+  color: var(--color-brand-800);
+}
+
+.label:hover .theme-dark.status-unselected.state-default {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-gray-400);
+}
+
+.label:hover .theme-dark.status-selected.state-default {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-brand-600);
+  color: var(--color-brand-600);
 }
 
 /* Focus state */
@@ -154,24 +224,45 @@
   outline: none;
 }
 
-.input:focus-visible ~ .radioWrapper .status-unselected.state-default {
+.input:focus-visible
+  ~ .radioWrapper
+  .theme-light.status-unselected.state-default {
   border-color: var(--color-brand-700);
 }
 
-.input:focus-visible ~ .radioWrapper .status-selected.state-default {
-  background-color: var(--color-brand-700);
+.input:focus-visible
+  ~ .radioWrapper
+  .theme-light.status-selected.state-default {
   border-color: var(--color-brand-700);
+  color: var(--color-brand-700);
 }
 
-/* Focus ring is controlled by state prop, not focus-visible */
+.input:focus-visible
+  ~ .radioWrapper
+  .theme-dark.status-unselected.state-default {
+  border-color: var(--color-brand-400);
+}
+
+.input:focus-visible ~ .radioWrapper .theme-dark.status-selected.state-default {
+  border-color: var(--color-brand-500);
+  color: var(--color-brand-500);
+}
 
 /* Active/Press state */
-
-.label:active .status-unselected.state-default {
+.label:active .theme-light.status-unselected.state-default {
   border-color: var(--color-gray-500);
 }
 
-.label:active .status-selected.state-default {
-  background-color: var(--color-brand-900);
+.label:active .theme-light.status-selected.state-default {
   border-color: var(--color-brand-900);
+  color: var(--color-brand-900);
+}
+
+.label:active .theme-dark.status-unselected.state-default {
+  border-color: var(--color-gray-500);
+}
+
+.label:active .theme-dark.status-selected.state-default {
+  border-color: var(--color-brand-700);
+  color: var(--color-brand-700);
 }
