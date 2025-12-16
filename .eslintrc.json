@@ -83,5 +83,13 @@
     "no-var": "error",
     "eqeqeq": ["error", "always", { "null": "ignore" }],
     "curly": ["error", "all"]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/*.stories.tsx", "**/*.stories.ts"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }
