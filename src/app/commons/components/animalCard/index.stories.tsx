@@ -4,7 +4,7 @@ import { TierType } from '../../constants/tierType.enum';
 import { AnimalType } from '../../constants/animalType.enum';
 
 const meta = {
-  title: 'Commons/AnimalCard',
+  title: 'Commons/Components/AnimalCard',
   component: AnimalCard,
   parameters: {
     layout: 'centered',
