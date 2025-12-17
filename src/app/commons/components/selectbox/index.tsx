@@ -11,8 +11,6 @@ export type SelectboxState =
   | 'disabled'
   | 'active';
 
-export type SelectboxTheme = 'light' | 'dark';
-
 export interface SelectboxItem {
   id: string;
   value: string;
@@ -20,7 +18,6 @@ export interface SelectboxItem {
 
 export interface SelectboxProps {
   state?: SelectboxState;
-  theme?: SelectboxTheme;
   label?: string;
   items: SelectboxItem[];
   selectedId?: string;
@@ -32,7 +29,6 @@ export interface SelectboxProps {
 
 export default function Selectbox({
   state = 'default',
-  theme = 'light',
   label,
   items,
   selectedId,
@@ -114,7 +110,6 @@ export default function Selectbox({
   const selectboxClasses = [
     styles.selectbox,
     styles[`state-${actualState}`],
-    styles[`theme-${theme}`],
     isDisabled && styles.disabled,
     isFilled && styles.filled,
     className,
@@ -122,11 +117,7 @@ export default function Selectbox({
     .filter(Boolean)
     .join(' ');
 
-  const optionGroupClasses = [
-    styles.optionGroup,
-    styles[`theme-${theme}`],
-    isOpen && styles.open,
-  ]
+  const optionGroupClasses = [styles.optionGroup, isOpen && styles.open]
     .filter(Boolean)
     .join(' ');
 
