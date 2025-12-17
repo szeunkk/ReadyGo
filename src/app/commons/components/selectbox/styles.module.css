@@ -177,6 +177,10 @@
   box-sizing: border-box;
 }
 
+.optionItem:hover {
+  background-color: var(--color-transparent-12);
+}
+
 .optionItem.selected {
   background-color: var(--color-transparent-12);
 }
