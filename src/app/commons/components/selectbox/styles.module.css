@@ -1,5 +1,6 @@
 /* Wrapper */
 .wrapper {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -19,15 +20,11 @@
   line-height: var(--typo-body-md-line-height);
   font-weight: var(--typo-body-md-font-weight);
   margin-bottom: 8px;
-  color: var(--color-neutral-900);
-}
-
-.theme-dark .label {
-  color: var(--color-base-white);
+  color: var(--color-text-primary);
 }
 
 .required {
-  color: var(--color-danger-400);
+  color: var(--color-text-danger);
   margin-left: 2px;
 }
 
@@ -42,6 +39,8 @@
   border-radius: var(--border-radius-12, 12px);
   box-sizing: border-box;
   cursor: pointer;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid transparent;
   transition:
     background-color 0.2s,
     border-color 0.2s,
@@ -59,6 +58,7 @@
 
 .selectbox.disabled {
   cursor: not-allowed;
+  background-color: var(--color-bg-disabled);
 }
 
 /* Content */
@@ -70,22 +70,18 @@
 }
 
 .value {
-  color: var(--color-neutral-900);
+  color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .value.placeholder {
-  color: var(--color-neutral-500);
+  color: var(--color-text-interactive-secondary);
 }
 
-.theme-dark .value {
-  color: var(--color-base-white);
-}
-
-.theme-dark .value.placeholder {
-  color: var(--color-neutral-400);
+.selectbox.disabled .value {
+  color: var(--color-text-disabled);
 }
 
 /* Chevron */
@@ -95,211 +91,85 @@
   justify-content: center;
   flex-shrink: 0;
   margin-left: 12px;
-  color: var(--color-neutral-500);
+  color: var(--color-text-interactive-secondary);
   transition:
     transform 0.2s,
     color 0.2s;
 }
 
-.theme-dark .chevron {
-  color: var(--color-neutral-400);
+.selectbox.disabled .chevron {
+  color: var(--color-text-disabled);
 }
 
 .selectbox.state-active .chevron {
   transform: rotate(180deg);
 }
 
-/* Light Theme - Default State */
-.theme-light.state-default {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-neutral-300);
+/* State: Hover */
+.selectbox.state-hover {
+  border-color: var(--color-border-interactive-secondary);
 }
 
-.theme-light.state-default:hover:not(.disabled) {
-  border-color: var(--color-neutral-400);
+.selectbox:hover:not(.disabled):not(.state-active) {
+  border-color: var(--color-border-interactive-secondary);
 }
 
-/* Light Theme - Hover State */
-.theme-light.state-hover {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-neutral-400);
+/* State: Active/Filled */
+.selectbox.state-active,
+.selectbox.state-filled,
+.selectbox.filled {
+  border-color: var(--color-border-interactive-primary);
 }
 
-/* Light Theme - Active State */
-.theme-light.state-active {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-brand-700);
-}
-
-/* Light Theme - Filled State */
-.theme-light.state-filled,
-.theme-light.filled {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-brand-700);
-}
-
-.theme-light.state-filled .value,
-.theme-light.filled .value {
-  color: var(--color-neutral-900);
-}
-
-/* Light Theme - Error State */
-.theme-light.state-error {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-danger-500);
-}
-
-/* Light Theme - Disabled State */
-.theme-light.state-disabled,
-.theme-light.disabled {
-  background-color: var(--color-neutral-200);
-  border: 1px solid var(--color-neutral-400);
-  opacity: 0.6;
-}
-
-.theme-light.state-disabled .value,
-.theme-light.disabled .value {
-  color: var(--color-neutral-400);
-}
-
-.theme-light.state-disabled .chevron,
-.theme-light.disabled .chevron {
-  color: var(--color-neutral-400);
-}
-
-/* Dark Theme - Default State */
-.theme-dark.state-default {
-  background-color: var(--color-neutral-800);
-  border: 1px solid var(--color-neutral-700);
-}
-
-.theme-dark.state-default:hover:not(.disabled) {
-  border-color: var(--color-neutral-600);
-}
-
-/* Dark Theme - Hover State */
-.theme-dark.state-hover {
-  background-color: var(--color-neutral-800);
-  border: 1px solid var(--color-neutral-600);
-}
-
-/* Dark Theme - Active State */
-.theme-dark.state-active {
-  background-color: var(--color-neutral-800);
-  border: 1px solid var(--color-brand-500);
-}
-
-/* Dark Theme - Filled State */
-.theme-dark.state-filled,
-.theme-dark.filled {
-  background-color: var(--color-neutral-800);
-  border: 1px solid var(--color-brand-500);
-}
-
-.theme-dark.state-filled .value,
-.theme-dark.filled .value {
-  color: var(--color-base-white);
-}
-
-/* Dark Theme - Error State */
-.theme-dark.state-error {
-  background-color: var(--color-neutral-800);
-  border: 1px solid var(--color-danger-500);
-}
-
-/* Dark Theme - Disabled State */
-.theme-dark.state-disabled,
-.theme-dark.disabled {
-  background-color: var(--color-neutral-900);
-  border: 1px solid var(--color-neutral-700);
-  opacity: 0.6;
-}
-
-.theme-dark.state-disabled .value,
-.theme-dark.disabled .value {
-  color: var(--color-neutral-700);
-}
-
-.theme-dark.state-disabled .chevron,
-.theme-dark.disabled .chevron {
-  color: var(--color-neutral-700);
-}
-
-/* Additional Info */
-.additionalInfo {
-  margin-top: 8px;
-  font-family:
-    var(--font-pretendard, 'Pretendard'),
-    -apple-system,
-    BlinkMacSystemFont,
-    system-ui,
-    sans-serif;
-  font-size: var(--typo-body-sm-font-size);
-  line-height: var(--typo-body-sm-line-height);
-  font-weight: var(--typo-body-sm-font-weight);
-  color: var(--color-neutral-500);
-}
-
-.theme-dark .additionalInfo {
-  color: var(--color-neutral-400);
-}
-
-.additionalInfo.error {
-  color: var(--color-danger-400);
+/* State: Error */
+.selectbox.state-error {
+  border-color: var(--color-border-danger);
 }
 
 /* Option Group */
 .optionGroup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
   display: none;
   flex-direction: column;
   margin-top: 4px;
+  padding: 8px 0;
   border-radius: var(--border-radius-12, 12px);
   overflow: hidden;
-  box-shadow: 0 4px 12px var(--color-shadow-default);
+  box-shadow:
+    0 2px 8px 0 rgba(0, 0, 0, 0.12),
+    0 0 2px 0 rgba(0, 0, 0, 0.08);
   width: 100%;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border-secondary);
 }
 
 .optionGroup.open {
   display: flex;
 }
 
-/* Light Theme - Option Group */
-.theme-light.optionGroup {
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-neutral-200);
-}
-
-/* Dark Theme - Option Group */
-.theme-dark.optionGroup {
-  background-color: var(--color-neutral-800);
-  border: 1px solid var(--color-neutral-700);
-}
-
 /* Option Item */
 .optionItem {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  gap: 2px;
+  padding: 10px 8px;
   cursor: pointer;
   transition: background-color 0.2s;
-  min-height: 48px;
+  height: 36px;
+  width: 100%;
   box-sizing: border-box;
 }
 
 .optionItem:hover {
-  background-color: var(--color-neutral-100);
-}
-
-.theme-dark .optionItem:hover {
-  background-color: var(--color-neutral-700);
+  background-color: var(--color-transparent-12);
 }
 
 .optionItem.selected {
-  background-color: var(--color-brand-50);
-}
-
-.theme-dark .optionItem.selected {
-  background-color: var(--color-neutral-700);
+  background-color: var(--color-transparent-12);
 }
 
 /* Check Icon */
@@ -308,31 +178,29 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-right: 12px;
-  width: 16px;
-  height: 16px;
-  color: var(--color-brand-700);
-}
-
-.theme-dark .checkIcon {
-  color: var(--color-brand-500);
+  width: 20px;
+  height: 20px;
+  color: var(--color-icon-interactive-primary);
 }
 
 /* Option Value */
 .optionValue {
-  flex: 1;
+  flex: 1 1 0%;
+  min-width: 0;
+  margin-left: 22px; /* leadingbox space: 20px icon + 2px gap */
   font-family:
     var(--font-pretendard, 'Pretendard'),
     -apple-system,
     BlinkMacSystemFont,
     system-ui,
     sans-serif;
-  font-size: var(--typo-body-lg-font-size);
-  line-height: var(--typo-body-lg-line-height);
-  font-weight: var(--typo-body-lg-font-weight);
-  color: var(--color-neutral-900);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-font-weight);
+  color: var(--color-text-primary);
 }
 
-.theme-dark .optionValue {
-  color: var(--color-base-white);
+/* When check icon exists, remove the margin */
+.checkIcon ~ .optionValue {
+  margin-left: 0;
 }

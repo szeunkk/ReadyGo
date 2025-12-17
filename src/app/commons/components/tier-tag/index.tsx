@@ -6,20 +6,16 @@ import styles from './styles.module.css';
 import { HTMLAttributes } from 'react';
 import { TierType, getTierTypeMeta } from '../../constants/tierType.enum';
 
-export type TierTagTheme = 'light' | 'dark';
-
 export interface TierTagProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
   'style'
 > {
   tier: TierType;
-  theme?: TierTagTheme;
   className?: string;
 }
 
 export default function TierTag({
   tier,
-  theme = 'light',
   className = '',
   ...props
 }: TierTagProps) {
@@ -33,8 +29,6 @@ export default function TierTag({
       data: {
         tier,
         tierType: typeof tier,
-        theme,
-        themeType: typeof theme,
         className,
       },
       timestamp: Date.now(),
@@ -68,7 +62,7 @@ export default function TierTag({
   }).catch(() => {});
   // #endregion
 
-  const tagClasses = [styles.tierTag, styles[`theme-${theme}`], className]
+  const tagClasses = [styles.tierTag, className]
     .filter(Boolean)
     .join(' ');
 
@@ -81,8 +75,6 @@ export default function TierTag({
       message: 'Before render',
       data: {
         tagClasses,
-        themeClass: styles[`theme-${theme}`],
-        themeKey: `theme-${theme}`,
         stylesKeys: Object.keys(styles),
       },
       timestamp: Date.now(),
