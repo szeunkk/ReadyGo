@@ -38,7 +38,10 @@
   height: 16px;
   border-radius: 2px;
   box-sizing: border-box;
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
   flex-shrink: 0;
 }
 
@@ -248,4 +251,3 @@
 .label:active .status-partial.state-default {
   background-color: var(--color-brand-800);
 }
-

@@ -12,8 +12,10 @@ import { AnimalType, getAnimalTypeMeta } from '../../constants/animalType.enum';
 export type AnimalCardProperty = 'my' | 'user';
 export type AnimalCardTheme = 'dark' | 'light';
 
-export interface AnimalCardProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'style'> {
+export interface AnimalCardProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'style'
+> {
   property?: AnimalCardProperty;
   theme?: AnimalCardTheme;
   nickname: string;

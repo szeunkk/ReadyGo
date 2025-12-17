@@ -9,8 +9,12 @@
 .label {
   display: flex;
   align-items: center;
-  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);
   font-weight: var(--typo-body-md-font-weight);
@@ -38,9 +42,16 @@
   border-radius: var(--border-radius-12, 12px);
   box-sizing: border-box;
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
-  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
   font-size: var(--typo-body-lg-font-size);
   line-height: var(--typo-body-lg-line-height);
   font-weight: var(--typo-body-lg-font-weight);
@@ -85,7 +96,9 @@
   flex-shrink: 0;
   margin-left: 12px;
   color: var(--color-neutral-500);
-  transition: transform 0.2s, color 0.2s;
+  transition:
+    transform 0.2s,
+    color 0.2s;
 }
 
 .theme-dark .chevron {
@@ -215,8 +228,12 @@
 /* Additional Info */
 .additionalInfo {
   margin-top: 8px;
-  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
   font-size: var(--typo-body-sm-font-size);
   line-height: var(--typo-body-sm-line-height);
   font-weight: var(--typo-body-sm-font-weight);
@@ -304,8 +321,12 @@
 /* Option Value */
 .optionValue {
   flex: 1;
-  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
   font-size: var(--typo-body-lg-font-size);
   line-height: var(--typo-body-lg-line-height);
   font-weight: var(--typo-body-lg-font-weight);

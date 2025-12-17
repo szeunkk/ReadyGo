@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import styles from "./styles.module.css";
-import Image from "next/image";
+import React, { useState } from 'react';
+import styles from './styles.module.css';
+import Image from 'next/image';
 
-export type AvatarSize = "s" | "m" | "L";
-export type AvatarStatus = "online" | "away" | "ban" | "offline";
-export type AvatarTheme = "light" | "dark";
+export type AvatarSize = 's' | 'm' | 'L';
+export type AvatarStatus = 'online' | 'away' | 'ban' | 'offline';
+export type AvatarTheme = 'light' | 'dark';
 
 export interface AvatarProps {
   src?: string;
@@ -21,16 +21,16 @@ export interface AvatarProps {
 
 export default function Avatar({
   src,
-  alt = "Avatar",
-  size = "m",
-  status = "offline",
-  theme = "light",
+  alt = 'Avatar',
+  size = 'm',
+  status = 'offline',
+  theme = 'light',
   showStatus = true,
-  className = "",
+  className = '',
   statusRingColor,
 }: AvatarProps) {
   const [imageError, setImageError] = useState(false);
-  const defaultImage = "/images/bird.svg";
+  const defaultImage = '/images/bird.svg';
   const imageSrc = src && !imageError ? src : defaultImage;
 
   const wrapperClasses = [
@@ -40,7 +40,7 @@ export default function Avatar({
     className,
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   const statusDotClasses = [
     styles.statusDot,
@@ -49,20 +49,20 @@ export default function Avatar({
     styles[`size-${size}`],
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   const getStatusLabel = () => {
     switch (status) {
-      case "online":
-        return "온라인";
-      case "away":
-        return "자리비움";
-      case "ban":
-        return "차단됨";
-      case "offline":
-        return "오프라인";
+      case 'online':
+        return '온라인';
+      case 'away':
+        return '자리비움';
+      case 'ban':
+        return '차단됨';
+      case 'offline':
+        return '오프라인';
       default:
-        return "";
+        return '';
     }
   };
 
@@ -72,8 +72,8 @@ export default function Avatar({
         <Image
           src={imageSrc}
           alt={alt}
-          width={size === "s" ? 40 : size === "m" ? 64 : 100}
-          height={size === "s" ? 40 : size === "m" ? 64 : 100}
+          width={size === 's' ? 40 : size === 'm' ? 64 : 100}
+          height={size === 's' ? 40 : size === 'm' ? 64 : 100}
           className={styles.image}
           onError={() => setImageError(true)}
         />
@@ -94,5 +94,3 @@ export default function Avatar({
     </div>
   );
 }
-
-
