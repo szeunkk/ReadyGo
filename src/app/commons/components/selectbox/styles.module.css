@@ -167,16 +167,26 @@
 /* Option Item */
 .optionItem {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
   padding: 10px 8px;
   cursor: pointer;
   transition: background-color 0.2s;
-  min-height: 36px;
+  height: 36px;
+  width: 100%;
   box-sizing: border-box;
 }
 
 .optionItem.selected {
   background-color: var(--color-transparent-12);
+}
+
+/* Option Item Inner Wrapper */
+.optionItem > * {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  width: 100%;
 }
 
 /* Check Icon */
@@ -185,7 +195,6 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-right: 8px;
   width: 20px;
   height: 20px;
   color: var(--color-icon-interactive-primary);
@@ -193,7 +202,8 @@
 
 /* Option Value */
 .optionValue {
-  flex: 1;
+  flex: 1 1 0%;
+  min-width: 0;
   font-family:
     var(--font-pretendard, 'Pretendard'),
     -apple-system,
