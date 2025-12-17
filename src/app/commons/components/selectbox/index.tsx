@@ -180,7 +180,7 @@ export default function Selectbox({
           </svg>
         </div>
       </div>
-      {additionalInfo && !isOpen && (
+      {additionalInfo && (
         <div
           className={`${styles.additionalInfo} ${
             actualState === 'error' ? styles.error : ''
