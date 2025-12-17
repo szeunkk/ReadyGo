@@ -38,10 +38,6 @@ const meta = {
       control: 'text',
       description: '셀렉트박스의 레이블',
     },
-    additionalInfo: {
-      control: 'text',
-      description: '셀렉트박스의 추가 정보',
-    },
     items: {
       control: 'object',
       description: '셀렉트박스의 옵션 아이템 목록',
@@ -130,26 +126,9 @@ export const WithLabel: Story = {
   },
 };
 
-export const WithAdditionalInfo: Story = {
-  args: {
-    label: '레이블',
-    additionalInfo: '추가 정보 텍스트',
-    items: sampleItems,
-  },
-};
-
 export const WithLabelOnly: Story = {
   args: {
     label: '레이블만',
-    items: sampleItems,
-  },
-};
-
-export const ErrorStateWithInfo: Story = {
-  args: {
-    state: 'error',
-    label: '에러 상태',
-    additionalInfo: '에러 메시지가 표시됩니다',
     items: sampleItems,
   },
 };
@@ -383,7 +362,6 @@ const InteractiveSelectboxComponent = () => {
   return (
     <Selectbox
       label="선택하세요"
-      additionalInfo="드롭다운을 열어 옵션을 선택할 수 있습니다"
       items={sampleItems}
       selectedId={selectedId}
       onSelect={handleSelect}

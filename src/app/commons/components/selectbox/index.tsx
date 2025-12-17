@@ -22,7 +22,6 @@ export interface SelectboxProps {
   state?: SelectboxState;
   theme?: SelectboxTheme;
   label?: string;
-  additionalInfo?: string;
   items: SelectboxItem[];
   selectedId?: string;
   onSelect?: (item: SelectboxItem) => void;
@@ -35,7 +34,6 @@ export default function Selectbox({
   state = 'default',
   theme = 'light',
   label,
-  additionalInfo,
   items,
   selectedId,
   onSelect,
@@ -180,15 +178,6 @@ export default function Selectbox({
           </svg>
         </div>
       </div>
-      {additionalInfo && (
-        <div
-          className={`${styles.additionalInfo} ${
-            actualState === 'error' ? styles.error : ''
-          }`}
-        >
-          {additionalInfo}
-        </div>
-      )}
       {isOpen && (
         <div className={optionGroupClasses} role="listbox">
           {items.map((item) => {

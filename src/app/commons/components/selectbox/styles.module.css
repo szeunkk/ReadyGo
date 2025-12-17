@@ -126,25 +126,6 @@
   border-color: var(--color-border-danger);
 }
 
-/* Additional Info */
-.additionalInfo {
-  margin-top: 8px;
-  font-family:
-    var(--font-pretendard, 'Pretendard'),
-    -apple-system,
-    BlinkMacSystemFont,
-    system-ui,
-    sans-serif;
-  font-size: var(--typo-body-sm-font-size);
-  line-height: var(--typo-body-sm-line-height);
-  font-weight: var(--typo-body-sm-font-weight);
-  color: var(--color-text-interactive-secondary);
-}
-
-.additionalInfo.error {
-  color: var(--color-text-danger);
-}
-
 /* Option Group */
 .optionGroup {
   position: absolute;
