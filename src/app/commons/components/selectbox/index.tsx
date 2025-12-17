@@ -24,6 +24,7 @@ export interface SelectboxProps {
   selectedId?: string;
   onSelect?: (item: SelectboxItem) => void;
   placeholder?: string;
+  required?: boolean;
   className?: string;
   children?: React.ReactNode;
 }
@@ -35,6 +36,7 @@ export default function Selectbox({
   selectedId,
   onSelect,
   placeholder = 'Placeholder',
+  required = false,
   className = '',
   children,
 }: SelectboxProps) {
@@ -127,7 +129,7 @@ export default function Selectbox({
       {label && (
         <label className={styles.label}>
           {label}
-          {label.includes('*') && <span className={styles.required}>*</span>}
+          {required && <span className={styles.required}>*</span>}
         </label>
       )}
       <div
