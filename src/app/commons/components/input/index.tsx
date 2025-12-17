@@ -5,14 +5,7 @@ import styles from './styles.module.css';
 import { InputHTMLAttributes } from 'react';
 import Image from 'next/image';
 
-export type InputVariant =
-  | 'primary'
-  | 'hover'
-  | 'active'
-  | 'filled'
-  | 'danger'
-  | 'disabled'
-  | 'secondary';
+export type InputVariant = 'primary' | 'secondary';
 export type InputState =
   | 'Default'
   | 'hover'
@@ -55,25 +48,10 @@ export default function Input({
   disabled,
   ...props
 }: InputProps) {
-  const isDisabled = disabled || state === 'disabled' || variant === 'disabled';
+  const isDisabled = disabled || state === 'disabled';
 
   // variant와 state를 기반으로 실제 적용할 클래스 결정
   const getVariantClass = () => {
-    if (isDisabled) {
-      return 'disabled';
-    }
-    if (state === 'error' || variant === 'danger') {
-      return 'danger';
-    }
-    if (state === 'filled' || variant === 'filled') {
-      return 'filled';
-    }
-    if (state === 'active' || variant === 'active') {
-      return 'active';
-    }
-    if (state === 'hover' || variant === 'hover') {
-      return 'hover';
-    }
     if (variant === 'secondary') {
       return 'secondary';
     }
@@ -120,7 +98,7 @@ export default function Input({
   const additionalInfoClasses = [
     styles.additionalInfo,
     styles[`theme-${theme}`],
-    (actualState === 'error' || actualVariant === 'danger') && styles.error,
+    actualState === 'error' && styles.error,
   ]
     .filter(Boolean)
     .join(' ');
@@ -192,6 +170,3 @@ export default function Input({
     </div>
   );
 }
-
-
-

@@ -1,32 +1,30 @@
-/* Container */
-.container {
+/* Wrapper */
+.wrapper {
   display: flex;
   flex-direction: column;
-  gap: 8px;
   width: 100%;
 }
 
 /* Label */
 .label {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);
-  font-weight: var(--typo-body-md-medium-font-weight);
-  color: var(--color-text-primary);
+  font-weight: var(--typo-body-md-font-weight);
+  margin-bottom: 8px;
+  color: var(--color-neutral-900);
 }
 
-/* Additional Info */
-.additionalInfo {
-  font-size: var(--typo-body-sm-font-size);
-  line-height: var(--typo-body-sm-line-height);
-  font-weight: var(--typo-body-sm-font-weight);
-  color: var(--color-text-secondary);
+.theme-dark .label {
+  color: var(--color-base-white);
 }
 
-/* Selectbox Wrapper */
-.selectboxWrapper {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+.required {
+  color: var(--color-danger-400);
+  margin-left: 2px;
 }
 
 /* Selectbox Base */
@@ -35,23 +33,17 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: 44px;
+  min-height: 48px;
   padding: 12px 16px;
-  border: 1.5px solid transparent;
-  border-radius: 8px;
-  background-color: var(--color-base-white);
+  border-radius: var(--border-radius-12, 12px);
+  box-sizing: border-box;
   cursor: pointer;
   transition: background-color 0.2s, border-color 0.2s, color 0.2s;
-  box-sizing: border-box;
-  font-size: var(--typo-body-md-font-size);
-  line-height: var(--typo-body-md-line-height);
-  font-weight: var(--typo-body-md-font-weight);
-  color: var(--color-text-primary);
-  gap: 8px;
-}
-
-.selectbox:disabled {
-  cursor: not-allowed;
+  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  font-weight: var(--typo-body-lg-font-weight);
 }
 
 .selectbox.disabled {
@@ -63,255 +55,263 @@
   display: flex;
   align-items: center;
   flex: 1;
-  gap: 8px;
+  min-width: 0;
 }
 
-.text {
-  flex: 1;
+.value {
+  color: var(--color-neutral-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Arrow Icon */
-.arrowIcon {
+.value.placeholder {
+  color: var(--color-neutral-500);
+}
+
+.theme-dark .value {
+  color: var(--color-base-white);
+}
+
+.theme-dark .value.placeholder {
+  color: var(--color-neutral-400);
+}
+
+/* Chevron */
+.chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  color: var(--color-icon-secondary);
-  transition: transform 0.2s;
+  margin-left: 12px;
+  color: var(--color-neutral-500);
+  transition: transform 0.2s, color 0.2s;
 }
 
-.selectbox.open .arrowIcon {
+.theme-dark .chevron {
+  color: var(--color-neutral-400);
+}
+
+.selectbox.state-active .chevron {
   transform: rotate(180deg);
 }
 
-/* Dropdown */
-.dropdown {
+/* Light Theme - Default State */
+.theme-light.state-default {
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-neutral-300);
+}
+
+.theme-light.state-default:hover:not(.disabled) {
+  border-color: var(--color-neutral-400);
+}
+
+/* Light Theme - Hover State */
+.theme-light.state-hover {
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-neutral-400);
+}
+
+/* Light Theme - Active State */
+.theme-light.state-active {
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-brand-700);
+}
+
+/* Light Theme - Filled State */
+.theme-light.state-filled,
+.theme-light.filled {
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-brand-700);
+}
+
+.theme-light.state-filled .value,
+.theme-light.filled .value {
+  color: var(--color-neutral-900);
+}
+
+/* Light Theme - Error State */
+.theme-light.state-error {
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-danger-500);
+}
+
+/* Light Theme - Disabled State */
+.theme-light.state-disabled,
+.theme-light.disabled {
+  background-color: var(--color-neutral-200);
+  border: 1px solid var(--color-neutral-400);
+  opacity: 0.6;
+}
+
+.theme-light.state-disabled .value,
+.theme-light.disabled .value {
+  color: var(--color-neutral-400);
+}
+
+.theme-light.state-disabled .chevron,
+.theme-light.disabled .chevron {
+  color: var(--color-neutral-400);
+}
+
+/* Dark Theme - Default State */
+.theme-dark.state-default {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-neutral-700);
+}
+
+.theme-dark.state-default:hover:not(.disabled) {
+  border-color: var(--color-neutral-600);
+}
+
+/* Dark Theme - Hover State */
+.theme-dark.state-hover {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-neutral-600);
+}
+
+/* Dark Theme - Active State */
+.theme-dark.state-active {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-brand-500);
+}
+
+/* Dark Theme - Filled State */
+.theme-dark.state-filled,
+.theme-dark.filled {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-brand-500);
+}
+
+.theme-dark.state-filled .value,
+.theme-dark.filled .value {
+  color: var(--color-base-white);
+}
+
+/* Dark Theme - Error State */
+.theme-dark.state-error {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-danger-500);
+}
+
+/* Dark Theme - Disabled State */
+.theme-dark.state-disabled,
+.theme-dark.disabled {
+  background-color: var(--color-neutral-900);
+  border: 1px solid var(--color-neutral-700);
+  opacity: 0.6;
+}
+
+.theme-dark.state-disabled .value,
+.theme-dark.disabled .value {
+  color: var(--color-neutral-700);
+}
+
+.theme-dark.state-disabled .chevron,
+.theme-dark.disabled .chevron {
+  color: var(--color-neutral-700);
+}
+
+/* Additional Info */
+.additionalInfo {
+  margin-top: 8px;
+  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  font-weight: var(--typo-body-sm-font-weight);
+  color: var(--color-neutral-500);
+}
+
+.theme-dark .additionalInfo {
+  color: var(--color-neutral-400);
+}
+
+.additionalInfo.error {
+  color: var(--color-danger-400);
+}
+
+/* Option Group */
+.optionGroup {
   display: none;
   flex-direction: column;
-  width: 100%;
   margin-top: 4px;
-  border-radius: 8px;
-  border: 1.5px solid var(--color-border-primary);
-  background-color: var(--color-bg-default);
-  box-shadow: 0 4px 12px var(--color-shadow-default);
+  border-radius: var(--border-radius-12, 12px);
   overflow: hidden;
-  max-height: 300px;
-  overflow-y: auto;
+  box-shadow: 0 4px 12px var(--color-shadow-default);
+  width: 100%;
 }
 
-.dropdown.open {
+.optionGroup.open {
   display: flex;
-  animation: slideDown 0.2s ease-out;
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Light Theme - Option Group */
+.theme-light.optionGroup {
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-neutral-200);
+}
+
+/* Dark Theme - Option Group */
+.theme-dark.optionGroup {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-neutral-700);
 }
 
 /* Option Item */
 .optionItem {
   display: flex;
   align-items: center;
-  gap: 12px;
   padding: 12px 16px;
   cursor: pointer;
   transition: background-color 0.2s;
-  border-bottom: 1px solid var(--color-border-secondary);
-}
-
-.optionItem:last-child {
-  border-bottom: none;
+  min-height: 48px;
+  box-sizing: border-box;
 }
 
 .optionItem:hover {
-  background-color: var(--color-bg-secondary);
+  background-color: var(--color-neutral-100);
+}
+
+.theme-dark .optionItem:hover {
+  background-color: var(--color-neutral-700);
 }
 
 .optionItem.selected {
-  background-color: var(--color-bg-interactive-primary);
+  background-color: var(--color-brand-50);
+}
+
+.theme-dark .optionItem.selected {
+  background-color: var(--color-neutral-700);
 }
 
 /* Check Icon */
 .checkIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  margin-right: 12px;
   width: 16px;
   height: 16px;
-  color: var(--color-icon-interactive-primary);
-}
-
-/* Option Content */
-.optionContent {
-  flex: 1;
-  font-size: var(--typo-body-md-font-size);
-  line-height: var(--typo-body-md-line-height);
-  font-weight: var(--typo-body-md-font-weight);
-  color: var(--color-text-primary);
-}
-
-/* Light Theme - State: Default */
-.theme-light.state-default {
-  background-color: var(--color-base-white);
-  border-color: var(--color-gray-300);
-  color: var(--color-text-primary);
-}
-
-.theme-light.state-default:hover {
-  background-color: var(--color-base-white);
-  border-color: var(--color-gray-400);
-}
-
-/* Light Theme - State: Hover */
-.theme-light.state-hover {
-  background-color: var(--color-base-white);
-  border-color: var(--color-gray-400);
-  color: var(--color-text-primary);
-}
-
-/* Light Theme - State: Filled */
-.theme-light.state-filled {
-  background-color: var(--color-base-white);
-  border-color: var(--color-gray-300);
-  color: var(--color-text-primary);
-}
-
-.theme-light.state-filled:hover {
-  background-color: var(--color-base-white);
-  border-color: var(--color-gray-400);
-}
-
-/* Light Theme - State: Error */
-.theme-light.state-error {
-  background-color: var(--color-base-white);
-  border-color: var(--color-danger-600);
-  color: var(--color-text-primary);
-}
-
-.theme-light.state-error:hover {
-  background-color: var(--color-base-white);
-  border-color: var(--color-danger-600);
-}
-
-/* Light Theme - State: Disabled */
-.theme-light.state-disabled {
-  background-color: var(--color-gray-200);
-  border-color: var(--color-gray-400);
-  color: var(--color-text-disabled);
-  cursor: not-allowed;
-}
-
-.theme-light.state-disabled .arrowIcon {
-  color: var(--color-icon-disabled);
-}
-
-/* Light Theme - Focus State */
-.theme-light.state-default:focus-visible,
-.theme-light.state-hover:focus-visible,
-.theme-light.state-filled:focus-visible {
-  outline: none;
-  border-color: var(--color-brand-700);
-}
-
-.theme-light.state-error:focus-visible {
-  outline: none;
-  border-color: var(--color-danger-600);
-}
-
-/* Dark Theme - State: Default */
-.theme-dark.state-default {
-  background-color: var(--color-gray-900);
-  border-color: var(--color-gray-500);
-  color: var(--color-text-primary);
-}
-
-.theme-dark.state-default:hover {
-  background-color: var(--color-gray-800);
-  border-color: var(--color-gray-400);
-}
-
-/* Dark Theme - State: Hover */
-.theme-dark.state-hover {
-  background-color: var(--color-gray-800);
-  border-color: var(--color-gray-400);
-  color: var(--color-text-primary);
-}
-
-/* Dark Theme - State: Filled */
-.theme-dark.state-filled {
-  background-color: var(--color-gray-900);
-  border-color: var(--color-gray-500);
-  color: var(--color-text-primary);
-}
-
-.theme-dark.state-filled:hover {
-  background-color: var(--color-gray-800);
-  border-color: var(--color-gray-400);
-}
-
-/* Dark Theme - State: Error */
-.theme-dark.state-error {
-  background-color: var(--color-gray-900);
-  border-color: var(--color-danger-400);
-  color: var(--color-text-primary);
-}
-
-.theme-dark.state-error:hover {
-  background-color: var(--color-gray-800);
-  border-color: var(--color-danger-400);
-}
-
-/* Dark Theme - State: Disabled */
-.theme-dark.state-disabled {
-  background-color: var(--color-gray-600);
-  border-color: var(--color-gray-700);
-  color: var(--color-text-disabled);
-  cursor: not-allowed;
-}
-
-.theme-dark.state-disabled .arrowIcon {
-  color: var(--color-icon-disabled);
-}
-
-/* Dark Theme - Focus State */
-.theme-dark.state-default:focus-visible,
-.theme-dark.state-hover:focus-visible,
-.theme-dark.state-filled:focus-visible {
-  outline: none;
-  border-color: var(--color-brand-400);
-}
-
-.theme-dark.state-error:focus-visible {
-  outline: none;
-  border-color: var(--color-danger-400);
-}
-
-/* Dark Theme Dropdown */
-.theme-dark .dropdown {
-  background-color: var(--color-gray-900);
-  border-color: var(--color-gray-500);
-}
-
-.theme-dark .optionItem {
-  border-bottom-color: var(--color-gray-700);
-}
-
-.theme-dark .optionItem:hover {
-  background-color: var(--color-gray-800);
-}
-
-.theme-dark .optionItem.selected {
-  background-color: var(--color-bg-interactive-primary);
-}
-
-.theme-dark .optionContent {
-  color: var(--color-text-primary);
+  color: var(--color-brand-700);
 }
 
 .theme-dark .checkIcon {
-  color: var(--color-icon-interactive-primary);
+  color: var(--color-brand-500);
+}
+
+/* Option Value */
+.optionValue {
+  flex: 1;
+  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  font-weight: var(--typo-body-lg-font-weight);
+  color: var(--color-neutral-900);
+}
+
+.theme-dark .optionValue {
+  color: var(--color-base-white);
 }

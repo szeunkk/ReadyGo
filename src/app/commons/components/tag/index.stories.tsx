@@ -367,6 +367,3 @@ export const CompleteExample: Story = {
     },
   },
 };
-
-
-

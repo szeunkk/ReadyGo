@@ -28,7 +28,8 @@
 }
 
 .radioWrapper.hasFocusRing {
-  border-color: var(--color-border-focus-ring);
+  /* border-color: var(--color-border-focus-ring); */
+  box-shadow: 0 0 0 4px rgba(127, 253, 232, 0.32);
 }
 
 .radio {
@@ -78,7 +79,7 @@
 
 .theme-light.status-unselected.state-focus {
   background-color: var(--color-base-white);
-  border: 1.5px solid var(--color-brand-700);
+  border: 1px solid var(--color-border-interactive-primary);
 }
 
 .theme-light.status-unselected.state-disabled {
@@ -91,29 +92,27 @@
   border: 1.5px solid var(--color-danger-600);
 }
 
-/* Light Theme - Status: Selected */
-.theme-light.status-selected.state-default {
-  background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
-  color: var(--color-base-white);
+/* Status: Selected */
+.status-selected.state-default {
+  background-color: var(--color-bg-interactive-primary);
+  border: none;
 }
 
-.theme-light.status-selected.state-hover {
-  background-color: var(--color-brand-800);
-  border-color: var(--color-brand-800);
-  color: var(--color-base-white);
+.status-selected.state-hover,
+.label:hover
+  .status-selected.state-default:not(.state-disabled):not(.disabled) {
+  background-color: var(--color-bg-interactive-primary-hover);
+  border: none;
 }
 
-.theme-light.status-selected.state-press {
-  background-color: var(--color-brand-900);
-  border-color: var(--color-brand-900);
-  color: var(--color-base-white);
+.status-selected.state-press {
+  background-color: var(--color-bg-interactive-primary-pressed);
+  border: none;
 }
 
-.theme-light.status-selected.state-focus {
-  background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
-  color: var(--color-base-white);
+.status-selected.state-focus {
+  background-color: var(--color-bg-interactive-primary);
+  border: none;
 }
 
 .theme-light.status-selected.state-disabled {
@@ -196,77 +195,23 @@
   color: var(--color-base-black);
 }
 
-/* Hover state (when not explicitly set) */
-.label:hover .theme-light.status-unselected.state-default {
-  background-color: var(--color-base-white);
-  border: 1.5px solid var(--color-gray-400);
-}
-
-.label:hover .theme-light.status-selected.state-default {
-  background-color: var(--color-brand-800);
-  border-color: var(--color-brand-800);
-  color: var(--color-base-black);
-}
-
-.label:hover .theme-dark.status-unselected.state-default {
-  background-color: var(--color-gray-800);
-  border: 1.5px solid var(--color-gray-400);
-}
-
-.label:hover .theme-dark.status-selected.state-default {
-  background-color: var(--color-brand-600);
-  border-color: var(--color-brand-600);
-  color: var(--color-base-black);
-}
-
 /* Focus state */
 .input:focus-visible ~ .radioWrapper .radio {
   outline: none;
 }
 
-.input:focus-visible
-  ~ .radioWrapper
-  .theme-light.status-unselected.state-default {
-  border: 1.5px solid var(--color-brand-700);
+.input:focus-visible ~ .radioWrapper .status-unselected.state-default {
+  border-color: var(--color-border-interactive-primary);
 }
 
-.input:focus-visible
-  ~ .radioWrapper
-  .theme-light.status-selected.state-default {
-  background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
-  color: var(--color-base-white);
+.input:focus-visible ~ .radioWrapper .status-selected.state-default {
+  background-color: var(--color-bg-interactive-primary);
 }
 
-.input:focus-visible
-  ~ .radioWrapper
-  .theme-dark.status-unselected.state-default {
-  border: 1.5px solid var(--color-brand-400);
+.label:active .status-unselected.state-default {
+  border-color: var(--color-neutral-500);
 }
 
-.input:focus-visible ~ .radioWrapper .theme-dark.status-selected.state-default {
-  background-color: var(--color-brand-500);
-  border-color: var(--color-brand-500);
-  color: var(--color-base-white);
-}
-
-/* Active/Press state */
-.label:active .theme-light.status-unselected.state-default {
-  border: 1.5px solid var(--color-gray-500);
-}
-
-.label:active .theme-light.status-selected.state-default {
-  background-color: var(--color-brand-900);
-  border-color: var(--color-brand-900);
-  color: var(--color-base-white);
-}
-
-.label:active .theme-dark.status-unselected.state-default {
-  border: 1.5px solid var(--color-gray-500);
-}
-
-.label:active .theme-dark.status-selected.state-default {
-  background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
-  color: var(--color-base-white);
+.label:active .status-selected.state-default {
+  background-color: var(--color-bg-interactive-primary-pressed);
 }

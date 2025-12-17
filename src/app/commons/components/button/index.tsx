@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import React from "react";
-import styles from "./styles.module.css";
-import { ButtonHTMLAttributes } from "react";
+import React from 'react';
+import styles from './styles.module.css';
+import { ButtonHTMLAttributes } from 'react';
 
-export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost";
-export type ButtonSize = "s" | "m";
-export type ButtonState = "default" | "hover" | "disabled";
-export type ButtonShape = "round" | "rectangle";
-export type ButtonTheme = "light" | "dark";
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
+export type ButtonSize = 's' | 'm';
+export type ButtonState = 'default' | 'hover' | 'disabled';
+export type ButtonShape = 'round' | 'rectangle';
+export type ButtonTheme = 'light' | 'dark';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -20,17 +20,17 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export default function Button({
-  variant = "primary",
-  size = "m",
-  state = "default",
-  shape = "round",
-  theme = "light",
+  variant = 'primary',
+  size = 'm',
+  state = 'default',
+  shape = 'round',
+  theme = 'light',
   children,
-  className = "",
+  className = '',
   disabled,
   ...props
 }: ButtonProps) {
-  const isDisabled = disabled || state === "disabled";
+  const isDisabled = disabled || state === 'disabled';
 
   const buttonClasses = [
     styles.button,
@@ -43,7 +43,7 @@ export default function Button({
     className,
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   return (
     <button className={buttonClasses} disabled={isDisabled} {...props}>
@@ -51,11 +51,3 @@ export default function Button({
     </button>
   );
 }
-
-
-
-
-
-
-
-

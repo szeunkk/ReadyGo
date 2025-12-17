@@ -8,25 +8,27 @@ export type SelectboxState =
   | 'hover'
   | 'filled'
   | 'error'
-  | 'disabled';
+  | 'disabled'
+  | 'active';
+
 export type SelectboxTheme = 'light' | 'dark';
 
 export interface SelectboxItem {
   id: string;
-  value: React.ReactNode;
-  label?: string;
+  value: string;
 }
 
 export interface SelectboxProps {
   state?: SelectboxState;
   theme?: SelectboxTheme;
-  label?: string | React.ReactNode;
-  additionalInfo?: string | React.ReactNode;
-  items?: SelectboxItem[];
+  label?: string;
+  additionalInfo?: string;
+  items: SelectboxItem[];
   selectedId?: string;
   onSelect?: (item: SelectboxItem) => void;
-  children?: React.ReactNode;
+  placeholder?: string;
   className?: string;
+  children?: React.ReactNode;
 }
 
 export default function Selectbox({
@@ -34,29 +36,28 @@ export default function Selectbox({
   theme = 'light',
   label,
   additionalInfo,
-  items = [],
+  items,
   selectedId,
   onSelect,
-  children,
+  placeholder = 'Placeholder',
   className = '',
+  children,
 }: SelectboxProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalState, setInternalState] = useState<SelectboxState>(state);
   const selectboxRef = useRef<HTMLDivElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
   const isDisabled = state === 'disabled';
-  const selectedItem = items.find((item) => item.id === selectedId);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         selectboxRef.current &&
-        !selectboxRef.current.contains(event.target as Node) &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !selectboxRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
+        if (state === 'default') {
+          setInternalState('default');
+        }
       }
     };
 
@@ -67,89 +68,63 @@ export default function Selectbox({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen]);
+  }, [isOpen, state]);
 
-  useEffect(() => {
-    setInternalState(state);
-  }, [state]);
-
+  // hover 상태 관리
   const handleMouseEnter = () => {
-    if (!isDisabled && internalState === 'default') {
+    if (!isDisabled && state === 'default' && !isOpen) {
       setInternalState('hover');
     }
   };
 
   const handleMouseLeave = () => {
-    if (!isDisabled && internalState === 'hover') {
+    if (!isDisabled && state === 'default' && !isOpen) {
       setInternalState('default');
     }
   };
 
-  const handleSelectboxClick = () => {
+  const handleClick = () => {
     if (!isDisabled) {
       setIsOpen(!isOpen);
-      if (!isOpen && internalState === 'default') {
-        setInternalState('filled');
+      if (!isOpen && state === 'default') {
+        setInternalState('active');
+      } else if (isOpen && state === 'default') {
+        setInternalState('default');
       }
     }
   };
 
   const handleItemClick = (item: SelectboxItem) => {
-    if (!isDisabled) {
-      onSelect?.(item);
-      setIsOpen(false);
-      setInternalState('filled');
+    if (onSelect) {
+      onSelect(item);
+    }
+    setIsOpen(false);
+    if (state === 'default') {
+      setInternalState('default');
     }
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (isDisabled) {
-      return;
-    }
+  const selectedItem = items.find((item) => item.id === selectedId);
+  const displayValue = selectedItem ? selectedItem.value : placeholder;
+  const isFilled = selectedItem !== undefined;
 
-    switch (event.key) {
-      case 'Enter':
-      case ' ':
-        event.preventDefault();
-        if (!isOpen) {
-          setIsOpen(true);
-          setInternalState('filled');
-        }
-        break;
-      case 'Escape':
-        if (isOpen) {
-          setIsOpen(false);
-        }
-        break;
-      case 'ArrowDown':
-        event.preventDefault();
-        if (!isOpen) {
-          setIsOpen(true);
-          setInternalState('filled');
-        }
-        break;
-      case 'ArrowUp':
-        event.preventDefault();
-        if (isOpen) {
-          setIsOpen(false);
-        }
-        break;
-    }
-  };
+  // 실제 사용할 state 결정
+  const actualState =
+    state !== 'default' ? state : isOpen ? 'active' : internalState;
 
   const selectboxClasses = [
     styles.selectbox,
-    styles[`state-${internalState}`],
+    styles[`state-${actualState}`],
     styles[`theme-${theme}`],
     isDisabled && styles.disabled,
-    isOpen && styles.open,
+    isFilled && styles.filled,
     className,
   ]
     .filter(Boolean)
     .join(' ');
 
-  const dropdownClasses = [
-    styles.dropdown,
+  const optionGroupClasses = [
+    styles.optionGroup,
     styles[`theme-${theme}`],
     isOpen && styles.open,
   ]
@@ -157,33 +132,37 @@ export default function Selectbox({
     .join(' ');
 
   return (
-    <div className={styles.container}>
-      {label && <div className={styles.label}>{label}</div>}
-      {additionalInfo && (
-        <div className={styles.additionalInfo}>{additionalInfo}</div>
+    <div className={styles.wrapper} ref={selectboxRef}>
+      {label && (
+        <label className={styles.label}>
+          {label}
+          {label.includes('*') && <span className={styles.required}>*</span>}
+        </label>
       )}
-      <div className={styles.selectboxWrapper} ref={selectboxRef}>
-        <button
-          type="button"
-          className={selectboxClasses}
-          onClick={handleSelectboxClick}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          onKeyDown={handleKeyDown}
-          disabled={isDisabled}
-          aria-expanded={isOpen}
-          aria-haspopup="listbox"
-          aria-label={label ? String(label) : 'Selectbox'}
-        >
-          <div className={styles.content}>
-            {children || (
-              <span className={styles.text}>
-                {selectedItem?.value || '선택하세요'}
-              </span>
-            )}
-          </div>
+      <div
+        className={selectboxClasses}
+        onClick={handleClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        role="button"
+        tabIndex={isDisabled ? -1 : 0}
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        aria-disabled={isDisabled}
+      >
+        <div className={styles.content}>
+          {children || (
+            <span
+              className={`${styles.value} ${
+                !selectedItem ? styles.placeholder : ''
+              }`}
+            >
+              {displayValue}
+            </span>
+          )}
+        </div>
+        <div className={styles.chevron}>
           <svg
-            className={styles.arrowIcon}
             width="16"
             height="16"
             viewBox="0 0 16 16"
@@ -198,36 +177,34 @@ export default function Selectbox({
               strokeLinejoin="round"
             />
           </svg>
-        </button>
-        {items.length > 0 && (
-          <div
-            className={dropdownClasses}
-            ref={dropdownRef}
-            role="listbox"
-            aria-label="Options"
-          >
-            {items.map((item) => {
-              const isSelected = item.id === selectedId;
-              return (
-                <div
-                  key={item.id}
-                  className={[styles.optionItem, isSelected && styles.selected]
-                    .filter(Boolean)
-                    .join(' ')}
-                  onClick={() => handleItemClick(item)}
-                  role="option"
-                  aria-selected={isSelected}
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleItemClick(item);
-                    }
-                  }}
-                >
-                  {isSelected && (
+        </div>
+      </div>
+      {additionalInfo && (
+        <div
+          className={`${styles.additionalInfo} ${
+            actualState === 'error' ? styles.error : ''
+          }`}
+        >
+          {additionalInfo}
+        </div>
+      )}
+      {isOpen && (
+        <div className={optionGroupClasses} role="listbox">
+          {items.map((item) => {
+            const isSelected = item.id === selectedId;
+            return (
+              <div
+                key={item.id}
+                className={`${styles.optionItem} ${
+                  isSelected ? styles.selected : ''
+                }`}
+                onClick={() => handleItemClick(item)}
+                role="option"
+                aria-selected={isSelected}
+              >
+                {isSelected && (
+                  <span className={styles.checkIcon}>
                     <svg
-                      className={styles.checkIcon}
                       width="16"
                       height="16"
                       viewBox="0 0 16 16"
@@ -235,21 +212,21 @@ export default function Selectbox({
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M13 4L6 11L3 8"
+                        d="M13.3333 4L6 11.3333L2.66667 8"
                         stroke="currentColor"
-                        strokeWidth="1.5"
+                        strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                     </svg>
-                  )}
-                  <div className={styles.optionContent}>{item.value}</div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                  </span>
+                )}
+                <span className={styles.optionValue}>{item.value}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -5,8 +5,8 @@
   justify-content: center;
   border: none;
   cursor: pointer;
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui,
-    sans-serif;
+  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
   font-style: normal;
   font-weight: var(--font-weight-medium);
   transition: background-color 0.2s, border-color 0.2s, color 0.2s;
@@ -47,11 +47,11 @@
 }
 
 .shape-rectangle.size-m {
-  border-radius: 12px;
+  border-radius: var(--border-radius-12, 12px);
 }
 
 .shape-rectangle.size-s {
-  border-radius: 8px;
+  border-radius: var(--border-radius-8, 8px);
 }
 
 /* Light Theme - Primary Variant */
