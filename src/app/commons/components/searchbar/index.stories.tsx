@@ -9,21 +9,12 @@ const meta = {
     docs: {
       description: {
         component:
-          '검색바 컴포넌트입니다. theme, iconLeft, iconRight 등의 속성을 통해 다양한 스타일을 적용할 수 있습니다.',
+          '검색바 컴포넌트입니다. iconLeft, iconRight 등의 속성을 통해 다양한 스타일을 적용할 수 있습니다. 테마는 globals.css의 시맨틱 컬러 시스템으로 자동 관리됩니다.',
       },
     },
   },
   tags: ['autodocs'],
   argTypes: {
-    theme: {
-      control: 'select',
-      options: ['light', 'dark'],
-      description: '검색바의 테마',
-      table: {
-        type: { summary: 'SearchbarTheme' },
-        defaultValue: { summary: 'light' },
-      },
-    },
     children: {
       control: 'text',
       description: '검색바 내부 콘텐츠 (input 대신 사용)',
@@ -94,34 +85,6 @@ export const Default: Story = {
   },
 };
 
-// Theme 스토리
-export const LightTheme: Story = {
-  args: {
-    theme: 'light',
-    placeholder: '검색하세요',
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ padding: '20px', backgroundColor: '#ffffff' }}>
-        <Story />
-      </div>
-    ),
-  ],
-};
-
-export const DarkTheme: Story = {
-  args: {
-    theme: 'dark',
-    placeholder: '검색하세요',
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ padding: '20px', backgroundColor: '#030712' }}>
-        <Story />
-      </div>
-    ),
-  ],
-};
 
 // Icon 스토리
 export const WithLeftIcon: Story = {
@@ -188,25 +151,6 @@ export const DisabledWithIcons: Story = {
 };
 
 // 조합 스토리
-export const AllThemes: Story = {
-  render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      <div style={{ padding: '20px', backgroundColor: '#ffffff' }}>
-        <Searchbar theme="light" placeholder="Light Theme" />
-      </div>
-      <div style={{ padding: '20px', backgroundColor: '#030712' }}>
-        <Searchbar theme="dark" placeholder="Dark Theme" />
-      </div>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: '모든 theme 타입을 한 번에 확인할 수 있습니다.',
-      },
-    },
-  },
-};
 
 export const AllIconCombinations: Story = {
   render: () => (
@@ -246,65 +190,30 @@ export const AllIconSizes: Story = {
   },
 };
 
-export const LightThemeVariants: Story = {
+export const AllVariants: Story = {
   render: () => (
     <div
       style={{
         display: 'flex',
         flexDirection: 'column',
         gap: '12px',
-        padding: '20px',
-        backgroundColor: '#ffffff',
       }}
     >
-      <Searchbar theme="light" placeholder="기본" />
-      <Searchbar theme="light" iconLeft={true} placeholder="왼쪽 아이콘" />
-      <Searchbar theme="light" iconRight={true} placeholder="오른쪽 아이콘" />
+      <Searchbar placeholder="기본" />
+      <Searchbar iconLeft={true} placeholder="왼쪽 아이콘" />
+      <Searchbar iconRight={true} placeholder="오른쪽 아이콘" />
       <Searchbar
-        theme="light"
         iconLeft={true}
         iconRight={true}
         placeholder="양쪽 아이콘"
       />
-      <Searchbar theme="light" disabled placeholder="비활성화" />
+      <Searchbar disabled placeholder="비활성화" />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Light 테마의 모든 변형을 확인할 수 있습니다.',
-      },
-    },
-  },
-};
-
-export const DarkThemeVariants: Story = {
-  render: () => (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        padding: '20px',
-        backgroundColor: '#030712',
-      }}
-    >
-      <Searchbar theme="dark" placeholder="기본" />
-      <Searchbar theme="dark" iconLeft={true} placeholder="왼쪽 아이콘" />
-      <Searchbar theme="dark" iconRight={true} placeholder="오른쪽 아이콘" />
-      <Searchbar
-        theme="dark"
-        iconLeft={true}
-        iconRight={true}
-        placeholder="양쪽 아이콘"
-      />
-      <Searchbar theme="dark" disabled placeholder="비활성화" />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Dark 테마의 모든 변형을 확인할 수 있습니다.',
+        story: '모든 변형을 확인할 수 있습니다. 테마는 Storybook 툴바에서 전환 가능합니다.',
       },
     },
   },
@@ -312,61 +221,16 @@ export const DarkThemeVariants: Story = {
 
 export const CompleteExample: Story = {
   render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <h3 style={{ margin: 0 }}>Light Theme</h3>
-        <div style={{ padding: '20px', backgroundColor: '#ffffff' }}>
-          <Searchbar
-            theme="light"
-            iconLeft={true}
-            iconRight={true}
-            placeholder="검색어를 입력하세요"
-            onIconLeftClick={() => console.log('검색 클릭')}
-            onIconRightClick={() => console.log('초기화 클릭')}
-          />
-        </div>
-        <div style={{ padding: '20px', backgroundColor: '#ffffff' }}>
-          <Searchbar
-            theme="light"
-            iconLeft={true}
-            placeholder="왼쪽 아이콘만 있는 검색바"
-          />
-        </div>
-        <div style={{ padding: '20px', backgroundColor: '#ffffff' }}>
-          <Searchbar
-            theme="light"
-            iconRight={true}
-            placeholder="오른쪽 아이콘만 있는 검색바"
-          />
-        </div>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <h3 style={{ margin: 0 }}>Dark Theme</h3>
-        <div style={{ padding: '20px', backgroundColor: '#030712' }}>
-          <Searchbar
-            theme="dark"
-            iconLeft={true}
-            iconRight={true}
-            placeholder="검색어를 입력하세요"
-            onIconLeftClick={() => console.log('검색 클릭')}
-            onIconRightClick={() => console.log('초기화 클릭')}
-          />
-        </div>
-        <div style={{ padding: '20px', backgroundColor: '#030712' }}>
-          <Searchbar
-            theme="dark"
-            iconLeft={true}
-            placeholder="왼쪽 아이콘만 있는 검색바"
-          />
-        </div>
-        <div style={{ padding: '20px', backgroundColor: '#030712' }}>
-          <Searchbar
-            theme="dark"
-            iconRight={true}
-            placeholder="오른쪽 아이콘만 있는 검색바"
-          />
-        </div>
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <Searchbar
+        iconLeft={true}
+        iconRight={true}
+        placeholder="검색어를 입력하세요"
+        onIconLeftClick={() => console.log('검색 클릭')}
+        onIconRightClick={() => console.log('초기화 클릭')}
+      />
+      <Searchbar iconLeft={true} placeholder="왼쪽 아이콘만 있는 검색바" />
+      <Searchbar iconRight={true} placeholder="오른쪽 아이콘만 있는 검색바" />
     </div>
   ),
   parameters: {

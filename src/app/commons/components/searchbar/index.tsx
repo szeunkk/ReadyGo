@@ -5,13 +5,10 @@ import styles from './styles.module.css';
 import { InputHTMLAttributes } from 'react';
 import Image from 'next/image';
 
-export type SearchbarTheme = 'light' | 'dark';
-
 export interface SearchbarProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
   'size'
 > {
-  theme?: SearchbarTheme;
   children?: React.ReactNode;
   iconLeft?: boolean;
   iconRight?: boolean;
@@ -22,7 +19,6 @@ export interface SearchbarProps extends Omit<
 }
 
 export default function Searchbar({
-  theme = 'light',
   children,
   iconLeft,
   iconRight,
@@ -33,11 +29,7 @@ export default function Searchbar({
   className = '',
   ...props
 }: SearchbarProps) {
-  const searchbarClasses = [
-    styles.searchbar,
-    styles[`theme-${theme}`],
-    className,
-  ]
+  const searchbarClasses = [styles.searchbar, className]
     .filter(Boolean)
     .join(' ');
 
