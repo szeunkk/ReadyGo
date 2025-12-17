@@ -8,14 +8,12 @@ export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
 export type ButtonSize = 's' | 'm';
 export type ButtonState = 'default' | 'hover' | 'disabled';
 export type ButtonShape = 'round' | 'rectangle';
-export type ButtonTheme = 'light' | 'dark';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   state?: ButtonState;
   shape?: ButtonShape;
-  theme?: ButtonTheme;
   children?: React.ReactNode;
 }
 
@@ -24,7 +22,6 @@ export default function Button({
   size = 'm',
   state = 'default',
   shape = 'round',
-  theme = 'light',
   children,
   className = '',
   disabled,
@@ -38,7 +35,6 @@ export default function Button({
     styles[`size-${size}`],
     styles[`state-${state}`],
     styles[`shape-${shape}`],
-    styles[`theme-${theme}`],
     isDisabled && styles.disabled,
     className,
   ]
