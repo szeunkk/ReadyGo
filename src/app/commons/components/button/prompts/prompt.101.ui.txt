@@ -56,3 +56,10 @@
             조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: hrwj1gor)
             조건-피그마) 참고할 공통컴포넌트 노드ID(dark-mode): 2075:52720
             조건-피그마) 참고할 공통컴포넌트 노드ID(light-mode): 2126:3855
+
+====================피그마 MCP==========================
+
+조건-피그마) 참고할 공통컴포넌트 노드ID(dark-mode): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2118-2882&m=dev
+조건-피그마) 참고할 공통컴포넌트 노드ID(light-mode): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2126-3855&m=dev
+
+핵심요구사항)global.css에 정의된 CSS 변수(상수 토큰)를 사용할 것.
