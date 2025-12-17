@@ -16,6 +16,23 @@ export type TraitKey =
   | 'social';
 
 // ============================================
+// Trait Labels (성향 한글 레이블)
+// ============================================
+
+export const traitLabels: Record<TraitKey, string> = {
+  cooperation: '협동성',
+  exploration: '모험성',
+  strategy: '전략성',
+  leadership: '리더십',
+  social: '교류성',
+} as const;
+
+// 레이더 차트용 타입 (5개 축)
+export type RadarTraitKey = TraitKey;
+
+export const radarTraitLabels: Record<RadarTraitKey, string> = traitLabels;
+
+// ============================================
 // Animal Group Enum
 // ============================================
 
