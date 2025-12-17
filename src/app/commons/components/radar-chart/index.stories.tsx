@@ -26,9 +26,13 @@ const meta: Meta<typeof RadarChart> = {
       control: 'boolean',
       description: '축 레이블 표시 여부',
     },
-    data: {
+    myData: {
       control: 'object',
-      description: '레이더 차트 데이터 (5개 축)',
+      description: '내 프로필 레이더 차트 데이터 (5개 축)',
+    },
+    userData: {
+      control: 'object',
+      description: '상대 프로필 레이더 차트 데이터 (5개 축, optional)',
     },
   },
 };
@@ -45,10 +49,10 @@ const defaultData: RadarChartData[] = [
   { trait: 'social', value: 65 },
 ];
 
-// 기본 스토리
+// 기본 스토리 - 내 프로필만
 export const Default: Story = {
   args: {
-    data: defaultData,
+    myData: defaultData,
     size: 'm',
     showLabels: true,
   },
@@ -57,7 +61,7 @@ export const Default: Story = {
 // 균형 잡힌 타입 (판다)
 export const Balanced: Story = {
   args: {
-    data: [
+    myData: [
       { trait: 'exploration', value: 60 },
       { trait: 'cooperation', value: 65 },
       { trait: 'strategy', value: 55 },
@@ -72,7 +76,7 @@ export const Balanced: Story = {
 // 공격형 타입 (호랑이)
 export const AttackType: Story = {
   args: {
-    data: [
+    myData: [
       { trait: 'exploration', value: 95 },
       { trait: 'cooperation', value: 30 },
       { trait: 'strategy', value: 40 },
@@ -87,7 +91,7 @@ export const AttackType: Story = {
 // 전략형 타입 (올빼미)
 export const StrategyType: Story = {
   args: {
-    data: [
+    myData: [
       { trait: 'exploration', value: 35 },
       { trait: 'cooperation', value: 50 },
       { trait: 'strategy', value: 95 },
@@ -102,7 +106,7 @@ export const StrategyType: Story = {
 // 소셜형 타입 (강아지)
 export const SocialType: Story = {
   args: {
-    data: [
+    myData: [
       { trait: 'exploration', value: 55 },
       { trait: 'cooperation', value: 85 },
       { trait: 'strategy', value: 40 },
@@ -117,7 +121,7 @@ export const SocialType: Story = {
 // 균형형 타입 (코알라)
 export const BalancedType: Story = {
   args: {
-    data: [
+    myData: [
       { trait: 'exploration', value: 40 },
       { trait: 'cooperation', value: 70 },
       { trait: 'strategy', value: 50 },
@@ -132,7 +136,7 @@ export const BalancedType: Story = {
 // 극단값 - 최대
 export const MaxValues: Story = {
   args: {
-    data: [
+    myData: [
       { trait: 'exploration', value: 100 },
       { trait: 'cooperation', value: 100 },
       { trait: 'strategy', value: 100 },
@@ -147,7 +151,7 @@ export const MaxValues: Story = {
 // 극단값 - 최소
 export const MinValues: Story = {
   args: {
-    data: [
+    myData: [
       { trait: 'exploration', value: 10 },
       { trait: 'cooperation', value: 10 },
       { trait: 'strategy', value: 10 },
@@ -162,7 +166,7 @@ export const MinValues: Story = {
 // 사이즈 S
 export const SizeSmall: Story = {
   args: {
-    data: defaultData,
+    myData: defaultData,
     size: 's',
     showLabels: true,
   },
@@ -171,7 +175,7 @@ export const SizeSmall: Story = {
 // 사이즈 L
 export const SizeLarge: Story = {
   args: {
-    data: defaultData,
+    myData: defaultData,
     size: 'l',
     showLabels: true,
   },
@@ -180,7 +184,7 @@ export const SizeLarge: Story = {
 // 레이블 숨김
 export const NoLabels: Story = {
   args: {
-    data: defaultData,
+    myData: defaultData,
     size: 'm',
     showLabels: false,
   },
@@ -189,7 +193,7 @@ export const NoLabels: Story = {
 // 리더형 타입 (늑대)
 export const LeaderType: Story = {
   args: {
-    data: [
+    myData: [
       { trait: 'exploration', value: 85 },
       { trait: 'cooperation', value: 70 },
       { trait: 'strategy', value: 60 },
@@ -204,12 +208,78 @@ export const LeaderType: Story = {
 // 서포트형 타입 (곰)
 export const SupportType: Story = {
   args: {
-    data: [
+    myData: [
       { trait: 'exploration', value: 40 },
       { trait: 'cooperation', value: 90 },
       { trait: 'strategy', value: 70 },
       { trait: 'leadership', value: 55 },
       { trait: 'social', value: 75 },
+    ],
+    size: 'm',
+    showLabels: true,
+  },
+};
+
+// 두 프로필 비교 - 내 프로필 vs 상대 프로필
+export const CompareProfiles: Story = {
+  args: {
+    myData: [
+      { trait: 'exploration', value: 80 },
+      { trait: 'cooperation', value: 70 },
+      { trait: 'strategy', value: 60 },
+      { trait: 'leadership', value: 50 },
+      { trait: 'social', value: 65 },
+    ],
+    userData: [
+      { trait: 'exploration', value: 40 },
+      { trait: 'cooperation', value: 90 },
+      { trait: 'strategy', value: 85 },
+      { trait: 'leadership', value: 70 },
+      { trait: 'social', value: 55 },
+    ],
+    size: 'm',
+    showLabels: true,
+  },
+};
+
+// 두 프로필 비교 - 유사한 성향
+export const CompareSimilar: Story = {
+  args: {
+    myData: [
+      { trait: 'exploration', value: 70 },
+      { trait: 'cooperation', value: 75 },
+      { trait: 'strategy', value: 65 },
+      { trait: 'leadership', value: 60 },
+      { trait: 'social', value: 70 },
+    ],
+    userData: [
+      { trait: 'exploration', value: 75 },
+      { trait: 'cooperation', value: 70 },
+      { trait: 'strategy', value: 68 },
+      { trait: 'leadership', value: 65 },
+      { trait: 'social', value: 72 },
+    ],
+    size: 'm',
+    showLabels: true,
+  },
+};
+
+// 두 프로필 비교 - 정반대 성향
+export const CompareOpposite: Story = {
+  args: {
+    myData: [
+      { trait: 'exploration', value: 90 },
+      { trait: 'cooperation', value: 30 },
+      { trait: 'strategy', value: 85 },
+      { trait: 'leadership', value: 25 },
+      { trait: 'social', value: 35 },
+    ],
+    userData: [
+      { trait: 'exploration', value: 30 },
+      { trait: 'cooperation', value: 90 },
+      { trait: 'strategy', value: 40 },
+      { trait: 'leadership', value: 85 },
+      { trait: 'social', value: 95 },
     ],
     size: 'm',
     showLabels: true,

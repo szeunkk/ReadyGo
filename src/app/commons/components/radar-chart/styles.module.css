@@ -21,8 +21,8 @@
 }
 
 .size-m {
-  width: 236px;
-  height: 204px;
+  width: 235px; /* 오각형 축 175px + 라벨 공간 */
+  height: 200px; /* 오각형 축 166px + 라벨 공간 */
 }
 
 .size-l {
