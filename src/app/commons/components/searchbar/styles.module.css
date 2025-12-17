@@ -21,6 +21,7 @@
 .searchbarContent {
   display: flex;
   align-items: center;
+  gap: 10px;
   width: 100%;
   height: 100%;
   padding-left: 16px;
@@ -78,6 +79,7 @@
 .icon {
   flex-shrink: 0;
   display: block;
+  color: var(--color-icon-interactive-primary);
 }
 
 /* Theme - Mode-aware using semantic colors */
