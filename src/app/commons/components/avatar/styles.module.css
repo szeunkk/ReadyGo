@@ -4,6 +4,7 @@
   display: inline-block;
   border-radius: 99999px;
   overflow: visible;
+  background-color: var(--color-bg-primary);
 }
 
 /* Image Container */
@@ -28,74 +29,33 @@
 .size-s {
   width: 40px;
   height: 40px;
+  border: 2px solid var(--color-border-secondary);
 }
 
 .size-m {
   width: 64px;
   height: 64px;
+  border: 2px solid var(--color-border-secondary);
 }
 
 .size-L {
   width: 100px;
   height: 100px;
-}
-
-/* Theme Styles - Border */
-/* size 'L'일 때: border solid 3px */
-/* size 'm', 's'일 때: border solid 2px */
-.theme-light.size-L {
-  border: 3px solid var(--color-neutral-100);
-}
-
-.theme-light.size-m,
-.theme-light.size-s {
-  border: 2px solid var(--color-neutral-100);
-}
-
-.theme-dark.size-L {
-  border: 3px solid var(--color-neutral-700);
-}
-
-.theme-dark.size-m,
-.theme-dark.size-s {
-  border: 2px solid var(--color-neutral-700);
+  border: 3px solid var(--color-border-secondary);
 }
 
 /* Status Dot Base */
 .statusDot {
   position: absolute;
   border-radius: 99999px;
-  /* 
-   * StatusDot의 원의 중심이 avatar circle의 border solid 중심과 겹치도록 위치
-   * StatusDot의 중심점이 avatar 원의 외곽선(반지름 위치)에 정확히 위치하도록 배치
-   * 
-   * 계산 방식:
-   * - Avatar 중심에서 StatusDot 중심까지의 거리 = Avatar 반지름
-   * - 우측 하단(4~5시 방향)에 배치하므로, right와 bottom을 조정
-   * - StatusDot의 중심이 원의 외곽선에 위치하도록 transform 사용
-   */
 }
 
 /* Status Dot Sizes - 아바타 크기에 비례 (약 18~22%) */
-/* StatusDot 위치: 중심이 avatar 원의 외곽선(반지름 위치)에 정확히 위치 */
-/* 
- * 계산 방식:
- * - Avatar 중심: (50%, 50%)
- * - StatusDot 중심이 위치할 곳: 우측 하단(225도 방향)의 border 외곽선
- * - Avatar 반지름 = width / 2
- * - 225도 방향: cos(225°) = sin(225°) = -√2/2 ≈ -0.707
- * - StatusDot 중심 위치: (50% + 반지름 * 0.707, 50% + 반지름 * 0.707)
- * - right/bottom은 요소의 오른쪽/아래쪽 끝 기준이므로, StatusDot width/height의 절반을 더함
- */
 .size-s .statusDot {
   width: 10px;
   height: 10px;
   min-width: 10px;
   min-height: 10px;
-  /* Avatar size-s: 40px, 반지름 20px, border 2px */
-  /* StatusDot 중심이 border 외곽선에 위치: (50% + 20px * 0.707, 50% + 20px * 0.707) = (50% + 14.14px, 50% + 14.14px) */
-  /* StatusDot 오른쪽 끝: 50% + 14.14px + 5px = 50% + 19.14px */
-  /* right = 100% - (50% + 19.14px) = 50% - 19.14px */
   right: calc(50% - 19.14px);
   bottom: calc(50% - 19.14px);
 }
@@ -105,10 +65,6 @@
   height: 14px;
   min-width: 14px;
   min-height: 14px;
-  /* Avatar size-m: 64px, 반지름 32px, border 2px */
-  /* StatusDot 중심이 border 외곽선에 위치: (50% + 32px * 0.707, 50% + 32px * 0.707) = (50% + 22.62px, 50% + 22.62px) */
-  /* StatusDot 오른쪽 끝: 50% + 22.62px + 7px = 50% + 29.62px */
-  /* right = 100% - (50% + 29.62px) = 50% - 29.62px */
   right: calc(50% - 29.62px);
   bottom: calc(50% - 29.62px);
 }
@@ -118,76 +74,40 @@
   height: 20px;
   min-width: 20px;
   min-height: 20px;
-  /* Avatar size-L: 100px, 반지름 50px, border 3px */
-  /* StatusDot 중심이 border 외곽선에 위치: (50% + 50px * 0.707, 50% + 50px * 0.707) = (50% + 35.35px, 50% + 35.35px) */
-  /* StatusDot 오른쪽 끝: 50% + 35.35px + 10px = 50% + 45.35px */
-  /* right = 100% - (50% + 45.35px) = 50% - 45.35px */
   right: calc(50% - 45.35px);
   bottom: calc(50% - 45.35px);
 }
 
-/* Status Colors - Light Theme */
-/* 기본(online, away, ban 상태): 모든 사이즈에서 border solid 2px */
-.theme-light .status-online {
-  background-color: var(--color-success-600);
-  border: 2px solid var(--color-base-white);
+/* Status Colors */
+.status-online {
+  background-color: var(--color-icon-success);
+  border: 2px solid var(--color-icon-interactive-inverse);
 }
 
-.theme-light .status-away {
-  background-color: var(--color-warning-600);
-  border: 2px solid var(--color-base-white);
+.status-away {
+  background-color: var(--color-icon-warning);
+  border: 2px solid var(--color-icon-interactive-inverse);
 }
 
-.theme-light .status-ban {
-  background-color: var(--color-danger-600);
-  border: 2px solid var(--color-base-white);
-}
-
-/* status 'offline'인 경우: size별로 border 두께 다름 */
-.theme-light .status-offline.size-s {
-  background-color: var(--color-base-white);
-  border: 2.5px solid var(--color-neutral-700);
-}
-
-.theme-light .status-offline.size-m {
-  background-color: var(--color-base-white);
-  border: 3.5px solid var(--color-neutral-700);
-}
-
-.theme-light .status-offline.size-L {
-  background-color: var(--color-base-white);
-  border: 5px solid var(--color-neutral-700);
-}
-
-/* Status Colors - Dark Theme */
-/* 기본(online, away, ban 상태): 모든 사이즈에서 border solid 2px */
-.theme-dark .status-online {
-  background-color: var(--color-success-400);
-  border: 2px solid var(--color-base-black);
-}
-
-.theme-dark .status-away {
-  background-color: var(--color-warning-400);
-  border: 2px solid var(--color-base-black);
-}
-
-.theme-dark .status-ban {
-  background-color: var(--color-danger-400);
-  border: 2px solid var(--color-base-black);
+.status-ban {
+  background-color: var(--color-icon-danger);
+  border: 2px solid var(--color-icon-interactive-inverse);
 }
 
 /* status 'offline'인 경우: size별로 border 두께 다름 */
-.theme-dark .status-offline.size-s {
-  background-color: var(--color-neutral-900);
-  border: 2.5px solid var(--color-neutral-500);
+.status-offline {
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-icon-interactive-secondary);
 }
 
-.theme-dark .status-offline.size-m {
-  background-color: var(--color-neutral-900);
-  border: 3.5px solid var(--color-neutral-500);
+.status-offline.size-s {
+  border: 2.5px solid var(--color-icon-interactive-secondary);
 }
 
-.theme-dark .status-offline.size-L {
-  background-color: var(--color-neutral-900);
-  border: 5px solid var(--color-neutral-500);
+.status-offline.size-m {
+  border: 3.5px solid var(--color-icon-interactive-secondary);
+}
+
+.status-offline.size-L {
+  border: 5px solid var(--color-icon-interactive-secondary);
 }
