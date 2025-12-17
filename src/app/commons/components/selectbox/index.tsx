@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import Icon from '../icon';
 import styles from './styles.module.css';
 
 export type SelectboxState =
@@ -11,8 +12,6 @@ export type SelectboxState =
   | 'disabled'
   | 'active';
 
-export type SelectboxTheme = 'light' | 'dark';
-
 export interface SelectboxItem {
   id: string;
   value: string;
@@ -20,9 +19,7 @@ export interface SelectboxItem {
 
 export interface SelectboxProps {
   state?: SelectboxState;
-  theme?: SelectboxTheme;
   label?: string;
-  additionalInfo?: string;
   items: SelectboxItem[];
   selectedId?: string;
   onSelect?: (item: SelectboxItem) => void;
@@ -33,9 +30,7 @@ export interface SelectboxProps {
 
 export default function Selectbox({
   state = 'default',
-  theme = 'light',
   label,
-  additionalInfo,
   items,
   selectedId,
   onSelect,
@@ -116,7 +111,6 @@ export default function Selectbox({
   const selectboxClasses = [
     styles.selectbox,
     styles[`state-${actualState}`],
-    styles[`theme-${theme}`],
     isDisabled && styles.disabled,
     isFilled && styles.filled,
     className,
@@ -124,11 +118,7 @@ export default function Selectbox({
     .filter(Boolean)
     .join(' ');
 
-  const optionGroupClasses = [
-    styles.optionGroup,
-    styles[`theme-${theme}`],
-    isOpen && styles.open,
-  ]
+  const optionGroupClasses = [styles.optionGroup, isOpen && styles.open]
     .filter(Boolean)
     .join(' ');
 
@@ -180,15 +170,6 @@ export default function Selectbox({
           </svg>
         </div>
       </div>
-      {additionalInfo && (
-        <div
-          className={`${styles.additionalInfo} ${
-            actualState === 'error' ? styles.error : ''
-          }`}
-        >
-          {additionalInfo}
-        </div>
-      )}
       {isOpen && (
         <div className={optionGroupClasses} role="listbox">
           {items.map((item) => {
@@ -205,21 +186,7 @@ export default function Selectbox({
               >
                 {isSelected && (
                   <span className={styles.checkIcon}>
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M13.3333 4L6 11.3333L2.66667 8"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                    <Icon name="check" size={20} />
                   </span>
                 )}
                 <span className={styles.optionValue}>{item.value}</span>

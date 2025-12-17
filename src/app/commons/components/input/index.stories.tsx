@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '인풋 컴포넌트입니다. variant, state, theme 등의 속성을 통해 다양한 스타일을 적용할 수 있습니다.',
+          '인풋 컴포넌트입니다. variant, state 등의 속성을 통해 다양한 스타일을 적용할 수 있습니다.',
       },
     },
   },
@@ -39,15 +39,6 @@ const meta = {
       table: {
         type: { summary: 'InputState' },
         defaultValue: { summary: 'Default' },
-      },
-    },
-    theme: {
-      control: 'select',
-      options: ['light', 'dark'],
-      description: '인풋의 테마',
-      table: {
-        type: { summary: 'InputTheme' },
-        defaultValue: { summary: 'light' },
       },
     },
     label: {
@@ -229,7 +220,6 @@ export const DisabledProp: Story = {
 // Theme 스토리
 export const LightTheme: Story = {
   args: {
-    theme: 'light',
     variant: 'primary',
     placeholder: 'Light Theme',
   },
@@ -244,7 +234,6 @@ export const LightTheme: Story = {
 
 export const DarkTheme: Story = {
   args: {
-    theme: 'dark',
     variant: 'primary',
     placeholder: 'Dark Theme',
   },

@@ -100,6 +100,7 @@
   font-weight: var(--font-weight-medium);
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-primary);
 }
 
 .labelIcon {
@@ -132,6 +133,11 @@
   font-weight: var(--font-weight-regular);
   font-size: var(--typo-body-sm-font-size);
   line-height: var(--typo-body-sm-line-height);
+  color: var(--color-text-interactive-secondary);
+}
+
+.additionalInfo.error {
+  color: var(--color-text-danger);
 }
 
 .additionalInfoIcon {
@@ -143,254 +149,100 @@
   align-items: center;
 }
 
-/* Dark Theme - Primary Variant */
-.theme-dark.variant-primary {
+/* Primary Variant */
+.variant-primary {
   background-color: var(--color-bg-secondary);
   border-radius: var(--border-radius-12, 12px);
   color: var(--color-text-primary);
 }
 
-.theme-dark.variant-primary .inputField::placeholder {
-  color: var(--color-text-interactive-secondary);
-}
-
-.theme-dark.variant-primary.state-Default {
+.variant-primary.state-Default {
   border: none;
 }
 
-.theme-dark.variant-primary.state-hover {
+.variant-primary.state-hover {
   background-color: var(--color-bg-secondary);
   border: 1px solid var(--color-border-interactive-secondary);
   border-radius: var(--border-radius-12, 12px);
 }
 
-.theme-dark.variant-primary.state-active {
+.variant-primary.state-active {
   background-color: var(--color-bg-secondary);
   border: 1px solid var(--color-border-interactive-primary);
   border-radius: var(--border-radius-12, 12px);
 }
 
-.theme-dark.variant-primary.state-filled {
+.variant-primary.state-filled {
   background-color: var(--color-bg-secondary);
   border: none;
   border-radius: var(--border-radius-12, 12px);
   color: var(--color-text-primary);
 }
 
-.theme-dark.variant-primary.state-error {
+.variant-primary.state-error {
   background-color: var(--color-bg-secondary);
   border: 1px solid var(--color-border-danger);
   border-radius: var(--border-radius-12, 12px);
   color: var(--color-text-primary);
 }
 
-.theme-dark.variant-primary.state-disabled,
-.theme-dark.disabled {
+.variant-primary.state-disabled,
+.disabled {
   background-color: var(--color-bg-disabled);
   border: none;
   border-radius: var(--border-radius-12, 12px);
   color: var(--color-text-disabled);
 }
 
-.theme-dark.variant-primary.state-disabled .inputField,
-.theme-dark.disabled .inputField {
+.variant-primary.state-disabled .inputField,
+.disabled .inputField {
   color: var(--color-text-disabled);
 }
 
-.theme-dark.variant-primary.state-disabled .inputField::placeholder,
-.theme-dark.disabled .inputField::placeholder {
-  color: var(--color-text-disabled);
-}
-
-/* Dark Theme - Secondary Variant */
-.theme-dark.variant-secondary {
+/* Secondary Variant */
+.variant-secondary {
   background-color: transparent;
   border: 1px solid var(--color-border-primary);
   border-radius: var(--border-radius-12, 12px);
   color: var(--color-text-primary);
 }
 
-.theme-dark.variant-secondary .inputField::placeholder {
-  color: var(--color-text-interactive-secondary);
-}
-
-.theme-dark.variant-secondary.state-Default {
+.variant-secondary.state-Default {
   border-color: var(--color-border-primary);
 }
 
-.theme-dark.variant-secondary.state-hover {
+.variant-secondary.state-hover {
   background-color: var(--color-bg-secondary);
   border-color: var(--color-border-interactive-secondary);
 }
 
-.theme-dark.variant-secondary.state-active {
+.variant-secondary.state-active {
   border-color: var(--color-border-interactive-primary);
 }
 
-.theme-dark.variant-secondary.state-filled {
+.variant-secondary.state-filled {
   border-color: var(--color-border-primary);
   color: var(--color-text-primary);
 }
 
-.theme-dark.variant-secondary.state-error {
+.variant-secondary.state-error {
   border-color: var(--color-border-danger);
   color: var(--color-text-primary);
 }
 
-.theme-dark.variant-secondary.state-disabled {
+.variant-secondary.state-disabled {
   background-color: var(--color-bg-disabled);
   border-color: var(--color-border-disabled);
   color: var(--color-text-disabled);
 }
 
-.theme-dark.variant-secondary.state-disabled .inputField {
+.variant-secondary.state-disabled .inputField {
   color: var(--color-text-disabled);
 }
 
-.theme-dark.variant-secondary.state-disabled .inputField::placeholder {
+/* Disabled State - Placeholder */
+.variant-primary.state-disabled .inputField::placeholder,
+.variant-secondary.state-disabled .inputField::placeholder,
+.disabled .inputField::placeholder {
   color: var(--color-text-disabled);
-}
-
-/* Dark Theme - Label */
-.theme-dark .label {
-  color: var(--color-text-primary);
-}
-
-.theme-dark .required {
-  color: var(--color-text-danger);
-}
-
-/* Dark Theme - Additional Info */
-.theme-dark .additionalInfo {
-  color: var(--color-icon-interactive-secondary);
-}
-
-.theme-dark .additionalInfo.error {
-  color: var(--color-text-danger);
-}
-
-/* Light Theme - Primary Variant */
-.theme-light.variant-primary {
-  background-color: var(--color-bg-secondary);
-  border-radius: var(--border-radius-12, 12px);
-  color: var(--color-text-primary);
-}
-
-.theme-light.variant-primary .inputField::placeholder {
-  color: var(--color-text-interactive-secondary);
-}
-
-.theme-light.variant-primary.state-Default {
-  border: none;
-}
-
-.theme-light.variant-primary.state-hover {
-  background-color: var(--color-bg-secondary);
-  border: 1px solid var(--color-border-interactive-secondary);
-  border-radius: var(--border-radius-12, 12px);
-}
-
-.theme-light.variant-primary.state-active {
-  background-color: var(--color-bg-secondary);
-  border: 1px solid var(--color-border-interactive-primary);
-  border-radius: var(--border-radius-12, 12px);
-}
-
-.theme-light.variant-primary.state-filled {
-  background-color: var(--color-bg-secondary);
-  border: none;
-  border-radius: var(--border-radius-12, 12px);
-  color: var(--color-text-primary);
-}
-
-.theme-light.variant-primary.state-error {
-  background-color: var(--color-bg-secondary);
-  border: 1px solid var(--color-border-danger);
-  border-radius: var(--border-radius-12, 12px);
-  color: var(--color-text-primary);
-}
-
-.theme-light.variant-primary.state-disabled,
-.theme-light.disabled {
-  background-color: var(--color-bg-disabled);
-  border: none;
-  border-radius: var(--border-radius-12, 12px);
-  color: var(--color-text-disabled);
-}
-
-.theme-light.variant-primary.state-disabled .inputField,
-.theme-light.disabled .inputField {
-  color: var(--color-text-disabled);
-}
-
-.theme-light.variant-primary.state-disabled .inputField::placeholder,
-.theme-light.disabled .inputField::placeholder {
-  color: var(--color-text-disabled);
-}
-
-/* Light Theme - Secondary Variant */
-.theme-light.variant-secondary {
-  background-color: transparent;
-  border: 1px solid var(--color-border-primary);
-  border-radius: var(--border-radius-12, 12px);
-  color: var(--color-text-primary);
-}
-
-.theme-light.variant-secondary .inputField::placeholder {
-  color: var(--color-text-interactive-secondary);
-}
-
-.theme-light.variant-secondary.state-Default {
-  border-color: var(--color-border-primary);
-}
-
-.theme-light.variant-secondary.state-hover {
-  background-color: var(--color-bg-secondary);
-  border-color: var(--color-border-interactive-secondary);
-}
-
-.theme-light.variant-secondary.state-active {
-  border-color: var(--color-border-interactive-primary);
-}
-
-.theme-light.variant-secondary.state-filled {
-  border-color: var(--color-border-primary);
-  color: var(--color-text-primary);
-}
-
-.theme-light.variant-secondary.state-error {
-  border-color: var(--color-border-danger);
-  color: var(--color-text-primary);
-}
-
-.theme-light.variant-secondary.state-disabled {
-  background-color: var(--color-bg-disabled);
-  border-color: var(--color-border-disabled);
-  color: var(--color-text-disabled);
-}
-
-.theme-light.variant-secondary.state-disabled .inputField {
-  color: var(--color-text-disabled);
-}
-
-.theme-light.variant-secondary.state-disabled .inputField::placeholder {
-  color: var(--color-text-disabled);
-}
-
-/* Light Theme - Label */
-.theme-light .label {
-  color: var(--color-text-primary);
-}
-
-.theme-light .required {
-  color: var(--color-text-danger);
-}
-
-/* Light Theme - Additional Info */
-.theme-light .additionalInfo {
-  color: var(--color-text-interactive-secondary);
-}
-
-.theme-light .additionalInfo.error {
-  color: var(--color-text-danger);
 }

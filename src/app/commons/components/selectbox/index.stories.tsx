@@ -10,7 +10,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '셀렉트박스 컴포넌트입니다. state, theme 등의 속성을 통해 다양한 상태를 표현할 수 있습니다.',
+          '셀렉트박스 컴포넌트입니다. state 등의 속성을 통해 다양한 상태를 표현할 수 있습니다.',
       },
     },
   },
@@ -25,22 +25,9 @@ const meta = {
         defaultValue: { summary: 'default' },
       },
     },
-    theme: {
-      control: 'select',
-      options: ['light', 'dark'],
-      description: '셀렉트박스의 테마',
-      table: {
-        type: { summary: 'SelectboxTheme' },
-        defaultValue: { summary: 'light' },
-      },
-    },
     label: {
       control: 'text',
       description: '셀렉트박스의 레이블',
-    },
-    additionalInfo: {
-      control: 'text',
-      description: '셀렉트박스의 추가 정보',
     },
     items: {
       control: 'object',
@@ -130,26 +117,9 @@ export const WithLabel: Story = {
   },
 };
 
-export const WithAdditionalInfo: Story = {
-  args: {
-    label: '레이블',
-    additionalInfo: '추가 정보 텍스트',
-    items: sampleItems,
-  },
-};
-
 export const WithLabelOnly: Story = {
   args: {
     label: '레이블만',
-    items: sampleItems,
-  },
-};
-
-export const ErrorStateWithInfo: Story = {
-  args: {
-    state: 'error',
-    label: '에러 상태',
-    additionalInfo: '에러 메시지가 표시됩니다',
     items: sampleItems,
   },
 };
@@ -169,39 +139,6 @@ export const WithLongPlaceholder: Story = {
     placeholder: '이것은 매우 긴 플레이스홀더 텍스트입니다',
     items: sampleItems,
   },
-};
-
-// Theme 스토리
-export const LightTheme: Story = {
-  args: {
-    theme: 'light',
-    label: 'Light Theme',
-    items: sampleItems,
-    selectedId: '2',
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ padding: '20px', backgroundColor: '#ffffff' }}>
-        <Story />
-      </div>
-    ),
-  ],
-};
-
-export const DarkTheme: Story = {
-  args: {
-    theme: 'dark',
-    label: 'Dark Theme',
-    items: sampleItems,
-    selectedId: '2',
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ padding: '20px', backgroundColor: '#030712' }}>
-        <Story />
-      </div>
-    ),
-  ],
 };
 
 // 조합 스토리
@@ -256,120 +193,6 @@ export const AllStatesWithLabel: Story = {
   },
 };
 
-export const LightThemeVariants: Story = {
-  args: {
-    items: sampleItems,
-  },
-  render: () => (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-        padding: '20px',
-        backgroundColor: '#ffffff',
-      }}
-    >
-      <Selectbox
-        theme="light"
-        state="default"
-        label="Default"
-        items={sampleItems}
-      />
-      <Selectbox
-        theme="light"
-        state="hover"
-        label="Hover"
-        items={sampleItems}
-      />
-      <Selectbox
-        theme="light"
-        state="filled"
-        label="Filled"
-        items={sampleItems}
-        selectedId="2"
-      />
-      <Selectbox
-        theme="light"
-        state="error"
-        label="Error"
-        items={sampleItems}
-      />
-      <Selectbox
-        theme="light"
-        state="disabled"
-        label="Disabled"
-        items={sampleItems}
-      />
-      <Selectbox
-        theme="light"
-        state="active"
-        label="Active"
-        items={sampleItems}
-      />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Light 테마의 모든 state를 확인할 수 있습니다.',
-      },
-    },
-  },
-};
-
-export const DarkThemeVariants: Story = {
-  args: {
-    items: sampleItems,
-  },
-  render: () => (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-        padding: '20px',
-        backgroundColor: '#030712',
-      }}
-    >
-      <Selectbox
-        theme="dark"
-        state="default"
-        label="Default"
-        items={sampleItems}
-      />
-      <Selectbox theme="dark" state="hover" label="Hover" items={sampleItems} />
-      <Selectbox
-        theme="dark"
-        state="filled"
-        label="Filled"
-        items={sampleItems}
-        selectedId="2"
-      />
-      <Selectbox theme="dark" state="error" label="Error" items={sampleItems} />
-      <Selectbox
-        theme="dark"
-        state="disabled"
-        label="Disabled"
-        items={sampleItems}
-      />
-      <Selectbox
-        theme="dark"
-        state="active"
-        label="Active"
-        items={sampleItems}
-      />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Dark 테마의 모든 state를 확인할 수 있습니다.',
-      },
-    },
-  },
-};
-
 // 인터랙티브 스토리
 const InteractiveSelectboxComponent = () => {
   const [selectedId, setSelectedId] = React.useState<string | undefined>(
@@ -383,7 +206,6 @@ const InteractiveSelectboxComponent = () => {
   return (
     <Selectbox
       label="선택하세요"
-      additionalInfo="드롭다운을 열어 옵션을 선택할 수 있습니다"
       items={sampleItems}
       selectedId={selectedId}
       onSelect={handleSelect}

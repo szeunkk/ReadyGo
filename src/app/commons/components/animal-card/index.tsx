@@ -10,14 +10,12 @@ import { TierType } from '../../constants/tierType.enum';
 import { AnimalType, getAnimalTypeMeta } from '../../constants/animalType.enum';
 
 export type AnimalCardProperty = 'my' | 'user';
-export type AnimalCardTheme = 'dark' | 'light';
 
 export interface AnimalCardProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
   'style'
 > {
   property?: AnimalCardProperty;
-  theme?: AnimalCardTheme;
   nickname: string;
   tier: TierType;
   animal: AnimalType;
@@ -33,7 +31,6 @@ export interface AnimalCardProps extends Omit<
 
 export default function AnimalCard({
   property = 'my',
-  theme = 'dark',
   nickname,
   tier,
   animal,
@@ -49,7 +46,7 @@ export default function AnimalCard({
 }: AnimalCardProps) {
   const animalMeta = getAnimalTypeMeta(animal);
 
-  const cardClasses = [styles.animalCard, styles[theme], className]
+  const cardClasses = [styles.animalCard, className]
     .filter(Boolean)
     .join(' ');
 
@@ -60,7 +57,7 @@ export default function AnimalCard({
         <div className={styles.nicknameWrapper}>
           <p className={styles.nickname}>{nickname}</p>
         </div>
-        <TierTag tier={tier} theme={theme} />
+        <TierTag tier={tier} />
       </div>
 
       {/* Animal Image */}

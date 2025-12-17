@@ -21,6 +21,7 @@
 .searchbarContent {
   display: flex;
   align-items: center;
+  gap: 10px;
   width: 100%;
   height: 100%;
   padding-left: 16px;
@@ -55,11 +56,6 @@
   min-width: 0;
 }
 
-.inputField::placeholder {
-  color: inherit;
-  opacity: 0.6;
-}
-
 .iconButton {
   display: flex;
   align-items: center;
@@ -83,34 +79,20 @@
 .icon {
   flex-shrink: 0;
   display: block;
+  color: var(--color-icon-interactive-primary);
 }
 
-/* Dark Theme */
-.theme-dark {
-  background-color: var(--color-neutral-800);
-  color: var(--color-neutral-400);
+/* Theme - Mode-aware using semantic colors */
+.searchbar {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-interactive-secondary);
 }
 
-.theme-dark .inputField {
-  color: var(--color-neutral-400);
+.inputField {
+  color: var(--color-text-interactive-secondary);
 }
 
-.theme-dark .inputField::placeholder {
-  color: var(--color-neutral-400);
-  opacity: 0.6;
-}
-
-/* Light Theme */
-.theme-light {
-  background-color: var(--color-neutral-100);
-  color: var(--color-neutral-700);
-}
-
-.theme-light .inputField {
-  color: var(--color-neutral-700);
-}
-
-.theme-light .inputField::placeholder {
-  color: var(--color-neutral-700);
+.inputField::placeholder {
+  color: var(--color-text-interactive-secondary);
   opacity: 0.6;
 }
