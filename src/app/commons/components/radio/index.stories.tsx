@@ -1,46 +1,52 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import React from 'react';
-import Radio from './index';
+import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
+import Radio from "./index";
 
 const meta = {
-  title: 'Commons/Components/Radio',
+  title: "Commons/Components/Radio",
   component: Radio,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
     docs: {
       description: {
         component:
-          '라디오 컴포넌트입니다. status, state, theme 등의 속성을 통해 다양한 상태를 표현할 수 있습니다.',
+          "라디오 버튼 컴포넌트입니다. status, state, checked 등의 속성을 통해 다양한 상태를 표현할 수 있습니다.",
       },
     },
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     status: {
-      control: 'select',
-      options: ['unselected', 'selected'],
-      description: '라디오의 선택 상태',
+      control: "select",
+      options: ["unselected", "selected"],
+      description: "라디오 버튼의 선택 상태",
       table: {
-        type: { summary: 'RadioStatus' },
-        defaultValue: { summary: 'unselected' },
+        type: { summary: "RadioStatus" },
       },
     },
     state: {
-      control: 'select',
-      options: ['default', 'hover', 'press', 'focus', 'disabled', 'error'],
-      description: '라디오의 상태',
+      control: "select",
+      options: ["default", "hover", "press", "focus", "disabled", "error"],
+      description: "라디오 버튼의 상태",
       table: {
-        type: { summary: 'RadioState' },
-        defaultValue: { summary: 'default' },
+        type: { summary: "RadioState" },
+        defaultValue: { summary: "default" },
       },
     },
-    theme: {
-      control: 'select',
-      options: ['light', 'dark'],
-      description: '라디오의 테마',
+    checked: {
+      control: { type: "boolean" },
+      description: "라디오 버튼 선택 여부",
       table: {
-        type: { summary: 'RadioTheme' },
-        defaultValue: { summary: 'light' },
+        type: { summary: "boolean" },
+        defaultValue: { summary: "false" },
+      },
+    },
+    disabled: {
+      control: { type: "boolean" },
+      description: "라디오 버튼 비활성화 여부",
+      table: {
+        type: { summary: "boolean" },
+        defaultValue: { summary: "false" },
       },
     },
   },
@@ -52,150 +58,143 @@ type Story = StoryObj<typeof meta>;
 // 기본 스토리
 export const Default: Story = {
   args: {
-    status: 'unselected',
+    checked: false,
   },
 };
 
 // Status 스토리
 export const Unselected: Story = {
   args: {
-    status: 'unselected',
+    status: "unselected",
+    checked: false,
   },
 };
 
 export const Selected: Story = {
   args: {
-    status: 'selected',
+    status: "selected",
+    checked: true,
   },
 };
 
 // State 스토리 - Unselected
 export const UnselectedDefault: Story = {
   args: {
-    status: 'unselected',
-    state: 'default',
+    status: "unselected",
+    state: "default",
+    checked: false,
   },
 };
 
 export const UnselectedHover: Story = {
   args: {
-    status: 'unselected',
-    state: 'hover',
+    status: "unselected",
+    state: "hover",
+    checked: false,
   },
 };
 
 export const UnselectedPress: Story = {
   args: {
-    status: 'unselected',
-    state: 'press',
+    status: "unselected",
+    state: "press",
+    checked: false,
   },
 };
 
 export const UnselectedFocus: Story = {
   args: {
-    status: 'unselected',
-    state: 'focus',
+    status: "unselected",
+    state: "focus",
+    checked: false,
   },
 };
 
 export const UnselectedDisabled: Story = {
   args: {
-    status: 'unselected',
-    state: 'disabled',
+    status: "unselected",
+    state: "disabled",
+    checked: false,
   },
 };
 
 export const UnselectedError: Story = {
   args: {
-    status: 'unselected',
-    state: 'error',
+    status: "unselected",
+    state: "error",
+    checked: false,
   },
 };
 
 // State 스토리 - Selected
 export const SelectedDefault: Story = {
   args: {
-    status: 'selected',
-    state: 'default',
+    status: "selected",
+    state: "default",
+    checked: true,
   },
 };
 
 export const SelectedHover: Story = {
   args: {
-    status: 'selected',
-    state: 'hover',
+    status: "selected",
+    state: "hover",
+    checked: true,
   },
 };
 
 export const SelectedPress: Story = {
   args: {
-    status: 'selected',
-    state: 'press',
+    status: "selected",
+    state: "press",
+    checked: true,
   },
 };
 
 export const SelectedFocus: Story = {
   args: {
-    status: 'selected',
-    state: 'focus',
+    status: "selected",
+    state: "focus",
+    checked: true,
   },
 };
 
 export const SelectedDisabled: Story = {
   args: {
-    status: 'selected',
-    state: 'disabled',
+    status: "selected",
+    state: "disabled",
+    checked: true,
   },
 };
 
 export const SelectedError: Story = {
   args: {
-    status: 'selected',
-    state: 'error',
+    status: "selected",
+    state: "error",
+    checked: true,
   },
 };
 
-// Theme 스토리
-export const LightTheme: Story = {
+// Disabled prop 스토리
+export const DisabledProp: Story = {
   args: {
-    theme: 'light',
-    status: 'selected',
+    disabled: true,
+    checked: true,
   },
-  decorators: [
-    (Story) => (
-      <div style={{ padding: '20px', backgroundColor: '#ffffff' }}>
-        <Story />
-      </div>
-    ),
-  ],
-};
-
-export const DarkTheme: Story = {
-  args: {
-    theme: 'dark',
-    status: 'selected',
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ padding: '20px', backgroundColor: '#030712' }}>
-        <Story />
-      </div>
-    ),
-  ],
 };
 
 // 조합 스토리
 export const AllStatuses: Story = {
   render: () => (
-    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-      <Radio status="unselected" />
-      <Radio status="selected" />
+    <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+      <Radio status="unselected" checked={false} />
+      <Radio status="selected" checked={true} />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: '모든 status 타입을 한 번에 확인할 수 있습니다.',
+        story: "모든 status 타입을 한 번에 확인할 수 있습니다.",
       },
     },
   },
@@ -203,19 +202,19 @@ export const AllStatuses: Story = {
 
 export const AllStatesUnselected: Story = {
   render: () => (
-    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-      <Radio status="unselected" state="default" />
-      <Radio status="unselected" state="hover" />
-      <Radio status="unselected" state="press" />
-      <Radio status="unselected" state="focus" />
-      <Radio status="unselected" state="disabled" />
-      <Radio status="unselected" state="error" />
+    <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+      <Radio status="unselected" state="default" checked={false} />
+      <Radio status="unselected" state="hover" checked={false} />
+      <Radio status="unselected" state="press" checked={false} />
+      <Radio status="unselected" state="focus" checked={false} />
+      <Radio status="unselected" state="disabled" checked={false} />
+      <Radio status="unselected" state="error" checked={false} />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Unselected 상태의 모든 state 타입을 확인할 수 있습니다.',
+        story: "Unselected 상태의 모든 state 타입을 확인할 수 있습니다.",
       },
     },
   },
@@ -223,19 +222,19 @@ export const AllStatesUnselected: Story = {
 
 export const AllStatesSelected: Story = {
   render: () => (
-    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-      <Radio status="selected" state="default" />
-      <Radio status="selected" state="hover" />
-      <Radio status="selected" state="press" />
-      <Radio status="selected" state="focus" />
-      <Radio status="selected" state="disabled" />
-      <Radio status="selected" state="error" />
+    <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+      <Radio status="selected" state="default" checked={true} />
+      <Radio status="selected" state="hover" checked={true} />
+      <Radio status="selected" state="press" checked={true} />
+      <Radio status="selected" state="focus" checked={true} />
+      <Radio status="selected" state="disabled" checked={true} />
+      <Radio status="selected" state="error" checked={true} />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Selected 상태의 모든 state 타입을 확인할 수 있습니다.',
+        story: "Selected 상태의 모든 state 타입을 확인할 수 있습니다.",
       },
     },
   },
@@ -245,58 +244,54 @@ export const StatusAndStateMatrix: Story = {
   render: () => (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-      }}
-    >
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+      }}>
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(7, 1fr)',
-          gap: '16px',
-          alignItems: 'center',
-        }}
-      >
-        <div style={{ fontWeight: 'bold' }}>Status / State</div>
-        <div style={{ fontWeight: 'bold' }}>Default</div>
-        <div style={{ fontWeight: 'bold' }}>Hover</div>
-        <div style={{ fontWeight: 'bold' }}>Press</div>
-        <div style={{ fontWeight: 'bold' }}>Focus</div>
-        <div style={{ fontWeight: 'bold' }}>Disabled</div>
-        <div style={{ fontWeight: 'bold' }}>Error</div>
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: "16px",
+          alignItems: "center",
+        }}>
+        <div style={{ fontWeight: "bold" }}>Status / State</div>
+        <div style={{ fontWeight: "bold" }}>Default</div>
+        <div style={{ fontWeight: "bold" }}>Hover</div>
+        <div style={{ fontWeight: "bold" }}>Press</div>
+        <div style={{ fontWeight: "bold" }}>Focus</div>
+        <div style={{ fontWeight: "bold" }}>Disabled</div>
+        <div style={{ fontWeight: "bold" }}>Error</div>
       </div>
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(7, 1fr)',
-          gap: '16px',
-          alignItems: 'center',
-        }}
-      >
-        <div style={{ fontWeight: 'bold' }}>Unselected</div>
-        <Radio status="unselected" state="default" />
-        <Radio status="unselected" state="hover" />
-        <Radio status="unselected" state="press" />
-        <Radio status="unselected" state="focus" />
-        <Radio status="unselected" state="disabled" />
-        <Radio status="unselected" state="error" />
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: "16px",
+          alignItems: "center",
+        }}>
+        <div style={{ fontWeight: "bold" }}>Unselected</div>
+        <Radio status="unselected" state="default" checked={false} />
+        <Radio status="unselected" state="hover" checked={false} />
+        <Radio status="unselected" state="press" checked={false} />
+        <Radio status="unselected" state="focus" checked={false} />
+        <Radio status="unselected" state="disabled" checked={false} />
+        <Radio status="unselected" state="error" checked={false} />
       </div>
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(7, 1fr)',
-          gap: '16px',
-          alignItems: 'center',
-        }}
-      >
-        <div style={{ fontWeight: 'bold' }}>Selected</div>
-        <Radio status="selected" state="default" />
-        <Radio status="selected" state="hover" />
-        <Radio status="selected" state="press" />
-        <Radio status="selected" state="focus" />
-        <Radio status="selected" state="disabled" />
-        <Radio status="selected" state="error" />
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: "16px",
+          alignItems: "center",
+        }}>
+        <div style={{ fontWeight: "bold" }}>Selected</div>
+        <Radio status="selected" state="default" checked={true} />
+        <Radio status="selected" state="hover" checked={true} />
+        <Radio status="selected" state="press" checked={true} />
+        <Radio status="selected" state="focus" checked={true} />
+        <Radio status="selected" state="disabled" checked={true} />
+        <Radio status="selected" state="error" checked={true} />
       </div>
     </div>
   ),
@@ -304,83 +299,7 @@ export const StatusAndStateMatrix: Story = {
     docs: {
       description: {
         story:
-          '모든 status와 state의 조합을 한눈에 확인할 수 있는 매트릭스입니다.',
-      },
-    },
-  },
-};
-
-export const LightThemeVariants: Story = {
-  render: () => (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        padding: '20px',
-        backgroundColor: '#ffffff',
-      }}
-    >
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-        <Radio theme="light" status="unselected" state="default" />
-        <Radio theme="light" status="selected" state="default" />
-      </div>
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-        <Radio theme="light" status="unselected" state="hover" />
-        <Radio theme="light" status="selected" state="hover" />
-      </div>
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-        <Radio theme="light" status="unselected" state="disabled" />
-        <Radio theme="light" status="selected" state="disabled" />
-      </div>
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-        <Radio theme="light" status="unselected" state="error" />
-        <Radio theme="light" status="selected" state="error" />
-      </div>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Light 테마의 모든 status와 state 조합을 확인할 수 있습니다.',
-      },
-    },
-  },
-};
-
-export const DarkThemeVariants: Story = {
-  render: () => (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        padding: '20px',
-        backgroundColor: '#030712',
-      }}
-    >
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-        <Radio theme="dark" status="unselected" state="default" />
-        <Radio theme="dark" status="selected" state="default" />
-      </div>
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-        <Radio theme="dark" status="unselected" state="hover" />
-        <Radio theme="dark" status="selected" state="hover" />
-      </div>
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-        <Radio theme="dark" status="unselected" state="disabled" />
-        <Radio theme="dark" status="selected" state="disabled" />
-      </div>
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-        <Radio theme="dark" status="unselected" state="error" />
-        <Radio theme="dark" status="selected" state="error" />
-      </div>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Dark 테마의 모든 status와 state 조합을 확인할 수 있습니다.',
+          "모든 status와 state의 조합을 한눈에 확인할 수 있는 매트릭스입니다.",
       },
     },
   },
@@ -390,77 +309,76 @@ export const WithLabels: Story = {
   render: () => (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-      }}
-    >
-      <label style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-        <Radio status="unselected" />
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px",
+      }}>
+      <label style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <Radio name="option" value="option1" checked={false} />
         <span>옵션 1</span>
       </label>
-      <label style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-        <Radio status="selected" />
+      <label style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <Radio name="option" value="option2" checked={true} />
         <span>옵션 2</span>
+      </label>
+      <label style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <Radio name="option" value="option3" checked={false} />
+        <span>옵션 3</span>
       </label>
       <label
         style={{
-          display: 'flex',
-          gap: '8px',
-          alignItems: 'center',
+          display: "flex",
+          gap: "8px",
+          alignItems: "center",
           opacity: 0.5,
-        }}
-      >
-        <Radio status="unselected" state="disabled" />
-        <span>옵션 3 (비활성화)</span>
+        }}>
+        <Radio name="option" value="option4" disabled={true} checked={false} />
+        <span>옵션 4 (비활성화)</span>
       </label>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: '실제 사용 예시로 라벨과 함께 사용하는 경우입니다.',
+        story: "실제 사용 예시로 라벨과 함께 사용하는 경우입니다.",
       },
     },
   },
 };
 
 const RadioGroupComponent = () => {
-  const [selectedValue, setSelectedValue] = React.useState('option1');
-
-  const handleChange = (value: string) => {
-    setSelectedValue(value);
-  };
-
+  const [selected, setSelected] = React.useState("option1");
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-      }}
-    >
-      <label style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px",
+      }}>
+      <label style={{ display: "flex", gap: "8px", alignItems: "center" }}>
         <Radio
-          name="radio-group"
-          status={selectedValue === 'option1' ? 'selected' : 'unselected'}
-          onChange={() => handleChange('option1')}
+          name="group"
+          value="option1"
+          checked={selected === "option1"}
+          onChange={(e) => setSelected(e.target.value)}
         />
         <span>옵션 1</span>
       </label>
-      <label style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+      <label style={{ display: "flex", gap: "8px", alignItems: "center" }}>
         <Radio
-          name="radio-group"
-          status={selectedValue === 'option2' ? 'selected' : 'unselected'}
-          onChange={() => handleChange('option2')}
+          name="group"
+          value="option2"
+          checked={selected === "option2"}
+          onChange={(e) => setSelected(e.target.value)}
         />
         <span>옵션 2</span>
       </label>
-      <label style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+      <label style={{ display: "flex", gap: "8px", alignItems: "center" }}>
         <Radio
-          name="radio-group"
-          status={selectedValue === 'option3' ? 'selected' : 'unselected'}
-          onChange={() => handleChange('option3')}
+          name="group"
+          value="option3"
+          checked={selected === "option3"}
+          onChange={(e) => setSelected(e.target.value)}
         />
         <span>옵션 3</span>
       </label>
@@ -473,9 +391,14 @@ export const RadioGroup: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          '라디오 그룹으로 사용하는 경우입니다. 하나의 옵션만 선택할 수 있습니다.',
+        story: "라디오 버튼 그룹으로 사용하는 경우입니다.",
       },
     },
   },
 };
+
+
+
+
+
+

@@ -17,7 +17,7 @@
 조건-파일경로) 구현될 TSX 파일경로: src/commons/components/button/index.tsx
 조건-파일경로) 구현될 CSS 파일경로: src/commons/components/button/styles.module.css
 
-==============================================  
+==============================================
 
 기존히스토리-참고만) MCP를 연동하여 피그마의 디자인을 그대로 소스코드로 구현할 것.
 

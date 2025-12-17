@@ -84,41 +84,34 @@
 
 /* Dark Theme */
 .theme-dark {
-  background-color: var(--color-bg-dark-default);
-  color: var(--color-text-dark-primary);
+  background-color: var(--color-neutral-800);
+  color: var(--color-neutral-400);
 }
 
 .theme-dark .inputField {
-  color: var(--color-text-dark-primary);
+  color: var(--color-neutral-400);
 }
 
 .theme-dark .inputField::placeholder {
-  color: var(--color-text-dark-primary);
+  color: var(--color-neutral-400);
   opacity: 0.6;
-}
-
-.theme-dark .iconButton {
-  color: var(--color-icon-dark-secondary);
 }
 
 /* Light Theme */
 .theme-light {
-  background-color: var(--color-bg-light-secondary);
-  color: var(--color-text-light-primary);
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-700);
 }
 
 .theme-light .inputField {
-  color: var(--color-text-light-primary);
+  color: var(--color-neutral-700);
 }
 
 .theme-light .inputField::placeholder {
-  color: var(--color-text-light-primary);
+  color: var(--color-neutral-700);
   opacity: 0.6;
 }
 
-.theme-light .iconButton {
-  color: var(--color-icon-light-secondary);
-}
 
 
 

@@ -24,22 +24,20 @@
   border-radius: 4px;
   border: 1.5px solid transparent;
   box-sizing: border-box;
-  transition: border-color 0.2s;
 }
 
 .checkboxWrapper.hasFocusRing {
-  border-color: var(--color-border-focus-ring);
+  border-color: var(--color-info-500);
 }
 
 .checkbox {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
   box-sizing: border-box;
-  border: 1.5px solid transparent;
   transition: background-color 0.2s, border-color 0.2s, color 0.2s;
   flex-shrink: 0;
 }
@@ -52,325 +50,202 @@
   cursor: not-allowed;
 }
 
-.checkIcon,
-.partialIcon {
+.icon {
   width: 12px;
   height: 12px;
+  display: block;
   flex-shrink: 0;
 }
 
-/* Light Theme - Status: Unselected */
-.theme-light.status-unselected.state-default {
+/* Status: Unselected */
+.status-unselected.state-default {
   background-color: var(--color-base-white);
-  border-color: var(--color-gray-300);
+  border: 1.5px solid var(--color-neutral-300);
 }
 
-.theme-light.status-unselected.state-hover {
+.status-unselected.state-hover {
   background-color: var(--color-base-white);
-  border-color: var(--color-gray-400);
+  border: 1.5px solid var(--color-neutral-400);
 }
 
-.theme-light.status-unselected.state-press {
+.status-unselected.state-press {
   background-color: var(--color-base-white);
-  border-color: var(--color-gray-500);
+  border: 1.5px solid var(--color-neutral-500);
 }
 
-.theme-light.status-unselected.state-focus {
+.status-unselected.state-focus {
   background-color: var(--color-base-white);
-  border-color: var(--color-brand-700);
+  border: 1.5px solid var(--color-brand-700);
 }
 
-.theme-light.status-unselected.state-disabled {
-  background-color: var(--color-gray-200);
-  border-color: var(--color-gray-400);
+.status-unselected.state-disabled {
+  background-color: var(--color-neutral-200);
+  border: 1.5px solid var(--color-neutral-400);
 }
 
-.theme-light.status-unselected.state-error {
+.status-unselected.state-error {
   background-color: var(--color-base-white);
-  border-color: var(--color-danger-600);
+  border: 1.5px solid var(--color-danger-600);
 }
 
-/* Light Theme - Status: Selected */
-.theme-light.status-selected.state-default {
-  background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
-  color: var(--color-base-white);
-}
-
-.theme-light.status-selected.state-hover {
-  background-color: var(--color-brand-800);
-  border-color: var(--color-brand-800);
-  color: var(--color-base-white);
-}
-
-.theme-light.status-selected.state-press {
-  background-color: var(--color-brand-900);
-  border-color: var(--color-brand-900);
-  color: var(--color-base-white);
-}
-
-.theme-light.status-selected.state-focus {
-  background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
-  color: var(--color-base-white);
-}
-
-.theme-light.status-selected.state-disabled {
-  background-color: var(--color-gray-200);
-  border-color: var(--color-gray-200);
-  color: var(--color-gray-400);
-}
-
-.theme-light.status-selected.state-error {
-  background-color: var(--color-danger-600);
-  border-color: var(--color-danger-600);
-  color: var(--color-base-white);
-}
-
-/* Light Theme - Status: Partial */
-.theme-light.status-partial.state-default {
-  background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
-  color: var(--color-base-white);
-}
-
-.theme-light.status-partial.state-hover {
-  background-color: var(--color-brand-800);
-  border-color: var(--color-brand-800);
-  color: var(--color-base-white);
-}
-
-.theme-light.status-partial.state-press {
-  background-color: var(--color-brand-900);
-  border-color: var(--color-brand-900);
-  color: var(--color-base-white);
-}
-
-.theme-light.status-partial.state-focus {
-  background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
-  color: var(--color-base-white);
-}
-
-.theme-light.status-partial.state-disabled {
-  background-color: var(--color-gray-200);
-  border-color: var(--color-gray-200);
-  color: var(--color-gray-400);
-}
-
-.theme-light.status-partial.state-error {
-  background-color: var(--color-danger-600);
-  border-color: var(--color-danger-600);
-  color: var(--color-base-white);
-}
-
-/* Dark Theme - Status: Unselected */
-.theme-dark.status-unselected.state-default {
-  background-color: var(--color-gray-900);
-  border-color: var(--color-gray-500);
-}
-
-.theme-dark.status-unselected.state-hover {
-  background-color: var(--color-gray-800);
-  border-color: var(--color-gray-400);
-}
-
-.theme-dark.status-unselected.state-press {
-  background-color: var(--color-gray-700);
-  border-color: var(--color-gray-500);
-}
-
-.theme-dark.status-unselected.state-focus {
-  background-color: var(--color-gray-900);
-  border-color: var(--color-brand-400);
-}
-
-.theme-dark.status-unselected.state-disabled {
-  background-color: var(--color-gray-600);
-  border-color: var(--color-gray-700);
-}
-
-.theme-dark.status-unselected.state-error {
-  background-color: var(--color-gray-900);
-  border-color: var(--color-danger-400);
-}
-
-/* Dark Theme - Status: Selected */
-.theme-dark.status-selected.state-default {
-  background-color: var(--color-brand-500);
-  border-color: var(--color-brand-500);
-  color: var(--color-base-white);
-}
-
-.theme-dark.status-selected.state-hover {
+/* Status: Selected */
+.status-selected.state-default {
   background-color: var(--color-brand-600);
-  border-color: var(--color-brand-600);
+  border: none;
+}
+
+.status-selected.state-default .icon {
   color: var(--color-base-white);
 }
 
-.theme-dark.status-selected.state-press {
+.status-selected.state-hover {
   background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
+  border: none;
+}
+
+.status-selected.state-hover .icon {
   color: var(--color-base-white);
 }
 
-.theme-dark.status-selected.state-focus {
-  background-color: var(--color-brand-500);
-  border-color: var(--color-brand-500);
+.status-selected.state-press {
+  background-color: var(--color-brand-800);
+  border: none;
+}
+
+.status-selected.state-press .icon {
   color: var(--color-base-white);
 }
 
-.theme-dark.status-selected.state-disabled {
-  background-color: var(--color-gray-600);
-  border-color: var(--color-gray-600);
-  color: var(--color-gray-700);
+.status-selected.state-focus {
+  background-color: var(--color-brand-700);
+  border: none;
 }
 
-.theme-dark.status-selected.state-error {
-  background-color: var(--color-danger-400);
-  border-color: var(--color-danger-400);
+.status-selected.state-focus .icon {
   color: var(--color-base-white);
 }
 
-/* Dark Theme - Status: Partial */
-.theme-dark.status-partial.state-default {
-  background-color: var(--color-brand-500);
-  border-color: var(--color-brand-500);
-  color: var(--color-base-white);
+.status-selected.state-disabled {
+  background-color: var(--color-neutral-200);
+  border: 1.5px solid var(--color-neutral-400);
 }
 
-.theme-dark.status-partial.state-hover {
+.status-selected.state-disabled .icon {
+  color: var(--color-neutral-400);
+}
+
+.status-selected.state-error {
+  background-color: var(--color-base-white);
+  border: 1.5px solid var(--color-danger-600);
+}
+
+.status-selected.state-error .icon {
+  color: var(--color-danger-600);
+}
+
+/* Status: Partial */
+.status-partial.state-default {
   background-color: var(--color-brand-600);
-  border-color: var(--color-brand-600);
+  border: none;
+}
+
+.status-partial.state-default .icon {
   color: var(--color-base-white);
 }
 
-.theme-dark.status-partial.state-press {
+.status-partial.state-hover {
   background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
+  border: none;
+}
+
+.status-partial.state-hover .icon {
   color: var(--color-base-white);
 }
 
-.theme-dark.status-partial.state-focus {
-  background-color: var(--color-brand-500);
-  border-color: var(--color-brand-500);
+.status-partial.state-press {
+  background-color: var(--color-brand-800);
+  border: none;
+}
+
+.status-partial.state-press .icon {
   color: var(--color-base-white);
 }
 
-.theme-dark.status-partial.state-disabled {
-  background-color: var(--color-gray-600);
-  border-color: var(--color-gray-600);
-  color: var(--color-gray-700);
+.status-partial.state-focus {
+  background-color: var(--color-brand-700);
+  border: none;
 }
 
-.theme-dark.status-partial.state-error {
-  background-color: var(--color-danger-400);
-  border-color: var(--color-danger-400);
+.status-partial.state-focus .icon {
   color: var(--color-base-white);
+}
+
+.status-partial.state-disabled {
+  background-color: var(--color-neutral-200);
+  border: 1.5px solid var(--color-neutral-400);
+}
+
+.status-partial.state-disabled .icon {
+  color: var(--color-neutral-400);
+}
+
+.status-partial.state-error {
+  background-color: var(--color-base-white);
+  border: 1.5px solid var(--color-danger-600);
+}
+
+.status-partial.state-error .icon {
+  color: var(--color-danger-600);
 }
 
 /* Hover state (when not explicitly set) */
-.label:hover .theme-light.status-unselected.state-default {
+.label:hover .checkbox:not(.disabled):not(.state-disabled) {
+  /* Only apply hover if state is default */
+}
+
+.label:hover .status-unselected.state-default {
   background-color: var(--color-base-white);
-  border-color: var(--color-gray-400);
+  border-color: var(--color-neutral-400);
 }
 
-.label:hover .theme-light.status-selected.state-default {
-  background-color: var(--color-brand-800);
-  border-color: var(--color-brand-800);
+.label:hover .status-selected.state-default {
+  background-color: var(--color-brand-700);
 }
 
-.label:hover .theme-light.status-partial.state-default {
-  background-color: var(--color-brand-800);
-  border-color: var(--color-brand-800);
-}
-
-.label:hover .theme-dark.status-unselected.state-default {
-  background-color: var(--color-gray-800);
-  border-color: var(--color-gray-400);
-}
-
-.label:hover .theme-dark.status-selected.state-default {
-  background-color: var(--color-brand-600);
-  border-color: var(--color-brand-600);
-}
-
-.label:hover .theme-dark.status-partial.state-default {
-  background-color: var(--color-brand-600);
-  border-color: var(--color-brand-600);
+.label:hover .status-partial.state-default {
+  background-color: var(--color-brand-700);
 }
 
 /* Focus state */
-.input:focus-visible ~ .checkboxWrapper .checkbox {
+.input:focus-visible + .checkbox {
   outline: none;
 }
 
-.input:focus-visible
-  ~ .checkboxWrapper
-  .theme-light.status-unselected.state-default {
+.input:focus-visible + .status-unselected.state-default {
   border-color: var(--color-brand-700);
 }
 
-.input:focus-visible
-  ~ .checkboxWrapper
-  .theme-light.status-selected.state-default {
+.input:focus-visible + .status-selected.state-default,
+.input:focus-visible + .status-partial.state-default {
   background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
 }
 
-.input:focus-visible
-  ~ .checkboxWrapper
-  .theme-light.status-partial.state-default {
-  background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
-}
-
-.input:focus-visible
-  ~ .checkboxWrapper
-  .theme-dark.status-unselected.state-default {
-  border-color: var(--color-brand-400);
-}
-
-.input:focus-visible
-  ~ .checkboxWrapper
-  .theme-dark.status-selected.state-default {
-  background-color: var(--color-brand-500);
-  border-color: var(--color-brand-500);
-}
-
-.input:focus-visible
-  ~ .checkboxWrapper
-  .theme-dark.status-partial.state-default {
-  background-color: var(--color-brand-500);
-  border-color: var(--color-brand-500);
-}
+/* Focus ring is controlled by state prop, not focus-visible */
 
 /* Active/Press state */
-.label:active .theme-light.status-unselected.state-default {
-  border-color: var(--color-gray-500);
+.label:active .checkbox:not(.disabled):not(.state-disabled) {
+  /* Only apply press if state is default */
 }
 
-.label:active .theme-light.status-selected.state-default {
-  background-color: var(--color-brand-900);
-  border-color: var(--color-brand-900);
+.label:active .status-unselected.state-default {
+  border-color: var(--color-neutral-500);
 }
 
-.label:active .theme-light.status-partial.state-default {
-  background-color: var(--color-brand-900);
-  border-color: var(--color-brand-900);
+.label:active .status-selected.state-default {
+  background-color: var(--color-brand-800);
 }
 
-.label:active .theme-dark.status-unselected.state-default {
-  border-color: var(--color-gray-500);
-}
-
-.label:active .theme-dark.status-selected.state-default {
-  background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
-}
-
-.label:active .theme-dark.status-partial.state-default {
-  background-color: var(--color-brand-700);
-  border-color: var(--color-brand-700);
+.label:active .status-partial.state-default {
+  background-color: var(--color-brand-800);
 }
 

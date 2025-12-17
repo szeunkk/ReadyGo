@@ -323,9 +323,6 @@
 
 .theme-light.variant-secondary .inputField::placeholder {
   color: var(--color-text-interactive-secondary);
-  border: 1px solid var(--color-border-light-primary);
-  border-radius: 8px;
-  color: var(--color-text-light-primary);
 }
 
 .theme-light.variant-secondary.state-Default {
@@ -382,3 +379,4 @@
 .theme-light .additionalInfo.error {
   color: var(--color-text-danger);
 }
+

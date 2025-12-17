@@ -48,6 +48,7 @@ export default function Selectbox({
   const selectboxRef = useRef<HTMLDivElement>(null);
   const isDisabled = state === 'disabled';
 
+  // 외부 클릭 감지
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
