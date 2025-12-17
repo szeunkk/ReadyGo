@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef } from 'react';
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -110,27 +110,6 @@ export default function RadarChart({
 }: RadarChartProps) {
   const chartRef = useRef<ChartJS<'radar'>>(null);
 
-  // CSS 변수에서 타이포그래피 토큰 값 가져오기
-  const typography = useMemo(() => {
-    if (typeof window === 'undefined') {
-      return { fontSize: 12, lineHeight: 16, fontWeight: 400 };
-    }
-    const styles = getComputedStyle(document.documentElement);
-    return {
-      fontSize:
-        parseInt(styles.getPropertyValue('--typo-body-sm-font-size').trim()) ||
-        12,
-      lineHeight:
-        parseInt(
-          styles.getPropertyValue('--typo-body-sm-line-height').trim()
-        ) || 16,
-      fontWeight:
-        parseInt(
-          styles.getPropertyValue('--typo-body-sm-font-weight').trim()
-        ) || 400,
-    };
-  }, []);
-
   // 5개 축 순서 고정 (Figma 디자인 기준: 정오각형 - 상단부터 시계방향)
   const orderedTraits: RadarTraitKey[] = [
     'social', // 교류성 (12시)
@@ -173,7 +152,7 @@ export default function RadarChart({
           return gradient;
         },
         borderColor: '#5FFCE2',
-        borderWidth: 2,
+        borderWidth: 3,
         pointBackgroundColor: '#5FFCE2',
         pointBorderColor: '#5FFCE2',
         pointBorderWidth: 0,
@@ -214,10 +193,10 @@ export default function RadarChart({
         pointLabels: {
           display: showLabels,
           font: {
-            size: typography.fontSize,
-            family: 'Pretendard',
-            weight: typography.fontWeight,
-            lineHeight: typography.lineHeight / typography.fontSize, // Chart.js는 상대값 사용
+            size: 12,
+            family: 'Inter',
+            weight: 400, // Regular
+            lineHeight: 1.33, // 16px / 12px
           },
           color: '#9CA3AF',
           padding: 8,
