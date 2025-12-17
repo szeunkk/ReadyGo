@@ -36,16 +36,9 @@
   white-space: nowrap;
 }
 
-/* Light Theme - All Tiers */
-.theme-light {
+/* Tier Styles - All Tiers (Mode-aware via semantic colors) */
+.tierTag {
   background-color: transparent;
   border: 1px solid var(--color-border-secondary);
-  color: var(--color-border-interactive-secondary);
-}
-
-/* Dark Theme - All Tiers */
-.theme-dark {
-  background-color: transparent;
-  border: 1px solid var(--color-border-secondary);
-  color: var(--color-border-interactive-secondary);
+  color: var(--color-text-secondary);
 }
