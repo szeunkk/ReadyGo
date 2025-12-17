@@ -1,5 +1,6 @@
 /* Wrapper */
 .wrapper {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -146,6 +147,11 @@
 
 /* Option Group */
 .optionGroup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
   display: none;
   flex-direction: column;
   margin-top: 4px;
