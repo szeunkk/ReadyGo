@@ -7,7 +7,7 @@
   --foreground: #171717;
 
   /* Font Family */
-  --font-code: "Source Code Pro", "Courier New", monospace;
+  --font-code: 'Source Code Pro', 'Courier New', monospace;
 
   /* Font Weight */
   --font-weight-regular: 400;
@@ -60,11 +60,11 @@
   --color-gray-100: #f3f4f6;
   --color-gray-200: #e5e7eb;
   --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
+  --color-gray-400: #a9afb9;
+  --color-gray-500: #747982;
+  --color-gray-600: #353a42;
+  --color-gray-700: #31323a;
+  --color-gray-800: #11121c;
   --color-gray-900: #030712;
 
   /* Green Colors (Success) */
@@ -155,17 +155,17 @@
   --color-warning-700: var(--color-yellow-700);
   --color-warning-800: var(--color-yellow-800);
 
-  /* Shadow Colors - Light Mode */
-  --color-shadow-light-subtle: #0000001f;
-  --color-shadow-light-default: #00000029;
-  --color-shadow-light-bold: #00000033;
-  --color-shadow-light-bolder: #0000003d;
+  /* Shadow Colors - Light Mode (teal-400 based) */
+  --color-shadow-light-subtle: #7ffde81f;
+  --color-shadow-light-default: #7ffde829;
+  --color-shadow-light-bold: #7ffde833;
+  --color-shadow-light-bolder: #7ffde83d;
 
-  /* Shadow Colors - Dark Mode */
-  --color-shadow-dark-subtle: #00000033;
-  --color-shadow-dark-default: #0000003d;
-  --color-shadow-dark-bold: #00000047;
-  --color-shadow-dark-bolder: #00000052;
+  /* Shadow Colors - Dark Mode (teal-400 based) */
+  --color-shadow-dark-subtle: #7ffde833;
+  --color-shadow-dark-default: #7ffde83d;
+  --color-shadow-dark-bold: #7ffde847;
+  --color-shadow-dark-bolder: #7ffde852;
 
   /* Shadow Colors (Mode-aware) */
   --color-shadow-subtle: var(--color-shadow-light-subtle);
@@ -190,6 +190,288 @@
   --color-transparent-16: var(--color-transparent-light-16);
   --color-transparent-20: var(--color-transparent-light-20);
   --color-transparent-24: var(--color-transparent-light-24);
+
+  /* Semantic Colors - Background (Light Mode) */
+  --color-bg-light-default: var(--color-base-white);
+  --color-bg-light-secondary: var(--color-gray-50);
+  --color-bg-light-tertiary: var(--color-gray-100);
+  --color-bg-light-disabled: var(--color-gray-200);
+  --color-bg-light-danger: var(--color-red-50);
+  --color-bg-light-danger-subtle: var(--color-red-100);
+  --color-bg-light-info: var(--color-blue-50);
+  --color-bg-light-info-subtle: var(--color-blue-100);
+  --color-bg-light-success: var(--color-green-50);
+  --color-bg-light-success-subtle: var(--color-green-100);
+  --color-bg-light-warning: var(--color-yellow-50);
+  --color-bg-light-warning-subtle: var(--color-yellow-100);
+  --color-bg-light-interactive-primary: var(--color-brand-50);
+  --color-bg-light-interactive-primary-hover: var(--color-brand-100);
+  --color-bg-light-interactive-primary-pressed: var(--color-brand-200);
+  --color-bg-light-interactive-secondary: var(--color-gray-50);
+  --color-bg-light-interactive-secondary-hover: var(--color-gray-100);
+  --color-bg-light-interactive-secondary-pressed: var(--color-gray-200);
+
+  /* Semantic Colors - Background (Dark Mode) */
+  --color-bg-dark-default: var(--color-gray-900);
+  --color-bg-dark-secondary: var(--color-gray-800);
+  --color-bg-dark-tertiary: var(--color-gray-700);
+  --color-bg-dark-disabled: var(--color-gray-600);
+  --color-bg-dark-danger: var(--color-red-900);
+  --color-bg-dark-danger-subtle: var(--color-red-800);
+  --color-bg-dark-info: var(--color-blue-900);
+  --color-bg-dark-info-subtle: var(--color-blue-800);
+  --color-bg-dark-success: var(--color-green-900);
+  --color-bg-dark-success-subtle: var(--color-green-800);
+  --color-bg-dark-warning: var(--color-yellow-900);
+  --color-bg-dark-warning-subtle: var(--color-yellow-800);
+  --color-bg-dark-interactive-primary: var(--color-brand-900);
+  --color-bg-dark-interactive-primary-hover: var(--color-brand-800);
+  --color-bg-dark-interactive-primary-pressed: var(--color-brand-700);
+  --color-bg-dark-interactive-secondary: var(--color-gray-800);
+  --color-bg-dark-interactive-secondary-hover: var(--color-gray-700);
+  --color-bg-dark-interactive-secondary-pressed: var(--color-gray-600);
+
+  /* Semantic Colors - Background (Mode-aware) */
+  --color-bg-default: var(--color-bg-light-default);
+  --color-bg-secondary: var(--color-bg-light-secondary);
+  --color-bg-tertiary: var(--color-bg-light-tertiary);
+  --color-bg-disabled: var(--color-bg-light-disabled);
+  --color-bg-danger: var(--color-bg-light-danger);
+  --color-bg-danger-subtle: var(--color-bg-light-danger-subtle);
+  --color-bg-info: var(--color-bg-light-info);
+  --color-bg-info-subtle: var(--color-bg-light-info-subtle);
+  --color-bg-success: var(--color-bg-light-success);
+  --color-bg-success-subtle: var(--color-bg-light-success-subtle);
+  --color-bg-warning: var(--color-bg-light-warning);
+  --color-bg-warning-subtle: var(--color-bg-light-warning-subtle);
+  --color-bg-interactive-primary: var(--color-bg-light-interactive-primary);
+  --color-bg-interactive-primary-hover: var(
+    --color-bg-light-interactive-primary-hover
+  );
+  --color-bg-interactive-primary-pressed: var(
+    --color-bg-light-interactive-primary-pressed
+  );
+  --color-bg-interactive-secondary: var(--color-bg-light-interactive-secondary);
+  --color-bg-interactive-secondary-hover: var(
+    --color-bg-light-interactive-secondary-hover
+  );
+  --color-bg-interactive-secondary-pressed: var(
+    --color-bg-light-interactive-secondary-pressed
+  );
+
+  /* Semantic Colors - Border (Light Mode) */
+  --color-border-light-primary: var(--color-gray-300);
+  --color-border-light-secondary: var(--color-gray-100);
+  --color-border-light-disabled: var(--color-gray-400);
+  --color-border-light-danger: var(--color-danger-600);
+  --color-border-light-danger-subtle: var(--color-danger-100);
+  --color-border-light-info: var(--color-info-600);
+  --color-border-light-info-subtle: var(--color-info-100);
+  --color-border-light-success: var(--color-success-600);
+  --color-border-light-success-subtle: var(--color-success-100);
+  --color-border-light-warning: var(--color-warning-600);
+  --color-border-light-warning-subtle: var(--color-warning-100);
+  --color-border-light-focus-ring: var(--color-brand-600);
+  --color-border-light-interactive-primary: var(--color-brand-700);
+  --color-border-light-interactive-primary-hover: var(--color-brand-800);
+  --color-border-light-interactive-primary-pressed: var(--color-brand-900);
+  --color-border-light-interactive-secondary: var(--color-gray-400);
+  --color-border-light-interactive-secondary-hover: var(--color-gray-500);
+  --color-border-light-interactive-secondary-pressed: var(--color-gray-600);
+
+  /* Semantic Colors - Border (Dark Mode) */
+  --color-border-dark-primary: var(--color-gray-500);
+  --color-border-dark-secondary: var(--color-gray-700);
+  --color-border-dark-disabled: var(--color-gray-700);
+  --color-border-dark-danger: var(--color-danger-400);
+  --color-border-dark-danger-subtle: var(--color-danger-700);
+  --color-border-dark-info: var(--color-info-400);
+  --color-border-dark-info-subtle: var(--color-info-700);
+  --color-border-dark-success: var(--color-success-400);
+  --color-border-dark-success-subtle: var(--color-success-700);
+  --color-border-dark-warning: var(--color-warning-400);
+  --color-border-dark-warning-subtle: var(--color-warning-700);
+  --color-border-dark-focus-ring: var(--color-brand-400);
+  --color-border-dark-interactive-primary: var(--color-brand-500);
+  --color-border-dark-interactive-primary-hover: var(--color-brand-200);
+  --color-border-dark-interactive-primary-pressed: var(--color-brand-100);
+  --color-border-dark-interactive-secondary: var(--color-gray-400);
+  --color-border-dark-interactive-secondary-hover: var(--color-gray-300);
+  --color-border-dark-interactive-secondary-pressed: var(--color-gray-100);
+
+  /* Semantic Colors - Border (Mode-aware) */
+  --color-border-primary: var(--color-border-light-primary);
+  --color-border-secondary: var(--color-border-light-secondary);
+  --color-border-disabled: var(--color-border-light-disabled);
+  --color-border-danger: var(--color-border-light-danger);
+  --color-border-danger-subtle: var(--color-border-light-danger-subtle);
+  --color-border-info: var(--color-border-light-info);
+  --color-border-info-subtle: var(--color-border-light-info-subtle);
+  --color-border-success: var(--color-border-light-success);
+  --color-border-success-subtle: var(--color-border-light-success-subtle);
+  --color-border-warning: var(--color-border-light-warning);
+  --color-border-warning-subtle: var(--color-border-light-warning-subtle);
+  --color-border-focus-ring: var(--color-border-light-focus-ring);
+  --color-border-interactive-primary: var(
+    --color-border-light-interactive-primary
+  );
+  --color-border-interactive-primary-hover: var(
+    --color-border-light-interactive-primary-hover
+  );
+  --color-border-interactive-primary-pressed: var(
+    --color-border-light-interactive-primary-pressed
+  );
+  --color-border-interactive-secondary: var(
+    --color-border-light-interactive-secondary
+  );
+  --color-border-interactive-secondary-hover: var(
+    --color-border-light-interactive-secondary-hover
+  );
+  --color-border-interactive-secondary-pressed: var(
+    --color-border-light-interactive-secondary-pressed
+  );
+
+  /* Semantic Colors - Icon (Light Mode) */
+  --color-icon-light-primary: var(--color-gray-900);
+  --color-icon-light-secondary: var(--color-gray-700);
+  --color-icon-light-disabled: var(--color-gray-400);
+  --color-icon-light-danger: var(--color-danger-600);
+  --color-icon-light-info: var(--color-info-600);
+  --color-icon-light-success: var(--color-success-600);
+  --color-icon-light-warning: var(--color-warning-600);
+  --color-icon-light-interactive-primary: var(--color-brand-700);
+  --color-icon-light-interactive-primary-hover: var(--color-brand-800);
+  --color-icon-light-interactive-primary-pressed: var(--color-brand-900);
+  --color-icon-light-interactive-secondary: var(--color-gray-700);
+  --color-icon-light-interactive-secondary-hover: var(--color-gray-800);
+  --color-icon-light-interactive-secondary-pressed: var(--color-gray-900);
+  --color-icon-light-interactive-inverse: var(--color-base-white);
+  --color-icon-light-interactive-visited: var(--color-brand-700);
+
+  /* Semantic Colors - Icon (Dark Mode) */
+  --color-icon-dark-primary: var(--color-base-white);
+  --color-icon-dark-secondary: var(--color-gray-400);
+  --color-icon-dark-disabled: var(--color-gray-700);
+  --color-icon-dark-danger: var(--color-danger-400);
+  --color-icon-dark-info: var(--color-info-400);
+  --color-icon-dark-success: var(--color-success-400);
+  --color-icon-dark-warning: var(--color-warning-400);
+  --color-icon-dark-interactive-primary: var(--color-brand-500);
+  --color-icon-dark-interactive-primary-hover: var(--color-brand-200);
+  --color-icon-dark-interactive-primary-pressed: var(--color-brand-100);
+  --color-icon-dark-interactive-secondary: var(--color-gray-400);
+  --color-icon-dark-interactive-secondary-hover: var(--color-gray-300);
+  --color-icon-dark-interactive-secondary-pressed: var(--color-gray-100);
+  --color-icon-dark-interactive-inverse: var(--color-base-black);
+  --color-icon-dark-interactive-visited: var(--color-brand-400);
+
+  /* Semantic Colors - Icon (Mode-aware) */
+  --color-icon-primary: var(--color-icon-light-primary);
+  --color-icon-secondary: var(--color-icon-light-secondary);
+  --color-icon-disabled: var(--color-icon-light-disabled);
+  --color-icon-danger: var(--color-icon-light-danger);
+  --color-icon-info: var(--color-icon-light-info);
+  --color-icon-success: var(--color-icon-light-success);
+  --color-icon-warning: var(--color-icon-light-warning);
+  --color-icon-interactive-primary: var(--color-icon-light-interactive-primary);
+  --color-icon-interactive-primary-hover: var(
+    --color-icon-light-interactive-primary-hover
+  );
+  --color-icon-interactive-primary-pressed: var(
+    --color-icon-light-interactive-primary-pressed
+  );
+  --color-icon-interactive-secondary: var(
+    --color-icon-light-interactive-secondary
+  );
+  --color-icon-interactive-secondary-hover: var(
+    --color-icon-light-interactive-secondary-hover
+  );
+  --color-icon-interactive-secondary-pressed: var(
+    --color-icon-light-interactive-secondary-pressed
+  );
+  --color-icon-interactive-inverse: var(--color-icon-light-interactive-inverse);
+  --color-icon-interactive-visited: var(--color-icon-light-interactive-visited);
+
+  /* Semantic Colors - Text (Light Mode) */
+  --color-text-light-primary: var(--color-gray-900);
+  --color-text-light-secondary: var(--color-gray-700);
+  --color-text-light-tertiary: var(--color-gray-600);
+  --color-text-light-disabled: var(--color-gray-400);
+  --color-text-light-danger: var(--color-danger-600);
+  --color-text-light-danger-bold: var(--color-red-700);
+  --color-text-light-info: var(--color-info-600);
+  --color-text-light-info-bold: var(--color-info-700);
+  --color-text-light-success: var(--color-success-600);
+  --color-text-light-success-bold: var(--color-success-700);
+  --color-text-light-warning: var(--color-warning-600);
+  --color-text-light-warning-bold: var(--color-warning-800);
+  --color-text-light-interactive-primary: var(--color-brand-700);
+  --color-text-light-interactive-primary-hover: var(--color-brand-800);
+  --color-text-light-interactive-primary-pressed: var(--color-brand-900);
+  --color-text-light-interactive-secondary: var(--color-gray-700);
+  --color-text-light-interactive-secondary-hover: var(--color-gray-800);
+  --color-text-light-interactive-secondary-pressed: var(--color-gray-900);
+  --color-text-light-interactive-inverse: var(--color-base-white);
+  --color-text-light-interactive-selected: var(--color-brand-600);
+  --color-text-light-interactive-visited: var(--color-brand-700);
+
+  /* Semantic Colors - Text (Dark Mode) */
+  --color-text-dark-primary: var(--color-base-white);
+  --color-text-dark-secondary: var(--color-gray-100);
+  --color-text-dark-tertiary: var(--color-gray-200);
+  --color-text-dark-disabled: var(--color-gray-700);
+  --color-text-dark-danger: var(--color-danger-400);
+  --color-text-dark-danger-bold: var(--color-red-200);
+  --color-text-dark-info: var(--color-info-400);
+  --color-text-dark-info-bold: var(--color-info-200);
+  --color-text-dark-success: var(--color-success-400);
+  --color-text-dark-success-bold: var(--color-success-200);
+  --color-text-dark-warning: var(--color-warning-400);
+  --color-text-dark-warning-bold: var(--color-warning-200);
+  --color-text-dark-interactive-primary: var(--color-brand-500);
+  --color-text-dark-interactive-primary-hover: var(--color-brand-200);
+  --color-text-dark-interactive-primary-pressed: var(--color-brand-100);
+  --color-text-dark-interactive-secondary: var(--color-gray-400);
+  --color-text-dark-interactive-secondary-hover: var(--color-gray-300);
+  --color-text-dark-interactive-secondary-pressed: var(--color-gray-100);
+  --color-text-dark-interactive-inverse: var(--color-base-black);
+  --color-text-dark-interactive-selected: var(--color-brand-500);
+  --color-text-dark-interactive-visited: var(--color-brand-400);
+
+  /* Semantic Colors - Text (Mode-aware) */
+  --color-text-primary: var(--color-text-light-primary);
+  --color-text-secondary: var(--color-text-light-secondary);
+  --color-text-tertiary: var(--color-text-light-tertiary);
+  --color-text-disabled: var(--color-text-light-disabled);
+  --color-text-danger: var(--color-text-light-danger);
+  --color-text-danger-bold: var(--color-text-light-danger-bold);
+  --color-text-info: var(--color-text-light-info);
+  --color-text-info-bold: var(--color-text-light-info-bold);
+  --color-text-success: var(--color-text-light-success);
+  --color-text-success-bold: var(--color-text-light-success-bold);
+  --color-text-warning: var(--color-text-light-warning);
+  --color-text-warning-bold: var(--color-text-light-warning-bold);
+  --color-text-interactive-primary: var(--color-text-light-interactive-primary);
+  --color-text-interactive-primary-hover: var(
+    --color-text-light-interactive-primary-hover
+  );
+  --color-text-interactive-primary-pressed: var(
+    --color-text-light-interactive-primary-pressed
+  );
+  --color-text-interactive-secondary: var(
+    --color-text-light-interactive-secondary
+  );
+  --color-text-interactive-secondary-hover: var(
+    --color-text-light-interactive-secondary-hover
+  );
+  --color-text-interactive-secondary-pressed: var(
+    --color-text-light-interactive-secondary-pressed
+  );
+  --color-text-interactive-inverse: var(--color-text-light-interactive-inverse);
+  --color-text-interactive-selected: var(
+    --color-text-light-interactive-selected
+  );
+  --color-text-interactive-visited: var(--color-text-light-interactive-visited);
 
   /* Typography - Desktop */
   --typo-heading-4xl-font-size: 48px;
@@ -255,6 +537,142 @@
     --color-transparent-16: var(--color-transparent-dark-24);
     --color-transparent-20: var(--color-transparent-dark-20);
     --color-transparent-24: var(--color-transparent-dark-24);
+
+    /* Semantic Colors - Background (Mode-aware) - Dark Mode */
+    --color-bg-default: var(--color-bg-dark-default);
+    --color-bg-secondary: var(--color-bg-dark-secondary);
+    --color-bg-tertiary: var(--color-bg-dark-tertiary);
+    --color-bg-disabled: var(--color-bg-dark-disabled);
+    --color-bg-danger: var(--color-bg-dark-danger);
+    --color-bg-danger-subtle: var(--color-bg-dark-danger-subtle);
+    --color-bg-info: var(--color-bg-dark-info);
+    --color-bg-info-subtle: var(--color-bg-dark-info-subtle);
+    --color-bg-success: var(--color-bg-dark-success);
+    --color-bg-success-subtle: var(--color-bg-dark-success-subtle);
+    --color-bg-warning: var(--color-bg-dark-warning);
+    --color-bg-warning-subtle: var(--color-bg-dark-warning-subtle);
+    --color-bg-interactive-primary: var(--color-bg-dark-interactive-primary);
+    --color-bg-interactive-primary-hover: var(
+      --color-bg-dark-interactive-primary-hover
+    );
+    --color-bg-interactive-primary-pressed: var(
+      --color-bg-dark-interactive-primary-pressed
+    );
+    --color-bg-interactive-secondary: var(
+      --color-bg-dark-interactive-secondary
+    );
+    --color-bg-interactive-secondary-hover: var(
+      --color-bg-dark-interactive-secondary-hover
+    );
+    --color-bg-interactive-secondary-pressed: var(
+      --color-bg-dark-interactive-secondary-pressed
+    );
+
+    /* Semantic Colors - Border (Mode-aware) - Dark Mode */
+    --color-border-primary: var(--color-border-dark-primary);
+    --color-border-secondary: var(--color-border-dark-secondary);
+    --color-border-disabled: var(--color-border-dark-disabled);
+    --color-border-danger: var(--color-border-dark-danger);
+    --color-border-danger-subtle: var(--color-border-dark-danger-subtle);
+    --color-border-info: var(--color-border-dark-info);
+    --color-border-info-subtle: var(--color-border-dark-info-subtle);
+    --color-border-success: var(--color-border-dark-success);
+    --color-border-success-subtle: var(--color-border-dark-success-subtle);
+    --color-border-warning: var(--color-border-dark-warning);
+    --color-border-warning-subtle: var(--color-border-dark-warning-subtle);
+    --color-border-focus-ring: var(--color-border-dark-focus-ring);
+    --color-border-interactive-primary: var(
+      --color-border-dark-interactive-primary
+    );
+    --color-border-interactive-primary-hover: var(
+      --color-border-dark-interactive-primary-hover
+    );
+    --color-border-interactive-primary-pressed: var(
+      --color-border-dark-interactive-primary-pressed
+    );
+    --color-border-interactive-secondary: var(
+      --color-border-dark-interactive-secondary
+    );
+    --color-border-interactive-secondary-hover: var(
+      --color-border-dark-interactive-secondary-hover
+    );
+    --color-border-interactive-secondary-pressed: var(
+      --color-border-dark-interactive-secondary-pressed
+    );
+
+    /* Semantic Colors - Icon (Mode-aware) - Dark Mode */
+    --color-icon-primary: var(--color-icon-dark-primary);
+    --color-icon-secondary: var(--color-icon-dark-secondary);
+    --color-icon-disabled: var(--color-icon-dark-disabled);
+    --color-icon-danger: var(--color-icon-dark-danger);
+    --color-icon-info: var(--color-icon-dark-info);
+    --color-icon-success: var(--color-icon-dark-success);
+    --color-icon-warning: var(--color-icon-dark-warning);
+    --color-icon-interactive-primary: var(
+      --color-icon-dark-interactive-primary
+    );
+    --color-icon-interactive-primary-hover: var(
+      --color-icon-dark-interactive-primary-hover
+    );
+    --color-icon-interactive-primary-pressed: var(
+      --color-icon-dark-interactive-primary-pressed
+    );
+    --color-icon-interactive-secondary: var(
+      --color-icon-dark-interactive-secondary
+    );
+    --color-icon-interactive-secondary-hover: var(
+      --color-icon-dark-interactive-secondary-hover
+    );
+    --color-icon-interactive-secondary-pressed: var(
+      --color-icon-dark-interactive-secondary-pressed
+    );
+    --color-icon-interactive-inverse: var(
+      --color-icon-dark-interactive-inverse
+    );
+    --color-icon-interactive-visited: var(
+      --color-icon-dark-interactive-visited
+    );
+
+    /* Semantic Colors - Text (Mode-aware) - Dark Mode */
+    --color-text-primary: var(--color-text-dark-primary);
+    --color-text-secondary: var(--color-text-dark-secondary);
+    --color-text-tertiary: var(--color-text-dark-tertiary);
+    --color-text-disabled: var(--color-text-dark-disabled);
+    --color-text-danger: var(--color-text-dark-danger);
+    --color-text-danger-bold: var(--color-text-dark-danger-bold);
+    --color-text-info: var(--color-text-dark-info);
+    --color-text-info-bold: var(--color-text-dark-info-bold);
+    --color-text-success: var(--color-text-dark-success);
+    --color-text-success-bold: var(--color-text-dark-success-bold);
+    --color-text-warning: var(--color-text-dark-warning);
+    --color-text-warning-bold: var(--color-text-dark-warning-bold);
+    --color-text-interactive-primary: var(
+      --color-text-dark-interactive-primary
+    );
+    --color-text-interactive-primary-hover: var(
+      --color-text-dark-interactive-primary-hover
+    );
+    --color-text-interactive-primary-pressed: var(
+      --color-text-dark-interactive-primary-pressed
+    );
+    --color-text-interactive-secondary: var(
+      --color-text-dark-interactive-secondary
+    );
+    --color-text-interactive-secondary-hover: var(
+      --color-text-dark-interactive-secondary-hover
+    );
+    --color-text-interactive-secondary-pressed: var(
+      --color-text-dark-interactive-secondary-pressed
+    );
+    --color-text-interactive-inverse: var(
+      --color-text-dark-interactive-inverse
+    );
+    --color-text-interactive-selected: var(
+      --color-text-dark-interactive-selected
+    );
+    --color-text-interactive-visited: var(
+      --color-text-dark-interactive-visited
+    );
   }
 }
 
@@ -278,7 +696,7 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-pretendard, "Pretendard"), -apple-system,
+  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
     BlinkMacSystemFont, system-ui, sans-serif;
 }
 

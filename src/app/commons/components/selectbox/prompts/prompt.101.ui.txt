@@ -8,47 +8,48 @@
             - @02-wireframe.mdc
             - @03-ui.mdc
 
-==============================================
+============================================== 
 
-조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: s1dcu1ct)
-조건-피그마) 참고할 공통컴포넌트 노드ID(dark-mode-selectbox): 2130:36282
-조건-피그마) 참고할 공통컴포넌트 노드ID(dark-mode-option-group): 2130:36785
-조건-피그마) 참고할 공통컴포넌트 노드ID(light-mode-selectbox): 2155:3638
-조건-피그마) 참고할 공통컴포넌트 노드ID(light-mode-option-group): 2155:3487
+조건-피그마) 피그마 MCP를 연결하여 작업을 진행할 것.
+조건-피그마) 참고할 공통컴포넌트 노드ID(selectbox): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2130-36283&m=dev
+조건-피그마) 참고할 공통컴포넌트 노드ID(dark-mode-selectbox): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2130-36282&m=dev
+조건-피그마) 참고할 공통컴포넌트 노드ID(dark-mode-option-group): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2130-36786&m=dev
+조건-피그마) 참고할 공통컴포넌트 노드ID(light-mode-selectbox): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2155-3637&m=dev
+조건-피그마) 참고할 공통컴포넌트 노드ID(light-mode-option-group): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2155-3488&m=dev
 
 조건-파일경로) 구현될 TSX 파일경로: src/commons/components/selectbox/index.tsx
 조건-파일경로) 구현될 CSS 파일경로: src/commons/components/selectbox/styles.module.css
 
 ==============================================
 
-기존히스토리-참고만) MCP를 연동하여 피그마의 디자인을 그대로 소스코드로 구현할 것.
+핵심요구사항) 하드코딩된 색상 및 폰트 값을 절대 사용하지 말 것. 반드시 global.css에 정의된 CSS 변수(상수 토큰)를 사용할 것.
 
-기존히스토리-참고만) 다음 조건을 모두 만족하는 완전한 variant 시스템을 구현할 것.
-            - variant: 'primary' | 'hover' | 'active' | 'filled' | 'danger' | 'disabled'
-            - state: 'default' | 'hover' | 'filled' | 'error' | 'disabled'
+핵심요구사항) MCP를 연동하여 피그마의 디자인을 그대로 소스코드로 구현할 것.
+
+핵심요구사항) 다음 조건을 모두 만족하는 완전한 variant 시스템을 구현할 것.
+            - state: 'default' | 'hover' | 'filled' | 'error' | 'disabled' | 'active'
             - theme: 'light' | 'dark'
 
-기존히스토리-참고만) selectbox 클릭 시 option-group이 드롭다운 형식으로 표시되도록 구현할 것.
-            - selectbox 클릭 시 option-group이 나타나도록 구현
-            - 아이템 클릭 시 해당 아이템이 선택되도록 구현
-            - 드롭다운이 열리고 닫히는 애니메이션 및 상태 관리 구현
+핵심요구사항) Label와 Additional information는 props로 유연하게 관리할 것.
+            - label prop: 선택적(optional) 문자열 타입으로 제공
+            - additionalInfo prop: 선택적(optional) 문자열 타입으로 제공
+            - 두 props 모두 제공되지 않을 경우 해당 UI 요소는 렌더링하지 않음
 
-기존히스토리-참고만) Label과 Additional information는 props로 관리할 것.
-            - props를 통해 Label과 Additional information을 전달받아 표시
+핵심요구사항) selectbox를 클릭하면 드롭다운으로 option-group이 표시되도록 구현할 것.
+            - selectbox 클릭 시 드롭다운 메뉴가 열리고 닫히는 토글 기능 구현
+            - 드롭다운이 열릴 때 option-group 컴포넌트가 표시됨
+            - 드롭다운 외부 클릭 시 자동으로 닫히는 기능 구현
 
-기존히스토리-참고만) selectbox의 아이콘과 텍스트는 children으로 유연하게 관리할 것.
-            - 아이콘과 텍스트를 children으로 받아서 자유롭게 배치 가능하도록 구현
-            - gap 속성을 사용하여 아이콘과 텍스트 사이의 공간을 조절할 수 있도록 구현
+핵심요구사항) 옵션 그룹의 아이템 개수는 props로 관리할 것.
+            - items prop: 배열 타입으로 옵션 아이템 목록을 받음
+            - 각 아이템은 고유한 id와 표시할 value를 포함
+            - items 배열의 길이에 따라 동적으로 옵션 그룹 아이템이 생성됨
 
-기존히스토리-참고만) option-group의 아이템 갯수는 props로 유동적으로 관리할 것.
-            - items?: Array<{ id: string; value: React.ReactNode }> 형태로 props로 전달
-            - 아이템 갯수에 따라 동적으로 렌더링되도록 구현
+핵심요구사항) 옵션 그룹 안에서 선택된 항목은 좌측에 체크표시를 표시할 것.
+            - selectedId prop을 통해 현재 선택된 아이템의 id를 전달받음
+            - 선택된 아이템의 좌측에 체크 아이콘 또는 체크 표시를 시각적으로 표시
+            - 체크 표시는 피그마 디자인에 맞게 구현할 것
 
-기존히스토리-참고만) option-group 안의 텍스트와 아이콘은 children으로 유동적으로 관리할 것.
-            - 각 option 아이템의 텍스트와 아이콘을 children으로 받아서 유연하게 배치
-            - 각 아이템의 children을 통해 아이콘과 텍스트를 자유롭게 구성 가능하도록 구현
 
-==============================================
 
-핵심요구사항) 하드코딩된 색상 및 폰트 값을 절대 사용하지 말 것. 반드시 global.css에 정의된 CSS 변수(상수 토큰)를 사용할 것.
 

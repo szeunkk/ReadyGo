@@ -1,8 +1,7 @@
-/* Container */
-.container {
+/* Wrapper */
+.wrapper {
   display: flex;
   flex-direction: column;
-  gap: 8px;
   width: 100%;
 }
 
@@ -10,287 +9,309 @@
 .label {
   display: flex;
   align-items: center;
-  font-family: inherit;
-  font-style: normal;
-  font-weight: var(--font-weight-medium);
+  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);
-}
-
-.labelText {
-  display: flex;
-  align-items: center;
-}
-
-.required {
-  margin-left: 4px;
-}
-
-/* Light Theme - Label */
-.theme-light .label {
+  font-weight: var(--typo-body-md-font-weight);
+  margin-bottom: 8px;
   color: var(--color-neutral-900);
 }
 
-.theme-light .required {
-  color: var(--color-danger-600);
-}
-
-/* Dark Theme - Label */
 .theme-dark .label {
   color: var(--color-base-white);
 }
 
-.theme-dark .required {
+.required {
   color: var(--color-danger-400);
+  margin-left: 2px;
 }
 
-/* Selectbox Wrapper */
-.selectboxWrapper {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-/* Base Selectbox */
+/* Selectbox Base */
 .selectbox {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 48px;
-  padding: 0 16px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-family: inherit;
-  font-style: normal;
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typo-body-lg-font-size);
-  line-height: var(--typo-body-lg-line-height);
-  box-sizing: border-box;
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
-}
-
-.selectbox:disabled,
-.selectbox.disabled {
-  cursor: not-allowed;
-}
-
-.selectboxContent {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border-radius: var(--border-radius-12, 12px);
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  font-weight: var(--typo-body-lg-font-weight);
 }
 
-.selectboxChildren {
+.selectbox.disabled {
+  cursor: not-allowed;
+}
+
+/* Content */
+.content {
   display: flex;
   align-items: center;
   flex: 1;
+  min-width: 0;
 }
 
-.selectboxText {
-  display: flex;
-  align-items: center;
-  flex: 1;
+.value {
+  color: var(--color-neutral-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.placeholder {
+.value.placeholder {
+  color: var(--color-neutral-500);
+}
+
+.theme-dark .value {
+  color: var(--color-base-white);
+}
+
+.theme-dark .value.placeholder {
   color: var(--color-neutral-400);
 }
 
+/* Chevron */
 .chevron {
-  width: 20px;
-  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  transition: transform 0.2s;
-  color: currentColor;
+  margin-left: 12px;
+  color: var(--color-neutral-500);
+  transition: transform 0.2s, color 0.2s;
 }
 
-.chevronOpen {
+.theme-dark .chevron {
+  color: var(--color-neutral-400);
+}
+
+.selectbox.state-active .chevron {
   transform: rotate(180deg);
 }
 
-/* Light Theme - Selectbox */
-.theme-light .selectbox {
-  background-color: var(--color-neutral-100);
-  color: var(--color-neutral-700);
-  border: 1px solid transparent;
-}
-
-.theme-light .selectbox.variant-primary {
-  background-color: var(--color-neutral-100);
-  border-color: transparent;
-}
-
-.theme-light .selectbox.variant-hover,
-.theme-light .selectbox.state-hover {
-  background-color: var(--color-neutral-100);
-  border-color: var(--color-neutral-400);
-}
-
-.theme-light .selectbox.variant-active,
-.theme-light .selectbox.state-active {
-  background-color: var(--color-neutral-100);
-  border-color: var(--color-brand-700);
-}
-
-.theme-light .selectbox.variant-filled,
-.theme-light .selectbox.state-filled {
-  background-color: var(--color-neutral-100);
-  color: var(--color-neutral-900);
-}
-
-.theme-light .selectbox.variant-danger,
-.theme-light .selectbox.state-error {
-  background-color: var(--color-neutral-100);
-  border-color: var(--color-danger-600);
-  color: var(--color-neutral-900);
-}
-
-.theme-light .selectbox.variant-disabled,
-.theme-light .selectbox.state-disabled,
-.theme-light .selectbox.disabled {
-  background-color: var(--color-neutral-300);
-  color: var(--color-neutral-400);
-  cursor: not-allowed;
-}
-
-/* Dark Theme - Selectbox */
-.theme-dark .selectbox {
-  background-color: var(--color-neutral-900);
-  color: var(--color-neutral-400);
-  border: 1px solid transparent;
-}
-
-.theme-dark .selectbox.variant-primary {
-  background-color: var(--color-neutral-900);
-  border-color: transparent;
-}
-
-.theme-dark .selectbox.variant-hover,
-.theme-dark .selectbox.state-hover {
-  background-color: var(--color-neutral-900);
-  border-color: var(--color-neutral-400);
-}
-
-.theme-dark .selectbox.variant-active,
-.theme-dark .selectbox.state-active {
-  background-color: var(--color-neutral-900);
-  border-color: var(--color-brand-500);
-}
-
-.theme-dark .selectbox.variant-filled,
-.theme-dark .selectbox.state-filled {
-  background-color: var(--color-neutral-900);
-  color: var(--color-base-white);
-}
-
-.theme-dark .selectbox.variant-danger,
-.theme-dark .selectbox.state-error {
-  background-color: var(--color-neutral-900);
-  border-color: var(--color-danger-400);
-  color: var(--color-base-white);
-}
-
-.theme-dark .selectbox.variant-disabled,
-.theme-dark .selectbox.state-disabled,
-.theme-dark .selectbox.disabled {
-  background-color: var(--color-neutral-900);
-  color: var(--color-neutral-700);
-  cursor: not-allowed;
-}
-
-/* Dropdown */
-.dropdown {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin-top: 4px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px -1px var(--color-shadow-default),
-    0 2px 4px -1px var(--color-shadow-subtle);
-  max-height: 304px;
-  overflow-y: auto;
-}
-
-/* Light Theme - Dropdown */
-.theme-light .dropdown {
+/* Light Theme - Default State */
+.theme-light.state-default {
   background-color: var(--color-base-white);
-  border: 1px solid var(--color-neutral-100);
+  border: 1px solid var(--color-neutral-300);
 }
 
-/* Dark Theme - Dropdown */
-.theme-dark .dropdown {
-  background-color: var(--color-neutral-900);
+.theme-light.state-default:hover:not(.disabled) {
+  border-color: var(--color-neutral-400);
+}
+
+/* Light Theme - Hover State */
+.theme-light.state-hover {
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-neutral-400);
+}
+
+/* Light Theme - Active State */
+.theme-light.state-active {
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-brand-700);
+}
+
+/* Light Theme - Filled State */
+.theme-light.state-filled,
+.theme-light.filled {
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-brand-700);
+}
+
+.theme-light.state-filled .value,
+.theme-light.filled .value {
+  color: var(--color-neutral-900);
+}
+
+/* Light Theme - Error State */
+.theme-light.state-error {
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-danger-500);
+}
+
+/* Light Theme - Disabled State */
+.theme-light.state-disabled,
+.theme-light.disabled {
+  background-color: var(--color-neutral-200);
+  border: 1px solid var(--color-neutral-400);
+  opacity: 0.6;
+}
+
+.theme-light.state-disabled .value,
+.theme-light.disabled .value {
+  color: var(--color-neutral-400);
+}
+
+.theme-light.state-disabled .chevron,
+.theme-light.disabled .chevron {
+  color: var(--color-neutral-400);
+}
+
+/* Dark Theme - Default State */
+.theme-dark.state-default {
+  background-color: var(--color-neutral-800);
   border: 1px solid var(--color-neutral-700);
 }
 
-/* Dropdown Item */
-.dropdownItem {
-  display: flex;
-  align-items: center;
-  min-height: 36px;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-family: inherit;
-  font-style: normal;
-  font-weight: var(--font-weight-medium);
-  font-size: var(--typo-body-md-font-size);
-  line-height: var(--typo-body-md-line-height);
-  transition: background-color 0.15s;
+.theme-dark.state-default:hover:not(.disabled) {
+  border-color: var(--color-neutral-600);
 }
 
-.dropdownItem:hover {
-  background-color: color-mix(in srgb, var(--color-brand-400) 12%, transparent);
+/* Dark Theme - Hover State */
+.theme-dark.state-hover {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-neutral-600);
 }
 
-.dropdownItem.selected {
-  background-color: color-mix(in srgb, var(--color-brand-400) 12%, transparent);
+/* Dark Theme - Active State */
+.theme-dark.state-active {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-brand-500);
 }
 
-/* Light Theme - Dropdown Item */
-.theme-light .dropdownItem {
-  color: var(--color-neutral-900);
+/* Dark Theme - Filled State */
+.theme-dark.state-filled,
+.theme-dark.filled {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-brand-500);
 }
 
-/* Dark Theme - Dropdown Item */
-.theme-dark .dropdownItem {
+.theme-dark.state-filled .value,
+.theme-dark.filled .value {
   color: var(--color-base-white);
 }
 
-/* Additional Information */
-.additionalInfo {
-  display: flex;
-  align-items: center;
-  font-family: inherit;
-  font-style: normal;
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typo-body-sm-font-size);
-  line-height: var(--typo-body-sm-line-height);
+/* Dark Theme - Error State */
+.theme-dark.state-error {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-danger-500);
 }
 
-.additionalInfoText {
-  display: flex;
-  align-items: center;
+/* Dark Theme - Disabled State */
+.theme-dark.state-disabled,
+.theme-dark.disabled {
+  background-color: var(--color-neutral-900);
+  border: 1px solid var(--color-neutral-700);
+  opacity: 0.6;
 }
 
-/* Light Theme - Additional Info */
-.theme-light .additionalInfo {
+.theme-dark.state-disabled .value,
+.theme-dark.disabled .value {
   color: var(--color-neutral-700);
 }
 
-.theme-light .additionalInfo.error {
-  color: var(--color-danger-600);
+.theme-dark.state-disabled .chevron,
+.theme-dark.disabled .chevron {
+  color: var(--color-neutral-700);
 }
 
-/* Dark Theme - Additional Info */
+/* Additional Info */
+.additionalInfo {
+  margin-top: 8px;
+  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  font-weight: var(--typo-body-sm-font-weight);
+  color: var(--color-neutral-500);
+}
+
 .theme-dark .additionalInfo {
   color: var(--color-neutral-400);
 }
 
-.theme-dark .additionalInfo.error {
+.additionalInfo.error {
   color: var(--color-danger-400);
 }
 
+/* Option Group */
+.optionGroup {
+  display: none;
+  flex-direction: column;
+  margin-top: 4px;
+  border-radius: var(--border-radius-12, 12px);
+  overflow: hidden;
+  box-shadow: 0 4px 12px var(--color-shadow-default);
+  width: 100%;
+}
 
+.optionGroup.open {
+  display: flex;
+}
 
+/* Light Theme - Option Group */
+.theme-light.optionGroup {
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-neutral-200);
+}
+
+/* Dark Theme - Option Group */
+.theme-dark.optionGroup {
+  background-color: var(--color-neutral-800);
+  border: 1px solid var(--color-neutral-700);
+}
+
+/* Option Item */
+.optionItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-height: 48px;
+  box-sizing: border-box;
+}
+
+.optionItem:hover {
+  background-color: var(--color-neutral-100);
+}
+
+.theme-dark .optionItem:hover {
+  background-color: var(--color-neutral-700);
+}
+
+.optionItem.selected {
+  background-color: var(--color-brand-50);
+}
+
+.theme-dark .optionItem.selected {
+  background-color: var(--color-neutral-700);
+}
+
+/* Check Icon */
+.checkIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 12px;
+  width: 16px;
+  height: 16px;
+  color: var(--color-brand-700);
+}
+
+.theme-dark .checkIcon {
+  color: var(--color-brand-500);
+}
+
+/* Option Value */
+.optionValue {
+  flex: 1;
+  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  font-weight: var(--typo-body-lg-font-weight);
+  color: var(--color-neutral-900);
+}
+
+.theme-dark .optionValue {
+  color: var(--color-base-white);
+}
