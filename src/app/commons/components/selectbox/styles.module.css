@@ -196,6 +196,7 @@
 .optionValue {
   flex: 1 1 0%;
   min-width: 0;
+  margin-left: 22px; /* leadingbox space: 20px icon + 2px gap */
   font-family:
     var(--font-pretendard, 'Pretendard'),
     -apple-system,
@@ -206,4 +207,9 @@
   line-height: var(--typo-body-md-line-height);
   font-weight: var(--typo-body-md-font-weight);
   color: var(--color-text-primary);
+}
+
+/* When check icon exists, remove the margin */
+.checkIcon ~ .optionValue {
+  margin-left: 0;
 }
