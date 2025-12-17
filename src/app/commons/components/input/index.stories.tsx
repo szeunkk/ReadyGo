@@ -41,6 +41,15 @@ const meta = {
         defaultValue: { summary: 'Default' },
       },
     },
+    size: {
+      control: 'select',
+      options: ['m', 'l'],
+      description: '인풋의 크기',
+      table: {
+        type: { summary: 'InputSize' },
+        defaultValue: { summary: 'm' },
+      },
+    },
     label: {
       control: 'text',
       description: '인풋 라벨',
@@ -429,6 +438,39 @@ export const VariantAndStateMatrix: Story = {
       description: {
         story:
           '모든 variant와 state의 조합을 한눈에 확인할 수 있는 매트릭스입니다.',
+      },
+    },
+  },
+};
+
+// Size 스토리
+export const SizeMedium: Story = {
+  args: {
+    size: 'm',
+    label: 'Medium Size',
+    placeholder: 'Size M (48px)',
+  },
+};
+
+export const SizeLarge: Story = {
+  args: {
+    size: 'l',
+    label: 'Large Size',
+    placeholder: 'Size L (56px)',
+  },
+};
+
+export const AllSizes: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <Input size="m" label="Medium Size (48px)" placeholder="Placeholder" />
+      <Input size="l" label="Large Size (56px)" placeholder="Placeholder" />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: '모든 size 타입을 한 번에 확인할 수 있습니다.',
       },
     },
   },
