@@ -132,21 +132,21 @@ export const Secondary: Story = {
 
 export const Hover: Story = {
   args: {
-    variant: 'hover',
+    state: 'hover',
     placeholder: 'Hover Input',
   },
 };
 
 export const Active: Story = {
   args: {
-    variant: 'active',
+    state: 'active',
     placeholder: 'Active Input',
   },
 };
 
 export const Filled: Story = {
   args: {
-    variant: 'filled',
+    state: 'filled',
     placeholder: 'Filled Input',
     defaultValue: '입력된 값',
   },
@@ -154,14 +154,14 @@ export const Filled: Story = {
 
 export const Danger: Story = {
   args: {
-    variant: 'danger',
+    state: 'error',
     placeholder: 'Danger Input',
   },
 };
 
 export const Disabled: Story = {
   args: {
-    variant: 'disabled',
+    state: 'disabled',
     placeholder: 'Disabled Input',
   },
 };
@@ -334,11 +334,6 @@ export const AllVariants: Story = {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       <Input variant="primary" placeholder="Primary" />
       <Input variant="secondary" placeholder="Secondary" />
-      <Input variant="hover" placeholder="Hover" />
-      <Input variant="active" placeholder="Active" />
-      <Input variant="filled" defaultValue="Filled" />
-      <Input variant="danger" placeholder="Danger" />
-      <Input variant="disabled" placeholder="Disabled" />
     </div>
   ),
   parameters: {
@@ -365,138 +360,6 @@ export const AllStates: Story = {
     docs: {
       description: {
         story: '모든 state 타입을 한 번에 확인할 수 있습니다.',
-      },
-    },
-  },
-};
-
-export const LightThemeVariants: Story = {
-  render: () => (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        padding: '20px',
-        backgroundColor: '#ffffff',
-      }}
-    >
-      <Input theme="light" variant="primary" placeholder="Primary" />
-      <Input theme="light" variant="secondary" placeholder="Secondary" />
-      <Input theme="light" variant="hover" placeholder="Hover" />
-      <Input theme="light" variant="active" placeholder="Active" />
-      <Input theme="light" variant="filled" defaultValue="Filled" />
-      <Input theme="light" variant="danger" placeholder="Danger" />
-      <Input theme="light" variant="disabled" placeholder="Disabled" />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Light 테마의 모든 variant를 확인할 수 있습니다.',
-      },
-    },
-  },
-};
-
-export const DarkThemeVariants: Story = {
-  render: () => (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        padding: '20px',
-        backgroundColor: '#030712',
-      }}
-    >
-      <Input theme="dark" variant="primary" placeholder="Primary" />
-      <Input theme="dark" variant="secondary" placeholder="Secondary" />
-      <Input theme="dark" variant="hover" placeholder="Hover" />
-      <Input theme="dark" variant="active" placeholder="Active" />
-      <Input theme="dark" variant="filled" defaultValue="Filled" />
-      <Input theme="dark" variant="danger" placeholder="Danger" />
-      <Input theme="dark" variant="disabled" placeholder="Disabled" />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Dark 테마의 모든 variant를 확인할 수 있습니다.',
-      },
-    },
-  },
-};
-
-export const CompleteExample: Story = {
-  render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <Input
-          label="이름"
-          required
-          placeholder="이름을 입력하세요"
-          theme="light"
-        />
-        <Input
-          label="이메일"
-          required
-          state="error"
-          additionalInfo="올바른 이메일 형식이 아닙니다"
-          placeholder="이메일을 입력하세요"
-          theme="light"
-        />
-        <Input
-          label="검색"
-          iconLeft="search"
-          placeholder="검색어를 입력하세요"
-          theme="light"
-        />
-        <Input
-          label="비밀번호"
-          required
-          type="password"
-          additionalInfo="8자 이상 입력하세요"
-          placeholder="비밀번호를 입력하세요"
-          theme="light"
-        />
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <Input
-          label="이름"
-          required
-          placeholder="이름을 입력하세요"
-          theme="dark"
-        />
-        <Input
-          label="이메일"
-          required
-          state="error"
-          additionalInfo="올바른 이메일 형식이 아닙니다"
-          placeholder="이메일을 입력하세요"
-          theme="dark"
-        />
-        <Input
-          label="검색"
-          iconLeft="search"
-          placeholder="검색어를 입력하세요"
-          theme="dark"
-        />
-        <Input
-          label="비밀번호"
-          required
-          type="password"
-          additionalInfo="8자 이상 입력하세요"
-          placeholder="비밀번호를 입력하세요"
-          theme="dark"
-        />
-      </div>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: '실제 사용 예시로 다양한 속성을 조합한 경우입니다.',
       },
     },
   },
