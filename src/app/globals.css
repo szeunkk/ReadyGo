@@ -49,9 +49,9 @@
   --color-teal-400: #7ffde8;
   --color-teal-500: #5ffce2;
   --color-teal-600: #56e5ce;
-  --color-teal-700: #43b3a0;
-  --color-teal-800: #348b7c;
-  --color-teal-900: #286a5f;
+  --color-teal-700: #39ac99;
+  --color-teal-800: #36817c;
+  --color-teal-900: #265b5b;
 
   /* Red Colors (Danger) */
   --color-red-50: #feebeb;
@@ -264,7 +264,7 @@
   --color-bg-dark-interactive-selected-pressed: var(--color-brand-700);
 
   /* Semantic Colors - Background (Mode-aware) */
-  --color-bg-default: var(--color-bg-light-default);
+  --color-bg-primary: var(--color-bg-light-default);
   --color-bg-secondary: var(--color-bg-light-secondary);
   --color-bg-tertiary: var(--color-bg-light-tertiary);
   --color-bg-brand: var(--color-bg-light-brand);
@@ -591,7 +591,7 @@
   --color-transparent-32: var(--color-transparent-32);
 
   /* Semantic Colors - Background (Mode-aware) - Dark Mode */
-  --color-bg-default: var(--color-bg-dark-default);
+  --color-bg-primary: var(--color-bg-dark-default);
   --color-bg-secondary: var(--color-bg-dark-secondary);
   --color-bg-tertiary: var(--color-bg-dark-tertiary);
   --color-bg-disabled: var(--color-bg-dark-disabled);

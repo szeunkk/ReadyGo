@@ -9,7 +9,7 @@
   padding: 24px;
   border-radius: 42px;
   box-sizing: border-box;
-  background-color: var(--color-bg-default);
+  background-color: var(--color-bg-primary);
   border: 1px solid var(--color-border-secondary);
 }
 
