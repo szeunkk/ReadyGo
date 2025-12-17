@@ -582,13 +582,7 @@
   --color-shadow-bold: var(--color-shadow-dark-bold);
   --color-shadow-bolder: var(--color-shadow-dark-bolder);
 
-  /* Transparent Colors (Mode-aware) - Dark Mode */
-  --color-transparent-12: var(--color-transparent-12);
-  --color-transparent-16: var(--color-transparent-16);
-  --color-transparent-20: var(--color-transparent-20);
-  --color-transparent-24: var(--color-transparent-24);
-  --color-transparent-28: var(--color-transparent-28);
-  --color-transparent-32: var(--color-transparent-32);
+  /* Transparent Colors: inherited from :root (same for light/dark mode) */
 
   /* Semantic Colors - Background (Mode-aware) - Dark Mode */
   --color-bg-primary: var(--color-bg-dark-default);
