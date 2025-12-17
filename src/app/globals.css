@@ -11,25 +11,35 @@
 
   /* Typography Font Families */
   --typo-heading-4xl-font-family:
-    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
   --typo-heading-3xl-font-family:
-    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
   --typo-heading-2xl-font-family:
-    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
   --typo-heading-xl-font-family:
-    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
   --typo-heading-lg-font-family:
-    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
   --typo-heading-md-font-family:
-    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
   --typo-heading-sm-font-family:
-    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
   --typo-body-lg-font-family:
-    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
   --typo-body-md-font-family:
-    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
   --typo-body-sm-font-family:
-    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    var(--font-pretendard, 'Pretendard'), -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
 
   /* Font Weight */
   --font-weight-regular: 400;
