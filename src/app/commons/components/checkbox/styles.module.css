@@ -65,145 +65,147 @@
 
 /* Status: Unselected */
 .status-unselected.state-default {
-  background-color: var(--color-base-white);
-  border: 1.5px solid var(--color-neutral-300);
+  background-color: var(--color-bg-primary);
+  border: 1.5px solid var(--color-border-primary);
 }
 
 .status-unselected.state-hover {
-  background-color: var(--color-base-white);
-  border: 1.5px solid var(--color-neutral-400);
+  background-color: var(--color-bg-primary);
+  border: 1.5px solid var(--color-border-interactive-secondary-hover);
 }
 
 .status-unselected.state-press {
-  background-color: var(--color-base-white);
-  border: 1.5px solid var(--color-neutral-500);
+  background-color: var(--color-bg-primary);
+  border: 1.5px solid var(--color-border-interactive-secondary-pressed);
 }
 
 .status-unselected.state-focus {
-  background-color: var(--color-base-white);
-  border: 1.5px solid var(--color-brand-700);
+  background-color: var(--color-bg-primary);
+  border: 1.5px solid var(--color-border-interactive-primary);
   box-shadow: 0 0 0 4px var(--color-transparent-32, rgba(127, 253, 232, 0.32));
 }
 
 .status-unselected.state-disabled {
-  background-color: var(--color-neutral-200);
-  border: 1.5px solid var(--color-neutral-400);
+  background-color: var(--color-bg-disabled);
+  border: 1.5px solid var(--color-border-disabled);
 }
 
 .status-unselected.state-error {
-  background-color: var(--color-base-white);
-  border: 1.5px solid var(--color-danger-600);
+  background-color: var(--color-bg-primary);
+  border: 1.5px solid var(--color-border-danger);
 }
 
 /* Status: Selected */
 .status-selected.state-default {
-  background-color: var(--color-brand-600);
+  background-color: var(--color-bg-interactive-primary);
   border-color: transparent;
 }
 
 .status-selected.state-default .icon {
-  color: var(--color-base-white);
+  color: var(--color-text-primary);
 }
 
 .status-selected.state-hover {
-  background-color: var(--color-brand-700);
+  background-color: var(--color-bg-interactive-primary-hover);
   border-color: transparent;
 }
 
 .status-selected.state-hover .icon {
-  color: var(--color-base-white);
+  color: var(--color-text-primary);
 }
 
 .status-selected.state-press {
-  background-color: var(--color-brand-800);
+  background-color: var(--color-bg-interactive-primary-pressed);
   border-color: transparent;
 }
 
 .status-selected.state-press .icon {
-  color: var(--color-base-white);
+  color: var(--color-text-primary);
 }
 
 .status-selected.state-focus {
-  background-color: var(--color-brand-700);
+  background-color: var(--color-text-interactive-primary);
   opacity: 0.4;
   border-color: transparent;
+  box-shadow: 0 0 0 4px var(--color-transparent-32, rgba(127, 253, 232, 0.32));
 }
 
 .status-selected.state-focus .icon {
-  color: var(--color-base-white);
+  color: var(--color-text-primary);
 }
 
 .status-selected.state-disabled {
-  background-color: var(--color-neutral-200);
-  border: 1.5px solid var(--color-neutral-400);
+  background-color: var(--color-bg-disabled);
+  border: 1.5px solid var(--color-border-disabled);
 }
 
 .status-selected.state-disabled .icon {
-  color: var(--color-neutral-400);
+  color: var(--color-text-disabled);
 }
 
 .status-selected.state-error {
-  background-color: var(--color-base-white);
-  border: 1.5px solid var(--color-danger-600);
+  background-color: var(--color-bg-primary);
+  border: 1.5px solid var(--color-border-danger);
 }
 
 .status-selected.state-error .icon {
-  color: var(--color-danger-600);
+  color: var(--color-text-danger);
 }
 
 /* Status: Partial */
 .status-partial.state-default {
-  background-color: var(--color-brand-600);
+  background-color: var(--color-bg-interactive-primary);
   border-color: transparent;
 }
 
 .status-partial.state-default .icon {
-  color: var(--color-base-white);
+  color: var(--color-text-primary);
 }
 
 .status-partial.state-hover {
-  background-color: var(--color-brand-700);
+  background-color: var(--color-bg-interactive-primary-hover);
   border-color: transparent;
 }
 
 .status-partial.state-hover .icon {
-  color: var(--color-base-white);
+  color: var(--color-text-primary);
 }
 
 .status-partial.state-press {
-  background-color: var(--color-brand-800);
+  background-color: var(--color-bg-interactive-primary-pressed);
   border-color: transparent;
 }
 
 .status-partial.state-press .icon {
-  color: var(--color-base-white);
+  color: var(--color-text-primary);
 }
 
 .status-partial.state-focus {
-  background-color: var(--color-brand-700);
+  background-color: var(--color-text-interactive-primary);
   border-color: transparent;
+  box-shadow: 0 0 0 4px var(--color-transparent-32, rgba(127, 253, 232, 0.32));
 }
 
 .status-partial.state-focus .icon {
-  color: var(--color-base-white);
+  color: var(--color-text-primary);
 }
 
 .status-partial.state-disabled {
-  background-color: var(--color-neutral-200);
-  border: 1.5px solid var(--color-neutral-400);
+  background-color: var(--color-bg-disabled);
+  border: 1.5px solid var(--color-border-disabled);
 }
 
 .status-partial.state-disabled .icon {
-  color: var(--color-neutral-400);
+  color: var(--color-text-disabled);
 }
 
 .status-partial.state-error {
-  background-color: var(--color-base-white);
-  border: 1.5px solid var(--color-danger-600);
+  background-color: var(--color-bg-primary);
+  border: 1.5px solid var(--color-border-danger);
 }
 
 .status-partial.state-error .icon {
-  color: var(--color-danger-600);
+  color: var(--color-text-danger);
 }
 
 /* Hover state (when not explicitly set) */
@@ -212,16 +214,16 @@
 }
 
 .label:hover .status-unselected.state-default {
-  background-color: var(--color-base-white);
-  border-color: var(--color-neutral-400);
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-border-interactive-secondary-hover);
 }
 
 .label:hover .status-selected.state-default {
-  background-color: var(--color-brand-700);
+  background-color: var(--color-bg-interactive-primary-hover);
 }
 
 .label:hover .status-partial.state-default {
-  background-color: var(--color-brand-700);
+  background-color: var(--color-bg-interactive-primary-hover);
 }
 
 /* Focus state */
@@ -230,12 +232,12 @@
 }
 
 .input:focus-visible + .status-unselected.state-default {
-  border-color: var(--color-brand-700);
+  border-color: var(--color-border-interactive-primary);
 }
 
 .input:focus-visible + .status-selected.state-default,
 .input:focus-visible + .status-partial.state-default {
-  background-color: var(--color-brand-700);
+  background-color: var(--color-bg-interactive-primary-hover);
 }
 
 /* Focus ring is controlled by state prop, not focus-visible */
@@ -246,13 +248,13 @@
 }
 
 .label:active .status-unselected.state-default {
-  border-color: var(--color-neutral-500);
+  border-color: var(--color-border-interactive-secondary-pressed);
 }
 
 .label:active .status-selected.state-default {
-  background-color: var(--color-brand-800);
+  background-color: var(--color-bg-interactive-primary-pressed);
 }
 
 .label:active .status-partial.state-default {
-  background-color: var(--color-brand-800);
+  background-color: var(--color-bg-interactive-primary-pressed);
 }

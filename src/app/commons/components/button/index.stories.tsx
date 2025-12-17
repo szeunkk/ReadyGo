@@ -10,7 +10,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '버튼 컴포넌트입니다. variant, size, state, shape, theme 등의 속성을 통해 다양한 스타일을 적용할 수 있습니다.',
+          '버튼 컴포넌트입니다. variant, size, state, shape 등의 속성을 통해 다양한 스타일을 적용할 수 있습니다.',
       },
     },
   },
@@ -50,15 +50,6 @@ const meta = {
       table: {
         type: { summary: 'ButtonShape' },
         defaultValue: { summary: 'round' },
-      },
-    },
-    theme: {
-      control: 'select',
-      options: ['light', 'dark'],
-      description: '버튼의 테마',
-      table: {
-        type: { summary: 'ButtonTheme' },
-        defaultValue: { summary: 'light' },
       },
     },
     disabled: {
@@ -174,37 +165,6 @@ export const DisabledProp: Story = {
   },
 };
 
-// Theme 스토리
-export const LightTheme: Story = {
-  args: {
-    theme: 'light',
-    variant: 'primary',
-    children: 'Light Theme',
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ padding: '20px', backgroundColor: '#ffffff' }}>
-        <Story />
-      </div>
-    ),
-  ],
-};
-
-export const DarkTheme: Story = {
-  args: {
-    theme: 'dark',
-    variant: 'primary',
-    children: 'Dark Theme',
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ padding: '20px', backgroundColor: '#030712' }}>
-        <Story />
-      </div>
-    ),
-  ],
-};
-
 // 조합 스토리
 export const AllVariants: Story = {
   render: () => (
@@ -273,42 +233,32 @@ export const AllStates: Story = {
   },
 };
 
-export const LightThemeVariants: Story = {
+export const AllVariantsWithStates: Story = {
   render: () => (
     <div
       style={{
         display: 'flex',
         flexDirection: 'column',
         gap: '12px',
-        padding: '20px',
-        backgroundColor: '#ffffff',
       }}
     >
       <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-        <Button theme="light" variant="primary">
-          Primary
-        </Button>
-        <Button theme="light" variant="secondary">
-          Secondary
-        </Button>
-        <Button theme="light" variant="outline">
-          Outline
-        </Button>
-        <Button theme="light" variant="ghost">
-          Ghost
-        </Button>
+        <Button variant="primary">Primary</Button>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="outline">Outline</Button>
+        <Button variant="ghost">Ghost</Button>
       </div>
       <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-        <Button theme="light" variant="primary" state="disabled">
+        <Button variant="primary" state="disabled">
           Primary Disabled
         </Button>
-        <Button theme="light" variant="secondary" state="disabled">
+        <Button variant="secondary" state="disabled">
           Secondary Disabled
         </Button>
-        <Button theme="light" variant="outline" state="disabled">
+        <Button variant="outline" state="disabled">
           Outline Disabled
         </Button>
-        <Button theme="light" variant="ghost" state="disabled">
+        <Button variant="ghost" state="disabled">
           Ghost Disabled
         </Button>
       </div>
@@ -317,58 +267,7 @@ export const LightThemeVariants: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          'Light 테마의 모든 variant와 disabled 상태를 확인할 수 있습니다.',
-      },
-    },
-  },
-};
-
-export const DarkThemeVariants: Story = {
-  render: () => (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        padding: '20px',
-        backgroundColor: '#030712',
-      }}
-    >
-      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-        <Button theme="dark" variant="primary">
-          Primary
-        </Button>
-        <Button theme="dark" variant="secondary">
-          Secondary
-        </Button>
-        <Button theme="dark" variant="outline">
-          Outline
-        </Button>
-        <Button theme="dark" variant="ghost">
-          Ghost
-        </Button>
-      </div>
-      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-        <Button theme="dark" variant="primary" state="disabled">
-          Primary Disabled
-        </Button>
-        <Button theme="dark" variant="secondary" state="disabled">
-          Secondary Disabled
-        </Button>
-        <Button theme="dark" variant="outline" state="disabled">
-          Outline Disabled
-        </Button>
-        <Button theme="dark" variant="ghost" state="disabled">
-          Ghost Disabled
-        </Button>
-      </div>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Dark 테마의 모든 variant와 disabled 상태를 확인할 수 있습니다.',
+        story: '모든 variant와 disabled 상태를 확인할 수 있습니다.',
       },
     },
   },

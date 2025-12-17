@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '아바타 컴포넌트입니다. size, status, theme 등의 속성을 통해 다양한 스타일을 적용할 수 있습니다.',
+          '아바타 컴포넌트입니다. size, status 등의 속성을 통해 다양한 스타일을 적용할 수 있습니다. 테마는 시멘틱 색상 변수로 자동 적용됩니다.',
       },
     },
   },
@@ -48,28 +48,12 @@ const meta = {
         defaultValue: { summary: 'offline' },
       },
     },
-    theme: {
-      control: 'select',
-      options: ['light', 'dark'],
-      description: '아바타의 테마',
-      table: {
-        type: { summary: 'AvatarTheme' },
-        defaultValue: { summary: 'light' },
-      },
-    },
     showStatus: {
       control: { type: 'boolean' },
       description: '상태 표시 여부',
       table: {
         type: { summary: 'boolean' },
         defaultValue: { summary: 'true' },
-      },
-    },
-    statusRingColor: {
-      control: 'color',
-      description: '상태 링 색상 (커스텀)',
-      table: {
-        type: { summary: 'string' },
       },
     },
     className: {
@@ -134,10 +118,9 @@ export const StatusOffline: Story = {
   },
 };
 
-// Theme 스토리
+// Theme 스토리 (dark class로 테마 전환)
 export const LightTheme: Story = {
   args: {
-    theme: 'light',
     status: 'online',
   },
   decorators: [
@@ -151,12 +134,14 @@ export const LightTheme: Story = {
 
 export const DarkTheme: Story = {
   args: {
-    theme: 'dark',
     status: 'online',
   },
   decorators: [
     (Story) => (
-      <div style={{ padding: '20px', backgroundColor: '#030712' }}>
+      <div
+        className="dark"
+        style={{ padding: '20px', backgroundColor: '#030712' }}
+      >
         <Story />
       </div>
     ),
@@ -182,14 +167,6 @@ export const WithCustomImage: Story = {
   args: {
     src: 'https://via.placeholder.com/100',
     alt: 'Custom Avatar',
-  },
-};
-
-// Custom Status Ring Color 스토리
-export const CustomStatusRingColor: Story = {
-  args: {
-    status: 'online',
-    statusRingColor: '#FF00FF',
   },
 };
 
@@ -240,10 +217,10 @@ export const LightThemeStatuses: Story = {
         backgroundColor: '#ffffff',
       }}
     >
-      <Avatar theme="light" status="online" />
-      <Avatar theme="light" status="away" />
-      <Avatar theme="light" status="ban" />
-      <Avatar theme="light" status="offline" />
+      <Avatar status="online" />
+      <Avatar status="away" />
+      <Avatar status="ban" />
+      <Avatar status="offline" />
     </div>
   ),
   parameters: {
@@ -258,6 +235,7 @@ export const LightThemeStatuses: Story = {
 export const DarkThemeStatuses: Story = {
   render: () => (
     <div
+      className="dark"
       style={{
         display: 'flex',
         gap: '12px',
@@ -266,10 +244,10 @@ export const DarkThemeStatuses: Story = {
         backgroundColor: '#030712',
       }}
     >
-      <Avatar theme="dark" status="online" />
-      <Avatar theme="dark" status="away" />
-      <Avatar theme="dark" status="ban" />
-      <Avatar theme="dark" status="offline" />
+      <Avatar status="online" />
+      <Avatar status="away" />
+      <Avatar status="ban" />
+      <Avatar status="offline" />
     </div>
   ),
   parameters: {
@@ -358,7 +336,7 @@ export const SizeAndStatusMatrix: Story = {
   },
 };
 
-export const ThemeAndStatusMatrix: Story = {
+export const ThemeComparison: Story = {
   render: () => (
     <div
       style={{
@@ -392,12 +370,13 @@ export const ThemeAndStatusMatrix: Story = {
         }}
       >
         <div style={{ fontWeight: 'bold' }}>Light</div>
-        <Avatar theme="light" status="online" />
-        <Avatar theme="light" status="away" />
-        <Avatar theme="light" status="ban" />
-        <Avatar theme="light" status="offline" />
+        <Avatar status="online" />
+        <Avatar status="away" />
+        <Avatar status="ban" />
+        <Avatar status="offline" />
       </div>
       <div
+        className="dark"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(5, 1fr)',
@@ -408,10 +387,10 @@ export const ThemeAndStatusMatrix: Story = {
         }}
       >
         <div style={{ fontWeight: 'bold', color: '#ffffff' }}>Dark</div>
-        <Avatar theme="dark" status="online" />
-        <Avatar theme="dark" status="away" />
-        <Avatar theme="dark" status="ban" />
-        <Avatar theme="dark" status="offline" />
+        <Avatar status="online" />
+        <Avatar status="away" />
+        <Avatar status="ban" />
+        <Avatar status="offline" />
       </div>
     </div>
   ),
@@ -419,7 +398,7 @@ export const ThemeAndStatusMatrix: Story = {
     docs: {
       description: {
         story:
-          '모든 theme과 status의 조합을 한눈에 확인할 수 있는 매트릭스입니다.',
+          'Light/Dark 테마와 status의 조합을 비교할 수 있습니다. dark 클래스로 테마가 자동 전환됩니다.',
       },
     },
   },
@@ -455,7 +434,7 @@ export const CompleteExample: Story = {
               alignItems: 'center',
             }}
           >
-            <Avatar theme="light" size="s" status="online" />
+            <Avatar size="s" status="online" />
             <span style={{ fontSize: '12px' }}>Small Online</span>
           </div>
           <div
@@ -466,7 +445,7 @@ export const CompleteExample: Story = {
               alignItems: 'center',
             }}
           >
-            <Avatar theme="light" size="m" status="away" />
+            <Avatar size="m" status="away" />
             <span style={{ fontSize: '12px' }}>Medium Away</span>
           </div>
           <div
@@ -477,7 +456,7 @@ export const CompleteExample: Story = {
               alignItems: 'center',
             }}
           >
-            <Avatar theme="light" size="L" status="ban" />
+            <Avatar size="L" status="ban" />
             <span style={{ fontSize: '12px' }}>Large Ban</span>
           </div>
           <div
@@ -488,17 +467,13 @@ export const CompleteExample: Story = {
               alignItems: 'center',
             }}
           >
-            <Avatar
-              theme="light"
-              size="m"
-              status="offline"
-              showStatus={false}
-            />
+            <Avatar size="m" status="offline" showStatus={false} />
             <span style={{ fontSize: '12px' }}>No Status</span>
           </div>
         </div>
       </div>
       <div
+        className="dark"
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -521,7 +496,7 @@ export const CompleteExample: Story = {
               alignItems: 'center',
             }}
           >
-            <Avatar theme="dark" size="s" status="online" />
+            <Avatar size="s" status="online" />
             <span style={{ fontSize: '12px', color: '#ffffff' }}>
               Small Online
             </span>
@@ -534,7 +509,7 @@ export const CompleteExample: Story = {
               alignItems: 'center',
             }}
           >
-            <Avatar theme="dark" size="m" status="away" />
+            <Avatar size="m" status="away" />
             <span style={{ fontSize: '12px', color: '#ffffff' }}>
               Medium Away
             </span>
@@ -547,7 +522,7 @@ export const CompleteExample: Story = {
               alignItems: 'center',
             }}
           >
-            <Avatar theme="dark" size="L" status="ban" />
+            <Avatar size="L" status="ban" />
             <span style={{ fontSize: '12px', color: '#ffffff' }}>
               Large Ban
             </span>
@@ -560,7 +535,7 @@ export const CompleteExample: Story = {
               alignItems: 'center',
             }}
           >
-            <Avatar theme="dark" size="m" status="offline" showStatus={false} />
+            <Avatar size="m" status="offline" showStatus={false} />
             <span style={{ fontSize: '12px', color: '#ffffff' }}>
               No Status
             </span>
