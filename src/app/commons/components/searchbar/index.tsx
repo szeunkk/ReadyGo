@@ -1,14 +1,16 @@
-"use client";
+'use client';
 
-import React from "react";
-import styles from "./styles.module.css";
-import { InputHTMLAttributes } from "react";
-import Image from "next/image";
+import React from 'react';
+import styles from './styles.module.css';
+import { InputHTMLAttributes } from 'react';
+import Image from 'next/image';
 
-export type SearchbarTheme = "light" | "dark";
+export type SearchbarTheme = 'light' | 'dark';
 
-export interface SearchbarProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
+export interface SearchbarProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'size'
+> {
   theme?: SearchbarTheme;
   children?: React.ReactNode;
   iconLeft?: boolean;
@@ -20,7 +22,7 @@ export interface SearchbarProps
 }
 
 export default function Searchbar({
-  theme = "light",
+  theme = 'light',
   children,
   iconLeft,
   iconRight,
@@ -28,7 +30,7 @@ export default function Searchbar({
   gap = 4,
   onIconLeftClick,
   onIconRightClick,
-  className = "",
+  className = '',
   ...props
 }: SearchbarProps) {
   const searchbarClasses = [
@@ -37,7 +39,7 @@ export default function Searchbar({
     className,
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   return (
     <div className={searchbarClasses}>
@@ -47,7 +49,8 @@ export default function Searchbar({
             type="button"
             className={styles.iconButton}
             onClick={onIconLeftClick}
-            aria-label="Search icon">
+            aria-label="Search icon"
+          >
             <Image
               src={`/icons/size=${iconSize}.svg`}
               alt=""
@@ -69,7 +72,8 @@ export default function Searchbar({
             type="button"
             className={styles.iconButton}
             onClick={onIconRightClick}
-            aria-label="Clear icon">
+            aria-label="Clear icon"
+          >
             <Image
               src={`/icons/size=${iconSize}.svg`}
               alt=""
@@ -83,10 +87,3 @@ export default function Searchbar({
     </div>
   );
 }
-
-
-
-
-
-
-

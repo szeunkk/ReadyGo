@@ -8,8 +8,10 @@ import { TierType, getTierTypeMeta } from '../../constants/tierType.enum';
 
 export type TierTagTheme = 'light' | 'dark';
 
-export interface TierTagProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'style'> {
+export interface TierTagProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'style'
+> {
   tier: TierType;
   theme?: TierTagTheme;
   className?: string;

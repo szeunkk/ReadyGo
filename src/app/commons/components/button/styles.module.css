@@ -5,11 +5,18 @@
   justify-content: center;
   border: none;
   cursor: pointer;
-  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
   font-style: normal;
   font-weight: var(--font-weight-medium);
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
   box-sizing: border-box;
 }
 

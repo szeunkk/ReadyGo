@@ -19,13 +19,20 @@
   display: flex;
   align-items: center;
   border: none;
-  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
   font-style: normal;
   font-weight: var(--font-weight-regular);
   font-size: var(--typo-body-lg-font-size);
   line-height: var(--typo-body-lg-line-height);
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
   box-sizing: border-box;
   height: 48px;
   padding: 0;
@@ -83,8 +90,12 @@
   align-items: center;
   gap: 4px;
   height: 18px;
-  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
   font-style: normal;
   font-weight: var(--font-weight-medium);
   font-size: var(--typo-body-md-font-size);
@@ -111,8 +122,12 @@
   align-items: center;
   gap: 4px;
   height: 16px;
-  font-family: var(--font-pretendard, 'Pretendard'), -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
   font-style: normal;
   font-weight: var(--font-weight-regular);
   font-size: var(--typo-body-sm-font-size);
@@ -379,4 +394,3 @@
 .theme-light .additionalInfo.error {
   color: var(--color-text-danger);
 }
-

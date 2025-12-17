@@ -8,7 +8,10 @@
   font-weight: var(--font-weight-regular);
   font-size: var(--typo-body-lg-font-size);
   line-height: var(--typo-body-lg-line-height);
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
   box-sizing: border-box;
   height: 48px;
   border-radius: 12px;
@@ -111,7 +114,3 @@
   color: var(--color-neutral-700);
   opacity: 0.6;
 }
-
-
-
-

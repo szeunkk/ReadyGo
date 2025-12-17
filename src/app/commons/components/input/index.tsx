@@ -15,8 +15,10 @@ export type InputState =
   | 'disabled';
 export type InputTheme = 'light' | 'dark';
 
-export interface InputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
+export interface InputProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'size'
+> {
   variant?: InputVariant;
   state?: InputState;
   theme?: InputTheme;
