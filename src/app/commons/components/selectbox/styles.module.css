@@ -167,8 +167,8 @@
 /* Option Item */
 .optionItem {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  gap: 2px;
   padding: 10px 8px;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -179,14 +179,6 @@
 
 .optionItem.selected {
   background-color: var(--color-transparent-12);
-}
-
-/* Option Item Inner Wrapper */
-.optionItem > * {
-  display: flex;
-  gap: 2px;
-  align-items: center;
-  width: 100%;
 }
 
 /* Check Icon */
