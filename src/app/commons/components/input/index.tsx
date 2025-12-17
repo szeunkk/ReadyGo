@@ -13,7 +13,6 @@ export type InputState =
   | 'filled'
   | 'error'
   | 'disabled';
-export type InputTheme = 'light' | 'dark';
 
 export interface InputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -21,7 +20,6 @@ export interface InputProps extends Omit<
 > {
   variant?: InputVariant;
   state?: InputState;
-  theme?: InputTheme;
   label?: React.ReactNode;
   additionalInfo?: React.ReactNode;
   required?: boolean;
@@ -36,7 +34,6 @@ export interface InputProps extends Omit<
 export default function Input({
   variant = 'primary',
   state = 'Default',
-  theme = 'light',
   label,
   additionalInfo,
   required = false,
@@ -86,20 +83,16 @@ export default function Input({
     styles.input,
     styles[`variant-${actualVariant}`],
     styles[`state-${actualState}`],
-    styles[`theme-${theme}`],
     isDisabled && styles.disabled,
     className,
   ]
     .filter(Boolean)
     .join(' ');
 
-  const labelClasses = [styles.label, styles[`theme-${theme}`]]
-    .filter(Boolean)
-    .join(' ');
+  const labelClasses = [styles.label].filter(Boolean).join(' ');
 
   const additionalInfoClasses = [
     styles.additionalInfo,
-    styles[`theme-${theme}`],
     actualState === 'error' && styles.error,
   ]
     .filter(Boolean)
