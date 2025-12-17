@@ -21,7 +21,7 @@
 
 /* Rectangle Style */
 .style-rectangle {
-  background-color: var(--color-bg-secondary);
+  background-color: var(--color-bg-tertiary);
   color: var(--color-text-tertiary);
   border-radius: 4px;
   padding-left: 8px;
@@ -44,6 +44,6 @@
   border: 1px solid var(--color-border-primary);
   color: var(--color-text-primary);
   border-radius: 99999px;
-  padding-left: 8px;
-  padding-right: 8px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
