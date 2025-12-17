@@ -9,17 +9,7 @@
   padding: 24px;
   border-radius: 42px;
   box-sizing: border-box;
-}
-
-/* Dark Theme */
-.animalCard.dark {
-  background-color: var(--color-bg-dark-default);
-  border: 1px solid var(--color-border-dark-secondary);
-}
-
-/* Light Theme */
-.animalCard.light {
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-bg-default);
   border: 1px solid var(--color-border-secondary);
 }
 
@@ -49,16 +39,9 @@
   font-size: var(--typo-heading-xl-font-size);
   font-weight: var(--font-weight-semibold);
   line-height: var(--typo-heading-xl-line-height);
+  color: var(--color-text-primary);
   white-space: nowrap;
   margin: 0;
-}
-
-.dark .nickname {
-  color: var(--color-text-dark-primary);
-}
-
-.light .nickname {
-  color: var(--color-text-primary);
 }
 
 /* Animal Image */
@@ -81,11 +64,11 @@
   opacity: 0.5;
 }
 
-.dark .backgroundImage {
+:global(.dark) .backgroundImage {
   mix-blend-mode: plus-darker;
 }
 
-.light .backgroundImage {
+:global(.light) .backgroundImage {
   mix-blend-mode: hard-light;
 }
 
@@ -151,16 +134,9 @@
   font-size: var(--typo-heading-xl-font-size);
   font-weight: var(--font-weight-semibold);
   line-height: var(--typo-heading-xl-line-height);
+  color: var(--color-text-primary);
   white-space: nowrap;
   margin: 0;
-}
-
-.dark .descriptionTitle {
-  color: var(--color-text-dark-primary);
-}
-
-.light .descriptionTitle {
-  color: var(--color-text-primary);
 }
 
 .descriptionText {
@@ -176,16 +152,9 @@
   font-size: var(--typo-body-lg-font-size);
   font-weight: var(--font-weight-regular);
   line-height: var(--typo-body-lg-line-height);
+  color: var(--color-text-interactive-secondary);
   white-space: nowrap;
   margin: 0;
-}
-
-.dark .descriptionSubtitle {
-  color: var(--color-text-dark-interactive-secondary);
-}
-
-.light .descriptionSubtitle {
-  color: var(--color-text-interactive-secondary);
 }
 
 /* Info Grid */
@@ -229,16 +198,9 @@
   font-size: var(--typo-body-md-font-size);
   font-weight: var(--font-weight-regular);
   line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-interactive-secondary);
   white-space: nowrap;
   margin: 0;
-}
-
-.dark .infoLabel {
-  color: var(--color-text-dark-interactive-secondary);
-}
-
-.light .infoLabel {
-  color: var(--color-text-interactive-secondary);
 }
 
 .infoValue {
@@ -246,16 +208,9 @@
   font-size: var(--typo-body-lg-font-size);
   font-weight: var(--font-weight-medium);
   line-height: var(--typo-body-lg-line-height);
+  color: var(--color-text-primary);
   white-space: nowrap;
   margin: 0;
-}
-
-.dark .infoValue {
-  color: var(--color-text-dark-primary);
-}
-
-.light .infoValue {
-  color: var(--color-text-primary);
 }
 
 /* Perfect Match - My Variant */
@@ -267,14 +222,7 @@
   width: 100%;
   padding: 12px 0;
   border-radius: 99999px;
-}
-
-.dark .perfectMatchMy {
-  background-color: var(--color-bg-dark-interactive-secondary);
-}
-
-.light .perfectMatchMy {
-  background-color: var(--color-bg-light-interactive-secondary);
+  background-color: var(--color-bg-interactive-teritiary);
 }
 
 .perfectMatchHeader {
@@ -289,16 +237,9 @@
   font-size: var(--typo-body-md-font-size);
   font-weight: var(--font-weight-regular);
   line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-interactive-primary);
   white-space: nowrap;
   margin: 0;
-}
-
-.dark .perfectMatchLabel {
-  color: var(--color-text-dark-interactive-primary);
-}
-
-.light .perfectMatchLabel {
-  color: var(--color-text-interactive-primary);
 }
 
 .perfectMatchTypes {
@@ -312,16 +253,9 @@
   font-size: var(--typo-body-lg-font-size);
   font-weight: var(--font-weight-medium);
   line-height: var(--typo-body-lg-line-height);
+  color: var(--color-text-primary);
   white-space: nowrap;
   text-align: center;
-}
-
-.dark .matchType {
-  color: var(--color-text-dark-primary);
-}
-
-.light .matchType {
-  color: var(--color-text-primary);
 }
 
 .separator {
@@ -329,16 +263,9 @@
   font-size: var(--typo-body-lg-font-size);
   font-weight: var(--font-weight-medium);
   line-height: var(--typo-body-lg-line-height);
+  color: var(--color-text-primary);
   white-space: nowrap;
   text-align: center;
-}
-
-.dark .separator {
-  color: var(--color-text-dark-primary);
-}
-
-.light .separator {
-  color: var(--color-text-primary);
 }
 
 /* Perfect Match - User Variant */
@@ -351,14 +278,7 @@
   width: 100%;
   padding: 16px 24px 24px;
   border-radius: 18px;
-}
-
-.dark .perfectMatchUser {
-  background-color: var(--color-bg-dark-interactive-secondary);
-}
-
-.light .perfectMatchUser {
-  background-color: var(--color-bg-light-interactive-secondary);
+  background-color: var(--color-bg-interactive-teritiary);
 }
 
 .matchPercentageRow {
@@ -372,16 +292,9 @@
   font-size: var(--typo-heading-sm-font-size);
   font-weight: var(--font-weight-semibold);
   line-height: var(--typo-heading-sm-line-height);
+  color: var(--color-text-primary);
   white-space: nowrap;
   margin: 0;
-}
-
-.dark .matchTitle {
-  color: var(--color-text-dark-primary);
-}
-
-.light .matchTitle {
-  color: var(--color-text-primary);
 }
 
 .matchPercentage {
@@ -389,17 +302,10 @@
   font-size: var(--typo-heading-lg-font-size);
   font-weight: var(--font-weight-semibold);
   line-height: var(--typo-heading-lg-line-height);
+  color: var(--color-text-interactive-primary);
   white-space: nowrap;
   text-align: center;
   margin: 0;
-}
-
-.dark .matchPercentage {
-  color: var(--color-text-dark-interactive-primary);
-}
-
-.light .matchPercentage {
-  color: var(--color-text-interactive-primary);
 }
 
 .matchReasons {
@@ -409,7 +315,7 @@
 }
 
 .matchReasons .separator {
-  color: var(--color-text-dark-interactive-secondary);
+  color: var(--color-text-interactive-secondary);
 }
 
 .matchReason {
@@ -417,14 +323,7 @@
   font-size: var(--typo-body-md-font-size);
   font-weight: var(--font-weight-regular);
   line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-interactive-secondary);
   white-space: nowrap;
   text-align: center;
-}
-
-.dark .matchReason {
-  color: var(--color-text-dark-interactive-secondary);
-}
-
-.light .matchReason {
-  color: var(--color-text-interactive-secondary);
 }

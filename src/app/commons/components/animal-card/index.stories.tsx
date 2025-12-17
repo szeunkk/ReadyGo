@@ -22,11 +22,6 @@ const meta = {
       options: ['my', 'user'],
       description: '카드의 variant (my: 내 프로필, user: 다른 유저 프로필)',
     },
-    theme: {
-      control: 'radio',
-      options: ['dark', 'light'],
-      description: '카드의 테마 (dark: 다크 모드, light: 라이트 모드)',
-    },
     nickname: {
       control: 'text',
       description: '사용자 닉네임',
@@ -394,7 +389,6 @@ export const UserTiger: Story = {
 export const LightMyWolf: Story = {
   args: {
     property: 'my',
-    theme: 'light',
     nickname: '호쾌한망토',
     tier: TierType.diamond,
     animal: AnimalType.wolf,
@@ -409,7 +403,6 @@ export const LightMyWolf: Story = {
 export const LightUserRaven: Story = {
   args: {
     property: 'user',
-    theme: 'light',
     nickname: '까칠한까마귀',
     tier: TierType.diamond,
     animal: AnimalType.raven,
@@ -429,7 +422,6 @@ export const LightUserRaven: Story = {
 export const Interactive: Story = {
   args: {
     property: 'my',
-    theme: 'dark',
     nickname: '호쾌한망토',
     tier: TierType.diamond,
     animal: AnimalType.wolf,
