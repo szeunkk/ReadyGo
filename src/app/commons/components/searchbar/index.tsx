@@ -3,29 +3,15 @@
 import React from 'react';
 import styles from './styles.module.css';
 import { InputHTMLAttributes } from 'react';
-import Image from 'next/image';
+import Icon from '../icon';
 
-export interface SearchbarProps extends Omit<
-  InputHTMLAttributes<HTMLInputElement>,
-  'size'
-> {
+export interface SearchbarProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   children?: React.ReactNode;
-  iconLeft?: boolean;
-  iconRight?: boolean;
-  iconSize?: 14 | 16 | 20 | 24 | 32 | 40;
-  gap?: number;
-  onIconLeftClick?: () => void;
-  onIconRightClick?: () => void;
 }
 
 export default function Searchbar({
   children,
-  iconLeft,
-  iconRight,
-  iconSize = 20,
-  gap = 4,
-  onIconLeftClick,
-  onIconRightClick,
   className = '',
   ...props
 }: SearchbarProps) {
@@ -35,23 +21,8 @@ export default function Searchbar({
 
   return (
     <div className={searchbarClasses}>
-      <div className={styles.searchbarContent} style={{ gap: `${gap}px` }}>
-        {iconLeft && (
-          <button
-            type="button"
-            className={styles.iconButton}
-            onClick={onIconLeftClick}
-            aria-label="Search icon"
-          >
-            <Image
-              src={`/icons/size=${iconSize}.svg`}
-              alt=""
-              width={iconSize}
-              height={iconSize}
-              className={styles.icon}
-            />
-          </button>
-        )}
+      <div className={styles.searchbarContent}>
+        <Icon name="search" size={20} className={styles.icon} />
         <div className={styles.inputContainer}>
           {children ? (
             <div className={styles.childrenContainer}>{children}</div>
@@ -59,22 +30,6 @@ export default function Searchbar({
             <input type="text" className={styles.inputField} {...props} />
           )}
         </div>
-        {iconRight && (
-          <button
-            type="button"
-            className={styles.iconButton}
-            onClick={onIconRightClick}
-            aria-label="Clear icon"
-          >
-            <Image
-              src={`/icons/size=${iconSize}.svg`}
-              alt=""
-              width={iconSize}
-              height={iconSize}
-              className={styles.icon}
-            />
-          </button>
-        )}
       </div>
     </div>
   );
