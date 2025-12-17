@@ -5,8 +5,10 @@ import styles from './styles.module.css';
 import { InputHTMLAttributes } from 'react';
 import Icon from '../icon';
 
-export interface SearchbarProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
+export interface SearchbarProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'size'
+> {
   children?: React.ReactNode;
 }
 
