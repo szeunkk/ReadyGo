@@ -3,7 +3,7 @@ import RadarChart from './index';
 import { RadarChartData } from './index';
 
 const meta: Meta<typeof RadarChart> = {
-  title: 'Commons/RadarChart',
+  title: 'Commons/Components/RadarChart',
   component: RadarChart,
   parameters: {
     layout: 'centered',
@@ -285,4 +285,3 @@ export const CompareOpposite: Story = {
     showLabels: true,
   },
 };
-
