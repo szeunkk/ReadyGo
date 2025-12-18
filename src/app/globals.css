@@ -757,7 +757,7 @@
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background: var(--color-bg-secondary);
   font-family:
     var(--font-pretendard, 'Pretendard'),
     -apple-system,
