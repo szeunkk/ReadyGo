@@ -1,0 +1,261 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  background-color: var(--color-bg-secondary);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 442px;
+  padding: 40px 32px;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-transparent-12);
+  border-radius: 24px;
+  box-shadow:
+    0px 10px 15px -3px var(--color-shadow-subtle),
+    0px 4px 6px -4px var(--color-shadow-subtle);
+}
+
+.titleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  margin: 0;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: var(--font-weight-bold);
+  font-size: 36px;
+  line-height: 40px;
+  color: var(--color-text-primary);
+  text-align: center;
+  letter-spacing: -3.6px;
+}
+
+.subtitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-interactive-secondary);
+  text-align: center;
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+}
+
+.signupButton {
+  width: 100%;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 20px;
+  position: relative;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-border-secondary);
+}
+
+.dividerText {
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-interactive-secondary);
+  background-color: var(--color-bg-primary);
+  padding: 0 8px;
+}
+
+.socialLoginGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.socialButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 2px 2.016px;
+  background-color: transparent;
+  border: 2px solid var(--color-border-secondary);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
+}
+
+.socialButton:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.socialButtonContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.socialIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.socialButtonText {
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  color: var(--color-text-primary);
+}
+
+.kakaoButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  width: 100%;
+  background-color: #fee500;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.kakaoButton:hover {
+  background-color: #fdd835;
+}
+
+.kakaoButtonText {
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  color: var(--color-base-black);
+}
+
+.loginLink {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+  width: 100%;
+  padding: 0 84px;
+}
+
+.loginText {
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-interactive-secondary);
+  text-align: center;
+  text-wrap: nowrap;
+}
+
+.loginButtonLink {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-interactive-primary);
+  transition: color 0.2s;
+  text-wrap: nowrap;
+}
+
+.loginButtonLink:hover {
+  color: var(--color-text-interactive-primary-hover);
+}
