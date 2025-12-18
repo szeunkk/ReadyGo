@@ -12,8 +12,9 @@ export const NextThemesProvider = ({ children }: NextThemesProviderProps) => {
     <ThemeProvider
       attribute="class"
       defaultTheme="dark"
-      enableSystem
+      enableSystem={false}
       disableTransitionOnChange
+      storageKey="readygo-theme"
     >
       {children}
     </ThemeProvider>
