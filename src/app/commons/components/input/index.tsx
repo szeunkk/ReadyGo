@@ -14,12 +14,15 @@ export type InputState =
   | 'error'
   | 'disabled';
 
+export type InputSize = 'm' | 'l';
+
 export interface InputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
   'size'
 > {
   variant?: InputVariant;
   state?: InputState;
+  size?: InputSize;
   label?: React.ReactNode;
   additionalInfo?: React.ReactNode;
   required?: boolean;
@@ -34,6 +37,7 @@ export interface InputProps extends Omit<
 export default function Input({
   variant = 'primary',
   state = 'Default',
+  size = 'm',
   label,
   additionalInfo,
   required = false,
@@ -81,6 +85,7 @@ export default function Input({
 
   const inputClasses = [
     styles.input,
+    styles[`size-${size}`],
     styles[`variant-${actualVariant}`],
     styles[`state-${actualState}`],
     isDisabled && styles.disabled,
