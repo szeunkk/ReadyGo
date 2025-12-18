@@ -248,7 +248,7 @@ export default function RadarChart({
           display: showLabels,
           font: {
             size: 12,
-            family: 'Inter',
+            family: 'Pretendard',
             weight: 400, // Regular
             lineHeight: 1.33, // 16px / 12px
           },
