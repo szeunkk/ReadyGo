@@ -10,7 +10,7 @@ export default function Signup() {
     <div className={styles.wrapper}>
       <div className={styles.container}>
         <div className={styles.titleSection}>
-          <h1 className={styles.title}>ㄹㄷㄱ</h1>
+          <h1 className={styles.title}>회원가입</h1>
           <p className={styles.subtitle}>
             입력하신 정보로 회원님의 계정이 생성됩니다.
           </p>
@@ -130,7 +130,7 @@ export default function Signup() {
         </div>
 
         <div className={styles.loginLink}>
-          <span className={styles.loginText}>이미 계정이 있나요?</span>
+          <span className={styles.loginText}>아직 계정이 없다면?</span>
           <button className={styles.loginButtonLink} type="button">
             로그인 하기
           </button>

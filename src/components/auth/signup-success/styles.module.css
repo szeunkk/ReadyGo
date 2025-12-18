@@ -13,8 +13,8 @@
   flex-direction: column;
   align-items: center;
   gap: 24px;
-  width: 442px;
-  padding: 48px 32px;
+  width: 495px;
+  padding: 40px 32px;
   background-color: var(--color-bg-primary);
   border: 1px solid var(--color-transparent-12);
   border-radius: 24px;
@@ -24,52 +24,125 @@
   text-align: center;
 }
 
+.titleSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
 .title {
-  font-size: var(--typo-heading-xl-font-size);
-  line-height: var(--typo-heading-xl-line-height);
-  font-weight: var(--typo-heading-xl-font-weight);
+  font-size: var(--typo-heading-2xl-font-size);
+  line-height: var(--typo-heading-2xl-line-height);
+  font-weight: var(--typo-heading-2xl-font-weight);
   color: var(--color-text-primary);
 }
 
 .subtitle {
   font-size: var(--typo-body-lg-font-size);
   line-height: var(--typo-body-lg-line-height);
-  color: var(--color-text-secondary);
+  color: var(--color-text-interactive-secondary);
 }
 
 .textGroup {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  width: 100%;
+  gap: 8px;
   background-color: var(--color-bg-secondary);
-  padding: 12px 16px;
-  border-radius: 12px;
+  padding: 24px;
+  border-radius: 10px;
 }
 
-.subtitle {
+.descriptionTitle {
   font-size: var(--typo-body-lg-font-size);
   line-height: var(--typo-body-lg-line-height);
-  color: var(--color-text-primary);
+  color: var(--color-icon-interactive-primary, #5ffce2);
+  text-align: center;
+  font-weight: var(--typo-body-lg-font-weight);
 }
 
 .description {
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);
   color: var(--color-text-interactive-secondary);
+  text-align: center;
+  white-space: pre-line;
 }
 
 .buttons {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 8px;
+  gap: 16px;
 }
 
-.icon {
-  margin-right: 8px;
+.icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .fullWidth {
   width: 100%;
+  padding: 14px 20px;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  align-self: stretch;
+}
+
+.laterWrapper {
+  /* existing rules */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+}
+
+.laterButton {
+  display: flex;
+  padding: 8px 0;
+  margin-bottom: 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-interactive-secondary, #a9afb9);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+}
+
+.laterList {
+  list-style: none;
+  padding-left: 0;
+  list-style: none;
+  padding-left: 0;
+  text-align: left;
+  /* inherit same flex config from wrapper */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--color-text-interactive-secondary);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border-secondary);
+}
+
+.laterList li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.laterList li::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-color: var(--color-bg-interactive-secondary);
 }
