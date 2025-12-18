@@ -44,26 +44,28 @@ const dashedGridPlugin: Plugin<'radar'> = {
     const numPoints = pointLabels.length; // 5개 축
 
     // 각 레벨의 오각형 그리기 (Chart.js의 getPointPosition 사용)
-    for (let i = 1; i <= numTicks; i++) {
+    Array.from({ length: numTicks }, (_, i) => i + 1).forEach((i) => {
       const distance = (angleLines * i) / numTicks;
 
       ctx.beginPath();
-      for (let index = 0; index < numPoints; index++) {
-        // Chart.js의 getPointPosition으로 정확한 좌표 얻기
-        const point = scale.getPointPosition(index, distance);
+      Array.from({ length: numPoints }, (_, index) => index).forEach(
+        (index) => {
+          // Chart.js의 getPointPosition으로 정확한 좌표 얻기
+          const point = scale.getPointPosition(index, distance);
 
-        if (index === 0) {
-          ctx.moveTo(point.x, point.y);
-        } else {
-          ctx.lineTo(point.x, point.y);
+          if (index === 0) {
+            ctx.moveTo(point.x, point.y);
+          } else {
+            ctx.lineTo(point.x, point.y);
+          }
         }
-      }
+      );
       ctx.closePath();
       ctx.stroke();
-    }
+    });
 
     // 각도 라인 그리기 (중앙에서 꼭지점으로, Chart.js의 getPointPosition 사용)
-    for (let index = 0; index < numPoints; index++) {
+    Array.from({ length: numPoints }, (_, index) => index).forEach((index) => {
       // Chart.js의 getPointPosition으로 정확한 좌표 얻기
       const point = scale.getPointPosition(index, angleLines);
 
@@ -71,7 +73,7 @@ const dashedGridPlugin: Plugin<'radar'> = {
       ctx.moveTo(scale.xCenter, scale.yCenter);
       ctx.lineTo(point.x, point.y);
       ctx.stroke();
-    }
+    });
 
     ctx.restore();
   },
