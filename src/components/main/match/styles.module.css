@@ -7,8 +7,8 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  width: 100%;
-  height: 100%;
+  width: fit-content;
+  height: fit-content;
 }
 
 /* 필터 섹션 */
@@ -17,12 +17,14 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  min-height: 48px; /* 최소 높이 고정 */
 }
 
 /* 필터 그룹 (Selectbox들) */
 .filterGroup {
+  width: fit-content;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   flex: 1;
 }
@@ -30,6 +32,9 @@
 /* Selectbox 스타일 */
 .selectbox {
   width: 320px;
+  min-width: 320px;
+  max-width: 320px;
+  flex-shrink: 0;
 }
 
 /* 목록갱신 버튼 */
@@ -89,6 +94,8 @@
 
   .selectbox {
     width: 250px;
+    min-width: 250px;
+    max-width: 250px;
   }
 }
 
@@ -111,6 +118,8 @@
 
   .selectbox {
     width: 100%;
+    min-width: unset;
+    max-width: unset;
   }
 
   .refreshButton {
@@ -122,4 +131,3 @@
     gap: 16px;
   }
 }
-
