@@ -1,0 +1,36 @@
+/* Overlay (backdrop) */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.overlayOpen {
+  opacity: 1;
+}
+
+/* Modal wrapper */
+.modalWrapper {
+  transform: scale(0.9);
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.modalOpen {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* 접근성을 위한 포커스 트랩 */
+.overlay:focus {
+  outline: none;
+}
