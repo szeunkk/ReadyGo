@@ -1,0 +1,27 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @02-wireframe.mdc
+            - @03-ui.mdc
+
+==============================================
+
+조건-피그마) 사용할 MCP: FigmaMCP
+조건-피그마) bar-chart(size s): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2654-9161&t=5oR82eTQNJfzWn8c-4
+조건-피그마) bar-chart(size m): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2503-38873&t=5oR82eTQNJfzWn8c-4
+
+조건-파일경로) 구현될 TSX 파일경로: src/commons/components/bar-chart/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/commons/components/bar-chart/styles.module.css
+
+==============================================
+
+핵심요구사항) 피그마의 bar-chart를 보고 피그마 디자인의 모든 속성과 변형을 확인하여 이 컴포넌트들을 구현할 것.
+
+핵심요구사항) 다음 조건을 모두 만족하는 완전한 variant 시스템을 구현할 것.
+            - size: 's' | 'm'
+
+핵심요구사항) chartjs 를 사용할 것.
