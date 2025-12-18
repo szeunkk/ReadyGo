@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import Checkbox from './index';
+import React from 'react';
+import Checkbox, { CheckboxStatus } from './index';
 
 const meta = {
   title: 'Commons/Components/Checkbox',
@@ -41,7 +42,7 @@ type Story = StoryObj<typeof meta>;
 // 기본 스토리
 export const Default: Story = {
   args: {
-    status: 'unselected',
+    status: 'unselected' as CheckboxStatus,
   },
 };
 
