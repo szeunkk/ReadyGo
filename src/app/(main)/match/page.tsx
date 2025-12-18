@@ -1,6 +1,5 @@
-import Match from '@/components/main/match/ui/match-list/matchList';
+import MatchPage from '@/components/main/match/matchPage';
 
-export default function MatchPage() {
-  return <Match />;
+export default function Page() {
+  return <MatchPage />;
 }
-
