@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import { NextThemesProvider } from '../commons/providers/next-themes/next-themes.provider';
+import { ModalProvider } from '../commons/providers/modal/modal.provider';
 
 const pretendard = localFont({
   src: '../fonts/PretendardVariable.woff2',
@@ -23,7 +24,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${pretendard.variable}  antialiased`}>
-        <NextThemesProvider>{children}</NextThemesProvider>
+        <NextThemesProvider>
+          <ModalProvider>{children}</ModalProvider>
+        </NextThemesProvider>
       </body>
     </html>
   );
