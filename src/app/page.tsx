@@ -2,15 +2,21 @@
 
 import { generateNickname } from '@/lib/nickname/generateNickname';
 import Radio from '@/commons/components/radio';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
   const [selectedGame, setSelectedGame] = useState('lol');
   const [selectedTier, setSelectedTier] = useState('gold');
+  const [nickname, setNickname] = useState('');
+
+  // 클라이언트에서만 닉네임 생성 (hydration 오류 방지)
+  useEffect(() => {
+    setNickname(generateNickname());
+  }, []);
 
   return (
     <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto' }}>
-      <h1>readygo{generateNickname()}</h1>
+      <h1>readygo - {nickname}</h1>
 
       <div style={{ marginTop: '40px' }}>
         <h2 style={{ marginBottom: '16px' }}>게임 선택</h2>
