@@ -5,14 +5,7 @@ import styles from './styles.module.css';
 import { InputHTMLAttributes } from 'react';
 import Image from 'next/image';
 
-export type InputVariant =
-  | 'primary'
-  | 'hover'
-  | 'active'
-  | 'filled'
-  | 'danger'
-  | 'disabled'
-  | 'secondary';
+export type InputVariant = 'primary' | 'secondary';
 export type InputState =
   | 'Default'
   | 'hover'
@@ -20,13 +13,16 @@ export type InputState =
   | 'filled'
   | 'error'
   | 'disabled';
-export type InputTheme = 'light' | 'dark';
 
-export interface InputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
+export type InputSize = 'm' | 'l';
+
+export interface InputProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'size'
+> {
   variant?: InputVariant;
   state?: InputState;
-  theme?: InputTheme;
+  size?: InputSize;
   label?: React.ReactNode;
   additionalInfo?: React.ReactNode;
   required?: boolean;
@@ -41,7 +37,7 @@ export interface InputProps
 export default function Input({
   variant = 'primary',
   state = 'Default',
-  theme = 'light',
+  size = 'm',
   label,
   additionalInfo,
   required = false,
@@ -55,25 +51,10 @@ export default function Input({
   disabled,
   ...props
 }: InputProps) {
-  const isDisabled = disabled || state === 'disabled' || variant === 'disabled';
+  const isDisabled = disabled || state === 'disabled';
 
   // variant와 state를 기반으로 실제 적용할 클래스 결정
   const getVariantClass = () => {
-    if (isDisabled) {
-      return 'disabled';
-    }
-    if (state === 'error' || variant === 'danger') {
-      return 'danger';
-    }
-    if (state === 'filled' || variant === 'filled') {
-      return 'filled';
-    }
-    if (state === 'active' || variant === 'active') {
-      return 'active';
-    }
-    if (state === 'hover' || variant === 'hover') {
-      return 'hover';
-    }
     if (variant === 'secondary') {
       return 'secondary';
     }
@@ -104,23 +85,20 @@ export default function Input({
 
   const inputClasses = [
     styles.input,
+    styles[`size-${size}`],
     styles[`variant-${actualVariant}`],
     styles[`state-${actualState}`],
-    styles[`theme-${theme}`],
     isDisabled && styles.disabled,
     className,
   ]
     .filter(Boolean)
     .join(' ');
 
-  const labelClasses = [styles.label, styles[`theme-${theme}`]]
-    .filter(Boolean)
-    .join(' ');
+  const labelClasses = [styles.label].filter(Boolean).join(' ');
 
   const additionalInfoClasses = [
     styles.additionalInfo,
-    styles[`theme-${theme}`],
-    (actualState === 'error' || actualVariant === 'danger') && styles.error,
+    actualState === 'error' && styles.error,
   ]
     .filter(Boolean)
     .join(' ');
@@ -192,4 +170,3 @@ export default function Input({
     </div>
   );
 }
-

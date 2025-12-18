@@ -1,34 +1,33 @@
-"use client";
+'use client';
 
-import React from "react";
-import styles from "./styles.module.css";
-import { InputHTMLAttributes } from "react";
+import React from 'react';
+import styles from './styles.module.css';
+import { InputHTMLAttributes } from 'react';
 
-export type CheckboxStatus = "unselected" | "selected" | "partial";
+export type CheckboxStatus = 'unselected' | 'selected' | 'partial';
 export type CheckboxState =
-  | "default"
-  | "hover"
-  | "press"
-  | "focus"
-  | "disabled"
-  | "error";
+  | 'default'
+  | 'hover'
+  | 'press'
+  | 'focus'
+  | 'disabled'
+  | 'error';
 
-export interface CheckboxProps
-  extends Omit<
-    InputHTMLAttributes<HTMLInputElement>,
-    "type" | "checked" | "disabled"
-  > {
+export interface CheckboxProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'type' | 'checked' | 'disabled'
+> {
   status?: CheckboxStatus;
   state?: CheckboxState;
 }
 
 export default function Checkbox({
-  status = "unselected",
-  state = "default",
-  className = "",
+  status = 'unselected',
+  state = 'default',
+  className = '',
   ...props
 }: CheckboxProps) {
-  const isDisabled = state === "disabled";
+  const isDisabled = state === 'disabled';
 
   const checkboxClasses = [
     styles.checkbox,
@@ -38,14 +37,14 @@ export default function Checkbox({
     className,
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     if (inputRef.current) {
-      inputRef.current.indeterminate = status === "partial";
-      inputRef.current.checked = status === "selected";
+      inputRef.current.indeterminate = status === 'partial';
+      inputRef.current.checked = status === 'selected';
     }
   }, [status]);
 
@@ -55,25 +54,27 @@ export default function Checkbox({
         ref={inputRef}
         type="checkbox"
         className={styles.input}
-        checked={status === "selected"}
+        checked={status === 'selected'}
         disabled={isDisabled}
         {...props}
       />
       <div
         className={`${styles.checkboxWrapper} ${
-          state === "focus" && (status === "selected" || status === "partial")
+          state === 'focus' && (status === 'selected' || status === 'partial')
             ? styles.hasFocusRing
-            : ""
-        }`}>
+            : ''
+        }`}
+      >
         <span className={checkboxClasses}>
-          {status === "selected" && (
+          {status === 'selected' && (
             <svg
               className={styles.icon}
               width="12"
               height="12"
               viewBox="0 0 12 12"
               fill="none"
-              xmlns="http://www.w3.org/2000/svg">
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path
                 d="M10 3L4.5 8.5L2 6"
                 stroke="currentColor"
@@ -83,14 +84,15 @@ export default function Checkbox({
               />
             </svg>
           )}
-          {status === "partial" && (
+          {status === 'partial' && (
             <svg
               className={styles.icon}
               width="12"
               height="12"
               viewBox="0 0 12 12"
               fill="none"
-              xmlns="http://www.w3.org/2000/svg">
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path
                 d="M3 6H9"
                 stroke="currentColor"
@@ -104,3 +106,4 @@ export default function Checkbox({
     </label>
   );
 }
+

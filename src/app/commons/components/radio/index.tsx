@@ -13,8 +13,10 @@ export type RadioState =
   | 'disabled'
   | 'error';
 
-export interface RadioProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'checked'> {
+export interface RadioProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'type' | 'checked'
+> {
   status?: RadioStatus;
   state?: RadioState;
   checked?: boolean;
