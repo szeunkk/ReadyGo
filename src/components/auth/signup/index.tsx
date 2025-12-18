@@ -27,6 +27,7 @@ export default function Signup() {
               iconLeft="envelope"
               iconSize={20}
               iconLeftColor="var(--color-icon-interactive-secondary)"
+              gap={8}
               className={styles.input}
             />
             <Input
@@ -40,6 +41,7 @@ export default function Signup() {
               iconSize={20}
               iconLeftColor="var(--color-icon-interactive-secondary)"
               iconRightColor="var(--color-icon-interactive-secondary)"
+              gap={8}
               className={styles.input}
             />
             <Input
@@ -53,6 +55,7 @@ export default function Signup() {
               iconSize={20}
               iconLeftColor="var(--color-icon-interactive-secondary)"
               iconRightColor="var(--color-icon-interactive-secondary)"
+              gap={8}
               className={styles.input}
             />
           </div>
@@ -130,7 +133,7 @@ export default function Signup() {
         </div>
 
         <div className={styles.loginLink}>
-          <span className={styles.loginText}>아직 계정이 없다면?</span>
+          <span className={styles.loginText}>이미 계정이 있다면?</span>
           <button className={styles.loginButtonLink} type="button">
             로그인 하기
           </button>
