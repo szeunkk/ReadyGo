@@ -3,7 +3,7 @@
   background-color: var(--color-bg-secondary);
   border-radius: 24px;
   padding: 32px;
-  width: 100%;
+  width: 396px;
   display: flex;
   flex-direction: column;
 }
@@ -91,9 +91,9 @@
 /* 매칭률 값 */
 .matchRateValue {
   font-family: var(--typo-body-lg-font-family);
-  font-size: var(--typo-body-lg-font-size);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--typo-body-lg-line-height);
+  font-size: var(--typo-body-lg-medium-font-size);
+  font-weight: var(--typo-body-lg-medium-font-weight);
+  line-height: var(--typo-body-lg-medium-line-height);
   color: var(--color-text-interactive-primary);
   text-align: center;
   white-space: nowrap;
