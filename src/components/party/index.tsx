@@ -59,7 +59,16 @@ export default function Party() {
             </Button>
           </div>
         </div>
-        <div className={styles.mainArea}>메인 영역</div>
+        <div className={styles.mainArea}>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div key={index} className={styles.card}>
+              <div className={styles.cardTitle}>title</div>
+              <div className={styles.cardPartyMember}>party-member</div>
+              <div className={styles.cardCategory}>category</div>
+              <div className={styles.cardButton}>button</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

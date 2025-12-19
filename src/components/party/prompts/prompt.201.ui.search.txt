@@ -45,3 +45,7 @@
                 - 검색바: <Searchbar />
                 - 새 파티 만들기: <Button />
 
+==============================================
+
+1차 추가사항) 구현될 컴포넌트 피그마링크(card) : @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2590-66084&m=dev
+        

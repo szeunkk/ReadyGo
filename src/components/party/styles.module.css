@@ -97,9 +97,61 @@
   width: 1272px;
   height: 1122px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-wrap: wrap;
   gap: 24px;
   box-sizing: border-box;
 }
 
+.card {
+  width: 624px;
+  height: 358px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-secondary, #f0f0f0);
+  border: 1px solid var(--color-border-primary, #e0e0e0);
+  box-sizing: border-box;
+}
+
+.cardTitle {
+  width: 576px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-tertiary, #e0e0e0);
+  box-sizing: border-box;
+}
+
+.cardPartyMember {
+  width: 576px;
+  height: 40px;
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-tertiary, #e0e0e0);
+  box-sizing: border-box;
+}
+
+.cardCategory {
+  width: 576px;
+  height: 72px;
+  margin-top: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-tertiary, #e0e0e0);
+  box-sizing: border-box;
+}
+
+.cardButton {
+  width: 576px;
+  height: 48px;
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-tertiary, #e0e0e0);
+  box-sizing: border-box;
+}
