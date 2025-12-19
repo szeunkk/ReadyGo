@@ -35,7 +35,9 @@ const QUESTIONS: Question[] = [
 
 export default function QuestionList() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
+  const [selectedAnswers, setSelectedAnswers] = useState<
+    Record<number, number>
+  >({});
 
   const totalSteps = 10;
   const [currentQuestion] = QUESTIONS; // 현재는 첫 질문만
@@ -90,10 +92,12 @@ export default function QuestionList() {
           <div className={styles.progressSection}>
             <div className={styles.progressHeader}>
               <span className={styles.progressLabel}>진행률</span>
-              <span className={styles.progressPercentage}>{progressPercentage}%</span>
+              <span className={styles.progressPercentage}>
+                {progressPercentage}%
+              </span>
             </div>
             <div className={styles.progressBarWrapper}>
-              <div 
+              <div
                 className={styles.progressBar}
                 style={{ width: `${progressWidth}%` }}
               />
@@ -107,11 +111,13 @@ export default function QuestionList() {
         {/* 질문 카드 헤더 */}
         <div className={styles.questionCardHeader}>
           <div className={styles.statusDots}>
-            {currentStep > 1 && <div className={styles.dotPast} />}
-            {currentStep > 0 && <div className={styles.dotCurrent} />}
-            {currentStep < totalSteps && <div className={styles.dotFuture} />}
+            <div className={styles.dotDark} />
+            <div className={styles.dotMedium} />
+            <div className={styles.dotLight} />
           </div>
-          <span className={styles.questionNumber}>Q{String(currentStep).padStart(2, '0')}</span>
+          <span className={styles.questionNumber}>
+            Q{String(currentStep).padStart(2, '0')}
+          </span>
         </div>
 
         {/* 질문 본문 */}
@@ -136,10 +142,10 @@ export default function QuestionList() {
         {/* 질문 카드 푸터 (팩맨 진행률) */}
         <div className={styles.questionCardFooter}>
           <div className={styles.pacmanProgress}>
-            <div 
+            <div
               className={styles.pacmanIcon}
-              style={{ 
-                transform: `translateX(${pacmanPosition * 21}px)` 
+              style={{
+                transform: `translateX(${pacmanPosition * 21}px)`,
               }}
             >
               <Image
@@ -180,4 +186,3 @@ export default function QuestionList() {
     </div>
   );
 }
-

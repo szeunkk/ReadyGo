@@ -145,7 +145,7 @@
   height: 8px;
 }
 
-.dotPast {
+.dotDark {
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -153,14 +153,14 @@
   opacity: 0.686;
 }
 
-.dotCurrent {
+.dotMedium {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--color-bg-interactive-primary-hover);
 }
 
-.dotFuture {
+.dotLight {
   width: 8px;
   height: 8px;
   border-radius: 50%;
