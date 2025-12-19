@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './styles.module.css';
 
 interface Answer {
@@ -39,12 +39,22 @@ const QUESTIONS: Question[] = [
 export default function QuestionList({
   onAnswerSelect,
   selectedAnswer,
+  currentStep,
 }: QuestionListProps) {
   const [currentQuestion] = QUESTIONS; // 현재는 첫 질문만
+  const [clickedAnswer, setClickedAnswer] = useState<number | null>(null);
+
+  // 질문이 바뀌면 클릭 상태 초기화
+  useEffect(() => {
+    setClickedAnswer(null);
+  }, [currentStep]);
 
   const handleAnswerSelect = (answerId: number) => {
+    // 클릭하는 즉시 로컬 상태 업데이트 (선택 효과 표시)
+    setClickedAnswer(answerId);
+
     if (onAnswerSelect) {
-      // 부모로부터 받은 콜백 실행 (자동 다음 단계로 이동)
+      // 300ms 후에 부모로 전달하여 다음 단계로 이동
       setTimeout(() => {
         onAnswerSelect(answerId);
       }, 300);
@@ -58,7 +68,9 @@ export default function QuestionList({
       {/* 답변 옵션들 */}
       <div className={styles.answersWrapper}>
         {currentQuestion.answers.map((answer) => {
-          const isSelected = selectedAnswer === answer.id;
+          // 클릭한 답변이거나 이전에 선택된 답변이면 선택 상태로 표시
+          const isSelected =
+            clickedAnswer === answer.id || selectedAnswer === answer.id;
           return (
             <button
               key={answer.id}
