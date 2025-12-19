@@ -54,7 +54,8 @@ export type IconName =
   | 'trophy'
   | 'user'
   | 'warning'
-  | 'x';
+  | 'x'
+  | 'readygo-fox';
 
 export interface IconProps {
   name: IconName;
@@ -1007,6 +1008,118 @@ const icons: Record<IconName, React.FC<{ className?: string }>> = {
         d="M9.87969 12.71L4.92969 17.66L6.33969 19.07L9.16969 16.24L11.9997 13.41L14.1197 15.54L17.6597 19.07L19.0697 17.66L14.1197 12.71L13.4097 12L19.0697 6.34L17.6597 4.93L11.9997 10.59L6.33969 4.93L4.92969 6.34L10.5897 12L9.87969 12.71Z"
         fill="currentColor"
       />
+    </svg>
+  ),
+  'readygo-fox': ({ className }) => (
+    <svg
+      width="40"
+      height="40"
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M21.333 37.334H20V36H19.334V26.667H21.333V37.334Z"
+        fill="currentColor"
+      />
+      <path
+        d="M19.334 36H18.667V34.667H17.334V26.667H19.334V36Z"
+        fill="currentColor"
+      />
+      <path
+        d="M17.333 33.334H15.334V26.667H17.334L17.333 33.334Z"
+        fill="currentColor"
+      />
+      <path
+        d="M14 26H14.667V26.667H15.334L15.333 32.667H14V31.334H13.334V25.333H14V26Z"
+        fill="currentColor"
+      />
+      <path
+        d="M23.333 28.667H22.667V32.667H21.334L21.333 26.667H22.667V22.667H21.334V19.333H23.333V28.667Z"
+        fill="currentColor"
+      />
+      <path
+        d="M13.334 31.334H12V30H11.334V22.667H13.333L13.334 31.334Z"
+        fill="currentColor"
+      />
+      <path
+        d="M11.334 30H10.667V28.667H9.33398V22.667H11.334V30Z"
+        fill="currentColor"
+      />
+      <path
+        d="M7.33301 27.334H6.66699V26.667H6V25.334H5.33398V22.667H6V21.334H5.33398V19.333H6V18H6.66699V13.333H7.33301V27.334Z"
+        fill="currentColor"
+      />
+      <path
+        d="M9.33301 15.334H8V21.333H9.33301V27.334H7.33301V13.333H8V10H9.33301V15.334Z"
+        fill="currentColor"
+      />
+      <path
+        d="M25.333 26.667H24.667V27.334H23.334V4.66699H24.667V3.33301H25.333V26.667Z"
+        fill="currentColor"
+      />
+      <path
+        d="M26 13.333H27.333V26.667H25.333V3.33301H26V13.333Z"
+        fill="currentColor"
+      />
+      <path
+        d="M28.667 18H29.333V26.667H27.333L27.334 15.333H28.667V18Z"
+        fill="currentColor"
+      />
+      <path
+        d="M31.333 26.667H29.333L29.334 19.333H31.333V26.667Z"
+        fill="currentColor"
+      />
+      <path
+        d="M33.333 25.334H32V26.667H31.333V19.333H33.333V25.334Z"
+        fill="currentColor"
+      />
+      <path
+        d="M5.33398 25.334H3.33398V24H4.66699V22.667H5.33398V25.334Z"
+        fill="currentColor"
+      />
+      <path
+        d="M16.667 10H17.333V25.334H15.334V21.333H16.667V15.334H15.334V8.66699H16.667V10Z"
+        fill="currentColor"
+      />
+      <path d="M19.333 25.334H17.333V10H19.333V25.334Z" fill="currentColor" />
+      <path
+        d="M21.334 22.667H20V25.334H19.333V10H20V8.66699H21.333L21.334 22.667Z"
+        fill="currentColor"
+      />
+      <path d="M15.333 24H14V22.667H15.333V24Z" fill="currentColor" />
+      <path
+        d="M35.333 22.667H34.667V24H33.334V20.667H35.333V22.667Z"
+        fill="currentColor"
+      />
+      <path
+        d="M5.33398 21.334H3.33398V20.667H4.66699V19.333H5.33398V21.334Z"
+        fill="currentColor"
+      />
+      <path
+        d="M11.333 21.334H10.667V15.333H11.333V21.334Z"
+        fill="currentColor"
+      />
+      <path
+        d="M13.333 21.334H11.333V15.333H13.333V21.334Z"
+        fill="currentColor"
+      />
+      <path d="M14 21.334H13.333V15.333H14V21.334Z" fill="currentColor" />
+      <path
+        d="M23.333 16.667H21.334V7.33301H22.667V6H23.333V16.667Z"
+        fill="currentColor"
+      />
+      <path
+        d="M11.333 14.667H9.33398V7.33301H10.667V4.66699H11.333V14.667Z"
+        fill="currentColor"
+      />
+      <path
+        d="M13.333 10.667H12V14.667H11.333V4.66699H12V3.33301H13.333V10.667Z"
+        fill="currentColor"
+      />
+      <path d="M15.333 14.667H14V10.667H15.333V14.667Z" fill="currentColor" />
+      <path d="M14 6H15.333V10H13.334V4.66699H14V6Z" fill="currentColor" />
     </svg>
   ),
 };

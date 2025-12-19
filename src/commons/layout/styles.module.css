@@ -1,0 +1,231 @@
+.container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 80px;
+  height: 100vh;
+  flex-shrink: 0;
+  background-color: var(--color-bg-primary);
+  border-right: 1px solid var(--color-border-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding: 16px 0;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  padding: 4px 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoIcon {
+  color: var(--color-bg-interactive-primary);
+}
+
+.sidebarContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  min-height: 0;
+}
+
+.navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+  width: 40px;
+}
+
+.navButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--color-text-interactive-secondary);
+  transition: all 0.2s ease;
+}
+
+.navButton:hover {
+  color: var(--color-text-interactive-secondary-hover);
+}
+
+.navButtonIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 16.4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.navIcon {
+  color: var(--color-icon-interactive-secondary);
+}
+
+.navButton:hover .navIcon {
+  color: var(--color-icon-interactive-secondary-hover);
+}
+
+.navButton.active .navButtonIcon {
+  background-color: var(--color-transparent-16);
+}
+
+.navButton.active .navIcon {
+  color: var(--color-icon-interactive-primary);
+}
+
+.navButton.active:hover .navIcon {
+  color: var(--color-icon-interactive-primary-hover);
+}
+
+.navButton.active {
+  color: var(--color-text-interactive-secondary-pressed);
+}
+
+.navButtonLabel {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  font-weight: var(--font-weight-regular);
+  white-space: nowrap;
+}
+
+.navButton.active .navButtonLabel {
+  font-weight: var(--font-weight-medium);
+}
+
+.menuButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+  width: 40px;
+}
+
+.menuButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 16.4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.menuButtonIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge {
+  --badge-size: 4px;
+  position: absolute;
+  top: calc(var(--badge-size) * -0.5);
+  right: 0;
+  width: var(--badge-size);
+  height: var(--badge-size);
+  border-radius: 50%;
+  background-color: var(--color-bg-interactive-primary);
+}
+
+/* Main Content Styles */
+.main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Header Styles */
+.header {
+  width: 100%;
+  height: 80px;
+  flex-shrink: 0;
+  background-color: var(--color-bg-primary);
+  border-bottom: 1px solid var(--color-border-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.themeButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 16.4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.themeIcon {
+  color: var(--color-icon-interactive-secondary);
+  transition: color 0.2s ease;
+}
+
+.themeIcon:hover {
+  color: var(--color-icon-interactive-secondary-hover);
+}
+
+.themeIcon:pressed {
+  color: var(--color-icon-interactive-secondary-pressed);
+}
+
+.userAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--color-bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-icon-interactive-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.userAvatar:hover {
+  opacity: 0.8;
+}
+
+/* Children Styles */
+.children {
+  flex: 1;
+  overflow: auto;
+}

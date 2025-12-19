@@ -124,8 +124,10 @@ export default function Selectbox({
     .filter(Boolean)
     .join(' ');
 
+  const wrapperClasses = [styles.wrapper, className].filter(Boolean).join(' ');
+
   return (
-    <div className={styles.wrapper} ref={selectboxRef}>
+    <div className={wrapperClasses} ref={selectboxRef}>
       {label && (
         <label className={styles.label}>
           {label}
