@@ -2,7 +2,7 @@
 
 /**
  * ModalProvider 사용 예제
- * 
+ *
  * 이 파일은 중첩 모달 기능을 테스트하기 위한 예제입니다.
  * 실제 프로젝트에서는 필요에 따라 삭제하거나 참고용으로 사용하세요.
  */
@@ -76,7 +76,8 @@ export function ModalExample() {
     openModal({
       variant: 'single',
       title: '세 번째 모달',
-      description: '최종 모달입니다. ESC 키를 누르거나 배경을 클릭하면 닫힙니다.',
+      description:
+        '최종 모달입니다. ESC 키를 누르거나 배경을 클릭하면 닫힙니다.',
       confirmText: '완료',
       onConfirm: () => {
         console.log('중첩 모달 완료');
@@ -116,26 +117,32 @@ export function ModalExample() {
     <div style={{ padding: '20px' }}>
       <h1>Modal Provider 테스트</h1>
       <p>현재 열린 모달 수: {modalCount}</p>
-      
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
-        <button onClick={handleSingleModal}>
-          단일 버튼 모달 열기
-        </button>
-        
-        <button onClick={handleDualModal}>
-          이중 버튼 모달 열기
-        </button>
-        
-        <button onClick={handleNestedModal1}>
-          중첩 모달 열기 (3단계)
-        </button>
-        
-        <button onClick={handleMultipleModals}>
-          여러 모달 동시에 열기
-        </button>
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+          marginTop: '20px',
+        }}
+      >
+        <button onClick={handleSingleModal}>단일 버튼 모달 열기</button>
+
+        <button onClick={handleDualModal}>이중 버튼 모달 열기</button>
+
+        <button onClick={handleNestedModal1}>중첩 모달 열기 (3단계)</button>
+
+        <button onClick={handleMultipleModals}>여러 모달 동시에 열기</button>
       </div>
 
-      <div style={{ marginTop: '30px', padding: '15px', background: '#f5f5f5', borderRadius: '8px' }}>
+      <div
+        style={{
+          marginTop: '30px',
+          padding: '15px',
+          background: '#f5f5f5',
+          borderRadius: '8px',
+        }}
+      >
         <h3>사용 방법</h3>
         <ul>
           <li>ESC 키를 누르면 가장 최근에 열린 모달이 닫힙니다.</li>
@@ -147,4 +154,3 @@ export function ModalExample() {
     </div>
   );
 }
-

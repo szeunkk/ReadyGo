@@ -121,15 +121,26 @@ export const ManyItems: Story = {
 // 모든 사이즈 비교
 export const AllSizes: Story = {
   render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', width: '400px' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '40px',
+        width: '400px',
+      }}
+    >
       <div>
-        <h3 style={{ marginBottom: '12px', fontSize: '14px', color: '#31323a' }}>
+        <h3
+          style={{ marginBottom: '12px', fontSize: '14px', color: '#31323a' }}
+        >
           Size: s
         </h3>
         <BarChart data={defaultData} size="s" />
       </div>
       <div>
-        <h3 style={{ marginBottom: '12px', fontSize: '14px', color: '#31323a' }}>
+        <h3
+          style={{ marginBottom: '12px', fontSize: '14px', color: '#31323a' }}
+        >
           Size: m
         </h3>
         <BarChart data={defaultData} size="m" />
@@ -179,4 +190,3 @@ export const GamePlayPattern: Story = {
     },
   },
 };
-

@@ -1,0 +1,53 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @02-wireframe.mdc
+            - @03-ui.mdc
+
+==============================================
+
+조건-피그마) 활용할MCP: 피그마MCP
+조건-피그마) 구현될 컴포넌트 피그마링크(card): https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2590-66084&m=dev
+조건-피그마) 구현될 컴포넌트 피그마링크(title): https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2590-66087&m=dev
+조건-피그마) 구현될 컴포넌트 피그마링크(party-member): https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2590-66094&m=dev
+조건-피그마) 구현될 컴포넌트 피그마링크(category): https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2590-66112&m=dev
+조건-피그마) 구현될 컴포넌트 피그마링크(button): https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2590-66146&m=dev
+
+
+조건-파일경로) 구현될 TSX 파일경로: src/components/party/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/party/styles.module.css
+
+==============================================
+
+조건-공통목록) 사용할 공통컴포넌트 목록
+            - <Tag />, <Button />
+
+조건-공통목록) 사용할 색상 목록(global.css에 명시된 변수 토큰 활용)
+            - 비슷한 토큰 선택하여 사용(하드코딩 금지)
+
+조건-공통목록) 사용할 타이포그래피 목록(global.css에 명시된 변수 토큰 활용)
+            - 비슷한 토큰 선택하여 사용(하드코딩 금지)
+
+==============================================
+
+핵심요구사항) 카드는 아래의 조건으로 Mock 데이터를 만들어 적용할 것.
+                - title: 텍스트는 피그마와 동일하게 구현할 것.
+                - party-member: 좌측 아바타 아이콘은 public/icons/avatar 경로를 참고하여 목업할 것.
+                - category: 텍스트는 피그마와 동일하게 구현할 것.
+                - button: 텍스트는 피그마와 동일하게 구현할 것.
+
+핵심요구사항) 공통컴포넌트는 다음의 규칙을 지켜 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+            1. 공통컴포넌트 원본을 수정하지 말고, 아래의 props만 활용할 것.
+                - variant: primary, secondary를 확인하여 구현할 것.
+                - theme: dark 모드만 사용할 것.
+                - size: 피그마와 일치할 것.
+                - className 전달: width만 허용할 것.
+
+            2. 적용될 공통컴포넌트 목록을 구현할 것.
+                - title: <tag />
+                - 참여하기: <Button />
+
