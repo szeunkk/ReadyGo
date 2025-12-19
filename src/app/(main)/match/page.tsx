@@ -1,5 +1,5 @@
-import { MatchPage } from '@/components/match';
+import { Match } from '@/components/match';
 
-export default function Page() {
-  return <MatchPage />;
+export default function MatchPage() {
+  return <Match />;
 }
