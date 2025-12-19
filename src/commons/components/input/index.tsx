@@ -3,7 +3,7 @@
 import React from 'react';
 import styles from './styles.module.css';
 import { InputHTMLAttributes } from 'react';
-import Image from 'next/image';
+import Icon, { IconName } from '@/commons/components/icon';
 
 export type InputVariant = 'primary' | 'secondary';
 export type InputState =
@@ -26,11 +26,15 @@ export interface InputProps extends Omit<
   label?: React.ReactNode;
   additionalInfo?: React.ReactNode;
   required?: boolean;
-  iconLeft?: string;
-  iconRight?: string;
+  iconLeft?: IconName;
+  iconRight?: IconName;
   iconSize?: 14 | 16 | 20 | 24 | 32 | 40;
-  labelIcon?: string;
-  additionalInfoIcon?: string;
+  iconLeftColor?: string;
+  iconRightColor?: string;
+  labelIcon?: IconName;
+  labelIconColor?: string;
+  additionalInfoIcon?: IconName;
+  additionalInfoIconColor?: string;
   gap?: number;
 }
 
@@ -44,8 +48,12 @@ export default function Input({
   iconLeft,
   iconRight,
   iconSize = 20,
+  iconLeftColor,
+  iconRightColor,
   labelIcon,
+  labelIconColor,
   additionalInfoIcon,
+  additionalInfoIconColor,
   gap = 4,
   className = '',
   disabled,
@@ -108,12 +116,11 @@ export default function Input({
       {label && (
         <div className={labelClasses} style={{ gap: `${gap}px` }}>
           {labelIcon && (
-            <Image
-              src={`/icons/size=${iconSize}.svg`}
-              alt=""
-              width={iconSize}
-              height={iconSize}
+            <Icon
+              name={labelIcon}
+              size={iconSize}
               className={styles.labelIcon}
+              style={labelIconColor ? { color: labelIconColor } : undefined}
             />
           )}
           <span className={styles.labelText}>{label}</span>
@@ -123,12 +130,11 @@ export default function Input({
       <div className={inputClasses}>
         <div className={styles.inputContent} style={{ gap: `${gap}px` }}>
           {iconLeft && (
-            <Image
-              src={`/icons/size=${iconSize}.svg`}
-              alt=""
-              width={iconSize}
-              height={iconSize}
+            <Icon
+              name={iconLeft}
+              size={iconSize}
               className={styles.inputIcon}
+              style={iconLeftColor ? { color: iconLeftColor } : undefined}
             />
           )}
           <div className={styles.inputTextContainer}>
@@ -143,12 +149,11 @@ export default function Input({
             />
           </div>
           {iconRight && (
-            <Image
-              src={`/icons/size=${iconSize}.svg`}
-              alt=""
-              width={iconSize}
-              height={iconSize}
+            <Icon
+              name={iconRight}
+              size={iconSize}
               className={styles.inputIcon}
+              style={iconRightColor ? { color: iconRightColor } : undefined}
             />
           )}
         </div>
@@ -156,12 +161,15 @@ export default function Input({
       {additionalInfo && (
         <div className={additionalInfoClasses} style={{ gap: `${gap}px` }}>
           {additionalInfoIcon && (
-            <Image
-              src={`/icons/size=${iconSize}.svg`}
-              alt=""
-              width={iconSize}
-              height={iconSize}
+            <Icon
+              name={additionalInfoIcon}
+              size={iconSize}
               className={styles.additionalInfoIcon}
+              style={
+                additionalInfoIconColor
+                  ? { color: additionalInfoIconColor }
+                  : undefined
+              }
             />
           )}
           <span className={styles.additionalInfoText}>{additionalInfo}</span>

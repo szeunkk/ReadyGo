@@ -61,6 +61,7 @@ export interface IconProps {
   name: IconName;
   size?: number;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 const icons: Record<IconName, React.FC<{ className?: string }>> = {
@@ -1123,7 +1124,12 @@ const icons: Record<IconName, React.FC<{ className?: string }>> = {
   ),
 };
 
-export default function Icon({ name, size = 20, className }: IconProps) {
+export default function Icon({
+  name,
+  size = 20,
+  className,
+  style,
+}: IconProps) {
   const IconComponent = icons[name];
 
   if (!IconComponent) {
@@ -1139,6 +1145,7 @@ export default function Icon({ name, size = 20, className }: IconProps) {
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
+        ...style,
       }}
       className={className}
     >

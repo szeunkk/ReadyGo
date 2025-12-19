@@ -85,6 +85,7 @@
 
 .inputIcon {
   flex-shrink: 0;
+  color: var(--color-icon-primary);
 }
 
 .cursor {
@@ -113,6 +114,7 @@
 
 .labelIcon {
   flex-shrink: 0;
+  color: var(--color-icon-primary);
 }
 
 .labelText {
@@ -150,6 +152,7 @@
 
 .additionalInfoIcon {
   flex-shrink: 0;
+  color: var(--color-icon-primary);
 }
 
 .additionalInfoText {
@@ -207,6 +210,11 @@
   color: var(--color-text-disabled);
 }
 
+.variant-primary.state-disabled .inputIcon,
+.disabled .inputIcon {
+  color: var(--color-icon-disabled);
+}
+
 /* Secondary Variant */
 .variant-secondary {
   background-color: transparent;
@@ -248,13 +256,13 @@
   color: var(--color-text-disabled);
 }
 
+.variant-secondary.state-disabled .inputIcon {
+  color: var(--color-icon-disabled);
+}
+
 /* Disabled State - Placeholder */
 .variant-primary.state-disabled .inputField::placeholder,
 .variant-secondary.state-disabled .inputField::placeholder,
 .disabled .inputField::placeholder {
   color: var(--color-text-disabled);
 }
-
-
-
-
