@@ -6,55 +6,14 @@ import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
 import Image from 'next/image';
 
-interface Answer {
-  id: number;
-  text: string;
+interface QuestionProps {
+  children: React.ReactNode;
 }
 
-interface Question {
-  id: number;
-  question: string;
-  answers: Answer[];
-}
-
-// 임시 질문 데이터 (실제로는 props나 API에서 받아올 것)
-const QUESTIONS: Question[] = [
-  {
-    id: 1,
-    question: '게임할 때 더 편한 방식은?',
-    answers: [
-      { id: 1, text: '완전 혼자서 플레이하는 걸 선호함' },
-      { id: 2, text: '혼자 플레이가 편하지만 파티도 가끔 함' },
-      { id: 3, text: '둘 다 상관없음' },
-      { id: 4, text: '팀 플레이가 더 즐거움' },
-      { id: 5, text: '팀원과 협력하는 플레이가 핵심이라고 생각함' },
-    ],
-  },
-  // 추가 질문들은 나중에 채워넣을 것
-];
-
-export default function QuestionList() {
+export default function Question({ children }: QuestionProps) {
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedAnswers, setSelectedAnswers] = useState<
-    Record<number, number>
-  >({});
 
   const totalSteps = 10;
-  const [currentQuestion] = QUESTIONS; // 현재는 첫 질문만
-
-  const handleAnswerSelect = (answerId: number) => {
-    setSelectedAnswers({
-      ...selectedAnswers,
-      [currentStep]: answerId,
-    });
-
-    // 자동으로 다음 단계로
-    if (currentStep < totalSteps) {
-      setTimeout(() => {
-        setCurrentStep(currentStep + 1);
-      }, 300);
-    }
-  };
 
   const handlePrevious = () => {
     if (currentStep > 1) {
@@ -64,6 +23,12 @@ export default function QuestionList() {
 
   const handleBack = () => {
     // 뒤로가기 로직 (실제 구현 시 router.back() 등 사용)
+  };
+
+  const handleNext = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
+    }
   };
 
   const progressPercentage = Math.round((currentStep / totalSteps) * 100);
@@ -120,24 +85,10 @@ export default function QuestionList() {
           </span>
         </div>
 
-        {/* 질문 본문 */}
-        <div className={styles.questionBody}>
-          <h2 className={styles.questionText}>{currentQuestion.question}</h2>
-
-          {/* 답변 옵션들 */}
-          <div className={styles.answersWrapper}>
-            {currentQuestion.answers.map((answer) => (
-              <button
-                key={answer.id}
-                className={styles.answerButton}
-                onClick={() => handleAnswerSelect(answer.id)}
-              >
-                <div className={styles.answerNumber}>{answer.id}</div>
-                <span className={styles.answerText}>{answer.text}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* 질문 본문 (children으로 교체 가능) */}
+        {React.cloneElement(children as React.ReactElement, {
+          onAnswerSelect: handleNext,
+        })}
 
         {/* 질문 카드 푸터 (팩맨 진행률) */}
         <div className={styles.questionCardFooter}>
@@ -186,3 +137,4 @@ export default function QuestionList() {
     </div>
   );
 }
+
