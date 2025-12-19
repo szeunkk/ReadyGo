@@ -1,3 +1,2 @@
 // components/home/index.ts
-export { default as HomePage } from './homePage';
-
+export { default as Home } from './homePage';

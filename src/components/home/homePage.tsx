@@ -121,7 +121,7 @@ const mockProfileData = {
   ],
 };
 
-export default function HomePage() {
+export default function Home() {
   return (
     <div className={styles.container}>
       {/* 왼쪽 컨텐츠 영역 */}
