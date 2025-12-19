@@ -4,7 +4,7 @@ import React from 'react';
 import styles from './styles.module.css';
 import MatchList from './ui/match-list/matchList';
 
-export default function MatchPage() {
+export default function Match() {
   return (
     <div className={styles.container}>
       {/* 헤더 섹션 */}
