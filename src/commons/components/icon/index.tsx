@@ -53,6 +53,7 @@ export type IconName =
   | 'time'
   | 'trophy'
   | 'user'
+  | 'userprofile'
   | 'warning'
   | 'x'
   | 'readygo-fox';
@@ -980,6 +981,21 @@ const icons: Record<IconName, React.FC<{ className?: string }>> = {
       />
     </svg>
   ),
+  userprofile: ({ className }) => (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M12 2C10.6739 2 9.40215 2.52678 8.46447 3.46447C7.52678 4.40215 7 5.67392 7 7C7 8.32608 7.52678 9.59785 8.46447 10.5355C9.40215 11.4732 10.6739 12 12 12C13.3261 12 14.5979 11.4732 15.5355 10.5355C16.4732 9.59785 17 8.32608 17 7C17 5.67392 16.4732 4.40215 15.5355 3.46447C14.5979 2.52678 13.3261 2 12 2ZM4 22H20C20.55 22 21 21.55 21 21V20C21 16.14 17.86 13 14 13H10C6.14 13 3 16.14 3 20V21C3 21.55 3.45 22 4 22Z"
+        fill="currentColor"
+      />
+    </svg>
+  ),
   warning: ({ className }) => (
     <svg
       width="24"
@@ -1124,12 +1140,7 @@ const icons: Record<IconName, React.FC<{ className?: string }>> = {
   ),
 };
 
-export default function Icon({
-  name,
-  size = 20,
-  className,
-  style,
-}: IconProps) {
+export default function Icon({ name, size = 20, className, style }: IconProps) {
   const IconComponent = icons[name];
 
   if (!IconComponent) {

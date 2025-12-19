@@ -1,0 +1,251 @@
+/* 컨테이너 */
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 408px;
+  height: 100%;
+  background: var(--color-bg-primary);
+  border-right: 1px solid var(--color-border-secondary);
+  padding: 32px 24px;
+  gap: 24px;
+}
+
+/* 헤더 */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--typo-heading-lg-font-family);
+  font-size: var(--typo-heading-lg-font-size);
+  line-height: var(--typo-heading-lg-line-height);
+  font-weight: var(--typo-heading-lg-font-weight);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* 리스트 래퍼 */
+.listWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  overflow-x: visible;
+  flex: 1;
+  padding: 1px; /* border가 잘리지 않도록 상하좌우 여백 추가 */
+}
+
+/* 채팅 아이템 */
+.chatItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid transparent; /* 기본 상태에서도 border 공간 확보 */
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-sizing: border-box;
+}
+
+/* 선택된 상태 - hover보다 먼저 정의하여 우선순위 확보 */
+.chatItem.selected {
+  border-radius: 8px;
+  border: 1px solid var(--color-border-primary);
+  background: var(--color-bg-secondary);
+}
+
+.chatItem.selected:hover {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+}
+
+/* hover는 selected가 아닐 때만 적용 */
+.chatItem:not(.selected):hover {
+  background: var(--color-bg-interactive-teritiary-hover);
+}
+
+/* 차단된 유저 */
+.chatItem.blocked {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* 채팅 아이템 콘텐츠 */
+.chatItemContent {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.avatarWrapper {
+  flex-shrink: 0;
+}
+
+/* 텍스트 블록 */
+.textBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+}
+
+.roomName {
+  font-family: var(--typo-body-lg-medium-font-family);
+  font-size: var(--typo-body-lg-medium-font-size);
+  line-height: var(--typo-body-lg-medium-line-height);
+  font-weight: var(--typo-body-lg-medium-font-weight);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roomName.unread {
+  font-weight: var(--font-weight-semibold);
+}
+
+.messageRow {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.lastMessage {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-font-weight);
+  color: var(--color-text-interactive-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 메타 블록 */
+.metaBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.timeRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.messageTime {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  font-weight: var(--typo-body-sm-font-weight);
+  color: var(--color-text-interactive-secondary);
+  white-space: nowrap;
+}
+
+.badgeRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 읽지 않은 메시지 뱃지 */
+.unreadBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--color-bg-interactive-primary);
+  border-radius: 9999px;
+}
+
+.unreadBadge span {
+  font-family: var(--typo-body-sm-medium-font-family);
+  font-size: var(--typo-body-sm-medium-font-size);
+  line-height: var(--typo-body-sm-medium-line-height);
+  font-weight: var(--typo-body-sm-medium-font-weight);
+  color: var(--color-text-interactive-inverse);
+  text-align: center;
+}
+
+/* 빈 상태 */
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 40px 20px;
+}
+
+.emptyText {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-font-weight);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+/* 반응형 (모바일) */
+@media (max-width: 480px) {
+  .container {
+    padding: 24px 16px;
+    gap: 16px;
+  }
+
+  .header {
+    padding: 0 8px;
+  }
+
+  .title {
+    font-size: var(--typo-heading-md-font-size);
+    line-height: var(--typo-heading-md-line-height);
+  }
+
+  .chatItem {
+    padding: 10px;
+  }
+
+  .roomName {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .lastMessage {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .messageTime {
+    font-size: 11px;
+    line-height: 14px;
+  }
+
+  .unreadBadge {
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+  }
+
+  .unreadBadge span {
+    font-size: 11px;
+    line-height: 14px;
+  }
+}
