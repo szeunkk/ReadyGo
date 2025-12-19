@@ -13,7 +13,7 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
   align-items: center;
   width: 100%;
 }
@@ -37,8 +37,8 @@
 /* 아바타 스타일 */
 .avatar {
   background-color: var(--color-bg-primary);
-  border: 2px solid var(--color-border-secondary);
-  padding: 2px;
+  border: 3px solid var(--color-border-secondary);
+  padding: 3px;
   border-radius: 99999px;
 }
 
@@ -96,8 +96,9 @@
 .questionSection {
   width: 100%;
   display: flex;
-  justify-content: center;
-  padding: 0 8px;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
 }
 
 /* 질문 텍스트 */
@@ -107,15 +108,15 @@
   font-weight: var(--typo-body-md-font-weight);
   line-height: var(--typo-body-md-line-height);
   color: var(--color-text-secondary);
-  text-align: center;
   margin: 0;
+  white-space: nowrap;
 }
 
 /* 선호도 섹션 */
 .preferencesSection {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -123,48 +124,48 @@
 .preferenceItem {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  background-color: var(--color-bg-tertiary);
-  border-radius: 12px;
-  min-height: 40px;
+  gap: 8px;
+  padding: 6px 12px;
+  background-color: var(--color-bg-primary);
+  border-radius: 8px;
 }
 
 /* 선호도 아이콘 및 라벨 */
 .preferenceIcon {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 
-/* 아이콘 이모지 */
-.iconEmoji {
-  font-size: 16px;
-  line-height: 1;
+/* 아이콘 래퍼 */
+.iconWrapper {
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  flex-shrink: 0;
+  color: var(--color-text-interactive-primary);
 }
 
 /* 선호도 라벨 */
 .preferenceLabel {
   font-family: var(--typo-body-md-font-family);
   font-size: var(--typo-body-md-font-size);
-  font-weight: var(--typo-body-md-font-weight);
+  font-weight: var(--typo-body-md-medium-font-weight);
   line-height: var(--typo-body-md-line-height);
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   white-space: nowrap;
+  width: 80px;
 }
 
 /* 선호도 값 */
 .preferenceValue {
   font-family: var(--typo-body-md-font-family);
   font-size: var(--typo-body-md-font-size);
-  font-weight: var(--typo-body-md-medium-font-weight);
+  font-weight: var(--typo-body-md-font-weight);
   line-height: var(--typo-body-md-line-height);
-  color: var(--color-text-primary);
+  color: var(--color-text-interactive-secondary);
   white-space: nowrap;
 }
 
@@ -184,16 +185,18 @@
   }
 
   .content {
-    gap: 20px;
+    gap: 24px;
+  }
+
+  .questionSection {
+    gap: 12px;
   }
 
   .preferencesSection {
-    gap: 10px;
+    gap: 6px;
   }
 
   .preferenceItem {
     padding: 6px 10px;
-    min-height: 36px;
   }
 }
-
