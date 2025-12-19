@@ -50,24 +50,24 @@
   background: rgba(127, 253, 232, 0.12);
   border-color: #5ffce2;
   box-shadow:
-    0px 10px 15px -3px rgba(95, 252, 226, 0.2),
-    0px 4px 6px -4px rgba(95, 252, 226, 0.2);
+    0px 20px 25px -5px rgba(95, 252, 226, 0.2),
+    0px 8px 10px -6px rgba(95, 252, 226, 0.2);
 }
 
 .answerButtonSelected:hover {
   background: rgba(127, 253, 232, 0.12);
   border-color: #5ffce2;
   box-shadow:
-    0px 10px 15px -3px rgba(95, 252, 226, 0.2),
-    0px 4px 6px -4px rgba(95, 252, 226, 0.2);
+    0px 20px 25px -5px rgba(95, 252, 226, 0.2),
+    0px 8px 10px -6px rgba(95, 252, 226, 0.2);
 }
 
 .answerButtonSelected:active {
   background: rgba(127, 253, 232, 0.12);
   border-color: #5ffce2;
   box-shadow:
-    0px 10px 15px -3px rgba(95, 252, 226, 0.2),
-    0px 4px 6px -4px rgba(95, 252, 226, 0.2);
+    0px 20px 25px -5px rgba(95, 252, 226, 0.2),
+    0px 8px 10px -6px rgba(95, 252, 226, 0.2);
 }
 
 .answerNumber {
