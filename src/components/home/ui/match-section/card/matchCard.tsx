@@ -4,6 +4,7 @@ import React from 'react';
 import styles from './styles.module.css';
 import Avatar from '@/commons/components/avatar';
 import Button from '@/commons/components/button';
+import Icon, { IconName } from '@/commons/components/icon';
 
 export interface MatchCardProps {
   /**
@@ -27,13 +28,17 @@ export interface MatchCardProps {
    */
   question?: string;
   /**
-   * 게임 선호 항목들
+   * 동일 게임 선호 (예: "Valorant, Apex")
    */
-  preferences?: {
-    icon: string;
-    label: string;
-    value: string;
-  }[];
+  gamePreference?: string;
+  /**
+   * 플레이 시간대 (예: "저녁 시간대")
+   */
+  playTime?: string;
+  /**
+   * 유사한 실력대 (예: "플래티넘")
+   */
+  skillLevel?: string;
   /**
    * 프로필 보기 버튼 클릭 핸들러
    */
@@ -50,13 +55,36 @@ export default function MatchCard({
   status = 'online',
   avatarSrc,
   question = '왜 이 친구와 잘 맞나요?',
-  preferences = [],
+  gamePreference,
+  playTime,
+  skillLevel,
   onProfileClick,
   className = '',
 }: MatchCardProps) {
   const containerClasses = [styles.container, className]
     .filter(Boolean)
     .join(' ');
+
+  // 고정된 선호도 항목 설정 (MVP)
+  const preferences = [
+    {
+      icon: 'joystick-alt' as IconName,
+      label: '동일 게임 선호',
+      value: gamePreference,
+    },
+    {
+      icon: 'time' as IconName,
+      label: '플레이 시간대',
+      value: playTime,
+    },
+    {
+      icon: 'trophy' as IconName,
+      label: '유사한 실력대',
+      value: skillLevel,
+    },
+  ].filter((pref) => pref.value); // 값이 있는 항목만 표시
+
+  const hasPreferences = preferences.length > 0;
 
   return (
     <div className={containerClasses}>
@@ -85,29 +113,31 @@ export default function MatchCard({
           </div>
         </div>
 
-        {/* 질문 섹션 */}
-        {question && (
+        {/* 질문 및 선호도 섹션 */}
+        {(question || hasPreferences) && (
           <div className={styles.questionSection}>
-            <p className={styles.questionText}>{question}</p>
-          </div>
-        )}
-
-        {/* 선호도 목록 */}
-        {preferences.length > 0 && (
-          <div className={styles.preferencesSection}>
-            {preferences.map((preference, index) => (
-              <div key={index} className={styles.preferenceItem}>
-                <div className={styles.preferenceIcon}>
-                  <span className={styles.iconEmoji}>{preference.icon}</span>
-                  <span className={styles.preferenceLabel}>
-                    {preference.label}
-                  </span>
-                </div>
-                <span className={styles.preferenceValue}>
-                  {preference.value}
-                </span>
+            {question && <p className={styles.questionText}>{question}</p>}
+            {hasPreferences && (
+              <div className={styles.preferencesSection}>
+                {preferences.map((preference, index) => (
+                  <div key={index} className={styles.preferenceItem}>
+                    <div className={styles.preferenceIcon}>
+                      <Icon
+                        name={preference.icon}
+                        size={20}
+                        className={styles.iconWrapper}
+                      />
+                      <span className={styles.preferenceLabel}>
+                        {preference.label}
+                      </span>
+                    </div>
+                    <span className={styles.preferenceValue}>
+                      {preference.value}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         )}
 
@@ -125,4 +155,3 @@ export default function MatchCard({
     </div>
   );
 }
-
