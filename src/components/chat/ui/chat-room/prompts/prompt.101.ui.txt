@@ -138,3 +138,29 @@
             - [ ] 접근성 속성 포함 완료
             - [ ] @room/page.tsx에 연결 완료
 
+==============================================
+
+핵심요구사항) searchBar는 공통컴포넌트 searchbar를 import해서 사용할 것.
+
+핵심요구사항) 아바타는 공통컴포넌트의 avatar를 s 사이즈로 사용하되, status는 미표시할 것.
+
+핵심요구사항) menuButton의 아이콘은 commons/components/icon/index.tsx에서 userprofile을 import해서 피그마디자인과 동일한 사이즈와 색상을 사용할 것.
+
+핵심요구사항) message input은 공통컴포넌트를 <Input/> import해서 가져오되, border를 none으로 처리할 것. 
+            varient: primary
+            size: m
+            labe: false
+            icon_L, icon_R: false
+            additional: false
+
+핵심요구사항) send button은 공통컴포넌트 <Button/>를 import해서 가져올것.
+            varient: secondary
+            size: m 
+            shape: rectange
+            type: only
+
+조건-피그마) header 영역 https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2157-4925&m=dev
+조건-피그마) inputArea 영역 https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2157-4948&m=dev
+
+
+핵심요구사항) menuButton이 눌렸을 때, 버튼 안에 icon의 색상이 var(--color-icon-interactive-primary, #5FFCE2);

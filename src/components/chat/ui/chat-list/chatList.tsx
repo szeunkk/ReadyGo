@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Avatar from '@/commons/components/avatar';
+import { getChatRoomUrl } from '@/commons/constants/url';
 import styles from './styles.module.css';
 
 // ERD 기반 Mock 데이터 타입 정의
@@ -55,8 +57,8 @@ interface ChatListItemData {
   isBlocked: boolean;
 }
 
-// Mock 데이터 (ERD 필드명 기반)
-const mockChatRooms: ChatListItemData[] = [
+// Mock 데이터 (ERD 필드명 기반) - export하여 다른 컴포넌트에서도 사용 가능
+export const mockChatRooms: ChatListItemData[] = [
   {
     room: {
       room_id: 'room-1',
@@ -286,6 +288,7 @@ const ChatListItem = ({
   const messageTime = lastMessage
     ? formatMessageTime(lastMessage.created_at)
     : '';
+  const router = useRouter();
 
   const itemClasses = [
     styles.chatItem,
@@ -296,8 +299,11 @@ const ChatListItem = ({
     .join(' ');
 
   const handleClick = () => {
-    if (!isBlocked && onClick) {
-      onClick();
+    if (!isBlocked) {
+      if (onClick) {
+        onClick();
+      }
+      router.push(getChatRoomUrl(room.room_id));
     }
   };
 
