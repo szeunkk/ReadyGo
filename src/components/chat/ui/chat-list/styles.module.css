@@ -2,7 +2,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 408px;
   height: 100%;
   background: var(--color-bg-primary);
   border-right: 1px solid var(--color-border-secondary);
@@ -33,7 +33,9 @@
   flex-direction: column;
   gap: 12px;
   overflow-y: auto;
+  overflow-x: visible;
   flex: 1;
+  padding: 1px; /* border가 잘리지 않도록 상하좌우 여백 추가 */
 }
 
 /* 채팅 아이템 */
@@ -43,27 +45,27 @@
   justify-content: space-between;
   padding: 12px;
   border-radius: 8px;
+  border: 1px solid transparent; /* 기본 상태에서도 border 공간 확보 */
   cursor: pointer;
   transition: background-color 0.2s;
+  box-sizing: border-box;
 }
 
-.chatItem:hover {
-  background: var(--color-bg-interactive-teritiary-hover);
-}
-
-.chatItem:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--color-border-focus-ring);
-}
-
-/* 선택된 상태 */
+/* 선택된 상태 - hover보다 먼저 정의하여 우선순위 확보 */
 .chatItem.selected {
-  background: var(--color-bg-interactive-selected);
+  border-radius: 8px;
   border: 1px solid var(--color-border-primary);
+  background: var(--color-bg-secondary);
 }
 
 .chatItem.selected:hover {
-  background: var(--color-bg-interactive-selected-hover);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+}
+
+/* hover는 selected가 아닐 때만 적용 */
+.chatItem:not(.selected):hover {
+  background: var(--color-bg-interactive-teritiary-hover);
 }
 
 /* 차단된 유저 */
@@ -125,7 +127,7 @@
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);
   font-weight: var(--typo-body-md-font-weight);
-  color: var(--color-text-secondary);
+  color: var(--color-text-interactive-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -152,7 +154,7 @@
   font-size: var(--typo-body-sm-font-size);
   line-height: var(--typo-body-sm-line-height);
   font-weight: var(--typo-body-sm-font-weight);
-  color: var(--color-text-secondary);
+  color: var(--color-text-interactive-secondary);
   white-space: nowrap;
 }
 
@@ -247,4 +249,3 @@
     line-height: 14px;
   }
 }
-

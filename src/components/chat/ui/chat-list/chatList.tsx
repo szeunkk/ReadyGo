@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Avatar from '@/commons/components/avatar';
 import styles from './styles.module.css';
 
@@ -20,6 +20,7 @@ interface ChatRoomMember {
   nickname: string;
   avatar_url: string;
   joined_at: string;
+  status?: 'online' | 'away' | 'ban' | 'offline';
 }
 
 interface ChatMessage {
@@ -71,6 +72,7 @@ const mockChatRooms: ChatListItemData[] = [
         nickname: '게이머호랑이',
         avatar_url: '/images/tiger_m.svg',
         joined_at: '2024-12-19T10:00:00Z',
+        status: 'online',
       },
     ],
     lastMessage: {
@@ -99,6 +101,7 @@ const mockChatRooms: ChatListItemData[] = [
         nickname: '호쾌한망토',
         avatar_url: '/images/fox_m.svg',
         joined_at: '2024-12-19T09:00:00Z',
+        status: 'away',
       },
     ],
     lastMessage: {
@@ -127,6 +130,7 @@ const mockChatRooms: ChatListItemData[] = [
         nickname: '까칠한까마귀',
         avatar_url: '/images/raven_m.svg',
         joined_at: '2024-12-19T08:00:00Z',
+        status: 'offline',
       },
     ],
     lastMessage: {
@@ -156,6 +160,7 @@ const mockChatRooms: ChatListItemData[] = [
         nickname: '용감한사자',
         avatar_url: '/images/bear_m.svg',
         joined_at: '2024-12-19T07:00:00Z',
+        status: 'online',
       },
       {
         member_id: 'member-5',
@@ -164,6 +169,7 @@ const mockChatRooms: ChatListItemData[] = [
         nickname: '날쌘독수리',
         avatar_url: '/images/hawk_m.svg',
         joined_at: '2024-12-19T07:00:00Z',
+        status: 'away',
       },
     ],
     lastMessage: {
@@ -192,6 +198,7 @@ const mockChatRooms: ChatListItemData[] = [
         nickname: '차단된유저',
         avatar_url: '/images/wolf_m.svg',
         joined_at: '2024-12-19T06:00:00Z',
+        status: 'ban',
       },
     ],
     lastMessage: {
@@ -265,9 +272,14 @@ const getChatRoomName = (room: ChatRoom, members: ChatRoomMember[]): string => {
 interface ChatListItemProps {
   data: ChatListItemData;
   isSelected?: boolean;
+  onClick?: () => void;
 }
 
-const ChatListItem = ({ data, isSelected = false }: ChatListItemProps) => {
+const ChatListItem = ({
+  data,
+  isSelected = false,
+  onClick,
+}: ChatListItemProps) => {
   const { room, members, lastMessage, unreadCount, isBlocked } = data;
   const roomName = getChatRoomName(room, members);
   const messageContent = formatMessageContent(lastMessage);
@@ -283,11 +295,26 @@ const ChatListItem = ({ data, isSelected = false }: ChatListItemProps) => {
     .filter(Boolean)
     .join(' ');
 
+  const handleClick = () => {
+    if (!isBlocked && onClick) {
+      onClick();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if ((e.key === 'Enter' || e.key === ' ') && !isBlocked && onClick) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
     <div
       className={itemClasses}
       role="button"
       tabIndex={0}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
       aria-label={`${roomName} 채팅방, ${unreadCount > 0 ? `읽지 않은 메시지 ${unreadCount}개` : '읽음'}`}
     >
       <div className={styles.chatItemContent}>
@@ -296,7 +323,8 @@ const ChatListItem = ({ data, isSelected = false }: ChatListItemProps) => {
             src={members[0]?.avatar_url}
             alt={roomName}
             size="s"
-            showStatus={false}
+            status={members[0]?.status || 'offline'}
+            showStatus={true}
           />
         </div>
 
@@ -334,6 +362,8 @@ const ChatListItem = ({ data, isSelected = false }: ChatListItemProps) => {
 };
 
 export default function ChatList() {
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+
   if (mockChatRooms.length === 0) {
     return (
       <div className={styles.container}>
@@ -358,7 +388,8 @@ export default function ChatList() {
           <ChatListItem
             key={chatRoom.room.room_id}
             data={chatRoom}
-            isSelected={false}
+            isSelected={selectedRoomId === chatRoom.room.room_id}
+            onClick={() => setSelectedRoomId(chatRoom.room.room_id)}
           />
         ))}
       </div>
