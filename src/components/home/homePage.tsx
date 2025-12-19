@@ -4,8 +4,11 @@ import React from 'react';
 import styles from './styles.module.css';
 import MatchSection from './ui/match-section/matchSection';
 import PartySection from './ui/party-section/partySection';
+import ProfileSection from './ui/profile-section/profileSection';
 import { MatchCardProps } from './ui/match-section/card/matchCard';
 import { PartyCardProps } from './ui/party-section/card/partyCard';
+import { AnimalType } from '@/commons/constants/animalType.enum';
+import { TierType } from '@/commons/constants/tierType.enum';
 
 // 임시 데이터 - 추후 API로 대체될 예정
 const mockMatchData: MatchCardProps[] = [
@@ -93,34 +96,65 @@ const mockPartyData: PartyCardProps[] = [
   },
 ];
 
+// 프로필 섹션 임시 데이터
+const mockProfileData = {
+  nickname: '호쾌한망토',
+  tier: TierType.silver,
+  animal: AnimalType.wolf,
+  favoriteGenre: 'FPS',
+  activeTime: '20 - 24시',
+  gameStyle: '경쟁적',
+  weeklyAverage: '5.4 시간',
+  perfectMatchTypes: [AnimalType.fox, AnimalType.bear, AnimalType.raven],
+  radarData: [
+    { trait: 'social' as const, value: 70 },
+    { trait: 'exploration' as const, value: 85 },
+    { trait: 'cooperation' as const, value: 75 },
+    { trait: 'strategy' as const, value: 60 },
+    { trait: 'leadership' as const, value: 90 },
+  ],
+  barData: [
+    { label: 'FPS', value: 23.6 },
+    { label: '생존', value: 12.5 },
+    { label: '모험', value: 7.2 },
+    { label: '캐주얼', value: 3.8 },
+  ],
+};
+
 export default function HomePage() {
   return (
     <div className={styles.container}>
-      <div className={styles.mainContent}>
-        {/* 왼쪽 컨텐츠 영역 */}
-        <div className={styles.leftSection}>
-          {/* 매치 섹션 */}
-          <MatchSection
-            title="레전드 조합, ㄹㄷ? 🎲"
-            matches={mockMatchData}
-            className={styles.matchSection}
-          />
+      {/* 왼쪽 컨텐츠 영역 */}
+      <div className={styles.leftSection}>
+        {/* 매치 섹션 */}
+        <MatchSection
+          title="레전드 조합, ㄹㄷ? 🎲"
+          matches={mockMatchData}
+          className={styles.matchSection}
+        />
 
-          {/* 파티 섹션 */}
-          <PartySection
-            title="너만 오면 ㄱ!🔥 "
-            parties={mockPartyData}
-            className={styles.partySection}
-          />
-        </div>
+        {/* 파티 섹션 */}
+        <PartySection
+          title="너만 오면 ㄱ!🔥 "
+          parties={mockPartyData}
+          className={styles.partySection}
+        />
+      </div>
 
-        {/* 오른쪽 사이드바 영역 (추후 구현) */}
-        <div className={styles.rightSection}>
-          {/* TODO: 사용자 프로필 카드 및 플레이스타일 차트 컴포넌트 추가 */}
-          <div className={styles.placeholder}>
-            <p>프로필 카드 영역</p>
-          </div>
-        </div>
+      {/* 오른쪽 사이드바 영역 */}
+      <div className={styles.rightSection}>
+        <ProfileSection
+          nickname={mockProfileData.nickname}
+          tier={mockProfileData.tier}
+          animal={mockProfileData.animal}
+          favoriteGenre={mockProfileData.favoriteGenre}
+          activeTime={mockProfileData.activeTime}
+          gameStyle={mockProfileData.gameStyle}
+          weeklyAverage={mockProfileData.weeklyAverage}
+          perfectMatchTypes={mockProfileData.perfectMatchTypes}
+          radarData={mockProfileData.radarData}
+          barData={mockProfileData.barData}
+        />
       </div>
     </div>
   );
