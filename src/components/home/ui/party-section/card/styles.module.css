@@ -1,9 +1,10 @@
 /* 파티 카드 컨테이너 */
 .container {
   background-color: var(--color-bg-secondary);
-  border-radius: 24px;
-  padding: 32px;
-  width: 396px;
+  border-radius: 20px;
+  padding: 24px;
+  width: 100%;
+  max-width: 576px;
   display: flex;
   flex-direction: column;
 }
@@ -12,168 +13,214 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  align-items: center;
+  gap: 20px;
   width: 100%;
 }
 
-/* 파티 제목 */
+/* ===== 상단: 제목 및 게임 태그 ===== */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.titleSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .title {
   font-family: var(--typo-heading-md-font-family);
   font-size: var(--typo-heading-md-font-size);
   font-weight: var(--typo-heading-md-font-weight);
   line-height: var(--typo-heading-md-line-height);
   color: var(--color-text-primary);
-  text-align: center;
   margin: 0;
-  width: 100%;
+  padding: 3px 0;
 }
 
-/* 아바타 래퍼 */
-.avatarWrapper {
+.gameTag {
+  flex-shrink: 0;
+}
+
+.gameTagComponent {
+  background-color: transparent;
+  border: 1px solid var(--color-border-interactive-primary);
+  border-radius: 8px;
+  padding: 5px 9px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 8px 0;
+}
+
+.gameTagComponent span {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-medium-font-size);
+  font-weight: var(--typo-body-md-medium-font-weight);
+  line-height: var(--typo-body-md-medium-line-height);
+  color: var(--color-text-interactive-primary);
+  white-space: nowrap;
+}
+
+/* ===== 설명 텍스트 ===== */
+.description {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: var(--typo-body-md-font-weight);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-interactive-secondary);
+  margin-top: -16px;
+}
+
+/* ===== 멤버 섹션 ===== */
+.membersSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  width: 100%;
+  position: relative;
+}
+
+/* 아바타 컨테이너 */
+.avatarContainer {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 40px;
+}
+
+/* 개별 아바타 래퍼 */
+.avatarWrapper {
+  position: relative;
+  margin-right: -12px;
+}
+
+.avatarWrapper:first-child {
+  margin-left: 0;
+}
+
+.avatarWrapper:last-child {
+  margin-right: 0;
 }
 
 /* 아바타 스타일 */
 .avatar {
   background-color: var(--color-bg-primary);
   border: 2px solid var(--color-border-secondary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
   padding: 2px;
-  border-radius: var(--border-radius-circle, 99999px);
 }
 
-/* 사용자 정보 (닉네임 및 매칭률) */
-.userInfo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-}
-
-/* 닉네임 스타일 */
-.nickname {
-  font-family: var(--typo-heading-md-font-family);
-  font-size: var(--typo-heading-md-font-size);
-  font-weight: var(--typo-heading-md-font-weight);
-  line-height: var(--typo-heading-md-line-height);
-  color: var(--color-text-primary);
-  text-align: center;
-  white-space: nowrap;
-}
-
-/* 매칭률 컨테이너 */
-.matchRate {
+/* 나머지 인원 표시 */
+.remainingCount {
+  background-color: var(--color-bg-primary);
+  border: 2px solid var(--color-border-secondary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-medium-font-size);
+  font-weight: var(--typo-body-sm-medium-font-weight);
+  line-height: var(--typo-body-sm-medium-line-height);
+  color: var(--color-text-interactive-secondary-hover);
+  position: relative;
+}
+
+/* 인원수 표시 */
+.memberCount {
+  display: flex;
+  align-items: flex-end;
   gap: 4px;
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
 
-/* 매칭률 라벨 */
-.matchRateLabel {
-  font-family: var(--typo-body-lg-font-family);
-  font-size: var(--typo-body-lg-font-size);
-  font-weight: var(--typo-body-lg-font-weight);
-  line-height: var(--typo-body-lg-line-height);
-  color: var(--color-text-secondary);
-  text-align: center;
-  white-space: nowrap;
-}
-
-/* 매칭률 값 */
-.matchRateValue {
+.currentCount {
   font-family: var(--typo-body-lg-font-family);
   font-size: var(--typo-body-lg-medium-font-size);
   font-weight: var(--typo-body-lg-medium-font-weight);
   line-height: var(--typo-body-lg-medium-line-height);
   color: var(--color-text-interactive-primary);
-  text-align: center;
-  white-space: nowrap;
 }
 
-/* 설명 텍스트 */
-.description {
-  font-family: var(--typo-body-md-font-family);
-  font-size: var(--typo-body-md-font-size);
-  font-weight: var(--typo-body-md-font-weight);
-  line-height: var(--typo-body-md-line-height);
-  color: var(--color-text-secondary);
-  text-align: center;
+.maxCount {
+  font-family: var(--typo-body-lg-font-family);
+  font-size: var(--typo-body-lg-medium-font-size);
+  font-weight: var(--typo-body-lg-medium-font-weight);
+  line-height: var(--typo-body-lg-medium-line-height);
+  color: var(--color-text-interactive-secondary);
+}
+
+/* ===== 하단: 태그 및 버튼 ===== */
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   width: 100%;
+  height: 37px;
 }
 
 /* 태그 컨테이너 */
 .tagContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-}
-
-/* 개별 태그 아이템 */
-.tagItem {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 0;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-/* 태그 아이콘 (circle tag) */
-.tagIcon {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  min-height: 32px;
+/* 개별 태그 스타일 */
+.tag {
+  background-color: var(--color-bg-tertiary);
+  border-radius: 4px;
+  padding: 4px 8px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-transparent-12);
-  border: 1px solid var(--color-border-interactive-primary);
-  border-radius: 50%;
-  font-size: 16px;
 }
 
-/* 태그 컨텐츠 */
-.tagContent {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-
-/* 태그 레이블 */
-.tagLabel {
-  font-family: var(--typo-body-md-font-family);
-  font-size: var(--typo-body-md-medium-font-size);
-  font-weight: var(--typo-body-md-medium-font-weight);
-  line-height: var(--typo-body-md-medium-line-height);
-  color: var(--color-text-primary);
-}
-
-/* 태그 설명 */
-.tagDescription {
+.tag span {
   font-family: var(--typo-body-sm-font-family);
   font-size: var(--typo-body-sm-font-size);
   font-weight: var(--typo-body-sm-font-weight);
   line-height: var(--typo-body-sm-line-height);
-  color: var(--color-text-secondary);
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
 }
 
-/* 프로필 보기 버튼 */
-.button {
-  width: 100%;
-  height: 48px;
-  padding: 14px 20px;
+/* 참여하기 버튼 */
+.joinButton {
+  flex-shrink: 0;
+  height: 37px;
+  padding: 10px 20px;
+  border-radius: var(--border-radius-circle, 99999px);
+}
+
+.joinButton span {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-medium-font-size);
+  font-weight: var(--typo-body-md-medium-font-weight);
+  line-height: var(--typo-body-md-medium-line-height);
+  color: var(--color-text-interactive-inverse);
 }
 
 /* 반응형 디자인 - 모바일 */
 @media (max-width: 768px) {
   .container {
-    width: 100%;
-    padding: 24px;
+    padding: 20px;
   }
 
   .title {
@@ -181,9 +228,13 @@
     line-height: var(--typo-heading-sm-line-height);
   }
 
-  .nickname {
-    font-size: var(--typo-heading-sm-font-size);
-    line-height: var(--typo-heading-sm-line-height);
+  .footer {
+    flex-direction: column;
+    height: auto;
+    align-items: stretch;
+  }
+
+  .joinButton {
+    width: 100%;
   }
 }
-

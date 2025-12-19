@@ -6,19 +6,15 @@ import Avatar from '@/commons/components/avatar';
 import Button from '@/commons/components/button';
 import Tag from '@/commons/components/tag';
 
-export interface PartyTag {
+export interface PartyMember {
   /**
-   * 태그 아이콘 이름
+   * 멤버 아바타 이미지 경로
    */
-  icon?: string;
+  avatarSrc?: string;
   /**
-   * 태그 레이블
+   * 멤버 닉네임
    */
-  label: string;
-  /**
-   * 태그 설명
-   */
-  description: string;
+  nickname: string;
 }
 
 export interface PartyCardProps {
@@ -27,33 +23,33 @@ export interface PartyCardProps {
    */
   title: string;
   /**
-   * 파티장 닉네임
+   * 게임 이름
    */
-  nickname: string;
-  /**
-   * 매칭률 (0-100)
-   */
-  matchRate: number;
-  /**
-   * 파티장 온라인 상태
-   */
-  status?: 'online' | 'away' | 'ban' | 'offline';
+  gameName: string;
   /**
    * 설명 텍스트
    */
-  description?: string;
+  description: string;
+  /**
+   * 현재 참여 인원
+   */
+  currentMembers: number;
+  /**
+   * 최대 인원
+   */
+  maxMembers: number;
+  /**
+   * 멤버 목록 (최대 3명까지 표시)
+   */
+  members: PartyMember[];
   /**
    * 태그 목록
    */
-  tags: PartyTag[];
+  tags: string[];
   /**
-   * 아바타 이미지 경로
+   * 참여하기 버튼 클릭 핸들러
    */
-  avatarSrc?: string;
-  /**
-   * 프로필 보기 버튼 클릭 핸들러
-   */
-  onProfileClick?: () => void;
+  onJoinClick?: () => void;
   /**
    * 추가 클래스명
    */
@@ -62,76 +58,90 @@ export interface PartyCardProps {
 
 export default function PartyCard({
   title,
-  nickname,
-  matchRate,
-  status = 'online',
-  description = '왜 이 친구와 잘 맞나요?',
+  gameName,
+  description,
+  currentMembers,
+  maxMembers,
+  members,
   tags,
-  avatarSrc,
-  onProfileClick,
+  onJoinClick,
   className = '',
 }: PartyCardProps) {
   const containerClasses = [styles.container, className]
     .filter(Boolean)
     .join(' ');
 
+  // 표시할 멤버 (최대 3명)
+  const displayMembers = members.slice(0, 3);
+  // 나머지 인원
+  const remainingMembers = members.length > 3 ? members.length - 3 : 0;
+
   return (
     <div className={containerClasses}>
       <div className={styles.content}>
-        {/* 파티 제목 */}
-        <h3 className={styles.title}>{title}</h3>
-
-        {/* 아바타 */}
-        <div className={styles.avatarWrapper}>
-          <Avatar
-            src={avatarSrc || '/images/bird.svg'}
-            alt={nickname}
-            size="L"
-            status={status}
-            showStatus={true}
-            className={styles.avatar}
-          />
-        </div>
-
-        {/* 닉네임 및 매칭률 */}
-        <div className={styles.userInfo}>
-          <div className={styles.nickname}>{nickname}</div>
-          <div className={styles.matchRate}>
-            <span className={styles.matchRateLabel}>매칭률</span>
-            <span className={styles.matchRateValue}>{matchRate}%</span>
+        {/* 상단: 제목 및 게임 태그 */}
+        <div className={styles.header}>
+          <div className={styles.titleSection}>
+            <h3 className={styles.title}>{title}</h3>
+          </div>
+          <div className={styles.gameTag}>
+            <Tag style="rectangle" className={styles.gameTagComponent}>
+              {gameName}
+            </Tag>
           </div>
         </div>
 
-        {/* 설명 텍스트 */}
+        {/* 설명 */}
         <div className={styles.description}>{description}</div>
 
-        {/* 태그 목록 */}
-        <div className={styles.tagContainer}>
-          {tags.map((tag, index) => (
-            <div key={index} className={styles.tagItem}>
-              <Tag style="circle" className={styles.tagIcon}>
-                {tag.icon || '🎮'}
-              </Tag>
-              <div className={styles.tagContent}>
-                <span className={styles.tagLabel}>{tag.label}</span>
-                <span className={styles.tagDescription}>{tag.description}</span>
+        {/* 멤버 아바타 및 인원수 */}
+        <div className={styles.membersSection}>
+          <div className={styles.avatarContainer}>
+            {displayMembers.map((member, index) => (
+              <div
+                key={index}
+                className={styles.avatarWrapper}
+                style={{ zIndex: displayMembers.length - index }}
+              >
+                <Avatar
+                  src={member.avatarSrc || '/images/bird.svg'}
+                  alt={member.nickname}
+                  size="s"
+                  showStatus={false}
+                  className={styles.avatar}
+                />
               </div>
-            </div>
-          ))}
+            ))}
+            {remainingMembers > 0 && (
+              <div className={styles.remainingCount}>+{remainingMembers}</div>
+            )}
+          </div>
+          <div className={styles.memberCount}>
+            <span className={styles.currentCount}>{currentMembers}</span>
+            <span className={styles.maxCount}> / {maxMembers}명</span>
+          </div>
         </div>
 
-        {/* 프로필 보기 버튼 */}
-        <Button
-          variant="secondary"
-          size="m"
-          shape="round"
-          className={styles.button}
-          onClick={onProfileClick}
-        >
-          프로필 보기
-        </Button>
+        {/* 하단: 태그 및 참여하기 버튼 */}
+        <div className={styles.footer}>
+          <div className={styles.tagContainer}>
+            {tags.map((tag, index) => (
+              <Tag key={index} style="rectangle" className={styles.tag}>
+                {tag}
+              </Tag>
+            ))}
+          </div>
+          <Button
+            variant="primary"
+            size="m"
+            shape="round"
+            className={styles.joinButton}
+            onClick={onJoinClick}
+          >
+            참여하기
+          </Button>
+        </div>
       </div>
     </div>
   );
 }
-
