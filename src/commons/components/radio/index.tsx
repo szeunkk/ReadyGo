@@ -4,26 +4,16 @@ import React from 'react';
 import styles from './styles.module.css';
 import { InputHTMLAttributes } from 'react';
 
-export type RadioStatus = 'unselected' | 'selected';
-export type RadioState =
-  | 'default'
-  | 'hover'
-  | 'press'
-  | 'focus'
-  | 'disabled'
-  | 'error';
+export type RadioState = 'default' | 'hover' | 'press' | 'disabled' | 'error';
 
 export interface RadioProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
-  'type' | 'checked'
+  'type'
 > {
-  status?: RadioStatus;
   state?: RadioState;
-  checked?: boolean;
 }
 
 export default function Radio({
-  status,
   state = 'default',
   checked = false,
   className = '',
@@ -32,15 +22,10 @@ export default function Radio({
 }: RadioProps) {
   const isDisabled = disabled || state === 'disabled';
 
-  // status를 checked로부터 결정
-  const actualStatus: RadioStatus =
-    status || (checked ? 'selected' : 'unselected');
-
   const radioClasses = [
     styles.radio,
-    styles[`status-${actualStatus}`],
+    styles[`status-${checked ? 'selected' : 'unselected'}`],
     styles[`state-${state}`],
-    isDisabled && styles.disabled,
     className,
   ]
     .filter(Boolean)
@@ -51,23 +36,15 @@ export default function Radio({
       <input
         type="radio"
         className={styles.input}
-        checked={checked}
         disabled={isDisabled}
+        checked={checked}
         {...props}
       />
-      <div
-        className={`${styles.radioWrapper} ${
-          state === 'focus' ? styles.hasFocusRing : ''
-        }`}
-      >
+      <div className={styles.radioWrapper}>
         <span className={radioClasses}>
-          {actualStatus === 'selected' && <span className={styles.indicator} />}
+          {checked && <span className={styles.indicator} />}
         </span>
       </div>
     </label>
   );
 }
-
-
-
-
