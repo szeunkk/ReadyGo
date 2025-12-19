@@ -106,10 +106,18 @@
   width: 624px;
   height: 358px;
   padding: 24px;
+  gap: 32px;
   display: flex;
   flex-direction: column;
   background-color: var(--color-bg-secondary, #f0f0f0);
   border: 1px solid var(--color-border-primary, #e0e0e0);
+  box-sizing: border-box;
+}
+
+.cardTitleMemberWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   box-sizing: border-box;
 }
 
@@ -126,7 +134,6 @@
 .cardPartyMember {
   width: 576px;
   height: 40px;
-  margin-top: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -134,10 +141,16 @@
   box-sizing: border-box;
 }
 
+.cardCategoryButtonWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  box-sizing: border-box;
+}
+
 .cardCategory {
   width: 576px;
   height: 72px;
-  margin-top: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -148,7 +161,6 @@
 .cardButton {
   width: 576px;
   height: 48px;
-  margin-top: 40px;
   display: flex;
   align-items: center;
   justify-content: center;

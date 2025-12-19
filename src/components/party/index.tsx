@@ -62,10 +62,14 @@ export default function Party() {
         <div className={styles.mainArea}>
           {Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className={styles.card}>
-              <div className={styles.cardTitle}>title</div>
-              <div className={styles.cardPartyMember}>party-member</div>
-              <div className={styles.cardCategory}>category</div>
-              <div className={styles.cardButton}>button</div>
+              <div className={styles.cardTitleMemberWrapper}>
+                <div className={styles.cardTitle}>title</div>
+                <div className={styles.cardPartyMember}>party-member</div>
+              </div>
+              <div className={styles.cardCategoryButtonWrapper}>
+                <div className={styles.cardCategory}>category</div>
+                <div className={styles.cardButton}>button</div>
+              </div>
             </div>
           ))}
         </div>
