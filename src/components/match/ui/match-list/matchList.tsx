@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import styles from './styles.module.css';
-import MatchCard from '@/components/main/match/ui/match-card/matchCard';
+import MatchCard from '@/components/match/ui/match-card/matchCard';
 import Selectbox, { SelectboxItem } from '@/commons/components/selectbox';
 import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
