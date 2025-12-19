@@ -3,8 +3,7 @@
   background-color: var(--color-bg-secondary);
   border-radius: 20px;
   padding: 24px;
-  width: 100%;
-  max-width: 576px;
+  width: 624px;
   display: flex;
   flex-direction: column;
 }
@@ -45,26 +44,6 @@
 
 .gameTag {
   flex-shrink: 0;
-}
-
-.gameTagComponent {
-  background-color: transparent;
-  border: 1px solid var(--color-border-interactive-primary);
-  border-radius: 8px;
-  padding: 5px 9px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.gameTagComponent span {
-  font-family: var(--typo-body-md-font-family);
-  font-size: var(--typo-body-md-medium-font-size);
-  font-weight: var(--typo-body-md-medium-font-weight);
-  line-height: var(--typo-body-md-medium-line-height);
-  color: var(--color-text-interactive-primary);
-  white-space: nowrap;
 }
 
 /* ===== 설명 텍스트 ===== */
@@ -179,26 +158,6 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-}
-
-/* 개별 태그 스타일 */
-.tag {
-  background-color: var(--color-bg-tertiary);
-  border-radius: 4px;
-  padding: 4px 8px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tag span {
-  font-family: var(--typo-body-sm-font-family);
-  font-size: var(--typo-body-sm-font-size);
-  font-weight: var(--typo-body-sm-font-weight);
-  line-height: var(--typo-body-sm-line-height);
-  color: var(--color-text-tertiary);
-  white-space: nowrap;
 }
 
 /* 참여하기 버튼 */

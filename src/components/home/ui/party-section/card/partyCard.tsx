@@ -85,9 +85,7 @@ export default function PartyCard({
             <h3 className={styles.title}>{title}</h3>
           </div>
           <div className={styles.gameTag}>
-            <Tag style="rectangle" className={styles.gameTagComponent}>
-              {gameName}
-            </Tag>
+            <Tag style="duotone">{gameName}</Tag>
           </div>
         </div>
 
@@ -126,7 +124,7 @@ export default function PartyCard({
         <div className={styles.footer}>
           <div className={styles.tagContainer}>
             {tags.map((tag, index) => (
-              <Tag key={index} style="rectangle" className={styles.tag}>
+              <Tag key={index} style="rectangle">
                 {tag}
               </Tag>
             ))}
