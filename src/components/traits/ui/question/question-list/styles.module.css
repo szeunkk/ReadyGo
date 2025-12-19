@@ -54,6 +54,22 @@
     0px 4px 6px -4px rgba(95, 252, 226, 0.2);
 }
 
+.answerButtonSelected:hover {
+  background: rgba(127, 253, 232, 0.12);
+  border-color: #5ffce2;
+  box-shadow:
+    0px 10px 15px -3px rgba(95, 252, 226, 0.2),
+    0px 4px 6px -4px rgba(95, 252, 226, 0.2);
+}
+
+.answerButtonSelected:active {
+  background: rgba(127, 253, 232, 0.12);
+  border-color: #5ffce2;
+  box-shadow:
+    0px 10px 15px -3px rgba(95, 252, 226, 0.2),
+    0px 4px 6px -4px rgba(95, 252, 226, 0.2);
+}
+
 .answerNumber {
   display: flex;
   align-items: center;
