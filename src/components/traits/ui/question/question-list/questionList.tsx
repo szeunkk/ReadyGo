@@ -15,7 +15,7 @@ interface Question {
 }
 
 interface QuestionListProps {
-  onAnswerSelect?: (answerId: number) => void;
+  onAnswerSelect?: (answer: number) => void;
   currentStep?: number;
   selectedAnswer?: number;
 }

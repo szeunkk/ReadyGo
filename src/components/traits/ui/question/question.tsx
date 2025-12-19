@@ -5,18 +5,18 @@ import styles from './styles.module.css';
 import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
 import Image from 'next/image';
+import QuestionList from './question-list/questionList';
+import QuestionSchedule from './question-schedule/questionSchedule';
 
-interface QuestionProps {
-  children: React.ReactNode;
-}
+type AnswerType = number | { dayType: string; timeSlot: string };
 
-export default function Question({ children }: QuestionProps) {
+export default function Question() {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedAnswers, setSelectedAnswers] = useState<
-    Record<number, number>
+    Record<number, AnswerType>
   >({});
 
-  const totalSteps = 10;
+  const totalSteps = 11;
 
   const handlePrevious = () => {
     if (currentStep > 1) {
@@ -28,23 +28,26 @@ export default function Question({ children }: QuestionProps) {
     // 뒤로가기 로직 (실제 구현 시 router.back() 등 사용)
   };
 
-  const handleAnswerSelect = (answerId: number) => {
+  const handleAnswerSelect = (answer: AnswerType) => {
     // 선택된 답변 저장
     setSelectedAnswers({
       ...selectedAnswers,
-      [currentStep]: answerId,
+      [currentStep]: answer,
     });
 
     // 다음 단계로 이동
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
+    } else {
+      // 마지막 질문 완료 - 결과 페이지로 이동
+      // TODO: 결과 페이지 구현
     }
   };
 
   const progressPercentage = Math.round((currentStep / totalSteps) * 100);
   const progressWidth = (currentStep / totalSteps) * 100;
 
-  // 팩맨 위치 계산 (0-9 사이)
+  // 팩맨 위치 계산 (0-10 사이)
   const pacmanPosition = currentStep - 1;
 
   return (
@@ -95,12 +98,24 @@ export default function Question({ children }: QuestionProps) {
           </span>
         </div>
 
-        {/* 질문 본문 (children으로 교체 가능) */}
-        {React.cloneElement(children as React.ReactElement, {
-          onAnswerSelect: handleAnswerSelect,
-          currentStep,
-          selectedAnswer: selectedAnswers[currentStep],
-        })}
+        {/* 질문 본문 */}
+        {currentStep === 11 ? (
+          <QuestionSchedule
+            onAnswerSelect={handleAnswerSelect}
+            currentStep={currentStep}
+            selectedAnswer={
+              selectedAnswers[currentStep] as
+                | { dayType: string; timeSlot: string }
+                | undefined
+            }
+          />
+        ) : (
+          <QuestionList
+            onAnswerSelect={handleAnswerSelect}
+            currentStep={currentStep}
+            selectedAnswer={selectedAnswers[currentStep] as number | undefined}
+          />
+        )}
 
         {/* 질문 카드 푸터 (팩맨 진행률) */}
         <div className={styles.questionCardFooter}>
