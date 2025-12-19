@@ -12,6 +12,9 @@ interface QuestionProps {
 
 export default function Question({ children }: QuestionProps) {
   const [currentStep, setCurrentStep] = useState(1);
+  const [selectedAnswers, setSelectedAnswers] = useState<
+    Record<number, number>
+  >({});
 
   const totalSteps = 10;
 
@@ -25,7 +28,14 @@ export default function Question({ children }: QuestionProps) {
     // 뒤로가기 로직 (실제 구현 시 router.back() 등 사용)
   };
 
-  const handleNext = () => {
+  const handleAnswerSelect = (answerId: number) => {
+    // 선택된 답변 저장
+    setSelectedAnswers({
+      ...selectedAnswers,
+      [currentStep]: answerId,
+    });
+
+    // 다음 단계로 이동
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
@@ -87,7 +97,9 @@ export default function Question({ children }: QuestionProps) {
 
         {/* 질문 본문 (children으로 교체 가능) */}
         {React.cloneElement(children as React.ReactElement, {
-          onAnswerSelect: handleNext,
+          onAnswerSelect: handleAnswerSelect,
+          currentStep,
+          selectedAnswer: selectedAnswers[currentStep],
         })}
 
         {/* 질문 카드 푸터 (팩맨 진행률) */}

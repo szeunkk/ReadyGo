@@ -16,6 +16,8 @@ interface Question {
 
 interface QuestionListProps {
   onAnswerSelect?: (answerId: number) => void;
+  currentStep?: number;
+  selectedAnswer?: number;
 }
 
 // 임시 질문 데이터 (실제로는 props나 API에서 받아올 것)
@@ -34,7 +36,10 @@ const QUESTIONS: Question[] = [
   // 추가 질문들은 나중에 채워넣을 것
 ];
 
-export default function QuestionList({ onAnswerSelect }: QuestionListProps) {
+export default function QuestionList({
+  onAnswerSelect,
+  selectedAnswer,
+}: QuestionListProps) {
   const [currentQuestion] = QUESTIONS; // 현재는 첫 질문만
 
   const handleAnswerSelect = (answerId: number) => {
@@ -52,16 +57,33 @@ export default function QuestionList({ onAnswerSelect }: QuestionListProps) {
 
       {/* 답변 옵션들 */}
       <div className={styles.answersWrapper}>
-        {currentQuestion.answers.map((answer) => (
-          <button
-            key={answer.id}
-            className={styles.answerButton}
-            onClick={() => handleAnswerSelect(answer.id)}
-          >
-            <div className={styles.answerNumber}>{answer.id}</div>
-            <span className={styles.answerText}>{answer.text}</span>
-          </button>
-        ))}
+        {currentQuestion.answers.map((answer) => {
+          const isSelected = selectedAnswer === answer.id;
+          return (
+            <button
+              key={answer.id}
+              className={`${styles.answerButton} ${
+                isSelected ? styles.answerButtonSelected : ''
+              }`}
+              onClick={() => handleAnswerSelect(answer.id)}
+            >
+              <div
+                className={`${styles.answerNumber} ${
+                  isSelected ? styles.answerNumberSelected : ''
+                }`}
+              >
+                {answer.id}
+              </div>
+              <span
+                className={`${styles.answerText} ${
+                  isSelected ? styles.answerTextSelected : ''
+                }`}
+              >
+                {answer.text}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

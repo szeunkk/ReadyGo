@@ -46,6 +46,14 @@
   background: var(--color-bg-interactive-teritiary-pressed);
 }
 
+.answerButtonSelected {
+  background: rgba(127, 253, 232, 0.12);
+  border-color: #5ffce2;
+  box-shadow:
+    0px 10px 15px -3px rgba(95, 252, 226, 0.2),
+    0px 4px 6px -4px rgba(95, 252, 226, 0.2);
+}
+
 .answerNumber {
   display: flex;
   align-items: center;
@@ -62,6 +70,12 @@
   flex-shrink: 0;
 }
 
+.answerNumberSelected {
+  background: var(--color-text-interactive-primary);
+  border-color: var(--color-text-interactive-primary);
+  color: var(--color-text-interactive-inverse);
+}
+
 .answerText {
   font-family: var(--typo-body-lg-font-family);
   font-size: var(--typo-body-lg-font-size);
@@ -69,5 +83,13 @@
   font-weight: var(--typo-body-lg-font-weight);
   color: var(--color-text-tertiary);
   text-align: left;
+}
+
+.answerTextSelected {
+  font-family: var(--typo-body-lg-medium-font-family);
+  font-size: var(--typo-body-lg-medium-font-size);
+  line-height: var(--typo-body-lg-medium-line-height);
+  font-weight: var(--typo-body-lg-medium-font-weight);
+  color: var(--color-text-interactive-primary);
 }
 
