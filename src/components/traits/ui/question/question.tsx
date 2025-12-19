@@ -8,7 +8,7 @@ import Image from 'next/image';
 import QuestionList from './question-list/questionList';
 import QuestionSchedule from './question-schedule/questionSchedule';
 
-type AnswerType = number | { dayType: string; timeSlot: string };
+type AnswerType = number | { dayTypes: string[]; timeSlots: string[] };
 
 export default function Question() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -105,7 +105,7 @@ export default function Question() {
             currentStep={currentStep}
             selectedAnswer={
               selectedAnswers[currentStep] as
-                | { dayType: string; timeSlot: string }
+                | { dayTypes: string[]; timeSlots: string[] }
                 | undefined
             }
           />

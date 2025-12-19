@@ -4,9 +4,9 @@ import React, { useState, useEffect } from 'react';
 import styles from './styles.module.css';
 
 interface QuestionScheduleProps {
-  onAnswerSelect?: (answer: { dayType: string; timeSlot: string }) => void;
+  onAnswerSelect?: (answer: { dayTypes: string[]; timeSlots: string[] }) => void;
   currentStep?: number;
-  selectedAnswer?: { dayType: string; timeSlot: string };
+  selectedAnswer?: { dayTypes: string[]; timeSlots: string[] };
 }
 
 const DAY_TYPES = [
@@ -26,32 +26,33 @@ export default function QuestionSchedule({
   selectedAnswer,
   currentStep,
 }: QuestionScheduleProps) {
-  const [selectedDayType, setSelectedDayType] = useState<string | null>(
-    selectedAnswer?.dayType || null
+  const [selectedDayTypes, setSelectedDayTypes] = useState<string[]>(
+    selectedAnswer?.dayTypes || []
   );
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(
-    selectedAnswer?.timeSlot || null
+  const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>(
+    selectedAnswer?.timeSlots || []
   );
-  const [clickedDayType, setClickedDayType] = useState<string | null>(null);
-  const [clickedTimeSlot, setClickedTimeSlot] = useState<string | null>(null);
 
-  // 질문이 바뀌면 클릭 상태 초기화
+  // 질문이 바뀌면 선택 상태 초기화
   useEffect(() => {
-    setClickedDayType(null);
-    setClickedTimeSlot(null);
-  }, [currentStep]);
+    setSelectedDayTypes(selectedAnswer?.dayTypes || []);
+    setSelectedTimeSlots(selectedAnswer?.timeSlots || []);
+  }, [currentStep, selectedAnswer]);
 
   const handleDayTypeSelect = (dayTypeId: string) => {
-    setClickedDayType(dayTypeId);
-    setSelectedDayType(dayTypeId);
+    const newSelected = selectedDayTypes.includes(dayTypeId)
+      ? selectedDayTypes.filter((id) => id !== dayTypeId)
+      : [...selectedDayTypes, dayTypeId];
+    
+    setSelectedDayTypes(newSelected);
 
-    // 시간대도 선택되었으면 300ms 후 자동 제출
-    if (selectedTimeSlot) {
+    // 요일과 시간대가 모두 1개 이상 선택되었으면 300ms 후 자동 제출
+    if (newSelected.length > 0 && selectedTimeSlots.length > 0) {
       setTimeout(() => {
         if (onAnswerSelect) {
           onAnswerSelect({
-            dayType: dayTypeId,
-            timeSlot: selectedTimeSlot,
+            dayTypes: newSelected,
+            timeSlots: selectedTimeSlots,
           });
         }
       }, 300);
@@ -59,16 +60,19 @@ export default function QuestionSchedule({
   };
 
   const handleTimeSlotSelect = (timeSlotId: string) => {
-    setClickedTimeSlot(timeSlotId);
-    setSelectedTimeSlot(timeSlotId);
+    const newSelected = selectedTimeSlots.includes(timeSlotId)
+      ? selectedTimeSlots.filter((id) => id !== timeSlotId)
+      : [...selectedTimeSlots, timeSlotId];
+    
+    setSelectedTimeSlots(newSelected);
 
-    // 요일도 선택되었으면 300ms 후 자동 제출
-    if (selectedDayType) {
+    // 요일과 시간대가 모두 1개 이상 선택되었으면 300ms 후 자동 제출
+    if (selectedDayTypes.length > 0 && newSelected.length > 0) {
       setTimeout(() => {
         if (onAnswerSelect) {
           onAnswerSelect({
-            dayType: selectedDayType,
-            timeSlot: timeSlotId,
+            dayTypes: selectedDayTypes,
+            timeSlots: newSelected,
           });
         }
       }, 300);
@@ -85,9 +89,7 @@ export default function QuestionSchedule({
           <label className={styles.sectionLabel}>주로 플레이하는 요일</label>
           <div className={styles.buttonRow}>
             {DAY_TYPES.map((dayType) => {
-              const isSelected =
-                clickedDayType === dayType.id ||
-                selectedDayType === dayType.id;
+              const isSelected = selectedDayTypes.includes(dayType.id);
               return (
                 <button
                   key={dayType.id}
@@ -114,9 +116,7 @@ export default function QuestionSchedule({
           <label className={styles.sectionLabel}>주로 플레이하는 시간대</label>
           <div className={styles.buttonGrid}>
             {TIME_SLOTS.map((timeSlot) => {
-              const isSelected =
-                clickedTimeSlot === timeSlot.id ||
-                selectedTimeSlot === timeSlot.id;
+              const isSelected = selectedTimeSlots.includes(timeSlot.id);
               return (
                 <button
                   key={timeSlot.id}
