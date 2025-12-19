@@ -15,34 +15,47 @@ export type CheckboxState =
 
 export interface CheckboxProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
-  'type' | 'checked' | 'disabled' | 'onChange'
+  'type' | 'onChange'
 > {
-  status?: CheckboxStatus; // 제어 컴포넌트용 (optional)
-  defaultStatus?: CheckboxStatus; // 비제어 컴포넌트 초기값
+  // 기본 모드: 표준 HTML 호환 (react-hook-form용)
+  checked?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+
+  // 고급 모드: partial 상태 지원
+  status?: CheckboxStatus;
+  onStatusChange?: (status: CheckboxStatus) => void;
+
   state?: CheckboxState;
-  onChange?: (status: CheckboxStatus) => void;
 }
 
 export default function Checkbox({
-  status: controlledStatus,
-  defaultStatus = 'unselected',
+  checked,
+  onChange,
+  status,
+  onStatusChange,
   state = 'default',
   className = '',
-  onChange,
+  disabled,
   ...props
 }: CheckboxProps) {
-  // 비제어 컴포넌트를 위한 내부 상태
-  const [internalStatus, setInternalStatus] =
-    React.useState<CheckboxStatus>(defaultStatus);
+  // 고급 모드 감지: status prop 사용 여부
+  const isAdvancedMode = status !== undefined;
 
-  // 제어 컴포넌트면 controlledStatus, 아니면 internalStatus 사용
-  const status = controlledStatus ?? internalStatus;
+  const isDisabled = disabled || state === 'disabled';
 
-  const isDisabled = state === 'disabled';
+  // checked 값 계산
+  const isChecked = isAdvancedMode ? status === 'selected' : checked;
+
+  // 클래스 계산 (고급 모드면 status 사용, 기본 모드면 checked로 계산)
+  const computedStatus: CheckboxStatus = isAdvancedMode
+    ? status
+    : isChecked
+      ? 'selected'
+      : 'unselected';
 
   const checkboxClasses = [
     styles.checkbox,
-    styles[`status-${status}`],
+    styles[`status-${computedStatus}`],
     styles[`state-${state}`],
     className,
   ]
@@ -51,31 +64,38 @@ export default function Checkbox({
 
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  // indeterminate와 checked 상태를 DOM에서 직접 관리
+  // indeterminate 상태는 DOM API로만 제어 가능 (고급 모드에서만)
   React.useEffect(() => {
-    if (inputRef.current) {
+    if (isAdvancedMode && inputRef.current) {
       inputRef.current.indeterminate = status === 'partial';
-      inputRef.current.checked = status === 'selected';
     }
-  }, [status]);
+  }, [isAdvancedMode, status]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('changed', e.target.checked, status);
     if (isDisabled) return;
 
-    // input의 checked 상태를 그대로 사용
-    // partial 상태에서 클릭하면 selected로 전환
-    const newStatus: CheckboxStatus = e.target.checked
-      ? 'selected'
-      : 'unselected';
+    // 표준 onChange 항상 호출 (react-hook-form 호환)
+    onChange?.(e);
 
-    // 비제어 컴포넌트인 경우 내부 상태 업데이트
-    if (controlledStatus === undefined) {
-      setInternalStatus(newStatus);
+    // 고급 모드에서만 onStatusChange 호출
+    if (isAdvancedMode && onStatusChange) {
+      const newStatus: CheckboxStatus = e.target.checked
+        ? 'selected'
+        : 'unselected';
+      onStatusChange(newStatus);
     }
-
-    onChange?.(newStatus);
   };
+
+  // wrapper 클래스 계산 (Radio와 동일한 패턴)
+  const wrapperClasses = [
+    styles.checkboxWrapper,
+    state === 'focus' &&
+    (computedStatus === 'selected' || computedStatus === 'partial')
+      ? styles.hasFocusRing
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <label className={styles.label}>
@@ -84,19 +104,14 @@ export default function Checkbox({
         type="checkbox"
         className={styles.input}
         disabled={isDisabled}
+        checked={isChecked}
         onChange={handleChange}
         {...props}
       />
 
-      <div
-        className={`${styles.checkboxWrapper} ${
-          state === 'focus' && (status === 'selected' || status === 'partial')
-            ? styles.hasFocusRing
-            : ''
-        }`}
-      >
+      <div className={wrapperClasses}>
         <span className={checkboxClasses}>
-          {status === 'selected' && (
+          {computedStatus === 'selected' && (
             <svg
               className={styles.icon}
               width="12"
@@ -114,7 +129,7 @@ export default function Checkbox({
               />
             </svg>
           )}
-          {status === 'partial' && (
+          {computedStatus === 'partial' && (
             <svg
               className={styles.icon}
               width="12"
