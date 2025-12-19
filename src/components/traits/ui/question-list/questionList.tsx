@@ -136,7 +136,12 @@ export default function QuestionList() {
         {/* 질문 카드 푸터 (팩맨 진행률) */}
         <div className={styles.questionCardFooter}>
           <div className={styles.pacmanProgress}>
-            <div className={styles.pacmanIcon}>
+            <div 
+              className={styles.pacmanIcon}
+              style={{ 
+                transform: `translateX(${pacmanPosition * 21}px)` 
+              }}
+            >
               <Image
                 src="/icons/pacman.svg"
                 alt="pacman"
