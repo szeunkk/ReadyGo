@@ -1,0 +1,105 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @02-wireframe.mdc
+            - @03-ui.mdc
+
+==============================================
+조건-피그마) https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2154-23120&m=dev
+
+조건-파일경로) 구현될 TSX 파일경로: src/components/chat/ui/chat-list/chatList.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/chat/ui/chat-list/styles.module.css
+
+==============================================
+
+조건-공통목록) 사용할 색상 목록(global.css에 명시된 변수 토큰 활용)
+            - 색상 토큰은 피그마와 동일하게 color-text-interaction-primary 의 예시와 같이 globals.css의 시멘틱 색상 토큰을 활용하여 구현할 것.
+            - 토큰 하드코딩 금지, 반드시 변수 사용.
+
+조건-공통목록) 사용할 타이포그래피 목록(global.css에 명시된 변수 토큰 활용)
+            - heading, body, caption 스타일에서 피그마와 유사한 토큰 선택하여 사용.
+            - 하드코딩 금지.
+
+조건-공통목록) 사용할 공통 컴포넌트 목록
+            - <Avatar /> (사용자 / 그룹 프로필 이미지)
+            - <Badge />  (읽지 않은 메시지 수 표시용, variant: counter)
+            - <Icon />   (옵션 메뉴 아이콘 등 필요 시)
+            - <Text />   (공통 텍스트 컴포넌트가 존재할 경우 활용)
+
+==============================================
+핵심요구사항) chat_rooms, chat_room_members, chat_messages, chat_message_reads, chat_blocks ERD 구조를 바탕으로 1:1 및 그룹 채팅방 리스트 UI만 퍼블리싱할 것(기능 구현 금지).
+
+핵심요구사항) MCP를 연동하여 피그마 디자인의 모든 속성과 변형을 확인하여 해당 컴포넌트를 구현할 것. (기능 구현 X, 퍼블리싱 전용)
+
+            - 채팅 리스트 전체 영역 : Implement this design from Figma. https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2154-23120&m=dev
+            - 리스트 항목(채팅방 셀) : Implement this design from Figma. https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2154-23472&m=dev
+            - 리스트 항목(채팅방 셀)_선택됨 : Implement this design from Figma. https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2157-1238&m=dev
+
+핵심요구사항) 각 채팅방 셀은 다음 정보를 포함하도록 퍼블리싱할 것.
+            1) 프로필 이미지(Avatar)
+            2) 채팅방 이름(1:1 이면 상대방 닉네임, 그룹이면 그룹명)
+                - 1:1 방은 상대방 Avatar + 닉네임 중심, 그룹 방은 참여자 수, 대표 Avatar Stack, 그룹 Badge 등으로 구분되게 구성할 것.
+            3) 마지막 메시지 미리보기(최대 1줄, 말줄임 처리)
+            4) 마지막 메시지 시간(24h, 오늘 내 메시지는 시간, 그 외는 날짜 형식)
+            5) 읽지 않은 메시지 수 Badge (0인 경우 미표시)
+                - 읽지 않은 메시지가 있는 경우 chat_message_reads.is_read false 상태를 토대로 Unread Badge와 굵은 텍스트 스타일을 적용할 것.
+            6) 차단된 유저와의 채팅방은 opacity 0.3 으로 처리 (시각적 표시만, 기능 X)
+
+핵심요구사항) 리스트 컨테이너 및 스크롤 스타일은 피그마를 따른다.
+            리스트는 room type, 참여자 정보, 최신 메시지, 읽음 여부, 생성/갱신 시간 등 ERD에 있는 필드 정보를 시각적으로 표현해야 함.
+
+핵심요구사항) 반응형 레이아웃 대응
+            - 모바일(≤ 480px): 리스트 항목 padding, 폰트 크기 축소
+            - 태블릿/데스크톱: 피그마 기준 사이즈 유지
+
+핵심요구사항) 기능 구현은 하지 말고, 더미 데이터로 UI 상태(읽음/안읽음, 뱃지 수 등)를 확인할 수 있도록 Mock 배열 5개 정도를 컴포넌트 상단에 작성할 것.
+
+핵심요구사항) 접근성(aria-label 등) 속성을 필수 포함할 것.
+
+핵심요구사항) placeholder 데이터는 ERD 필드명을 기반으로 mock 객체를 선언하여 사용하고, API 연동/상태관리는 구현하지 말 것.
+
+==============================================
+
+세부요구사항) 채팅방 카드
+            - 각 카드 레이아웃: 좌측 Avatar/Stack, 중앙 텍스트 블록(방 이름/참여자, 최신 메시지, 메타 정보), 우측 알림/시간 정보.
+            - hover/focus 시 네이티브 outline 제거 후 box-shadow 또는 border-color 변화를 globals 토큰으로 지정.
+
+세부요구사항) 최신 메시지 영역
+            - chat_messages.content, content_type을 기반으로 텍스트/이미지/시스템 메시지 케이스를 구분하는 스타일만 퍼블리싱.
+            - 메시지가 길 경우 두 줄에서 ellipsis 처리.
+            
+세부요구사항) 메타 정보
+            - chat_room_members 참여자 수, joined_at, chat_messages.created_at 등을 포맷팅한 예시 텍스트로 보여줄 것.
+            - 읽음 여부 Badge, mute 상태 아이콘(필요 시), pin 상태 아이콘 등을 우측 상단에 정렬.
+
+세부요구사항) 리스트 빈 상태 UI
+            - 방이 없을 때 chat-null UI를 재사용하거나 동일 톤으로 “채팅방이 없습니다” placeholder를 제공.
+==============================================
+
+체크리스트) 구현이 완료되면 다음 항목을 포함한 체크리스트를 반환할 것.
+            - [ ] 커서룰 @01-common.mdc 적용 결과
+            - [ ] 커서룰 @02-wireframe.mdc 적용 결과
+            - [ ] 커서룰 @03-ui.mdc 적용 결과
+            - [ ] ERD 기반 필드 정보 시각화 완료
+            - [ ] 1:1/그룹 방 구분 스타일링 완료
+            - [ ] 읽음/미읽음 상태 표현 완료
+            - [ ] 차단 사용자 표시 스타일 완료
+            - [ ] 빈 상태 UI 퍼블리싱 완료
+
+==============================================
+
+핵심요구사항) 완성된 컴포넌트를 페이지에서 import하여 연결시킬 것.
+            - 연결될 경로: src/app/(main)/chat/layout.tsx
+
+==============================================
+핵심요구사항) 색상, 텍스트 속성은 피그마 디자인과 동일하게 globals 토큰을 사용할 것.
+
+조건-피그마) 리스트 항목(채팅방 셀)_선택됨 https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2157-1238&m=dev
+조건-피그마) textBlock https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2157-1211&m=dev
+
+핵심요구사항) avatar 공통컴포넌트를 import해서 사용하고 status를 표시해줄 것. mock데이터의 각 avatar마다 다른 status를 표시하도록 할 것.
+            - <Avatar /> (사용자 / status 표시 )

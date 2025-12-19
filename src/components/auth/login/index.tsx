@@ -1,12 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './styles.module.css';
 import Input from '@/commons/components/input';
 import Button from '@/commons/components/button';
-import Checkbox from '@/commons/components/checkbox';
+import Checkbox, { type CheckboxStatus } from '@/commons/components/checkbox';
 
 export default function Login() {
+  const [rememberId, setRememberId] = useState<CheckboxStatus>('unselected');
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
@@ -40,7 +42,11 @@ export default function Login() {
               className={styles.input}
             />
             <div className={styles.checkboxWrapper}>
-              <Checkbox status="unselected" state="default" />
+              <Checkbox
+                status={rememberId}
+                onStatusChange={setRememberId}
+                state="default"
+              />
               <span className={styles.checkboxLabel}>아이디 저장</span>
             </div>
           </div>
