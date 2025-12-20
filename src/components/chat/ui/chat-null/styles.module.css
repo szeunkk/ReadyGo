@@ -1,0 +1,62 @@
+/* 컨테이너 */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg-secondary);
+  padding: 32px 24px;
+  gap: 24px;
+}
+
+/* 아이콘 컨테이너 */
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  background: var(--color-bg-tertiary);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.iconContainer svg {
+  width: 40px;
+  height: 40px;
+}
+
+/* 텍스트 컨테이너 */
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* 제목 */
+.title {
+  font-family: var(--typo-heading-lg-font-family);
+  font-size: var(--typo-heading-lg-font-size);
+  line-height: var(--typo-heading-lg-line-height);
+  font-weight: var(--typo-heading-lg-font-weight);
+  color: var(--color-text-primary);
+  text-align: center;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* 설명 */
+.description {
+  font-family: var(--typo-body-lg-medium-font-family);
+  font-size: var(--typo-body-lg-medium-font-size);
+  line-height: var(--typo-body-lg-medium-line-height);
+  font-weight: var(--typo-body-lg-medium-font-weight);
+  color: var(--color-text-interactive-secondary);
+  text-align: center;
+  margin: 0;
+  white-space: nowrap;
+}

@@ -1,0 +1,244 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+  padding: 32px 0 0;
+}
+
+/* ========== 헤더 ========== */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  padding: 32px 0 40px;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--color-text-interactive-secondary);
+}
+
+.backButton:hover {
+  color: var(--color-text-interactive-secondary-hover);
+}
+
+.backText {
+  font-family: var(--typo-heading-sm-font-family);
+  font-size: var(--typo-heading-sm-font-size);
+  line-height: var(--typo-heading-sm-line-height);
+  font-weight: var(--typo-heading-sm-font-weight);
+}
+
+.titleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  padding: 0 8px;
+}
+
+.titleWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-family: var(--typo-heading-lg-font-family);
+  font-size: var(--typo-heading-lg-font-size);
+  line-height: var(--typo-heading-lg-line-height);
+  font-weight: var(--typo-heading-lg-font-weight);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.stepCounter {
+  font-family: var(--typo-body-lg-medium-font-family);
+  font-size: var(--typo-body-lg-medium-font-size);
+  line-height: var(--typo-body-lg-medium-line-height);
+  font-weight: var(--typo-body-lg-medium-font-weight);
+  color: var(--color-text-interactive-secondary);
+  margin: 0;
+}
+
+.progressSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 20px;
+}
+
+.progressLabel {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-font-weight);
+  color: var(--color-text-interactive-secondary);
+}
+
+.progressPercentage {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-font-weight);
+  color: var(--color-text-interactive-primary);
+}
+
+.progressBarWrapper {
+  width: 100%;
+  height: 8px;
+  background: var(--color-bg-primary);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: var(--color-icon-interactive-primary);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+/* ========== 질문 카드 ========== */
+.questionCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-transparent-16);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0px 10px 15px -3px rgba(95, 252, 226, 0.05),
+    0px 4px 6px -4px rgba(95, 252, 226, 0.05);
+}
+
+.questionCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 49px;
+  padding: 16px 16px;
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid rgba(95, 252, 226, 0.1);
+}
+
+.statusDots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 8px;
+}
+
+.dotDark {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-bg-interactive-primary-pressed);
+  opacity: 0.686;
+}
+
+.dotMedium {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-bg-interactive-primary-hover);
+}
+
+.dotLight {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-bg-interactive-primary);
+}
+
+.questionNumber {
+  font-family: 'NeoDunggeunmo Pro', monospace;
+  font-size: 12px;
+  line-height: 12px;
+  color: var(--color-brand-500);
+}
+
+.questionCardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 49px;
+  padding: 16px;
+  background: var(--color-bg-secondary);
+  border-top: 1px solid rgba(95, 252, 226, 0.1);
+}
+
+.pacmanProgress {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pacmanIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.dotsWrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.progressDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-bg-interactive-primary);
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.progressDotEaten {
+  opacity: 0;
+}
+
+/* ========== 푸터 ========== */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.footer button {
+  border-color: var(--color-border-secondary);
+  color: var(--color-text-interactive-secondary);
+}
+
+.footer button:hover:not(:disabled) {
+  border-color: var(--color-border-interactive-secondary);
+}
+
+.footerHint {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  font-weight: var(--typo-body-sm-font-weight);
+  color: var(--color-text-interactive-secondary);
+  margin: 0;
+}
+

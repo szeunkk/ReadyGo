@@ -102,7 +102,7 @@
 }
 
 .status-selected.state-default .icon {
-  color: var(--color-text-primary);
+  color: var(--color-bg-primary);
 }
 
 .status-selected.state-hover {
@@ -120,7 +120,7 @@
 }
 
 .status-selected.state-press .icon {
-  color: var(--color-text-primary);
+  color: var(--color-bg-primary);
 }
 
 .status-selected.state-focus {
@@ -258,7 +258,3 @@
 .label:active .status-partial.state-default {
   background-color: var(--color-bg-interactive-primary-pressed);
 }
-
-
-
-
