@@ -32,4 +32,25 @@
 
 핵심요구사항) MCP를 연동하여 피그마의 디자인의 모든 속성과 변형을 확인하여 해당 컴포넌트를 구현할 것.
 
+==============================================
 
+1차 추가 요구사항) 아래 조건에 맞게 디자인 수정할 것.
+            - cardTitle과 tag를 하나의 div로 묶고, cardDescription을 따로 분리한 후 바깥 div에 gap 4px 줄 것.
+            - categoryItem 디자인이 피그마 디자인과 다른데 아래 피그마 링크와 조건을 참고해서 수정할 것
+                - https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2590-66137&m=dev
+                - padding: 6px 12px 
+                - 아이콘과 카테고리 라벨을 하나의 div로 묶고 카테고리 벨류(categoryValue)을 빼고 flex-direction은 가로로
+                - 아이콘 색상을 fill="#5FFCE2"
+                - categoryValue 텍스트 색상은 --color-text-interactive-secondary
+                - 카테고리 라벨의 텍스트 색상은 --color-text-primary
+                - 아이템 배경색은 --color-bg-primary
+                - 아이템 높이는 32px 
+
+==============================================
+
+2차 요구사항)아래 조건에 맞게 디자인 수정할 것.
+            1)아래 피그파 링크 참고하여 memberCount의 폰트 색상과, 크기 피그마 디자인과 동일하게 수정할 것.
+              - https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2590-66108&m=dev
+            
+            2)아래 피그마 링크 참고하여 categoryItem의 div구조, 아이콘 색상 폰트 색상, 크기 확앤해서 피그마 디자인과 동일하게 수정할 것.
+              - https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2590-66122&m=dev

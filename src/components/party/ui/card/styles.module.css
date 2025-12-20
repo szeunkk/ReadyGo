@@ -21,16 +21,15 @@
 /* Title Section */
 .titleSection {
   display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.titleTagWrapper {
+  display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 16px;
-}
-
-.titleContent {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
 }
 
 .cardTitle {
@@ -47,7 +46,7 @@
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);
   font-weight: var(--typo-body-md-font-weight);
-  color: var(--color-text-secondary);
+  color: var(--color-text-interactive-secondary);
   margin: 0;
 }
 
@@ -102,20 +101,20 @@
 
 .memberCount {
   display: flex;
+  gap: 4px;
   align-items: center;
-  font-family: var(--typo-body-md-font-family);
-  font-size: var(--typo-body-md-font-size);
-  line-height: var(--typo-body-md-line-height);
-  font-weight: var(--typo-body-md-font-weight);
+  font-family: var(--typo-body-lg-font-family);
+  font-size: var(--typo-body-lg-semibold-font-size);
+  line-height: var(--typo-body-lg-semibold-line-height);
+  font-weight: var(--typo-body-lg-semibold-font-weight);
 }
 
 .currentCount {
   color: var(--color-text-interactive-primary);
-  font-weight: var(--font-weight-semibold);
 }
 
 .maxCount {
-  color: var(--color-text-primary);
+  color: var(--color-text-interactive-secondary);
 }
 
 /* Category Section */
@@ -129,45 +128,45 @@
 .categoryGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 8px;
 }
 
 .categoryItem {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background-color: var(--color-bg-tertiary);
+  padding: 6px 12px;
+  background-color: var(--color-bg-primary);
   border-radius: 8px;
   box-sizing: border-box;
-  min-height: 72px;
+  height: 32px;
+  gap: 8px;
+}
+
+.categoryIconLabelWrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .categoryIcon {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  color: var(--color-icon-interactive-primary);
+  color: var(--color-bg-interactive-primary);
 }
 
 .categoryIcon svg {
-  fill: var(--color-icon-interactive-primary);
-  stroke: var(--color-icon-interactive-primary);
-}
-
-.categoryContent {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
+  color: inherit;
 }
 
 .categoryLabel {
-  font-family: var(--typo-body-sm-font-family);
-  font-size: var(--typo-body-sm-font-size);
-  line-height: var(--typo-body-sm-line-height);
-  font-weight: var(--typo-body-sm-font-weight);
-  color: var(--color-text-secondary);
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-medium-font-size);
+  line-height: var(--typo-body-md-medium-line-height);
+  font-weight: var(--typo-body-md-medium-font-weight);
+  color: var(--color-text-primary);
+  width: 80px;
 }
 
 .categoryValue {
@@ -175,7 +174,8 @@
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);
   font-weight: var(--typo-body-md-font-weight);
-  color: var(--color-text-primary);
+  color: var(--color-text-interactive-secondary);
+  flex-shrink: 0;
 }
 
 /* Button Section */

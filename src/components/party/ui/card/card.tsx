@@ -5,6 +5,7 @@ import Image from 'next/image';
 import styles from './styles.module.css';
 import Button from '@/commons/components/button';
 import Tag from '@/commons/components/tag';
+import Icon from '@/commons/components/icon';
 
 export interface PartyCardProps {
   /**
@@ -57,7 +58,7 @@ export default function Card({
   memberAvatars,
   currentMembers,
   maxMembers,
-  categories,
+  categories: _categories,
   onJoinClick,
   className = '',
 }: PartyCardProps) {
@@ -72,13 +73,13 @@ export default function Card({
       {/* Title 영역 */}
       <div className={styles.cardTitleMemberWrapper}>
         <div className={styles.titleSection}>
-          <div className={styles.titleContent}>
+          <div className={styles.titleTagWrapper}>
             <h2 className={styles.cardTitle}>{title}</h2>
-            <p className={styles.cardDescription}>{description}</p>
+            <Tag style="duotone" className={styles.gameTag}>
+              {gameTag}
+            </Tag>
           </div>
-          <Tag style="duotone" className={styles.gameTag}>
-            {gameTag}
-          </Tag>
+          <p className={styles.cardDescription}>{description}</p>
         </div>
 
         {/* Party Member 영역 */}
@@ -117,68 +118,60 @@ export default function Card({
       <div className={styles.cardCategoryButtonWrapper}>
         <div className={styles.categoryGrid}>
           <div className={styles.categoryItem}>
-            <Image
-              src="/icons/time.svg"
-              alt="시작 시간"
-              width={20}
-              height={20}
-              className={styles.categoryIcon}
-              unoptimized
-            />
-            <div className={styles.categoryContent}>
+            <div className={styles.categoryIconLabelWrapper}>
+              <Icon
+                key="time"
+                name="time"
+                size={20}
+                className={styles.categoryIcon}
+              />
               <span className={styles.categoryLabel}>시작 시간</span>
-              <span className={styles.categoryValue}>
-                {categories.startTime}
-              </span>
             </div>
+            <span className={styles.categoryValue}>
+              {_categories.startTime}
+            </span>
           </div>
           <div className={styles.categoryItem}>
-            <Image
-              src="/icons/mic.svg"
-              alt="보이스챗"
-              width={20}
-              height={20}
-              className={styles.categoryIcon}
-              unoptimized
-            />
-            <div className={styles.categoryContent}>
+            <div className={styles.categoryIconLabelWrapper}>
+              <Icon
+                key="mic"
+                name="mic"
+                size={20}
+                className={styles.categoryIcon}
+              />
               <span className={styles.categoryLabel}>보이스챗</span>
-              <span className={styles.categoryValue}>
-                {categories.voiceChat}
-              </span>
             </div>
+            <span className={styles.categoryValue}>
+              {_categories.voiceChat}
+            </span>
           </div>
           <div className={styles.categoryItem}>
-            <Image
-              src="/icons/crown.svg"
-              alt="난이도"
-              width={20}
-              height={20}
-              className={styles.categoryIcon}
-              unoptimized
-            />
-            <div className={styles.categoryContent}>
+            <div className={styles.categoryIconLabelWrapper}>
+              <Icon
+                key="crown"
+                name="crown"
+                size={20}
+                className={styles.categoryIcon}
+              />
               <span className={styles.categoryLabel}>난이도</span>
-              <span className={styles.categoryValue}>
-                {categories.difficulty}
-              </span>
             </div>
+            <span className={styles.categoryValue}>
+              {_categories.difficulty}
+            </span>
           </div>
           <div className={styles.categoryItem}>
-            <Image
-              src="/icons/gamepad.svg"
-              alt="컨트롤 수준"
-              width={20}
-              height={20}
-              className={styles.categoryIcon}
-              unoptimized
-            />
-            <div className={styles.categoryContent}>
+            <div className={styles.categoryIconLabelWrapper}>
+              <Icon
+                key="gamepad"
+                name="gamepad"
+                size={20}
+                className={styles.categoryIcon}
+              />
               <span className={styles.categoryLabel}>컨트롤 수준</span>
-              <span className={styles.categoryValue}>
-                {categories.controlLevel}
-              </span>
             </div>
+            <span className={styles.categoryValue}>
+              {_categories.controlLevel}
+            </span>
           </div>
         </div>
 
