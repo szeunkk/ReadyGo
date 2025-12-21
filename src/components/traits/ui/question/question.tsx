@@ -50,8 +50,8 @@ export default function Question({ onComplete }: QuestionProps) {
     }
   };
 
-  const progressPercentage = Math.round((currentStep / totalSteps) * 100);
-  const progressWidth = (currentStep / totalSteps) * 100;
+  const progressPercentage = Math.round(((currentStep - 1) / totalSteps) * 100);
+  const progressWidth = ((currentStep - 1) / totalSteps) * 100;
 
   // 팩맨 위치 계산 (0-10 사이)
   const pacmanPosition = currentStep - 1;
