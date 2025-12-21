@@ -10,7 +10,11 @@ import QuestionSchedule from './question-schedule/questionSchedule';
 
 type AnswerType = number | { dayTypes: string[]; timeSlots: string[] };
 
-export default function Question() {
+interface QuestionProps {
+  onComplete?: () => void;
+}
+
+export default function Question({ onComplete }: QuestionProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedAnswers, setSelectedAnswers] = useState<
     Record<number, AnswerType>
@@ -39,8 +43,10 @@ export default function Question() {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     } else {
-      // 마지막 질문 완료 - 결과 페이지로 이동
-      // TODO: 결과 페이지 구현
+      // 마지막 질문 완료 - 분석 로딩 화면 표시
+      if (onComplete) {
+        onComplete();
+      }
     }
   };
 
