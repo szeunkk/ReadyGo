@@ -6,7 +6,7 @@
   align-items: center;
   gap: 32px;
   padding: 48px 32px;
-  width: 100%;
+  width: fit-content;
   height: 100%;
   border-radius: 16px;
 }
@@ -642,4 +642,3 @@
     width: 100%;
   }
 }
-

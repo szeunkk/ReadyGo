@@ -49,6 +49,7 @@ export const URL_PATHS = {
   FRIENDS: '/friends',
   NOTIFICATIONS: '/notifications',
   TRAITS: '/traits',
+  TRAITS_RESULT: '/traits/result',
 } as const;
 
 // ============================================
@@ -147,6 +148,14 @@ export const URL_METADATA: Record<string, UrlMetadata> = {
       sidebar: false,
     },
   },
+  [URL_PATHS.TRAITS_RESULT]: {
+    path: URL_PATHS.TRAITS_RESULT,
+    accessStatus: 'member-only',
+    visibility: {
+      header: true,
+      sidebar: true,
+    },
+  },
 };
 
 // ============================================
@@ -203,6 +212,17 @@ export function getUrlMetadata(path: string): UrlMetadata | undefined {
   }
 
   if (path.startsWith('/party/') && path !== URL_PATHS.PARTY_NEW) {
+    return {
+      path,
+      accessStatus: 'member-only',
+      visibility: {
+        header: true,
+        sidebar: true,
+      },
+    };
+  }
+
+  if (path.startsWith('/traits/result')) {
     return {
       path,
       accessStatus: 'member-only',
