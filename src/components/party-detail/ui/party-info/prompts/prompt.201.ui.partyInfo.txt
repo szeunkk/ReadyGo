@@ -11,7 +11,7 @@
 ==============================================
 
 조건-피그마) 활용할MCP: Figma Desktop
-조건-피그마) 구현될 figma(party-info): https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2297-4166&m=dev
+조건-피그마) 구현될 figma(party-info): https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2325-434&m=dev
 
 조건-파일경로) 구현될 TSX 파일경로: src/components/party-detail/ui/party-info/partyInfo.tsx
 조건-파일경로) 구현될 CSS 파일경로: src/components/party-detail/ui/party-info/styles.module.css
@@ -30,8 +30,8 @@
 
 핵심요구사항) 완성된 컴포넌트를 src/components/party-detail/index.tsx에서 import하여 연결시킬 것.
             - 연결될 경로: src/components/party-detail/index.tsx
-            - chat-area 영역에 이 컴포넌트를 import하여 사용하도록 구현할 것.
-            - import 경로: src/components/party-detail/ui/chat-null/chatNull.tsx
+            - side-area 영역에 이 컴포넌트를 import하여 사용하도록 구현할 것.
+            - import 경로: src/components/party-detail/ui/party-info/partyInfo.tsx
 
 핵심요구사항) party-info에 사용되는 공통컴포넌트
             - <Tag />, <Button />

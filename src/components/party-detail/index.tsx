@@ -6,6 +6,7 @@ import Icon from '@/commons/components/icon';
 import { URL_PATHS } from '@/commons/constants/url';
 import ChatNull from './ui/chat-null/chatNull';
 import MemberList from './ui/member-list/memberList';
+import PartyInfo from './ui/party-info/partyInfo';
 import styles from './styles.module.css';
 
 export default function PartyDetail() {
@@ -25,7 +26,7 @@ export default function PartyDetail() {
         <ChatNull />
         <div className={styles.sideArea}>
           <MemberList />
-          <div className={styles.partyInfo}>party-info</div>
+          <PartyInfo />
         </div>
       </div>
     </div>
