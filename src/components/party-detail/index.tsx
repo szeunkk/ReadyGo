@@ -4,6 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import Icon from '@/commons/components/icon';
 import { URL_PATHS } from '@/commons/constants/url';
+import ChatNull from './ui/chat-null/chatNull';
+import MemberList from './ui/member-list/memberList';
 import styles from './styles.module.css';
 
 export default function PartyDetail() {
@@ -20,9 +22,9 @@ export default function PartyDetail() {
         </p>
       </div>
       <div className={styles.mainArea}>
-        <div className={styles.chatArea}>chat-area</div>
+        <ChatNull />
         <div className={styles.sideArea}>
-          <div className={styles.memberList}>member-list</div>
+          <MemberList />
           <div className={styles.partyInfo}>party-info</div>
         </div>
       </div>

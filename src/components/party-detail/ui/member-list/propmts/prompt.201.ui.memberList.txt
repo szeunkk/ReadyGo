@@ -12,16 +12,14 @@
 
 조건-피그마) 활용할MCP: Figma Desktop
 조건-피그마) 구현될 figma(chat-area): https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2297-4166&m=dev
-조건-피그마) 구현될 figma(chatLog):https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2297-4180&m=dev
-조건-피그마) 구현될 figma(messageArea): https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2297-4376&m=dev
 
-조건-파일경로) 구현될 TSX 파일경로: src/components/party-detail/ui/chat-null/chatNull.tsx
-조건-파일경로) 구현될 CSS 파일경로: src/components/party-detail/ui/chat-null/styles.module.css
+조건-파일경로) 구현될 TSX 파일경로: src/components/party-detail/ui/member-list/memberList.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/party-detail/ui/member-list/styles.module.css
 
 ==============================================
 
 조건-공통목록) 사용할 공통컴포넌트 목록
-            - <Input />, <Button />
+            - <Tag />
 
 조건-공통목록) 사용할 색상 목록(global.css에 명시된 변수 토큰 활용)
             - 색상 토큰은 피그마와 동일하게 color-text-interaction-primary 의 예시와 같이 globals.css의 시멘틱 색상 토큰을 활용하여 구현할 것.
@@ -32,9 +30,9 @@
 
 핵심요구사항) 완성된 컴포넌트를 src/components/party-detail/index.tsx에서 import하여 연결시킬 것.
             - 연결될 경로: src/components/party-detail/index.tsx
-            - chat-area 영역에 이 컴포넌트를 import하여 사용하도록 구현할 것.
-            - import 경로: src/components/party-detail/ui/chat-null/chatNull.tsx
+            - member-list 영역에 이 컴포넌트를 import하여 사용하도록 구현할 것.
+            - import 경로: src/components/party-detail/ui/member-list/memberList.tsx
 
-핵심요구사항) message-area에 사용되는 공통컴포넌트
-            - <Input />, <Button />
+핵심요구사항) member-list에 사용되는 공통컴포넌트
+            - <Tag />
 

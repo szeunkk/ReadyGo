@@ -72,16 +72,6 @@
   background-color: var(--color-bg-secondary);
 }
 
-.chatArea {
-  width: 824px;
-  height: 1230px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  background-color: var(--color-blue-100);
-}
-
 .sideArea {
   width: 464px;
   height: 1230px;
@@ -89,17 +79,6 @@
   flex-direction: column;
   gap: 24px;
   box-sizing: border-box;
-}
-
-.memberList {
-  width: 464px;
-  height: 754px;
-  padding: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  background-color: var(--color-green-100);
 }
 
 .partyInfo {
