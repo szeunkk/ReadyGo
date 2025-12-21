@@ -152,8 +152,8 @@ export const URL_METADATA: Record<string, UrlMetadata> = {
     path: URL_PATHS.TRAITS_RESULT,
     accessStatus: 'member-only',
     visibility: {
-      header: true,
-      sidebar: true,
+      header: false,
+      sidebar: false,
     },
   },
 };
@@ -227,8 +227,8 @@ export function getUrlMetadata(path: string): UrlMetadata | undefined {
       path,
       accessStatus: 'member-only',
       visibility: {
-        header: true,
-        sidebar: true,
+        header: false,
+        sidebar: false,
       },
     };
   }
