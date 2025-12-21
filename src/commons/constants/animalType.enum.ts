@@ -79,6 +79,15 @@ export type AnimalTypeMeta = {
   dominantTraits: TraitKey[];
   secondaryTraits: TraitKey[];
   avoidTraits: TraitKey[];
+  mainRole: {
+    name: string;
+    description: string;
+  };
+  subRole: {
+    name: string;
+    description: string;
+  };
+  checkSentences: string[];
   ui: {
     imageS: string;
     imageM: string;
@@ -100,6 +109,20 @@ export const animalTypeMeta = {
     dominantTraits: ['exploration', 'leadership'],
     secondaryTraits: ['cooperation', 'social'],
     avoidTraits: ['strategy'],
+    mainRole: {
+      name: '전술리더',
+      description: '팀의 흐름을 먼저 읽고,\n싸울지 물러날지의 기준을 잡습니다.',
+    },
+    subRole: {
+      name: '메인콜러',
+      description:
+        '상황을 빠르게 공유하고,\n결정이 필요한 순간 콜로 팀을 묶습니다.',
+    },
+    checkSentences: [
+      '팀을 끌고 가며 필요한 순간 과감하게 밀어붙입니다.',
+      '결단이 필요한 상황에서 주저하지 않는 편입니다.',
+      '전체 흐름을 보며 팀의 방향을 잡습니다.',
+    ],
     ui: {
       imageS: '/images/wolf_s.svg',
       imageM: '/images/wolf_m.svg',
@@ -114,6 +137,19 @@ export const animalTypeMeta = {
     dominantTraits: ['exploration'],
     secondaryTraits: ['leadership'],
     avoidTraits: ['cooperation', 'strategy', 'social'],
+    mainRole: {
+      name: '돌파 실행가',
+      description: '빠른 판단과 과감한 진입으로,\n전투의 흐름을 직접 바꿉니다.',
+    },
+    subRole: {
+      name: '선봉 압박자',
+      description: '앞에서 압박하며,\n팀이 공격적으로 나설 수 있게 만듭니다.',
+    },
+    checkSentences: [
+      '혼자서도 빠르게 치고 나가는 플레이를 선호합니다.',
+      '공격 타이밍을 놓치지 않는 편입니다.',
+      '솔랭이나 개인 기량 중심 플레이에 강합니다.',
+    ],
     ui: {
       imageS: '/images/tiger_s.svg',
       imageM: '/images/tiger_m.svg',
@@ -128,6 +164,19 @@ export const animalTypeMeta = {
     dominantTraits: ['strategy'],
     secondaryTraits: ['exploration'],
     avoidTraits: ['cooperation', 'leadership', 'social'],
+    mainRole: {
+      name: '정밀 딜러',
+      description: '상황을 정확히 읽고,\n필요한 순간에만 공격합니다.',
+    },
+    subRole: {
+      name: '침착한 판단자',
+      description: '감정에 휘둘리지 않고,\n냉정한 선택을 유지합니다.',
+    },
+    checkSentences: [
+      '집중력과 정확도를 중요하게 생각합니다.',
+      '무리하지 않고 확실한 상황만 노립니다.',
+      '침착한 플레이로 안정적인 딜을 넣습니다.',
+    ],
     ui: {
       imageS: '/images/hawk_s.svg',
       imageM: '/images/hawk_m.svg',
@@ -144,6 +193,19 @@ export const animalTypeMeta = {
     dominantTraits: ['strategy'],
     secondaryTraits: ['leadership'],
     avoidTraits: ['cooperation', 'exploration', 'social'],
+    mainRole: {
+      name: '운영 전략가',
+      description: '전체 흐름을 길게 보며,\n운영 중심으로 전투를 설계합니다.',
+    },
+    subRole: {
+      name: '판단 보조자',
+      description: '리스크를 계산해,\n안정적인 선택을 돕습니다.',
+    },
+    checkSentences: [
+      '장기적인 운영과 흐름을 중시합니다.',
+      '급한 판단보다는 안정적인 선택을 선호합니다.',
+      '게임 전체를 설계하듯 플레이합니다.',
+    ],
     ui: {
       imageS: '/images/owl_s.svg',
       imageM: '/images/owl_m.svg',
@@ -158,6 +220,19 @@ export const animalTypeMeta = {
     dominantTraits: ['strategy'],
     secondaryTraits: ['cooperation', 'exploration', 'social'],
     avoidTraits: ['leadership'],
+    mainRole: {
+      name: '심리전 설계자',
+      description: '상대의 선택을 읽고,\n유리한 상황을 만듭니다.',
+    },
+    subRole: {
+      name: '유연한 대응자',
+      description: '상황에 따라 전략을 바꾸며,\n흐름을 조절합니다.',
+    },
+    checkSentences: [
+      '눈치 싸움과 심리전에 강한 편입니다.',
+      '정형화되지 않은 플레이를 선호합니다.',
+      '유연한 판단으로 상황을 풀어갑니다.',
+    ],
     ui: {
       imageS: '/images/fox_s.svg',
       imageM: '/images/fox_m.svg',
@@ -172,6 +247,19 @@ export const animalTypeMeta = {
     dominantTraits: ['strategy'],
     secondaryTraits: ['exploration'],
     avoidTraits: ['cooperation', 'leadership', 'social'],
+    mainRole: {
+      name: '공략 연구가',
+      description: '데이터와 공략을 기반으로,\n최적의 플레이를 찾습니다.',
+    },
+    subRole: {
+      name: '최적화 담당',
+      description: '세부 요소를 분석해,\n플레이 효율을 높입니다.',
+    },
+    checkSentences: [
+      '혼자서 공략을 연구하는 시간을 즐깁니다.',
+      '실험과 분석을 통해 답을 찾는 편입니다.',
+      '최적화된 플레이를 선호합니다.',
+    ],
     ui: {
       imageS: '/images/hedgehog_s.svg',
       imageM: '/images/hedgehog_m.svg',
@@ -186,6 +274,19 @@ export const animalTypeMeta = {
     dominantTraits: ['strategy'],
     secondaryTraits: ['cooperation'],
     avoidTraits: ['exploration', 'leadership', 'social'],
+    mainRole: {
+      name: '패턴 분석가',
+      description: '상대의 움직임을 읽고,\n다음 행동을 예측합니다.',
+    },
+    subRole: {
+      name: '정보 공유자',
+      description: '관찰한 내용을 정리해,\n팀에 전달합니다.',
+    },
+    checkSentences: [
+      '상대 패턴을 파악하는 데 강합니다.',
+      '계산된 플레이를 선호합니다.',
+      '전투 흐름을 예측하며 움직입니다.',
+    ],
     ui: {
       imageS: '/images/raven_s.svg',
       imageM: '/images/raven_m.svg',
@@ -202,6 +303,19 @@ export const animalTypeMeta = {
     dominantTraits: ['cooperation'],
     secondaryTraits: ['strategy', 'leadership', 'social'],
     avoidTraits: ['exploration'],
+    mainRole: {
+      name: '팀 보호자',
+      description: '팀의 중심을 지키며,\n안정적인 전투를 만듭니다.',
+    },
+    subRole: {
+      name: '전선 유지자',
+      description: '무너지지 않도록 버티며,\n팀을 지탱합니다.',
+    },
+    checkSentences: [
+      '팀을 지켜주는 역할을 선호합니다.',
+      '안정적인 플레이로 신뢰를 줍니다.',
+      '무리하지 않고 팀을 보호합니다.',
+    ],
     ui: {
       imageS: '/images/bear_s.svg',
       imageM: '/images/bear_m.svg',
@@ -216,6 +330,19 @@ export const animalTypeMeta = {
     dominantTraits: ['cooperation'],
     secondaryTraits: ['social'],
     avoidTraits: ['exploration', 'strategy', 'leadership'],
+    mainRole: {
+      name: '힐링 서포터',
+      description: '차분한 플레이로,\n팀의 분위기를 안정시킵니다.',
+    },
+    subRole: {
+      name: '분위기 완충자',
+      description: '긴장을 낮추며,\n편안한 게임을 만듭니다.',
+    },
+    checkSentences: [
+      '편안한 게임을 선호합니다.',
+      '과도한 경쟁보다는 안정감을 중시합니다.',
+      '차분한 분위기를 만듭니다.',
+    ],
     ui: {
       imageS: '/images/deer_s.svg',
       imageM: '/images/deer_m.svg',
@@ -230,6 +357,19 @@ export const animalTypeMeta = {
     dominantTraits: ['social'],
     secondaryTraits: ['cooperation'],
     avoidTraits: ['exploration', 'strategy', 'leadership'],
+    mainRole: {
+      name: '캐주얼 플레이어',
+      description: '부담 없이 플레이하며,\n게임을 즐기는 데 집중합니다.',
+    },
+    subRole: {
+      name: '편안한 동료',
+      description: '주변을 편하게 만들어,\n함께 즐기기 좋은 분위기를 만듭니다.',
+    },
+    checkSentences: [
+      '가볍게 즐기는 플레이를 좋아합니다.',
+      '성과보다 재미를 중요하게 생각합니다.',
+      '편안한 파티 플레이를 선호합니다.',
+    ],
     ui: {
       imageS: '/images/koala_s.svg',
       imageM: '/images/koala_m.svg',
@@ -246,6 +386,19 @@ export const animalTypeMeta = {
     dominantTraits: ['cooperation', 'social'],
     secondaryTraits: ['exploration', 'leadership'],
     avoidTraits: ['strategy'],
+    mainRole: {
+      name: '분위기 메이커',
+      description: '밝은 소통으로,\n팀의 텐션을 끌어올립니다.',
+    },
+    subRole: {
+      name: '커뮤니케이션 허브',
+      description: '팀원 간 소통을 이어,\n호흡을 맞춥니다.',
+    },
+    checkSentences: [
+      '팀 분위기를 살리는 데 강합니다.',
+      '사람들과 빠르게 친해지는 편입니다.',
+      '함께 플레이하는 재미를 중시합니다.',
+    ],
     ui: {
       imageS: '/images/dog_s.svg',
       imageM: '/images/dog_m.svg',
@@ -260,6 +413,19 @@ export const animalTypeMeta = {
     dominantTraits: ['cooperation', 'social'],
     secondaryTraits: ['exploration'],
     avoidTraits: ['strategy', 'leadership'],
+    mainRole: {
+      name: '텐션 리더',
+      description: '유쾌한 에너지로,\n파티 분위기를 주도합니다.',
+    },
+    subRole: {
+      name: '협동 촉진자',
+      description: '함께 움직이며,\n협동 플레이를 끌어냅니다.',
+    },
+    checkSentences: [
+      '파티 게임과 협동 플레이를 좋아합니다.',
+      '분위기를 띄우는 데 익숙합니다.',
+      '함께 웃으며 플레이하는 걸 선호합니다.',
+    ],
     ui: {
       imageS: '/images/dolphin_s.svg',
       imageM: '/images/dolphin_m.svg',
@@ -274,6 +440,19 @@ export const animalTypeMeta = {
     dominantTraits: ['cooperation', 'social'],
     secondaryTraits: ['strategy'],
     avoidTraits: ['exploration', 'leadership'],
+    mainRole: {
+      name: '밸런스 플레이어',
+      description: '어느 역할이든 무난하게,\n팀에 맞춰 플레이합니다.',
+    },
+    subRole: {
+      name: '조율 담당',
+      description: '팀 분위기에 맞게,\n플레이를 조정합니다.',
+    },
+    checkSentences: [
+      '누구와도 무난하게 어울립니다.',
+      '특정 스타일에 치우치지 않습니다.',
+      '팀에 맞춰 유연하게 움직입니다.',
+    ],
     ui: {
       imageS: '/images/panda_s.svg',
       imageM: '/images/panda_m.svg',
@@ -288,6 +467,19 @@ export const animalTypeMeta = {
     dominantTraits: ['social'],
     secondaryTraits: ['cooperation', 'exploration'],
     avoidTraits: ['strategy', 'leadership'],
+    mainRole: {
+      name: '분위기 업로더',
+      description: '가벼운 소통으로,\n팀 분위기를 밝게 만듭니다.',
+    },
+    subRole: {
+      name: '순발 대응자',
+      description: '빠른 반응으로,\n흐름에 잘 적응합니다.',
+    },
+    checkSentences: [
+      '분위기를 가볍게 만드는 편입니다.',
+      '사람들과 빠르게 친해집니다.',
+      '경쾌한 플레이를 선호합니다.',
+    ],
     ui: {
       imageS: '/images/rabbit_s.svg',
       imageM: '/images/rabbit_m.svg',
@@ -304,6 +496,19 @@ export const animalTypeMeta = {
     dominantTraits: ['exploration'],
     secondaryTraits: ['strategy', 'leadership'],
     avoidTraits: ['cooperation', 'social'],
+    mainRole: {
+      name: '집중 경쟁자',
+      description: '승부에 집중하며,\n개인 성능을 극대화합니다.',
+    },
+    subRole: {
+      name: '고속 판단자',
+      description: '빠른 판단으로,\n기회를 놓치지 않습니다.',
+    },
+    checkSentences: [
+      '경쟁전과 솔랭을 선호합니다.',
+      '집중력이 높은 편입니다.',
+      '성능 위주 플레이를 합니다.',
+    ],
     ui: {
       imageS: '/images/leopard_s.svg',
       imageM: '/images/leopard_m.svg',
@@ -318,6 +523,19 @@ export const animalTypeMeta = {
     dominantTraits: ['strategy'],
     secondaryTraits: ['exploration'],
     avoidTraits: ['cooperation', 'leadership', 'social'],
+    mainRole: {
+      name: '잠입 플레이어',
+      description: '자신만의 루트로,\n혼자서 깊이 플레이합니다.',
+    },
+    subRole: {
+      name: '기술 숙련자',
+      description: '조작과 기술을 연마해,\n완성도 높은 플레이를 합니다.',
+    },
+    checkSentences: [
+      '혼자 몰입하는 플레이를 좋아합니다.',
+      '자신만의 스타일을 중시합니다.',
+      '기술적인 완성도를 추구합니다.',
+    ],
     ui: {
       imageS: '/images/cat_s.svg',
       imageM: '/images/cat_m.svg',
