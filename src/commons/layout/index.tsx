@@ -39,6 +39,9 @@ export const Layout = ({ children }: LayoutProps) => {
       setActiveNav('match');
     } else if (pathname.startsWith(URL_PATHS.PARTY)) {
       setActiveNav('party');
+    } else if (pathname.startsWith(URL_PATHS.TRAITS)) {
+      // traits 페이지는 홈에서 접근하는 기능이므로 home 활성화
+      setActiveNav('home');
     }
   }, [pathname]);
 
