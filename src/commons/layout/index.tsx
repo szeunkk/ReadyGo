@@ -7,6 +7,7 @@ import Icon from '@/commons/components/icon';
 import { getUrlMetadata, URL_PATHS } from '@/commons/constants/url';
 import styles from './styles.module.css';
 import { useSidePanelStore } from '@/stores/sidePanel.store';
+import { SidePanel } from '@/commons/side-panel';
 
 interface LayoutProps {
   children: ReactNode;
@@ -183,9 +184,9 @@ export const Layout = ({ children }: LayoutProps) => {
           </main>
 
           {/* Side Panel */}
-          <aside
-            className={`${styles.sidePanel} ${isOpen ? styles.open : ''}`}
-          />
+          <aside className={`${styles.sidePanel} ${isOpen ? styles.open : ''}`}>
+            <SidePanel />
+          </aside>
         </div>
       </div>
     </div>
