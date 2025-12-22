@@ -58,12 +58,22 @@ export const getCompatibilityLevel = (
   type2: AnimalType
 ): 'best' | 'good' | 'neutral' | 'challenging' | 'unknown' => {
   const compat = animalCompatibilities[type1];
-  if (!compat) return 'unknown';
+  if (!compat) {
+    return 'unknown';
+  }
 
-  if (compat.bestMatches?.includes(type2)) return 'best';
-  if (compat.goodMatches?.includes(type2)) return 'good';
-  if (compat.challengingMatches?.includes(type2)) return 'challenging';
-  if (compat.neutralMatches?.includes(type2)) return 'neutral';
+  if (compat.bestMatches?.includes(type2)) {
+    return 'best';
+  }
+  if (compat.goodMatches?.includes(type2)) {
+    return 'good';
+  }
+  if (compat.challengingMatches?.includes(type2)) {
+    return 'challenging';
+  }
+  if (compat.neutralMatches?.includes(type2)) {
+    return 'neutral';
+  }
 
   return 'unknown';
 };
