@@ -52,7 +52,7 @@ const MOCK_ROOM_DATA: Record<
     otherUser: {
       id: string;
       nickname: string;
-      avatar_url: string;
+      animalType?: string;
       status: 'online' | 'away' | 'ban' | 'offline';
     };
     messages: ChatMessage[];
@@ -64,7 +64,7 @@ const MOCK_ROOM_DATA: Record<
     otherUser: {
       id: 'user-1',
       nickname: '게이머호랑이',
-      avatar_url: '/images/tiger_m.svg',
+      animalType: 'tiger',
       status: 'online',
     },
     messages: [
@@ -170,7 +170,7 @@ const MOCK_ROOM_DATA: Record<
     otherUser: {
       id: 'user-2',
       nickname: '호쾌한망토',
-      avatar_url: '/images/fox_m.svg',
+      animalType: 'fox',
       status: 'away',
     },
     messages: [
@@ -207,7 +207,7 @@ const MOCK_ROOM_DATA: Record<
     otherUser: {
       id: 'user-3',
       nickname: '까칠한까마귀',
-      avatar_url: '/images/raven_m.svg',
+      animalType: 'raven',
       status: 'offline',
     },
     messages: [
@@ -228,7 +228,7 @@ const MOCK_ROOM_DATA: Record<
     otherUser: {
       id: 'user-4',
       nickname: '게임 파티',
-      avatar_url: '/images/bear_m.svg',
+      animalType: 'bear',
       status: 'online',
     },
     messages: [
@@ -256,7 +256,7 @@ const MOCK_ROOM_DATA: Record<
     otherUser: {
       id: 'user-6',
       nickname: '차단된유저',
-      avatar_url: '/images/wolf_m.svg',
+      animalType: 'wolf',
       status: 'ban',
     },
     messages: [
@@ -280,7 +280,7 @@ const DEFAULT_MOCK_DATA = {
   otherUser: {
     id: 'user-2',
     nickname: '까칠한까마귀',
-    avatar_url: '/images/raven_m.svg',
+    animalType: 'raven',
     status: 'online' as const,
   },
   messages: [
@@ -410,7 +410,7 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
           otherUser: {
             id: otherMember.user_id,
             nickname: otherMember.nickname,
-            avatar_url: otherMember.avatar_url,
+            animalType: otherMember.animalType,
             status: otherMember.status || 'offline',
           },
           messages: chatRoomData.lastMessage
@@ -439,7 +439,8 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
   const MOCK_OTHER_USER = {
     id: roomData.otherUser.id,
     nickname: roomData.otherUser.nickname,
-    avatar_url: roomData.otherUser.avatar_url,
+    animalType: roomData.otherUser.animalType,
+    status: roomData.otherUser.status,
     is_online: roomData.otherUser.status === 'online',
   };
 
@@ -483,10 +484,11 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
       <header className={styles.header} aria-label="채팅방 헤더">
         <div className={styles.headerLeft}>
           <Avatar
-            src={MOCK_OTHER_USER.avatar_url}
+            animalType={MOCK_OTHER_USER.animalType as any}
             alt={MOCK_OTHER_USER.nickname}
             size="s"
-            showStatus={false}
+            status={MOCK_OTHER_USER.status}
+            showStatus={true}
             className={styles.headerAvatar}
           />
           <div className={styles.headerUserInfo}>
@@ -596,10 +598,11 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
               >
                 {!isConsecutive && (
                   <Avatar
-                    src={MOCK_OTHER_USER.avatar_url}
+                    animalType={MOCK_OTHER_USER.animalType as any}
                     alt={MOCK_OTHER_USER.nickname}
                     size="s"
-                    showStatus={false}
+                    status={MOCK_OTHER_USER.status}
+                    showStatus={true}
                     className={styles.messageAvatar}
                   />
                 )}

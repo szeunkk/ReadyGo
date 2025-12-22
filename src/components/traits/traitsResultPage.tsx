@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Result from './ui/result/result';
-import { AnimalType } from '@/commons/constants/animalType.enum';
+import { AnimalType } from '@/commons/constants/animal';
 import { RadarChartData } from '@/commons/components/radar-chart';
 import styles from './styles.module.css';
 

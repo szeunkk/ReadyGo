@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import AnimalCard from './index';
 import { TierType } from '../../constants/tierType.enum';
-import { AnimalType } from '../../constants/animalType.enum';
+import { AnimalType } from '../../constants/animal';
 
 const meta = {
   title: 'Commons/Components/AnimalCard',

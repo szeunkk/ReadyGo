@@ -20,9 +20,9 @@ export interface MatchCardProps {
    */
   status?: 'online' | 'away' | 'ban' | 'offline';
   /**
-   * 사용자 아바타 이미지 경로
+   * 동물 타입
    */
-  avatarSrc?: string;
+  animalType?: string;
   /**
    * 질문 텍스트
    */
@@ -53,7 +53,7 @@ export default function MatchCard({
   nickname,
   matchRate,
   status = 'online',
-  avatarSrc,
+  animalType,
   question = '왜 이 친구와 잘 맞나요?',
   gamePreference,
   playTime,
@@ -94,7 +94,7 @@ export default function MatchCard({
           {/* 아바타 */}
           <div className={styles.avatarWrapper}>
             <Avatar
-              src={avatarSrc || '/images/bird.svg'}
+              animalType={animalType as any}
               alt={nickname}
               size="m"
               status={status}

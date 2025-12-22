@@ -7,7 +7,7 @@ import PartySection from './ui/party-section/partySection';
 import ProfileSection from './ui/profile-section/profileSection';
 import { MatchCardProps } from './ui/match-section/card/matchCard';
 import { PartyCardProps } from './ui/party-section/card/partyCard';
-import { AnimalType } from '@/commons/constants/animalType.enum';
+import { AnimalType } from '@/commons/constants/animal';
 import { TierType } from '@/commons/constants/tierType.enum';
 
 // 임시 데이터 - 추후 API로 대체될 예정

@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import styles from './styles.module.css';
+import Avatar from '@/commons/components/avatar';
 import Button from '@/commons/components/button';
 import Tag from '@/commons/components/tag';
 import Icon from '@/commons/components/icon';
@@ -21,7 +21,7 @@ export interface PartyCardProps {
    */
   gameTag: string;
   /**
-   * 파티 멤버 아바타 목록
+   * 파티 멤버 동물 타입 목록
    */
   memberAvatars: string[];
   /**
@@ -42,6 +42,11 @@ export interface PartyCardProps {
     controlLevel: string;
   };
   /**
+   * 아바타 색상 (CSS color 값)
+   * @default 'var(--color-text-secondary)'
+   */
+  avatarColor?: string;
+  /**
    * 참여하기 버튼 클릭 핸들러
    */
   onJoinClick?: () => void;
@@ -59,6 +64,7 @@ export default function Card({
   currentMembers,
   maxMembers,
   categories: _categories,
+  avatarColor = 'var(--color-text-secondary)',
   onJoinClick,
   className = '',
 }: PartyCardProps) {
@@ -91,19 +97,20 @@ export default function Card({
                 className={styles.avatarWrapper}
                 style={{ zIndex: displayAvatars.length - index }}
               >
-                <Image
-                  src={avatar}
+                <Avatar
+                  animalType={avatar as any}
                   alt={`Member ${index + 1}`}
-                  width={40}
-                  height={40}
-                  className={styles.avatar}
-                  unoptimized
+                  size="s"
+                  showStatus={false}
+                  color={avatarColor}
                 />
               </div>
             ))}
             {remainingCount > 0 && (
               <div className={styles.avatarWrapper} style={{ zIndex: 0 }}>
-                <div className={styles.remainingCount}>+{remainingCount}</div>
+                <div className={styles.remainingCountWrapper}>
+                  <div className={styles.remainingCount}>+{remainingCount}</div>
+                </div>
               </div>
             )}
           </div>

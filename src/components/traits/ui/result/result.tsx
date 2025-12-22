@@ -8,8 +8,7 @@ import Button from '@/commons/components/button';
 import {
   AnimalType,
   animalTypeMeta,
-  RadarTraitKey,
-} from '@/commons/constants/animalType.enum';
+} from '@/commons/constants/animal';
 import styles from './styles.module.css';
 
 export interface ResultProps {

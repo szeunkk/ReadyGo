@@ -17,7 +17,7 @@ import styles from './styles.module.css';
 import {
   RadarTraitKey,
   radarTraitLabels,
-} from '../../constants/animalType.enum';
+} from '../../constants/animal';
 
 // 점선 그리드를 위한 커스텀 플러그인
 const dashedGridPlugin: Plugin<'radar'> = {

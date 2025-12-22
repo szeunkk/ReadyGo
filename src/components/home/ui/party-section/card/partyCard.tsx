@@ -8,9 +8,9 @@ import Tag from '@/commons/components/tag';
 
 export interface PartyMember {
   /**
-   * 멤버 아바타 이미지 경로
+   * 멤버 동물 타입
    */
-  avatarSrc?: string;
+  animalType?: string;
   /**
    * 멤버 닉네임
    */
@@ -102,7 +102,7 @@ export default function PartyCard({
                 style={{ zIndex: displayMembers.length - index }}
               >
                 <Avatar
-                  src={member.avatarSrc || '/images/bird.svg'}
+                  animalType={member.animalType as any}
                   alt={member.nickname}
                   size="s"
                   showStatus={false}

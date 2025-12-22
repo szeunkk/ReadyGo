@@ -2,11 +2,7 @@
 
 import React, { useState } from 'react';
 import styles from './styles.module.css';
-import Image from 'next/image';
-import {
-  AnimalType,
-  getAnimalTypeMeta,
-} from '@/commons/constants/animalType.enum';
+import { AnimalType, getAnimalAssets } from '@/commons/constants/animal';
 
 export type AvatarSize = 's' | 'm' | 'L';
 export type AvatarStatus = 'online' | 'away' | 'ban' | 'offline';
@@ -41,8 +37,8 @@ export default function Avatar({
   // 이미지 경로 결정: animalType > defaultImage
   let imageSrc = defaultImage;
   if (animalType && !imageError) {
-    const animalMeta = getAnimalTypeMeta(animalType);
-    imageSrc = animalMeta.ui.avatar;
+    const animalAssets = getAnimalAssets(animalType);
+    imageSrc = animalAssets.avatar;
   }
 
   const wrapperClasses = [styles.wrapper, styles[`size-${size}`], className]
