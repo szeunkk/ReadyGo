@@ -1,0 +1,95 @@
+.container {
+  width: 1840px;
+  height: 1466px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.titleArea {
+  width: 1840px;
+  height: 172px;
+  padding: 32px 60px 40px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  background-color: var(--color-bg-primary);
+  gap: 8px;
+}
+
+.backLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.backIcon {
+  color: var(--color-text-interactive-secondary);
+  flex-shrink: 0;
+}
+
+.backText {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-font-weight);
+  color: var(--color-text-interactive-secondary);
+}
+
+.title {
+  margin: 0;
+  padding: 0;
+  font-family: var(--typo-heading-2xl-font-family);
+  font-size: var(--typo-heading-2xl-font-size);
+  line-height: var(--typo-heading-2xl-line-height);
+  font-weight: var(--typo-heading-2xl-font-weight);
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  margin: 0;
+  padding: 0;
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-font-weight);
+  color: var(--color-text-secondary);
+}
+
+.mainArea {
+  width: 1840px;
+  height: 1466px;
+  padding: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+  box-sizing: border-box;
+  background-color: var(--color-bg-secondary);
+}
+
+.sideArea {
+  width: 464px;
+  height: 1230px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+}
+
+.partyInfo {
+  width: 464px;
+  height: 452px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background-color: var(--color-teal-100);
+}

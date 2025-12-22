@@ -1,0 +1,67 @@
+/* Container */
+.container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  border-radius: 16px;
+  background-color: var(--color-bg-secondary);
+  min-height: 64px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border-secondary, #31323a);
+}
+
+/* Avatar Wrapper */
+.avatarWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Name and Tag Container */
+.nameAndTag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+/* Name */
+.name {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-lg-medium-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-heading-4xl-font-weight);
+  color: var(--color-text-primary);
+}
+
+/* Empty State */
+.empty {
+  border: 1px dashed var(--color-border-disabled);
+  background-color: var(--color-bg-primary);
+}
+
+.emptyAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 99999px;
+  background-color: var(--color-bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyIcon {
+  color: var(--color-text-disabled);
+}
+
+.emptyText {
+  flex: 1;
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-lg-medium-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-heading-4xl-font-weight);
+  color: var(--color-text-disabled);
+}
+

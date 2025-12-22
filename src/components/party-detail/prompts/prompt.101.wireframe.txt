@@ -1,0 +1,35 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @02-wireframe.mdc
+
+==============================================
+
+조건-파일경로) 구현될 TSX 파일경로: src/components/party-detail/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/party-detail/styles.module.css
+
+==============================================
+
+핵심요구사항) 완성된 컴포넌트를 페이지에서 import하여 연결시킬 것.
+                - 연결될 경로: src/app/(main)/party/[postId]/page.tsx
+
+핵심요구사항) HTML과 flexbox를 활용한 와이어프레임 구조만 만들어낼 것.
+
+핵심요구사항) 영역마다 텍스트와 배경색으로 표시할 것.
+
+핵심요구사항) 각 영역은 아래의 수치값을 그대로 반영할 것. (단위: px)
+                - 전체 레이아웃: 1840 * 1466
+
+                - title-area: 1840 * 172 (paddig: 위 32px, 양옆 60px, 아래 40px)
+
+                - main-area: 1840 * 1466 (paddig: 32px, gap: 32px)
+            
+                - 아래 영역은 main-area 안에 구성
+                    - chat-area: 824 * 1230 
+                    - (member-list/party-info)area: 464 * 1230(gap: 24px, columm구조)
+                    - member-list: 464 * 754 (padding: 32px)
+                    - party-info: 464 * 452 (padding: 32px, gap:16px)
