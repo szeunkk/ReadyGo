@@ -190,7 +190,6 @@
   font-weight: var(--typo-body-lg-medium-font-weight);
   line-height: var(--typo-body-lg-medium-line-height);
   color: var(--color-text-tertiary);
-  letter-spacing: -0.32px;
   margin: 0;
   width: 100%;
 }
