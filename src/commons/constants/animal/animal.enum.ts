@@ -51,9 +51,10 @@ export const getAllAnimalTypes = (): AnimalType[] => {
 
 /**
  * 특정 그룹에 속하는 동물 타입들을 반환
+ * 실제 구현은 animal.profile.ts에 있음 (순환 참조 방지)
  */
-export const getAnimalTypesByGroup = (group: AnimalGroup): AnimalType[] => {
-  return getAllAnimalTypes().filter((type) => {
+export const getAnimalTypesByGroup = (_group: AnimalGroup): AnimalType[] => {
+  return getAllAnimalTypes().filter((_type) => {
     // animal.profile.ts에서 import하여 사용해야 함
     // 순환 참조 방지를 위해 여기서는 기본 구조만 제공
     return true;

@@ -46,12 +46,10 @@ export default function TraitsResultPage() {
 
   const handlePrevious = () => {
     // TODO: 이전 페이지로 이동
-    console.log('이전 페이지로 이동');
   };
 
   const handleComplete = () => {
     // TODO: 홈으로 이동
-    console.log('홈으로 이동');
   };
 
   return (
