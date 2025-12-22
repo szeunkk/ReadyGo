@@ -217,7 +217,7 @@
   height: 16px;
   overflow: hidden;
   flex-shrink: 0;
-  color: var(--color-text-interactive-primary);
+  color: var(--color-text-interactive-secondary);
 }
 
 .characteristicText {
