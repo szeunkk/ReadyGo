@@ -103,13 +103,14 @@ export default function Card({
                   size="s"
                   showStatus={false}
                   color={avatarColor}
-                  className={styles.avatar}
                 />
               </div>
             ))}
             {remainingCount > 0 && (
               <div className={styles.avatarWrapper} style={{ zIndex: 0 }}>
-                <div className={styles.remainingCount}>+{remainingCount}</div>
+                <div className={styles.remainingCountWrapper}>
+                  <div className={styles.remainingCount}>+{remainingCount}</div>
+                </div>
               </div>
             )}
           </div>
