@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { forwardRef } from 'react';
 import styles from './styles.module.css';
 import { InputHTMLAttributes } from 'react';
 import Icon, { IconName } from '@/commons/components/icon';
@@ -36,29 +36,35 @@ export interface InputProps extends Omit<
   additionalInfoIcon?: IconName;
   additionalInfoIconColor?: string;
   gap?: number;
+  'data-testid'?: string;
 }
 
-export default function Input({
-  variant = 'primary',
-  state = 'Default',
-  size = 'm',
-  label,
-  additionalInfo,
-  required = false,
-  iconLeft,
-  iconRight,
-  iconSize = 20,
-  iconLeftColor,
-  iconRightColor,
-  labelIcon,
-  labelIconColor,
-  additionalInfoIcon,
-  additionalInfoIconColor,
-  gap = 4,
-  className = '',
-  disabled,
-  ...props
-}: InputProps) {
+const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  {
+    variant = 'primary',
+    state = 'Default',
+    size = 'm',
+    label,
+    additionalInfo,
+    required = false,
+    iconLeft,
+    iconRight,
+    iconSize = 20,
+    iconLeftColor,
+    iconRightColor,
+    labelIcon,
+    labelIconColor,
+    additionalInfoIcon,
+    additionalInfoIconColor,
+    gap = 4,
+    className = '',
+    disabled,
+    'data-testid': dataTestId,
+    type,
+    ...props
+  },
+  ref
+) {
   const isDisabled = disabled || state === 'disabled';
 
   // variant와 state를 기반으로 실제 적용할 클래스 결정
@@ -142,9 +148,11 @@ export default function Input({
               <span className={styles.cursor}>|</span>
             )}
             <input
-              type="text"
+              ref={ref}
+              type={type || 'text'}
               className={styles.inputField}
               disabled={isDisabled}
+              data-testid={dataTestId}
               {...props}
             />
           </div>
@@ -177,4 +185,6 @@ export default function Input({
       )}
     </div>
   );
-}
+});
+
+export default Input;

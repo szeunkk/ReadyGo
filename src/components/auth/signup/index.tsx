@@ -4,10 +4,17 @@ import React from 'react';
 import styles from './styles.module.css';
 import Input from '@/commons/components/input';
 import Button from '@/commons/components/button';
+import { useSignupForm } from './hooks/index.form.hook';
 
 export default function Signup() {
+  const { form, onSubmit, isFormValid, isSubmitting, errors } = useSignupForm();
+  const {
+    register,
+    formState: { errors: formErrors },
+  } = form;
+
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} data-testid="auth-signup-page">
       <div className={styles.container}>
         <div className={styles.titleSection}>
           <h1 className={styles.title}>회원가입</h1>
@@ -16,7 +23,7 @@ export default function Signup() {
           </p>
         </div>
 
-        <div className={styles.formSection}>
+        <form className={styles.formSection} onSubmit={onSubmit}>
           <div className={styles.inputGroup}>
             <Input
               variant="primary"
@@ -29,6 +36,11 @@ export default function Signup() {
               iconLeftColor="var(--color-icon-interactive-secondary)"
               gap={8}
               className={styles.input}
+              type="email"
+              state={formErrors.email ? 'error' : 'Default'}
+              additionalInfo={formErrors.email?.message}
+              data-testid="signup-email-input"
+              {...register('email')}
             />
             <Input
               variant="primary"
@@ -43,6 +55,11 @@ export default function Signup() {
               iconRightColor="var(--color-icon-interactive-secondary)"
               gap={8}
               className={styles.input}
+              type="password"
+              state={formErrors.password ? 'error' : 'Default'}
+              additionalInfo={formErrors.password?.message}
+              data-testid="signup-password-input"
+              {...register('password')}
             />
             <Input
               variant="primary"
@@ -57,6 +74,11 @@ export default function Signup() {
               iconRightColor="var(--color-icon-interactive-secondary)"
               gap={8}
               className={styles.input}
+              type="password"
+              state={formErrors.passwordConfirm ? 'error' : 'Default'}
+              additionalInfo={formErrors.passwordConfirm?.message}
+              data-testid="signup-password-confirm-input"
+              {...register('passwordConfirm')}
             />
           </div>
 
@@ -65,10 +87,13 @@ export default function Signup() {
             size="m"
             shape="rectangle"
             className={styles.signupButton}
+            type="submit"
+            disabled={!isFormValid || isSubmitting}
+            data-testid="signup-submit-button"
           >
-            회원가입
+            {isSubmitting ? '처리 중...' : '회원가입'}
           </Button>
-        </div>
+        </form>
 
         <div className={styles.divider}>
           <div className={styles.dividerLine}></div>
