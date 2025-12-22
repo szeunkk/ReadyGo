@@ -3,5 +3,18 @@
   max-width: 832px;
   margin: 0 auto;
   padding: 0 16px;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.pageLoading {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}

@@ -1,0 +1,135 @@
+/* Container - Full screen loading area */
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--color-bg-secondary);
+  position: relative;
+}
+
+/* Content wrapper */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  padding: 2px 0;
+}
+
+/* Spinner wrapper - 112x112 size */
+.spinnerWrapper {
+  position: relative;
+  width: 112px;
+  height: 112px;
+}
+
+/* Spinner background circle - static */
+.spinnerBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 112px;
+  height: 112px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Spinner animation container */
+.spinnerAnimation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 112px;
+  height: 112px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Rotating SVG animation */
+.spinnerSvg {
+  animation: rotate 1.5s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Text wrapper */
+.textWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Heading text - "당신의 성향을 분석 중..." */
+.heading {
+  /* Typography - heading/desktop/xl */
+  font-family: var(--typo-heading-xl-font-family);
+  font-size: var(--typo-heading-xl-font-size);
+  font-weight: var(--typo-heading-xl-font-weight);
+  line-height: var(--typo-heading-xl-line-height);
+  letter-spacing: 0;
+  
+  /* Color - text/interactive/primary */
+  color: var(--color-text-interactive-primary);
+  
+  /* Layout */
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Paragraph text - "잠시만 기다려주세요" */
+.paragraph {
+  /* Typography - body/md/regular */
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: var(--typo-body-md-font-weight);
+  line-height: var(--typo-body-md-line-height);
+  letter-spacing: 0;
+  
+  /* Color - text/interactive/secondary */
+  color: var(--color-neutral-400);
+  
+  /* Layout */
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+  padding: 0 83px;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .content {
+    gap: 40px;
+  }
+  
+  .heading {
+    font-size: var(--typo-heading-xl-font-size);
+    line-height: var(--typo-heading-xl-line-height);
+  }
+  
+  .paragraph {
+    padding: 0 40px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .spinnerSvg {
+    animation-duration: 3s;
+  }
+}
+

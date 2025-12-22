@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 32px;
   width: 100%;
-  padding: 32px 0 0;
+  padding: 0;
 }
 
 /* ========== 헤더 ========== */
@@ -12,7 +12,7 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
-  padding: 32px 0 40px;
+  padding: 0 0 40px;
 }
 
 .backButton {
@@ -241,4 +241,3 @@
   color: var(--color-text-interactive-secondary);
   margin: 0;
 }
-

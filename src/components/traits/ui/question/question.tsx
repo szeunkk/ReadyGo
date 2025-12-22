@@ -10,7 +10,11 @@ import QuestionSchedule from './question-schedule/questionSchedule';
 
 type AnswerType = number | { dayTypes: string[]; timeSlots: string[] };
 
-export default function Question() {
+interface QuestionProps {
+  onComplete?: () => void;
+}
+
+export default function Question({ onComplete }: QuestionProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedAnswers, setSelectedAnswers] = useState<
     Record<number, AnswerType>
@@ -39,13 +43,15 @@ export default function Question() {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     } else {
-      // 마지막 질문 완료 - 결과 페이지로 이동
-      // TODO: 결과 페이지 구현
+      // 마지막 질문 완료 - 분석 로딩 화면 표시
+      if (onComplete) {
+        onComplete();
+      }
     }
   };
 
-  const progressPercentage = Math.round((currentStep / totalSteps) * 100);
-  const progressWidth = (currentStep / totalSteps) * 100;
+  const progressPercentage = Math.round(((currentStep - 1) / totalSteps) * 100);
+  const progressWidth = ((currentStep - 1) / totalSteps) * 100;
 
   // 팩맨 위치 계산 (0-10 사이)
   const pacmanPosition = currentStep - 1;
