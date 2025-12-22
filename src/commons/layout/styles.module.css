@@ -161,6 +161,10 @@
   overflow: hidden;
 }
 
+.main.fullWidth {
+  width: 100%;
+}
+
 /* Header Styles */
 .header {
   width: 100%;
@@ -228,4 +232,8 @@
 .children {
   flex: 1;
   overflow: auto;
+}
+
+.children.noHeader {
+  height: 100%;
 }
