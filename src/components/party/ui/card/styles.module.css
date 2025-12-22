@@ -6,7 +6,6 @@
   display: flex;
   flex-direction: column;
   background-color: var(--color-bg-secondary);
-  border: 1px solid var(--color-border-primary);
   border-radius: 8px;
   box-sizing: border-box;
 }
@@ -72,7 +71,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: var(--color-bg-tertiary);
+  background-color: var(--color-bg-primary);
   border: 2px solid var(--color-bg-secondary);
   margin-left: -8px;
   display: flex;
@@ -86,9 +85,8 @@
 }
 
 .avatar {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 40px;
+  height: 40px;
 }
 
 .remainingCount {

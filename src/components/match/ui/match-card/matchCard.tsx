@@ -20,6 +20,10 @@ export interface MatchCardProps {
    */
   status?: 'online' | 'away' | 'ban' | 'offline';
   /**
+   * 동물 타입
+   */
+  animalType?: string;
+  /**
    * 태그 목록
    */
   tags: string[];
@@ -37,6 +41,7 @@ export default function MatchCard({
   nickname,
   matchRate,
   status = 'online',
+  animalType,
   tags,
   onProfileClick,
   className = '',
@@ -53,6 +58,7 @@ export default function MatchCard({
           {/* 아바타 */}
           <div className={styles.avatarWrapper}>
             <Avatar
+              animalType={animalType as any}
               alt={nickname}
               size="m"
               status={status}

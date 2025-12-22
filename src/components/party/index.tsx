@@ -13,13 +13,7 @@ const mockPartyData: PartyCardProps[] = [
     title: 'RPG 길드 매칭',
     description: '대형 RPG게임을 함께 즐기는 길드원 모집',
     gameTag: '팰월드',
-    memberAvatars: [
-      '/icons/avatar/raven.svg',
-      '/icons/avatar/hedgehog.svg',
-      '/icons/avatar/dolpin.svg',
-      '/icons/avatar/fox.svg',
-      '/icons/avatar/bear.svg',
-    ],
+    memberAvatars: ['raven', 'hedgehog', 'dolphin', 'fox', 'bear'],
     currentMembers: 5,
     maxMembers: 8,
     categories: {
@@ -33,12 +27,7 @@ const mockPartyData: PartyCardProps[] = [
     title: '새벽반 FPS 게이머',
     description: '새벽 시간대 FPS 게임을 즐기는 게이머 모임',
     gameTag: '오버워치',
-    memberAvatars: [
-      '/icons/avatar/tiger.svg',
-      '/icons/avatar/hawk.svg',
-      '/icons/avatar/leopard.svg',
-      '/icons/avatar/wolf.svg',
-    ],
+    memberAvatars: ['tiger', 'hawk', 'leopard', 'wolf'],
     currentMembers: 4,
     maxMembers: 6,
     categories: {
@@ -52,14 +41,7 @@ const mockPartyData: PartyCardProps[] = [
     title: '전략가들의 모임',
     description: '전략 게임을 깊이 있게 플레이하는 모임',
     gameTag: '백룸',
-    memberAvatars: [
-      '/icons/avatar/owl.svg',
-      '/icons/avatar/raven.svg',
-      '/icons/avatar/dolpin.svg',
-      '/icons/avatar/fox.svg',
-      '/icons/avatar/bear.svg',
-      '/icons/avatar/wolf.svg',
-    ],
+    memberAvatars: ['owl', 'raven', 'dolphin', 'fox', 'bear', 'wolf'],
     currentMembers: 6,
     maxMembers: 8,
     categories: {
@@ -73,11 +55,7 @@ const mockPartyData: PartyCardProps[] = [
     title: '캐주얼 게이머 연합',
     description: '편하게 즐기는 캐주얼 게임 커뮤니티',
     gameTag: '구스구스덕',
-    memberAvatars: [
-      '/icons/avatar/koala.svg',
-      '/icons/avatar/panda.svg',
-      '/icons/avatar/rabbit.svg',
-    ],
+    memberAvatars: ['koala', 'panda', 'rabbit'],
     currentMembers: 3,
     maxMembers: 10,
     categories: {
@@ -91,13 +69,7 @@ const mockPartyData: PartyCardProps[] = [
     title: '경쟁전 랭커 모집',
     description: '상위 티어 목표하는 게이머들의 모임',
     gameTag: '발로란트',
-    memberAvatars: [
-      '/icons/avatar/hawk.svg',
-      '/icons/avatar/tiger.svg',
-      '/icons/avatar/leopard.svg',
-      '/icons/avatar/wolf.svg',
-      '/icons/avatar/fox.svg',
-    ],
+    memberAvatars: ['hawk', 'tiger', 'leopard', 'wolf', 'fox'],
     currentMembers: 5,
     maxMembers: 5,
     categories: {
@@ -111,12 +83,7 @@ const mockPartyData: PartyCardProps[] = [
     title: '주말 레이드 파티',
     description: '주말에 모여 함께 레이드를 즐기는 파티',
     gameTag: '데스티니',
-    memberAvatars: [
-      '/icons/avatar/bear.svg',
-      '/icons/avatar/deer.svg',
-      '/icons/avatar/cat.svg',
-      '/icons/avatar/dog.svg',
-    ],
+    memberAvatars: ['bear', 'deer', 'cat', 'dog'],
     currentMembers: 4,
     maxMembers: 6,
     categories: {

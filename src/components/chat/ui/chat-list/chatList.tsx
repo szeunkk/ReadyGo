@@ -20,7 +20,7 @@ interface ChatRoomMember {
   room_id: string;
   user_id: string;
   nickname: string;
-  avatar_url: string;
+  animalType?: string;
   joined_at: string;
   status?: 'online' | 'away' | 'ban' | 'offline';
 }
@@ -72,7 +72,7 @@ export const mockChatRooms: ChatListItemData[] = [
         room_id: 'room-1',
         user_id: 'user-1',
         nickname: '게이머호랑이',
-        avatar_url: '/images/tiger_m.svg',
+        animalType: 'tiger',
         joined_at: '2024-12-19T10:00:00Z',
         status: 'online',
       },
@@ -101,7 +101,7 @@ export const mockChatRooms: ChatListItemData[] = [
         room_id: 'room-2',
         user_id: 'user-2',
         nickname: '호쾌한망토',
-        avatar_url: '/images/fox_m.svg',
+        animalType: 'fox',
         joined_at: '2024-12-19T09:00:00Z',
         status: 'away',
       },
@@ -130,7 +130,7 @@ export const mockChatRooms: ChatListItemData[] = [
         room_id: 'room-3',
         user_id: 'user-3',
         nickname: '까칠한까마귀',
-        avatar_url: '/images/raven_m.svg',
+        animalType: 'raven',
         joined_at: '2024-12-19T08:00:00Z',
         status: 'offline',
       },
@@ -160,7 +160,7 @@ export const mockChatRooms: ChatListItemData[] = [
         room_id: 'room-4',
         user_id: 'user-4',
         nickname: '용감한사자',
-        avatar_url: '/images/bear_m.svg',
+        animalType: 'bear',
         joined_at: '2024-12-19T07:00:00Z',
         status: 'online',
       },
@@ -169,7 +169,7 @@ export const mockChatRooms: ChatListItemData[] = [
         room_id: 'room-4',
         user_id: 'user-5',
         nickname: '날쌘독수리',
-        avatar_url: '/images/hawk_m.svg',
+        animalType: 'hawk',
         joined_at: '2024-12-19T07:00:00Z',
         status: 'away',
       },
@@ -198,7 +198,7 @@ export const mockChatRooms: ChatListItemData[] = [
         room_id: 'room-5',
         user_id: 'user-6',
         nickname: '차단된유저',
-        avatar_url: '/images/wolf_m.svg',
+        animalType: 'wolf',
         joined_at: '2024-12-19T06:00:00Z',
         status: 'ban',
       },
@@ -326,7 +326,7 @@ const ChatListItem = ({
       <div className={styles.chatItemContent}>
         <div className={styles.avatarWrapper}>
           <Avatar
-            src={members[0]?.avatar_url}
+            animalType={members[0]?.animalType as any}
             alt={roomName}
             size="s"
             status={members[0]?.status || 'offline'}
