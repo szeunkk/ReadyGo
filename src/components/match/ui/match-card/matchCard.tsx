@@ -53,7 +53,6 @@ export default function MatchCard({
           {/* 아바타 */}
           <div className={styles.avatarWrapper}>
             <Avatar
-              src="/images/bird.svg"
               alt={nickname}
               size="m"
               status={status}

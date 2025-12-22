@@ -25,6 +25,16 @@
   border-radius: 99999px;
 }
 
+/* Color Filter - SVG 색상 변경 (mask 방식) */
+.colorFilter .image {
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
 /* Size Styles */
 .size-s {
   width: 40px;

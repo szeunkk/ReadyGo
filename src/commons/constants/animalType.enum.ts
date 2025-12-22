@@ -91,6 +91,7 @@ export type AnimalTypeMeta = {
   ui: {
     imageS: string;
     imageM: string;
+    avatar: string;
   };
 };
 
@@ -126,6 +127,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/wolf_s.svg',
       imageM: '/images/wolf_m.svg',
+      avatar: '/icons/avatar/wolf.svg',
     },
   },
   [AnimalType.tiger]: {
@@ -153,6 +155,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/tiger_s.svg',
       imageM: '/images/tiger_m.svg',
+      avatar: '/icons/avatar/tiger.svg',
     },
   },
   [AnimalType.hawk]: {
@@ -180,6 +183,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/hawk_s.svg',
       imageM: '/images/hawk_m.svg',
+      avatar: '/icons/avatar/hawk.svg',
     },
   },
 
@@ -209,6 +213,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/owl_s.svg',
       imageM: '/images/owl_m.svg',
+      avatar: '/icons/avatar/owl.svg',
     },
   },
   [AnimalType.fox]: {
@@ -236,6 +241,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/fox_s.svg',
       imageM: '/images/fox_m.svg',
+      avatar: '/icons/avatar/fox.svg',
     },
   },
   [AnimalType.hedgehog]: {
@@ -263,6 +269,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/hedgehog_s.svg',
       imageM: '/images/hedgehog_m.svg',
+      avatar: '/icons/avatar/hedgehog.svg',
     },
   },
   [AnimalType.raven]: {
@@ -290,6 +297,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/raven_s.svg',
       imageM: '/images/raven_m.svg',
+      avatar: '/icons/avatar/raven.svg',
     },
   },
 
@@ -319,6 +327,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/bear_s.svg',
       imageM: '/images/bear_m.svg',
+      avatar: '/icons/avatar/bear.svg',
     },
   },
   [AnimalType.deer]: {
@@ -346,6 +355,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/deer_s.svg',
       imageM: '/images/deer_m.svg',
+      avatar: '/icons/avatar/deer.svg',
     },
   },
   [AnimalType.koala]: {
@@ -373,6 +383,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/koala_s.svg',
       imageM: '/images/koala_m.svg',
+      avatar: '/icons/avatar/koala.svg',
     },
   },
 
@@ -402,6 +413,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/dog_s.svg',
       imageM: '/images/dog_m.svg',
+      avatar: '/icons/avatar/dog.svg',
     },
   },
   [AnimalType.dolphin]: {
@@ -429,6 +441,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/dolphin_s.svg',
       imageM: '/images/dolphin_m.svg',
+      avatar: '/icons/avatar/dolpin.svg',
     },
   },
   [AnimalType.panda]: {
@@ -456,6 +469,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/panda_s.svg',
       imageM: '/images/panda_m.svg',
+      avatar: '/icons/avatar/panda.svg',
     },
   },
   [AnimalType.rabbit]: {
@@ -483,6 +497,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/rabbit_s.svg',
       imageM: '/images/rabbit_m.svg',
+      avatar: '/icons/avatar/rabbit.svg',
     },
   },
 
@@ -512,6 +527,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/leopard_s.svg',
       imageM: '/images/leopard_m.svg',
+      avatar: '/icons/avatar/leopard.svg',
     },
   },
   [AnimalType.cat]: {
@@ -539,6 +555,7 @@ export const animalTypeMeta = {
     ui: {
       imageS: '/images/cat_s.svg',
       imageM: '/images/cat_m.svg',
+      avatar: '/icons/avatar/cat.svg',
     },
   },
 } as const satisfies Record<AnimalType, AnimalTypeMeta>;
