@@ -355,4 +355,3 @@ export const animalCopies: Record<AnimalType, AnimalCopy> = {
 export const getAnimalCopy = (type: AnimalType): AnimalCopy => {
   return animalCopies[type];
 };
-

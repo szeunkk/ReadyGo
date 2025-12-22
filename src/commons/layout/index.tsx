@@ -6,6 +6,7 @@ import { useTheme } from 'next-themes';
 import Icon from '@/commons/components/icon';
 import { getUrlMetadata, URL_PATHS } from '@/commons/constants/url';
 import styles from './styles.module.css';
+import { useSidePanelStore } from '@/stores/sidePanel.store';
 
 interface LayoutProps {
   children: ReactNode;
@@ -19,6 +20,7 @@ export const Layout = ({ children }: LayoutProps) => {
   const [activeNav, setActiveNav] = useState<NavigationButton>('home');
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { isOpen } = useSidePanelStore();
 
   // 현재 경로의 visibility 설정 가져오기
   const urlMetadata = getUrlMetadata(pathname);
@@ -169,11 +171,22 @@ export const Layout = ({ children }: LayoutProps) => {
             </div>
           </header>
         )}
-        <main
-          className={`${styles.children} ${!showHeader ? styles.noHeader : ''}`}
+        <div
+          className={`${styles.contentWrapper} ${
+            isOpen ? styles.panelOpen : ''
+          }`}
         >
-          {children}
-        </main>
+          <main
+            className={`${styles.children} ${!showHeader ? styles.noHeader : ''}`}
+          >
+            {children}
+          </main>
+
+          {/* Side Panel */}
+          <aside
+            className={`${styles.sidePanel} ${isOpen ? styles.open : ''}`}
+          />
+        </div>
       </div>
     </div>
   );
