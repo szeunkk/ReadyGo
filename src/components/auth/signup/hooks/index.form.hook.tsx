@@ -121,24 +121,8 @@ export function useSignupForm() {
 
       const nickname = generateNickname();
 
-      // 한국 시간(KST, UTC+9)으로 현재 시간 생성
-      // 한국 시간대(Asia/Seoul)의 현재 시간을 ISO 8601 형식으로 생성
-      const now = new Date();
-      // 한국 시간대의 현재 시간을 가져와서 ISO 형식으로 변환
-      const kstDate = new Date(
-        now.toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
-      );
-      // ISO 형식으로 변환 (Supabase는 ISO 8601 형식을 기대)
-      // 한국 시간대 정보를 포함한 ISO 형식
-      const year = kstDate.getFullYear();
-      const month = String(kstDate.getMonth() + 1).padStart(2, '0');
-      const day = String(kstDate.getDate()).padStart(2, '0');
-      const hours = String(kstDate.getHours()).padStart(2, '0');
-      const minutes = String(kstDate.getMinutes()).padStart(2, '0');
-      const seconds = String(kstDate.getSeconds()).padStart(2, '0');
-      const created_at = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000+09:00`;
-
       // user_profiles 생성
+      // created_at, updated_at은 Supabase의 기본값 사용 (현재 UTC 시간)
       const { error: profileError } = await authenticatedSupabase
         .from('user_profiles')
         .insert({
@@ -150,7 +134,6 @@ export function useSignupForm() {
           tier: TierType.silver,
           temperature_score: 30,
           status_message: null,
-          created_at,
         });
 
       if (profileError) {
@@ -162,6 +145,7 @@ export function useSignupForm() {
       }
 
       // user_settings 생성
+      // created_at, updated_at은 Supabase의 기본값 사용 (현재 UTC 시간)
       const { error: settingsError } = await authenticatedSupabase
         .from('user_settings')
         .insert({
@@ -171,7 +155,6 @@ export function useSignupForm() {
           notification_chat: true,
           notification_party: true,
           language: 'ko',
-          created_at,
         });
 
       if (settingsError) {
