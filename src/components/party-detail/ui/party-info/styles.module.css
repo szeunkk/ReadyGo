@@ -2,6 +2,7 @@
   width: 464px;
   height: 452px;
   padding: 32px;
+  gap: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -16,7 +17,7 @@
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
   box-sizing: border-box;
   border-radius: 20px;
   background: var(--color-bg-secondary);
@@ -36,6 +37,7 @@
 
 .infoList {
   width: 100%;
+
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -43,10 +45,10 @@
 }
 
 .infoItem {
-  width: 100%;
+  width: 162px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
   box-sizing: border-box;
 }
 
@@ -56,8 +58,7 @@
 }
 
 .label {
-  flex: 1;
-  color: var(--color-text-secondary);
+  color: var(--color-text-interactive-secondary);
   font-size: var(--typo-body-md-font-size);
   font-weight: var(--font-weight-regular);
   line-height: var(--typo-body-md-line-height);
@@ -65,12 +66,11 @@
 
 .value {
   color: var(--color-text-primary);
-  font-size: var(--typo-body-md-font-size);
+  font-size: var(--typo-body-lg-font-size);
   font-weight: var(--font-weight-medium);
   line-height: var(--typo-body-md-line-height);
-  text-align: right;
+  text-align: left;
 }
-
 .tagGroup {
   width: 100%;
   display: flex;
