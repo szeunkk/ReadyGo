@@ -146,3 +146,11 @@
   flex-shrink: 0;
   background-color: var(--color-bg-interactive-secondary);
 }
+
+.loading {
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  color: var(--color-text-interactive-secondary);
+  text-align: center;
+  padding: 40px 0;
+}

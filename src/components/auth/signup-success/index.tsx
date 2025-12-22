@@ -4,10 +4,37 @@ import Image from 'next/image';
 import styles from './styles.module.css';
 import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
+import { useSignupSuccess } from './hooks/index.signup-success.hook';
 
 export default function SignupSuccess() {
+  const {
+    nickname,
+    isLoading,
+    handleTraitsTest,
+    handleSteamLink,
+    handleLater,
+  } = useSignupSuccess();
+
+  // 로딩 중일 때 로딩 화면 노출
+  if (isLoading) {
+    return (
+      <section
+        className={styles.wrapper}
+        data-testid="auth-signup-success-loading"
+      >
+        <div className={styles.container}>
+          <div className={styles.loading}>로딩 중...</div>
+        </div>
+      </section>
+    );
+  }
+
+  // 닉네임이 있으면 표시, 없으면 fallback
+  const displayNickname = nickname || '플레이어';
+  const title = `${displayNickname}님, 환영합니다!`;
+
   return (
-    <section className={styles.wrapper}>
+    <section className={styles.wrapper} data-testid="auth-signup-success-page">
       <div className={styles.container}>
         <Image
           src="/images/celebrate.svg"
@@ -17,7 +44,7 @@ export default function SignupSuccess() {
           priority
         />
         <div className={styles.titleSection}>
-          <h1 className={styles.title}>재빠른팬더76님, 환영합니다!</h1>
+          <h1 className={styles.title}>{title}</h1>
           <p className={styles.subtitle}>
             이제 나에게 딱 맞는 게임 친구를 찾아보세요
           </p>
@@ -40,6 +67,7 @@ export default function SignupSuccess() {
             shape="rectangle"
             size="m"
             className={styles.fullWidth}
+            onClick={handleTraitsTest}
           >
             <Icon name="gaming" size={20} className={styles.icon} />
             게임 성향 분석 테스트하기
@@ -50,6 +78,7 @@ export default function SignupSuccess() {
             shape="rectangle"
             size="m"
             className={styles.fullWidth}
+            onClick={handleSteamLink}
           >
             <Icon name="steam" size={20} className={styles.icon} />
             스팀 계정 연동하기
@@ -57,7 +86,11 @@ export default function SignupSuccess() {
         </div>
 
         <div className={styles.laterWrapper}>
-          <button type="button" className={styles.laterButton}>
+          <button
+            type="button"
+            className={styles.laterButton}
+            onClick={handleLater}
+          >
             나중에 할게요
           </button>
           <ul className={styles.laterList}>
