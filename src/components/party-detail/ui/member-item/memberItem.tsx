@@ -11,14 +11,14 @@ export type MemberItemType = 'leader' | 'member' | 'empty';
 export interface MemberItemProps {
   type: MemberItemType;
   name?: string;
-  avatarSrc?: string;
+  animalType?: string;
   className?: string;
 }
 
 export default function MemberItem({
   type,
   name,
-  avatarSrc,
+  animalType,
   className = '',
 }: MemberItemProps) {
   if (type === 'empty') {
@@ -46,7 +46,7 @@ export default function MemberItem({
     <div className={containerClasses}>
       <div className={styles.avatarWrapper}>
         <Avatar
-          src={avatarSrc}
+          animalType={animalType as any}
           alt={name || 'Member'}
           size="s"
           status="online"

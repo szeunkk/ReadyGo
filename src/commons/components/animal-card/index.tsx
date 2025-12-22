@@ -7,7 +7,7 @@ import { HTMLAttributes } from 'react';
 import TierTag from '../tier-tag';
 import Icon from '../icon';
 import { TierType } from '../../constants/tierType.enum';
-import { AnimalType, getAnimalTypeMeta } from '../../constants/animalType.enum';
+import { AnimalType, getAnimalTypeMeta } from '../../constants/animal';
 
 export type AnimalCardProperty = 'my' | 'user';
 
