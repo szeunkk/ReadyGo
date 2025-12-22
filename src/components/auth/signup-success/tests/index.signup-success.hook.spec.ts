@@ -10,7 +10,7 @@ test.describe('회원가입 성공 페이지', () => {
     // navigation 이벤트를 기다리면서 페이지 이동
     await Promise.all([
       page.waitForURL(/.*\/login/, { timeout: 2000 }),
-      page.goto('/signup-success'),
+      page.goto('/signup-success', { waitUntil: 'domcontentloaded' }),
     ]);
 
     // network 통신 후 리다이렉트이므로 2000ms 미만
@@ -19,7 +19,7 @@ test.describe('회원가입 성공 페이지', () => {
   test('닉네임 조회 및 표시', async ({ page }) => {
     // 회원가입 성공 페이지에 직접 접근
     // 로그인 세션이 있으면 페이지가 표시되고, 없으면 로그인 페이지로 리다이렉트됨
-    await page.goto('/signup-success');
+    await page.goto('/signup-success', { waitUntil: 'domcontentloaded' });
 
     // 리다이렉트 대기 (로그인 세션이 없으면 /login으로 리다이렉트)
     // 로그인 페이지로 리다이렉트된 경우 테스트 종료
@@ -44,7 +44,7 @@ test.describe('회원가입 성공 페이지', () => {
   test('게임 성향 분석 테스트 버튼 클릭 시 /traits로 이동', async ({
     page,
   }) => {
-    await page.goto('/signup-success');
+    await page.goto('/signup-success', { waitUntil: 'domcontentloaded' });
 
     // 리다이렉트 대기 (로그인 세션이 없으면 /login으로 리다이렉트)
     try {
@@ -69,7 +69,7 @@ test.describe('회원가입 성공 페이지', () => {
   });
 
   test('스팀 계정 연동 버튼 클릭 시 모달 표시', async ({ page }) => {
-    await page.goto('/signup-success');
+    await page.goto('/signup-success', { waitUntil: 'domcontentloaded' });
 
     // 리다이렉트 대기 (로그인 세션이 없으면 /login으로 리다이렉트)
     try {
@@ -103,7 +103,7 @@ test.describe('회원가입 성공 페이지', () => {
   });
 
   test('나중에 할게요 버튼 클릭 시 /home으로 이동', async ({ page }) => {
-    await page.goto('/signup-success');
+    await page.goto('/signup-success', { waitUntil: 'domcontentloaded' });
 
     // 리다이렉트 대기 (로그인 세션이 없으면 /login으로 리다이렉트)
     try {
