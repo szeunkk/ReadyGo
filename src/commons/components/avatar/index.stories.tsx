@@ -15,11 +15,29 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {
-    src: {
-      control: 'text',
-      description: '아바타 이미지 소스 URL',
+    animalType: {
+      control: 'select',
+      options: [
+        'wolf',
+        'tiger',
+        'hawk',
+        'owl',
+        'fox',
+        'hedgehog',
+        'raven',
+        'bear',
+        'deer',
+        'koala',
+        'dog',
+        'dolphin',
+        'panda',
+        'rabbit',
+        'leopard',
+        'cat',
+      ],
+      description: '동물 타입 (자동으로 해당 동물의 아바타 이미지 사용)',
       table: {
-        type: { summary: 'string' },
+        type: { summary: 'AnimalType' },
       },
     },
     alt: {
@@ -61,6 +79,15 @@ const meta = {
       description: '추가 CSS 클래스',
       table: {
         type: { summary: 'string' },
+      },
+    },
+    color: {
+      control: 'color',
+      description:
+        '아바타 색상 (CSS color 값). animalType을 사용할 때만 적용됩니다.',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: 'var(--color-icon-primary)' },
       },
     },
   },
@@ -159,14 +186,6 @@ export const WithStatus: Story = {
   args: {
     showStatus: true,
     status: 'online',
-  },
-};
-
-// Custom Image 스토리
-export const WithCustomImage: Story = {
-  args: {
-    src: 'https://via.placeholder.com/100',
-    alt: 'Custom Avatar',
   },
 };
 
@@ -399,6 +418,165 @@ export const ThemeComparison: Story = {
       description: {
         story:
           'Light/Dark 테마와 status의 조합을 비교할 수 있습니다. dark 클래스로 테마가 자동 전환됩니다.',
+      },
+    },
+  },
+};
+
+// Color 스토리
+export const WithAnimalType: Story = {
+  args: {
+    animalType: 'leopard',
+    status: 'online',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'animalType을 사용하면 자동으로 --color-icon-primary 색상이 적용됩니다.',
+      },
+    },
+  },
+};
+
+export const WithCustomColor: Story = {
+  args: {
+    animalType: 'leopard',
+    color: '#FF6B6B',
+    status: 'online',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'color prop으로 커스텀 색상을 지정할 수 있습니다.',
+      },
+    },
+  },
+};
+
+export const ColorVariations: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          alignItems: 'center',
+        }}
+      >
+        <Avatar animalType="tiger" color="#FF6B6B" status="online" />
+        <span style={{ fontSize: '12px' }}>Red</span>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          alignItems: 'center',
+        }}
+      >
+        <Avatar animalType="fox" color="#4ECDC4" status="online" />
+        <span style={{ fontSize: '12px' }}>Cyan</span>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          alignItems: 'center',
+        }}
+      >
+        <Avatar animalType="owl" color="#FFE66D" status="online" />
+        <span style={{ fontSize: '12px' }}>Yellow</span>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          alignItems: 'center',
+        }}
+      >
+        <Avatar animalType="wolf" color="#A8E6CF" status="online" />
+        <span style={{ fontSize: '12px' }}>Green</span>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          alignItems: 'center',
+        }}
+      >
+        <Avatar animalType="bear" color="#B4A7D6" status="online" />
+        <span style={{ fontSize: '12px' }}>Purple</span>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '다양한 색상을 적용한 아바타입니다. color prop으로 SVG 색상을 동적으로 변경할 수 있습니다.',
+      },
+    },
+  },
+};
+
+export const AnimalTypes: Story = {
+  render: () => (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: '16px',
+      }}
+    >
+      {[
+        'wolf',
+        'tiger',
+        'hawk',
+        'owl',
+        'fox',
+        'hedgehog',
+        'raven',
+        'bear',
+        'deer',
+        'koala',
+        'dog',
+        'dolphin',
+        'panda',
+        'rabbit',
+        'leopard',
+        'cat',
+      ].map((animal) => (
+        <div
+          key={animal}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            alignItems: 'center',
+          }}
+        >
+          <Avatar
+            animalType={animal as any}
+            status="online"
+            showStatus={false}
+          />
+          <span style={{ fontSize: '12px', textTransform: 'capitalize' }}>
+            {animal}
+          </span>
+        </div>
+      ))}
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '모든 동물 타입을 확인할 수 있습니다. animalType prop으로 자동으로 해당 동물 아바타가 표시됩니다.',
       },
     },
   },
