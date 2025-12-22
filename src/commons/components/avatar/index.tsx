@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react';
 import styles from './styles.module.css';
-import { AnimalType } from '@/commons/constants/animal/animal.enum';
-import { getAnimalAssets } from '@/commons/constants/animal/animal.assets';
+import { AnimalType, getAnimalAssets } from '@/commons/constants/animal';
 
 export type AvatarSize = 's' | 'm' | 'L';
 export type AvatarStatus = 'online' | 'away' | 'ban' | 'offline';

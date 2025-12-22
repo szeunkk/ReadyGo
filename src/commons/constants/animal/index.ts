@@ -6,37 +6,59 @@
 // ============================================
 // Enums & Types
 // ============================================
-export { AnimalType, AnimalGroup, getAllAnimalTypes } from './animal.enum';
+import { AnimalType, AnimalGroup, getAllAnimalTypes } from './animal.enum';
+import type { TraitKey } from './trait.enum';
+
+export { AnimalType, AnimalGroup, getAllAnimalTypes };
 export { type TraitKey, traitLabels, radarTraitLabels } from './trait.enum';
 export type { RadarTraitKey } from './trait.enum';
 
 // ============================================
 // Profile Data
 // ============================================
-export {
+import {
   type AnimalProfile,
   animalProfiles,
   getAnimalProfile,
   getAnimalTypesByGroup,
 } from './animal.profile';
 
+export {
+  type AnimalProfile,
+  animalProfiles,
+  getAnimalProfile,
+  getAnimalTypesByGroup,
+};
+
 // ============================================
 // Copy Data
 // ============================================
-export {
+import {
   type AnimalCopy,
   animalCopies,
   getAnimalCopy,
 } from './animal.copy';
 
+export {
+  type AnimalCopy,
+  animalCopies,
+  getAnimalCopy,
+};
+
 // ============================================
 // Assets Data
 // ============================================
-export {
+import {
   type AnimalAssets,
   animalAssets,
   getAnimalAssets,
 } from './animal.assets';
+
+export {
+  type AnimalAssets,
+  animalAssets,
+  getAnimalAssets,
+};
 
 // ============================================
 // Compatibility Data
@@ -83,7 +105,7 @@ export type AnimalTypeMeta = {
  * 기존 animalTypeMeta와 호환되는 통합 객체
  */
 export const animalTypeMeta: Record<AnimalType, AnimalTypeMeta> =
-  Object.values(AnimalType).reduce(
+  getAllAnimalTypes().reduce(
     (acc, type) => {
       const profile = animalProfiles[type];
       const copy = animalCopies[type];

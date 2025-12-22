@@ -5,7 +5,7 @@ import styles from './styles.module.css';
 import AnimalCard from '@/commons/components/animal-card';
 import RadarChart, { RadarChartData } from '@/commons/components/radar-chart';
 import BarChart, { BarChartDataItem } from '@/commons/components/bar-chart';
-import { AnimalType } from '@/commons/constants/animalType.enum';
+import { AnimalType } from '@/commons/constants/animal';
 import { TierType } from '@/commons/constants/tierType.enum';
 
 export interface ProfileSectionProps {
