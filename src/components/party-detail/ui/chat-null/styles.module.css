@@ -32,18 +32,19 @@
 }
 
 .iconWrapper {
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
   border-radius: 50%;
-  background-color: var(--color-bg-tertiary);
+  background: var(--color-bg-tertiary);
 }
-
-.icon {
-  color: var(--color-icon-secondary);
+.iconWrapper svg {
+  width: 40px;
+  height: 40px;
+  color: var(--color-bg-interactive-secondary-hover);
 }
 
 .mainMessage {
@@ -76,17 +77,17 @@
   gap: 12px;
   box-sizing: border-box;
 }
-
+/* 
 .input {
   display: flex;
-  height: 48px;
+  height: 100%;
   padding: 0 17px;
   align-items: center;
   gap: 10px;
   flex: 1 0 0;
   border-radius: var(--border-radius-12, 12px);
   background: var(--color-bg-secondary, #11121c);
-}
+} */
 
 .sendButton {
   width: 48px;
@@ -101,5 +102,7 @@
 }
 
 .sendIcon {
+  width: 20px;
+  height: 20px;
   color: var(--color-icon-disabled);
 }

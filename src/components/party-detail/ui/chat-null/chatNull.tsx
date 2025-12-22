@@ -26,12 +26,11 @@ export default function ChatNull() {
         <Input
           variant="primary"
           state="disabled"
+          size="m"
           placeholder="파티에 참여하면 메세지를 보낼 수 있어요"
-          disabled
-          className={styles.input}
         />
         <Button
-          variant="ghost"
+          variant="primary"
           state="disabled"
           shape="round"
           className={styles.sendButton}
@@ -43,5 +42,3 @@ export default function ChatNull() {
     </div>
   );
 }
-
-
