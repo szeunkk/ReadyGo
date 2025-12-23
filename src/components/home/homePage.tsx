@@ -9,7 +9,7 @@ import { MatchCardProps } from './ui/match-section/card/matchCard';
 import { PartyCardProps } from './ui/party-section/card/partyCard';
 import { AnimalType } from '@/commons/constants/animal';
 import { TierType } from '@/commons/constants/tierType.enum';
-import { useGoogleLogin } from '@/components/auth/login/hooks/index.login.google.hook';
+import { useGoogleOAuth } from '@/components/auth/hooks/useGoogleOAuth.hook';
 
 // 임시 데이터 - 추후 API로 대체될 예정
 const mockMatchData: MatchCardProps[] = [
@@ -127,7 +127,7 @@ const mockProfileData = {
 
 export default function Home() {
   // OAuth 콜백 처리를 위한 Hook 호출
-  useGoogleLogin();
+  useGoogleOAuth();
 
   return (
     <div className={styles.container}>

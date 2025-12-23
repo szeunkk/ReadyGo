@@ -7,15 +7,15 @@ import { URL_PATHS } from '@/commons/constants/url';
 import { useModal } from '@/commons/providers/modal';
 
 /**
- * 구글 로그인 Hook
- * - 구글 로그인 버튼 클릭 핸들러 제공
+ * 구글 OAuth Hook
+ * - 구글 로그인/회원가입 버튼 클릭 핸들러 제공
  * - Supabase OAuth 로그인 호출 (signInWithOAuth)
  * - OAuth 콜백 처리 (리다이렉트 후 세션 확인)
  * - localStorage 저장 처리 (accessToken, user)
  * - user_profiles 조회 처리
  * - 실패 모달 오픈 및 중복 방지
  */
-export const useGoogleLogin = () => {
+export const useGoogleOAuth = () => {
   const { openModal, closeAllModals } = useModal();
   const hasShownErrorModalRef = useRef(false);
   const hasProcessedCallbackRef = useRef(false);
@@ -120,11 +120,11 @@ export const useGoogleLogin = () => {
   };
 
   /**
-   * 구글 로그인 버튼 클릭 핸들러
+   * 구글 OAuth 버튼 클릭 핸들러 (로그인/회원가입 공통)
    * - Supabase OAuth 로그인 호출
    * - redirectTo 경로 설정 (현재 도메인 + /home)
    */
-  const handleGoogleLogin = async (): Promise<void> => {
+  const handleGoogleOAuth = async (): Promise<void> => {
     try {
       hasShownErrorModalRef.current = false;
 
@@ -246,7 +246,8 @@ export const useGoogleLogin = () => {
   }, []); // 빈 배열로 한 번만 실행
 
   return {
-    handleGoogleLogin,
+    handleGoogleOAuth,
     handleOAuthCallback,
   };
 };
+

@@ -6,7 +6,7 @@ import Input from '@/commons/components/input';
 import Button from '@/commons/components/button';
 import Checkbox from '@/commons/components/checkbox';
 import { useLoginForm } from './hooks/index.form.hook';
-import { useGoogleLogin } from './hooks/index.login.google.hook';
+import { useGoogleOAuth } from '../hooks/useGoogleOAuth.hook';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,7 +18,7 @@ export default function Login() {
     rememberIdStatus,
     handleRememberIdChange,
   } = useLoginForm();
-  const { handleGoogleLogin } = useGoogleLogin();
+  const { handleGoogleOAuth } = useGoogleOAuth();
   const {
     register,
     formState: { errors: formErrors },
@@ -104,7 +104,7 @@ export default function Login() {
           <button
             className={styles.socialButton}
             type="button"
-            onClick={handleGoogleLogin}
+            onClick={handleGoogleOAuth}
             data-testid="login-google-button"
           >
             <div className={styles.socialButtonContent}>
