@@ -5,8 +5,14 @@ import styles from './styles.module.css';
 import Avatar from '@/commons/components/avatar';
 import Button from '@/commons/components/button';
 import Tag from '@/commons/components/tag';
+import { AnimalType } from '@/commons/constants/animal';
+import { useSideProfilePanel } from '@/hooks/useSideProfilePanel';
 
 export interface MatchCardProps {
+  /**
+   * 사용자 ID
+   */
+  userId: string;
   /**
    * 사용자 닉네임
    */
@@ -28,24 +34,24 @@ export interface MatchCardProps {
    */
   tags: string[];
   /**
-   * 프로필 보기 버튼 클릭 핸들러
-   */
-  onProfileClick?: () => void;
-  /**
    * 추가 클래스명
    */
   className?: string;
 }
 
 export default function MatchCard({
+  userId,
   nickname,
   matchRate,
   status = 'online',
   animalType,
   tags,
-  onProfileClick,
   className = '',
 }: MatchCardProps) {
+  // 사이드 프로필 패널 제어
+  const { toggleProfile, isOpen, targetUserId } = useSideProfilePanel();
+  const isActive = isOpen && targetUserId === userId;
+
   const containerClasses = [styles.container, className]
     .filter(Boolean)
     .join(' ');
@@ -88,15 +94,20 @@ export default function MatchCard({
           </div>
         </div>
 
-        {/* 프로필 보기 버튼 */}
+        {/* 
+          프로필 보기 버튼
+          - 현재: userId props로 전달된 사용자 ID 사용
+          - 실제 데이터 전환 시: userId에 실제 user ID를 전달하면 됨
+          - toggleProfile() 함수는 수정 없이 그대로 동작
+        */}
         <Button
           variant="secondary"
           size="m"
           shape="round"
           className={styles.button}
-          onClick={onProfileClick}
+          onClick={() => toggleProfile(userId)}
         >
-          프로필 보기
+          {isActive ? '프로필 닫기' : '프로필 보기'}
         </Button>
       </div>
     </div>
