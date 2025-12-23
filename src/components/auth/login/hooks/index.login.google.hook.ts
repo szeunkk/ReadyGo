@@ -56,7 +56,7 @@ export const useGoogleLogin = () => {
         throw new Error(sessionError?.message || '세션을 받지 못했습니다.');
       }
 
-      const session = sessionData.session;
+      const { session } = sessionData;
 
       // localStorage에 accessToken 저장
       localStorage.setItem('accessToken', session.access_token);
@@ -188,6 +188,13 @@ export const useGoogleLogin = () => {
           return;
         }
 
+        // hash fragment가 있으면 제거 (깔끔한 URL 유지)
+        if (window.location.hash) {
+          const cleanUrl =
+            window.location.pathname + (window.location.search || '');
+          window.history.replaceState({}, '', cleanUrl);
+        }
+
         // URL에 OAuth 콜백 파라미터가 있는지 확인 (code 파라미터)
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
@@ -214,7 +221,18 @@ export const useGoogleLogin = () => {
             const newUrl =
               window.location.pathname +
               (urlParams.toString() ? `?${urlParams.toString()}` : '');
+            // hash fragment 제거 (OAuth 콜백 처리 후 불필요, 보안상 이미 사용된 정보)
             window.history.replaceState({}, '', newUrl);
+
+            // hash fragment가 여전히 남아있는 경우 명시적으로 제거
+            if (window.location.hash) {
+              window.history.replaceState(
+                {},
+                '',
+                window.location.pathname +
+                  (urlParams.toString() ? `?${urlParams.toString()}` : '')
+              );
+            }
           }
         }
       } catch (error) {
