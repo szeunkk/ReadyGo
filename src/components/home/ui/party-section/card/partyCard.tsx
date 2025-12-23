@@ -5,6 +5,7 @@ import styles from './styles.module.css';
 import Avatar from '@/commons/components/avatar';
 import Button from '@/commons/components/button';
 import Tag from '@/commons/components/tag';
+import { AnimalType } from '@/commons/constants/animal';
 
 export interface PartyMember {
   /**

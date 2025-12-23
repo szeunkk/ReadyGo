@@ -78,16 +78,19 @@
   background-color: var(--color-bg-interactive-teritiary-hover);
 }
 
-.menuButton:active {
+.menuButton:active,
+.menuButton.active {
   background-color: var(--color-bg-interactive-teritiary-pressed);
   color: var(--color-icon-interactive-primary, #5ffce2);
 }
 
-.menuButton:active svg {
+.menuButton:active svg,
+.menuButton.active svg {
   color: var(--color-icon-interactive-primary, #5ffce2);
 }
 
-.menuButton:active svg path {
+.menuButton:active svg path,
+.menuButton.active svg path {
   fill: var(--color-icon-interactive-primary, #5ffce2);
 }
 
