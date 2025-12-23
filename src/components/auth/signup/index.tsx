@@ -5,11 +5,13 @@ import styles from './styles.module.css';
 import Input from '@/commons/components/input';
 import Button from '@/commons/components/button';
 import { useSignupForm } from './hooks/index.form.hook';
+import { useGoogleOAuth } from '../hooks/useGoogleOAuth.hook';
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const { form, onSubmit, isFormValid, isSubmitting } = useSignupForm();
+  const { handleGoogleOAuth } = useGoogleOAuth();
   const {
     register,
     formState: { errors: formErrors },
@@ -108,7 +110,12 @@ export default function Signup() {
         </div>
 
         <div className={styles.socialLoginGroup}>
-          <button className={styles.socialButton} type="button">
+          <button
+            className={styles.socialButton}
+            type="button"
+            onClick={handleGoogleOAuth}
+            data-testid="signup-google-button"
+          >
             <div className={styles.socialButtonContent}>
               <div className={styles.socialIcon}>
                 {/* Google Icon */}

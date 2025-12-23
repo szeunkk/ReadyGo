@@ -29,11 +29,7 @@ alwaysApply: false
    - 이미 설치된 react-hook-form을 사용하여 폼을 구현할 것.
    - 이미 설치된 zod를 사용하여 검증로직을 구현할 것.
 
-5. API 조건
-   - 이미 설치된 @tanstack/react-query를 사용할 것.
-   - 이미 commons에 셋팅된 @tanstack/react-query를 사용할 것.
-
-6. TEST 조건
+5. TEST 조건
    - TDD기반으로 playwright 테스트를 먼저 작성할 것.
    - playwright.config.ts 설정은 변경하지 말 것.
    - playwright 테스트는 package.json의 scripts에 등록된 명령으로만 테스트 할 것.
