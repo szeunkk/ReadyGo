@@ -106,7 +106,12 @@ export const WithIconLeft: Story = {
       <input
         type="text"
         placeholder="게이머 이름으로 검색..."
-        style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent' }}
+        style={{
+          flex: 1,
+          border: 'none',
+          outline: 'none',
+          background: 'transparent',
+        }}
       />
     </Searchbar>
   ),
@@ -126,7 +131,12 @@ export const WithIconRight: Story = {
         type="text"
         placeholder="게이머 이름으로 검색..."
         defaultValue="검색어"
-        style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent' }}
+        style={{
+          flex: 1,
+          border: 'none',
+          outline: 'none',
+          background: 'transparent',
+        }}
       />
       <Icon
         name="x"
@@ -153,7 +163,12 @@ export const WithIconsBoth: Story = {
         type="text"
         placeholder="게이머 이름으로 검색..."
         defaultValue="검색어"
-        style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent' }}
+        style={{
+          flex: 1,
+          border: 'none',
+          outline: 'none',
+          background: 'transparent',
+        }}
       />
       <Icon
         name="x"
@@ -247,7 +262,12 @@ export const AllVariantsWithIcons: Story = {
           <input
             type="text"
             placeholder="게이머 이름으로 검색..."
-            style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent' }}
+            style={{
+              flex: 1,
+              border: 'none',
+              outline: 'none',
+              background: 'transparent',
+            }}
           />
         </Searchbar>
       </div>
@@ -259,7 +279,12 @@ export const AllVariantsWithIcons: Story = {
           <input
             type="text"
             placeholder="게이머 이름으로 검색..."
-            style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent' }}
+            style={{
+              flex: 1,
+              border: 'none',
+              outline: 'none',
+              background: 'transparent',
+            }}
           />
           <Icon name="x" size={20} style={{ cursor: 'pointer' }} />
         </Searchbar>
@@ -273,7 +298,12 @@ export const AllVariantsWithIcons: Story = {
           <input
             type="text"
             placeholder="게이머 이름으로 검색..."
-            style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent' }}
+            style={{
+              flex: 1,
+              border: 'none',
+              outline: 'none',
+              background: 'transparent',
+            }}
           />
           <Icon name="x" size={20} style={{ cursor: 'pointer' }} />
         </Searchbar>
@@ -287,7 +317,12 @@ export const AllVariantsWithIcons: Story = {
           <input
             type="text"
             defaultValue="검색어"
-            style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent' }}
+            style={{
+              flex: 1,
+              border: 'none',
+              outline: 'none',
+              background: 'transparent',
+            }}
           />
           <Icon name="x" size={20} style={{ cursor: 'pointer' }} />
         </Searchbar>

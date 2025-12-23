@@ -52,11 +52,34 @@ export const useGoogleOAuth = () => {
     // OAuth 콜백 처리 로직
     const processOAuthCallback = async (userId: string) => {
       try {
+        // 현재 세션 정보 가져오기 (localStorage 저장용)
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session?.access_token) {
+          throw new Error('세션을 받지 못했습니다.');
+        }
+
+        // localStorage에 accessToken 저장 (기존 로그인 폼과 일관성 유지)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('accessToken', session.access_token);
+        }
+
+        // user 정보 가져오기
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          throw new Error('사용자 정보를 가져오지 못했습니다.');
+        }
+
         // user_profiles 테이블에서 레코드 존재 여부 확인
         const { data: existingProfile, error: profileCheckError } =
           await supabase
             .from('user_profiles')
-            .select('id')
+            .select('id, nickname')
             .eq('id', userId)
             .maybeSingle();
 
@@ -112,6 +135,19 @@ export const useGoogleOAuth = () => {
             );
           }
 
+          // localStorage에 user 정보 저장 (기존 로그인 폼과 일관성 유지)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(
+              'user',
+              JSON.stringify({
+                id: user.id,
+                email: user.email,
+                _id: userId,
+                name: nickname,
+              })
+            );
+          }
+
           // 초기 데이터 생성 성공 → signup-success로 이동
           // OAuth 처리 플래그 제거
           if (typeof window !== 'undefined') {
@@ -119,6 +155,19 @@ export const useGoogleOAuth = () => {
           }
           router.push(URL_PATHS.SIGNUP_SUCCESS);
         } else {
+          // 기존 유저: localStorage에 user 정보 저장 (기존 로그인 폼과 일관성 유지)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(
+              'user',
+              JSON.stringify({
+                id: user.id,
+                email: user.email,
+                _id: existingProfile.id,
+                name: existingProfile.nickname || null,
+              })
+            );
+          }
+
           // 기존 유저: user_profiles 레코드가 이미 존재 → home으로 이동
           // OAuth 처리 플래그 제거
           if (typeof window !== 'undefined') {
@@ -203,9 +252,7 @@ export const useGoogleOAuth = () => {
         if (typeof window !== 'undefined') {
           localStorage.removeItem(OAUTH_PROCESSING_KEY);
         }
-        throw new Error(
-          authError.message || '구글 로그인에 실패했습니다.'
-        );
+        throw new Error(authError.message || '구글 로그인에 실패했습니다.');
       }
 
       // signInWithOAuth는 리다이렉트를 수행하므로,

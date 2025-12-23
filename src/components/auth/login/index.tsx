@@ -7,7 +7,6 @@ import Button from '@/commons/components/button';
 import Checkbox from '@/commons/components/checkbox';
 import { useLoginForm } from './hooks/index.form.hook';
 import { useGoogleOAuth } from '../hooks/useGoogleOAuth.hook';
-import { useKakaoOAuth } from '../hooks/useKakaoOAuth.hook';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);

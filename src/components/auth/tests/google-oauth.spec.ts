@@ -60,7 +60,7 @@ test.describe('구글 OAuth 로그인', () => {
 
     // 구글 로그인 버튼 클릭
     const googleButton = page.locator('[data-testid="login-google-button"]');
-    
+
     // 버튼 클릭 시 새 창이 열릴 수 있으므로 Promise.all 사용
     const [newPage] = await Promise.all([
       context.waitForEvent('page', { timeout: 5000 }).catch(() => null),
@@ -263,4 +263,3 @@ test.describe('구글 OAuth 로그인', () => {
     await expect(page).toHaveURL(/.*\/home/, { timeout: 500 });
   });
 });
-
