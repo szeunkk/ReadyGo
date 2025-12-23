@@ -2,47 +2,49 @@
 
 ```yaml
 - generic [active] [ref=e1]:
-    - main [ref=e4]:
-        - generic [ref=e6]:
+    - generic [ref=e4]:
+        - main [ref=e5]:
             - generic [ref=e7]:
-                - heading "ㄹㄷㄱ" [level=1] [ref=e8]
-                - paragraph [ref=e9]: 로그인하고 게임 친구를 찾아보세요
-            - generic [ref=e10]:
+                - generic [ref=e8]:
+                    - heading "ㄹㄷㄱ" [level=1] [ref=e9]
+                    - paragraph [ref=e10]: 로그인하고 게임 친구를 찾아보세요
                 - generic [ref=e11]:
                     - generic [ref=e12]:
                         - generic [ref=e13]:
-                            - generic [ref=e14]: 이메일
-                            - generic [ref=e15]: '*'
-                        - generic [ref=e17]:
-                            - img [ref=e19]
-                            - textbox "이메일을 입력하세요" [ref=e22]
-                    - generic [ref=e23]:
+                            - generic [ref=e14]:
+                                - generic [ref=e15]: 이메일
+                                - generic [ref=e16]: '*'
+                            - generic [ref=e18]:
+                                - img [ref=e20]
+                                - textbox "이메일을 입력하세요" [ref=e23]
                         - generic [ref=e24]:
-                            - generic [ref=e25]: 비밀번호
-                            - generic [ref=e26]: '*'
-                        - generic [ref=e28]:
-                            - img [ref=e30]
-                            - textbox "비밀번호를 입력하세요" [ref=e33]
-                            - button "Toggle password visibility" [ref=e34] [cursor=pointer]:
-                                - img [ref=e36]
-                    - generic [ref=e39]:
-                        - generic [ref=e40] [cursor=pointer]:
-                            - checkbox
-                        - generic [ref=e43]: 아이디 저장
-                - button "로그인" [disabled] [ref=e44]:
-                    - generic [ref=e45]: 로그인
-            - generic [ref=e48]: 또는
-            - generic [ref=e50]:
-                - button "Google로 로그인" [ref=e51] [cursor=pointer]:
-                    - generic [ref=e52]:
-                        - img [ref=e54]
-                        - generic [ref=e59]: Google로 로그인
-                - button "Kakao로 로그인" [ref=e60] [cursor=pointer]:
-                    - generic [ref=e61]:
-                        - img [ref=e63]
-                        - generic [ref=e65]: Kakao로 로그인
-            - generic [ref=e66]:
-                - generic [ref=e67]: 아직 계정이 없다면?
-                - button "회원가입 하기" [ref=e68] [cursor=pointer]
-    - alert [ref=e69]
+                            - generic [ref=e25]:
+                                - generic [ref=e26]: 비밀번호
+                                - generic [ref=e27]: '*'
+                            - generic [ref=e29]:
+                                - img [ref=e31]
+                                - textbox "비밀번호를 입력하세요" [ref=e34]
+                                - button "Toggle password visibility" [ref=e35] [cursor=pointer]:
+                                    - img [ref=e37]
+                        - generic [ref=e40]:
+                            - generic [ref=e41] [cursor=pointer]:
+                                - checkbox
+                            - generic [ref=e44]: 아이디 저장
+                    - button "로그인" [disabled] [ref=e45]:
+                        - generic [ref=e46]: 로그인
+                - generic [ref=e49]: 또는
+                - generic [ref=e51]:
+                    - button "Google로 로그인" [ref=e52] [cursor=pointer]:
+                        - generic [ref=e53]:
+                            - img [ref=e55]
+                            - generic [ref=e60]: Google로 로그인
+                    - button "Kakao로 로그인" [ref=e61] [cursor=pointer]:
+                        - generic [ref=e62]:
+                            - img [ref=e64]
+                            - generic [ref=e66]: Kakao로 로그인
+                - generic [ref=e67]:
+                    - generic [ref=e68]: 아직 계정이 없다면?
+                    - button "회원가입 하기" [ref=e69] [cursor=pointer]
+        - complementary [ref=e70]
+    - alert [ref=e71]
 ```
