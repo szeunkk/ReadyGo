@@ -25,7 +25,10 @@ const dashedGridPlugin: Plugin<'radar'> = {
       max: number;
       getDistanceFromCenterForValue: (value: number) => number;
       _pointLabels: string[];
-      getPointPosition: (index: number, distance: number) => { x: number; y: number };
+      getPointPosition: (
+        index: number,
+        distance: number
+      ) => { x: number; y: number };
       xCenter: number;
       yCenter: number;
     };

@@ -1140,7 +1140,13 @@ const icons: Record<IconName, React.FC<{ className?: string }>> = {
   ),
 };
 
-export default function Icon({ name, size = 20, className, style, ...props }: IconProps) {
+export default function Icon({
+  name,
+  size = 20,
+  className,
+  style,
+  ...props
+}: IconProps) {
   const IconComponent = icons[name];
 
   if (!IconComponent) {
