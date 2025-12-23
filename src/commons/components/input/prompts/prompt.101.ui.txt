@@ -58,3 +58,7 @@
 조건-피그마) 참고할 공통컴포넌트 노드ID(light-mode): @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2126-5641&m=dev
 
 핵심요구사항)global.css에 정의된 CSS 변수(상수 토큰)를 사용할 것.
+
+==============================================
+
+1차 추가 요구사항) 
