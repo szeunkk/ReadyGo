@@ -2,7 +2,7 @@
 .searchbar {
   display: flex;
   align-items: center;
-  border: none;
+  border: 1px solid transparent;
   font-family: inherit;
   font-style: normal;
   font-weight: var(--font-weight-regular);
@@ -28,20 +28,6 @@
   padding-right: 16px;
 }
 
-.inputContainer {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  min-width: 0;
-}
-
-.childrenContainer {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  flex: 1;
-}
-
 .inputField {
   flex: 1;
   border: none;
@@ -54,32 +40,6 @@
   color: inherit;
   width: 100%;
   min-width: 0;
-}
-
-.iconButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  flex-shrink: 0;
-  transition: opacity 0.2s;
-}
-
-.iconButton:hover {
-  opacity: 0.7;
-}
-
-.iconButton:active {
-  opacity: 0.5;
-}
-
-.icon {
-  flex-shrink: 0;
-  display: block;
-  color: var(--color-icon-interactive-primary);
 }
 
 /* Theme - Mode-aware using semantic colors */
@@ -95,4 +55,91 @@
 .inputField::placeholder {
   color: var(--color-text-interactive-secondary);
   opacity: 0.6;
+}
+
+/* State Variants - CSS Pseudo-class 사용 */
+
+/* 수동 state 클래스 (스토리북 등에서 강제 설정용) - 먼저 정의 */
+.searchbar.state-default {
+  border-color: transparent;
+}
+
+.searchbar.state-hover {
+  border-color: var(--color-border-interactive-secondary);
+}
+
+.searchbar.state-active {
+  border-color: var(--color-border-interactive-primary);
+}
+
+.searchbar.state-active .inputField,
+.searchbar.state-active {
+  color: var(--color-text-primary);
+}
+
+.searchbar.state-filled {
+  border-color: transparent;
+}
+
+.searchbar.state-filled .inputField,
+.searchbar.state-filled {
+  color: var(--color-text-primary);
+}
+
+/* Pseudo-class 상태 (수동 state 클래스가 없을 때 작동) */
+
+/* Hover State - state 클래스가 없을 때만 */
+.searchbar:not(.state-hover):not(.state-active):not(.state-filled):hover {
+  border-color: var(--color-border-interactive-secondary);
+}
+
+/* Active State (Focus) - input이 focus될 때 (hover보다 우선순위 높음, state 클래스가 없을 때만) */
+.searchbar:not(.state-hover):not(.state-active):not(.state-filled):has(
+    .inputField:focus
+  ),
+.searchbar:not(.state-hover):not(.state-active):not(.state-filled):has(
+    .inputField:focus-visible
+  ) {
+  border-color: var(--color-border-interactive-primary);
+}
+
+.searchbar:not(.state-hover):not(.state-active):not(.state-filled):has(
+    .inputField:focus
+  )
+  .inputField,
+.searchbar:not(.state-hover):not(.state-active):not(.state-filled):has(
+    .inputField:focus-visible
+  )
+  .inputField,
+.searchbar:not(.state-hover):not(.state-active):not(.state-filled):has(
+    .inputField:focus
+  ),
+.searchbar:not(.state-hover):not(.state-active):not(.state-filled):has(
+    .inputField:focus-visible
+  ) {
+  color: var(--color-text-primary);
+}
+
+/* Filled State - input에 값이 입력된 상태 (placeholder가 보이지 않을 때, state 클래스가 없을 때만) */
+.searchbar:not(.state-hover):not(.state-active):not(.state-filled):has(
+    .inputField:not(:placeholder-shown)
+  ) {
+  border-color: transparent;
+}
+
+.searchbar:not(.state-hover):not(.state-active):not(.state-filled):has(
+    .inputField:not(:placeholder-shown)
+  )
+  .inputField,
+.searchbar:not(.state-hover):not(.state-active):not(.state-filled):has(
+    .inputField:not(:placeholder-shown)
+  ) {
+  color: var(--color-text-primary);
+}
+
+/* Filled + Focus 조합 - 값이 있고 focus된 상태 */
+.searchbar:not(.state-hover):not(.state-active):not(.state-filled):has(
+    .inputField:not(:placeholder-shown):focus
+  ) {
+  border-color: var(--color-border-interactive-primary);
 }
