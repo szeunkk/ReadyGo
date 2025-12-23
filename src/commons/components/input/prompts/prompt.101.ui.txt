@@ -61,4 +61,7 @@
 
 ==============================================
 
-1차 추가 요구사항) 
+1차 추가 요구사항) input 안의 텍스트(placeholder 포함)색상이 각 state에 맞게 적용이 안되어 있는데 추가할 것.
+            - state: 'filled' | 'error' 일 때 폰트색상: --color-text-primary
+            - state: 'disabled' 일 때 폰트색상: --color-text-disabled
+            - 나머지 state 폰트색상은 --color-text-interactive-secondary

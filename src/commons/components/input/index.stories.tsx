@@ -301,7 +301,7 @@ export const WithAdditionalInfoIcon: Story = {
   args: {
     label: '입력 필드',
     additionalInfo: '추가 정보',
-    additionalInfoIcon: 'info',
+    additionalInfoIcon: 'lightbulb',
     placeholder: '입력하세요',
   },
 };
@@ -316,7 +316,7 @@ export const WithLeftIcon: Story = {
 
 export const WithRightIcon: Story = {
   args: {
-    iconRight: 'close',
+    iconRight: 'x',
     placeholder: '입력하세요',
   },
 };
@@ -324,7 +324,7 @@ export const WithRightIcon: Story = {
 export const WithBothIcons: Story = {
   args: {
     iconLeft: 'search',
-    iconRight: 'close',
+    iconRight: 'x',
     placeholder: '입력하세요',
   },
 };
