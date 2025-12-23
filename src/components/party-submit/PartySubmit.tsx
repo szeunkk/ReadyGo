@@ -348,4 +348,3 @@ export default function PartySubmit() {
     </div>
   );
 }
-

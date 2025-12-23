@@ -148,3 +148,4 @@ export const getAnimalTypesByGroup = (group: AnimalGroup): AnimalType[] => {
     .filter(([_, profile]) => profile.group === group)
     .map(([type]) => type as AnimalType);
 };
+

@@ -112,3 +112,4 @@ export const animalAssets: Record<AnimalType, AnimalAssets> = {
 export const getAnimalAssets = (type: AnimalType): AnimalAssets => {
   return animalAssets[type];
 };
+
