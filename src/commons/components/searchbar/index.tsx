@@ -3,35 +3,39 @@
 import React from 'react';
 import styles from './styles.module.css';
 import { InputHTMLAttributes } from 'react';
-import Icon from '../icon';
+
+export type SearchbarState = 'default' | 'hover' | 'active' | 'filled';
 
 export interface SearchbarProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
   'size'
 > {
+  state?: SearchbarState;
   children?: React.ReactNode;
 }
 
 export default function Searchbar({
+  state = 'default',
   children,
   className = '',
   ...props
 }: SearchbarProps) {
-  const searchbarClasses = [styles.searchbar, className]
+  const searchbarClasses = [
+    styles.searchbar,
+    state !== 'default' ? styles[`state-${state}`] : null,
+    className,
+  ]
     .filter(Boolean)
     .join(' ');
 
   return (
     <div className={searchbarClasses}>
       <div className={styles.searchbarContent}>
-        <Icon name="search" size={20} className={styles.icon} />
-        <div className={styles.inputContainer}>
-          {children ? (
-            <div className={styles.childrenContainer}>{children}</div>
-          ) : (
-            <input type="text" className={styles.inputField} {...props} />
-          )}
-        </div>
+        {children ? (
+          children
+        ) : (
+          <input type="text" className={styles.inputField} {...props} />
+        )}
       </div>
     </div>
   );
