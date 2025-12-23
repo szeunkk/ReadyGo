@@ -83,6 +83,10 @@
   color: var(--color-text-interactive-secondary);
 }
 
+.inputField:focus::placeholder {
+  opacity: 0;
+}
+
 .inputIcon {
   flex-shrink: 0;
   color: var(--color-icon-primary);
@@ -171,6 +175,41 @@
   border: none;
 }
 
+/* Hover state - CSS pseudo-class */
+.variant-primary.state-Default:hover:not(.state-disabled):not(.disabled):not(
+    :has(.inputField:focus)
+  ):not(.state-error),
+.variant-primary.state-filled:hover:not(.state-disabled):not(.disabled):not(
+    :has(.inputField:focus)
+  ):not(.state-error) {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-interactive-secondary);
+  border-radius: var(--border-radius-12, 12px);
+}
+
+/* Active state (focus) - CSS pseudo-class */
+.variant-primary.state-Default:has(.inputField:focus):not(.state-disabled):not(
+    .disabled
+  ):not(.state-error),
+.variant-primary.state-filled:has(.inputField:focus):not(.state-disabled):not(
+    .disabled
+  ):not(.state-error) {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-interactive-primary);
+  border-radius: var(--border-radius-12, 12px);
+}
+
+/* Filled state - CSS pseudo-class (placeholder 기반) */
+.variant-primary.state-Default:has(.inputField:not(:placeholder-shown)):not(
+    .state-disabled
+  ):not(.disabled):not(:has(.inputField:focus)):not(:hover):not(.state-error) {
+  background-color: var(--color-bg-secondary);
+  border: none;
+  border-radius: var(--border-radius-12, 12px);
+  color: var(--color-text-primary);
+}
+
+/* Legacy state classes (하위 호환성 유지) */
 .variant-primary.state-hover {
   background-color: var(--color-bg-secondary);
   border: 1px solid var(--color-border-interactive-secondary);
@@ -227,6 +266,36 @@
   border-color: var(--color-border-primary);
 }
 
+/* Hover state - CSS pseudo-class */
+.variant-secondary.state-Default:hover:not(.state-disabled):not(.disabled):not(
+    :has(.inputField:focus)
+  ):not(.state-error),
+.variant-secondary.state-filled:hover:not(.state-disabled):not(.disabled):not(
+    :has(.inputField:focus)
+  ):not(.state-error) {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border-interactive-secondary);
+}
+
+/* Active state (focus) - CSS pseudo-class */
+.variant-secondary.state-Default:has(.inputField:focus):not(
+    .state-disabled
+  ):not(.disabled):not(.state-error),
+.variant-secondary.state-filled:has(.inputField:focus):not(.state-disabled):not(
+    .disabled
+  ):not(.state-error) {
+  border-color: var(--color-border-interactive-primary);
+}
+
+/* Filled state - CSS pseudo-class (placeholder 기반) */
+.variant-secondary.state-Default:has(.inputField:not(:placeholder-shown)):not(
+    .state-disabled
+  ):not(.disabled):not(:has(.inputField:focus)):not(:hover):not(.state-error) {
+  border-color: var(--color-border-primary);
+  color: var(--color-text-primary);
+}
+
+/* Legacy state classes (하위 호환성 유지) */
 .variant-secondary.state-hover {
   background-color: var(--color-bg-secondary);
   border-color: var(--color-border-interactive-secondary);
