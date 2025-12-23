@@ -113,7 +113,7 @@
 .messageList {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   padding: 32px 16px;
   background-color: var(--color-bg-secondary);
   overflow-y: auto;
