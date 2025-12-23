@@ -103,29 +103,6 @@ export const getAllTierTypes = (): TierType[] => {
  * 티어 타입의 메타데이터를 반환
  */
 export const getTierTypeMeta = (type: TierType): TierTypeMeta => {
-  // #region agent log
-  if (typeof window !== 'undefined') {
-    fetch('http://127.0.0.1:7242/ingest/29c7f2c2-61fa-414f-962c-84e088badf45', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'tierType.enum.ts:105',
-        message: 'getTierTypeMeta called',
-        data: {
-          type,
-          typeOf: typeof type,
-          typeValue: String(type),
-          hasMetadata: !!tierTypeMeta[type],
-          allTierTypes: Object.keys(tierTypeMeta),
-        },
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        runId: 'pre-fix',
-        hypothesisId: 'C,E',
-      }),
-    }).catch(() => {});
-  }
-  // #endregion
   return tierTypeMeta[type];
 };
 

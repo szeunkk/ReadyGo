@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState, useEffect } from 'react';
+import { ReactNode, useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import Icon from '@/commons/components/icon';
@@ -21,13 +21,68 @@ export const Layout = ({ children }: LayoutProps) => {
   const [activeNav, setActiveNav] = useState<NavigationButton>('home');
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
-  const { isOpen } = useSidePanelStore();
+  const { isOpen, close } = useSidePanelStore();
 
   // 현재 경로의 visibility 설정 가져오기
   const urlMetadata = getUrlMetadata(pathname);
   const showSidebar = urlMetadata?.visibility.sidebar ?? false;
   const showHeader = urlMetadata?.visibility.header ?? false;
 
+  // 현재 탭 계산 -> 이전 탭과 비교해서 side panel 닫기
+  const getTopLevelRoute = (pathname: string) => {
+    if (pathname.startsWith(URL_PATHS.HOME)) {
+      return 'home';
+    }
+    if (pathname.startsWith(URL_PATHS.CHAT)) {
+      return 'chat';
+    }
+    if (pathname.startsWith(URL_PATHS.MATCH)) {
+      return 'match';
+    }
+    if (pathname.startsWith(URL_PATHS.PARTY)) {
+      return 'party';
+    }
+    // notifications와 friends는 overlay이므로 탭 변경으로 간주하지 않음
+    if (pathname.startsWith(URL_PATHS.NOTIFICATIONS)) {
+      return 'notifications';
+    }
+    if (pathname.startsWith(URL_PATHS.FRIENDS)) {
+      return 'friends';
+    }
+    return 'etc';
+  };
+
+  const prevTopRouteRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const currentTop = getTopLevelRoute(pathname);
+    const prevTop = prevTopRouteRef.current;
+
+    // pathname에 notifications나 friends가 포함되어 있는 경우 side panel을 닫지 않음
+    const isOverlayPath =
+      pathname.includes('/notifications') || pathname.includes('/friends');
+
+    // overlay 경로인 경우 side panel을 닫지 않음
+    if (isOverlayPath) {
+      prevTopRouteRef.current = currentTop;
+      return;
+    }
+
+    // 이전 페이지가 notifications나 friends인 경우 side panel을 닫지 않음
+    if (prevTop === 'notifications' || prevTop === 'friends') {
+      prevTopRouteRef.current = currentTop;
+      return;
+    }
+
+    // 일반 탭 간 이동 시에만 side panel 닫기
+    if (prevTop && prevTop !== currentTop) {
+      close();
+    }
+
+    prevTopRouteRef.current = currentTop;
+  }, [pathname, close]);
+
+  // 마운트 완료 후 테마 설정
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -50,7 +105,17 @@ export const Layout = ({ children }: LayoutProps) => {
 
   const handleNavClick = (nav: NavigationButton, path: string) => {
     setActiveNav(nav);
-    router.push(path);
+
+    // overlay 페이지에서 다른 탭으로 이동할 때는 router.replace로 overlay를 닫고 이동
+    const isCurrentlyOnOverlay =
+      pathname.includes('/notifications') || pathname.includes('/friends');
+
+    if (isCurrentlyOnOverlay) {
+      // replace를 사용하여 히스토리를 대체하면서 overlay 닫기
+      router.replace(path);
+    } else {
+      router.push(path);
+    }
   };
 
   return (
@@ -118,7 +183,13 @@ export const Layout = ({ children }: LayoutProps) => {
             <div className={styles.menuButtons}>
               <button
                 className={styles.menuButton}
-                onClick={() => router.push(URL_PATHS.NOTIFICATIONS)}
+                onClick={() => {
+                  if (pathname.startsWith(URL_PATHS.NOTIFICATIONS)) {
+                    router.back();
+                  } else {
+                    router.push(URL_PATHS.NOTIFICATIONS);
+                  }
+                }}
               >
                 <div className={styles.menuButtonIcon}>
                   <Icon
@@ -132,7 +203,13 @@ export const Layout = ({ children }: LayoutProps) => {
 
               <button
                 className={styles.menuButton}
-                onClick={() => router.push(URL_PATHS.FRIENDS)}
+                onClick={() => {
+                  if (pathname.startsWith(URL_PATHS.FRIENDS)) {
+                    router.back();
+                  } else {
+                    router.push(URL_PATHS.FRIENDS);
+                  }
+                }}
               >
                 <div className={styles.menuButtonIcon}>
                   <Icon name="group" size={24} className={styles.themeIcon} />

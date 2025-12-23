@@ -17,6 +17,11 @@
   flex: 1;
   max-width: 1336px;
   width: 100%;
+  transition: margin-right 0.25s ease;
+}
+
+.leftSection.sidePanelOpen {
+  margin-right: -456px; /* ProfileSection width(408px) + gap(32px) */
 }
 
 /* 매치 섹션 */

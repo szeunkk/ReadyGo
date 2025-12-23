@@ -1,0 +1,17 @@
+.overlayBackdrop {
+  position: absolute;
+  top: var(--header-height);
+  left: var(--side-bar-width);
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-overlay);
+}
+
+.overlayContent {
+  position: fixed;
+  top: var(--header-height);
+  left: var(--side-bar-width);
+  height: 100%;
+  border-radius: 16px;
+  z-index: 51;
+}

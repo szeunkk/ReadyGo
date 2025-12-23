@@ -21,9 +21,16 @@ const dashedGridPlugin: Plugin<'radar'> = {
   id: 'dashedGrid',
   beforeDraw(chart) {
     const { ctx, chartArea, scales } = chart;
-    const scale = scales.r as {
+    const scale = scales.r as unknown as {
       max: number;
       getDistanceFromCenterForValue: (value: number) => number;
+      _pointLabels: string[];
+      getPointPosition: (
+        index: number,
+        distance: number
+      ) => { x: number; y: number };
+      xCenter: number;
+      yCenter: number;
     };
 
     if (!scale || !chartArea) {
@@ -157,7 +164,7 @@ export default function RadarChart({
             right: number;
           };
         };
-      }) => {
+      }): string | CanvasGradient => {
         const { chart } = context;
         const { ctx, chartArea } = chart;
 
@@ -204,7 +211,7 @@ export default function RadarChart({
             right: number;
           };
         };
-      }) => {
+      }): string | CanvasGradient => {
         const { chart } = context;
         const { ctx, chartArea } = chart;
 

@@ -4,7 +4,7 @@ import { generateNickname } from '@/lib/nickname/generateNickname';
 import Radio from '@/commons/components/radio';
 import { useState, useEffect } from 'react';
 
-export default function Home() {
+export default function Page() {
   const [selectedGame, setSelectedGame] = useState('lol');
   const [selectedTier, setSelectedTier] = useState('gold');
   const [nickname, setNickname] = useState('');

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import Avatar from './index';
+import { AnimalType } from '@/commons/constants/animal';
 
 const meta = {
   title: 'Commons/Components/Avatar',
@@ -426,7 +427,7 @@ export const ThemeComparison: Story = {
 // Color 스토리
 export const WithAnimalType: Story = {
   args: {
-    animalType: 'leopard',
+    animalType: AnimalType.leopard,
     status: 'online',
   },
   parameters: {
@@ -441,7 +442,7 @@ export const WithAnimalType: Story = {
 
 export const WithCustomColor: Story = {
   args: {
-    animalType: 'leopard',
+    animalType: AnimalType.leopard,
     color: '#FF6B6B',
     status: 'online',
   },
@@ -465,7 +466,7 @@ export const ColorVariations: Story = {
           alignItems: 'center',
         }}
       >
-        <Avatar animalType="tiger" color="#FF6B6B" status="online" />
+        <Avatar animalType={AnimalType.tiger} color="#FF6B6B" status="online" />
         <span style={{ fontSize: '12px' }}>Red</span>
       </div>
       <div
@@ -476,7 +477,7 @@ export const ColorVariations: Story = {
           alignItems: 'center',
         }}
       >
-        <Avatar animalType="fox" color="#4ECDC4" status="online" />
+        <Avatar animalType={AnimalType.fox} color="#4ECDC4" status="online" />
         <span style={{ fontSize: '12px' }}>Cyan</span>
       </div>
       <div
@@ -487,7 +488,7 @@ export const ColorVariations: Story = {
           alignItems: 'center',
         }}
       >
-        <Avatar animalType="owl" color="#FFE66D" status="online" />
+        <Avatar animalType={AnimalType.owl} color="#FFE66D" status="online" />
         <span style={{ fontSize: '12px' }}>Yellow</span>
       </div>
       <div
@@ -498,7 +499,7 @@ export const ColorVariations: Story = {
           alignItems: 'center',
         }}
       >
-        <Avatar animalType="wolf" color="#A8E6CF" status="online" />
+        <Avatar animalType={AnimalType.wolf} color="#A8E6CF" status="online" />
         <span style={{ fontSize: '12px' }}>Green</span>
       </div>
       <div
@@ -509,7 +510,7 @@ export const ColorVariations: Story = {
           alignItems: 'center',
         }}
       >
-        <Avatar animalType="bear" color="#B4A7D6" status="online" />
+        <Avatar animalType={AnimalType.bear} color="#B4A7D6" status="online" />
         <span style={{ fontSize: '12px' }}>Purple</span>
       </div>
     </div>

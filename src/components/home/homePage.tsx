@@ -11,6 +11,7 @@ import { AnimalType } from '@/commons/constants/animal';
 import { TierType } from '@/commons/constants/tierType.enum';
 import { useGoogleOAuth } from '@/components/auth/hooks/useGoogleOAuth.hook';
 import { useKakaoOAuth } from '@/components/auth/hooks/useKakaoOAuth.hook';
+import { useSidePanelStore } from '@/stores/sidePanel.store';
 
 // 임시 데이터 - 추후 API로 대체될 예정
 const mockMatchData: MatchCardProps[] = [
@@ -131,10 +132,14 @@ export default function Home() {
   useGoogleOAuth();
   useKakaoOAuth();
 
+  const { isOpen } = useSidePanelStore();
+
   return (
     <div className={styles.container}>
       {/* 왼쪽 컨텐츠 영역 */}
-      <div className={styles.leftSection}>
+      <div
+        className={`${styles.leftSection} ${isOpen ? styles.sidePanelOpen : ''}`}
+      >
         {/* 매치 섹션 */}
         <MatchSection
           title="레전드 조합, ㄹㄷ? 🎲"
@@ -152,18 +157,20 @@ export default function Home() {
 
       {/* 오른쪽 사이드바 영역 */}
       <div className={styles.rightSection}>
-        <ProfileSection
-          nickname={mockProfileData.nickname}
-          tier={mockProfileData.tier}
-          animal={mockProfileData.animal}
-          favoriteGenre={mockProfileData.favoriteGenre}
-          activeTime={mockProfileData.activeTime}
-          gameStyle={mockProfileData.gameStyle}
-          weeklyAverage={mockProfileData.weeklyAverage}
-          perfectMatchTypes={mockProfileData.perfectMatchTypes}
-          radarData={mockProfileData.radarData}
-          barData={mockProfileData.barData}
-        />
+        {!isOpen && (
+          <ProfileSection
+            nickname={mockProfileData.nickname}
+            tier={mockProfileData.tier}
+            animal={mockProfileData.animal}
+            favoriteGenre={mockProfileData.favoriteGenre}
+            activeTime={mockProfileData.activeTime}
+            gameStyle={mockProfileData.gameStyle}
+            weeklyAverage={mockProfileData.weeklyAverage}
+            perfectMatchTypes={mockProfileData.perfectMatchTypes}
+            radarData={mockProfileData.radarData}
+            barData={mockProfileData.barData}
+          />
+        )}
       </div>
     </div>
   );
