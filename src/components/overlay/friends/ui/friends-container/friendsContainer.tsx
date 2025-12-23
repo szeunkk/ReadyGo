@@ -108,7 +108,9 @@ export default function FriendsContainer() {
             <span className={styles.tabText}>친구 요청</span>
             {friendRequests.length > 0 && (
               <div className={styles.badge}>
-                <span className={styles.badgeText}>{friendRequests.length}</span>
+                <span className={styles.badgeText}>
+                  {friendRequests.length}
+                </span>
               </div>
             )}
           </button>
@@ -166,7 +168,11 @@ export default function FriendsContainer() {
               <div key={request.id} className={styles.requestItem}>
                 <div className={styles.userInfo}>
                   <div className={styles.avatarWrapper}>
-                    <Avatar size="s" status={request.status} showStatus={false} />
+                    <Avatar
+                      size="s"
+                      status={request.status}
+                      showStatus={false}
+                    />
                   </div>
                   <div className={styles.textInfo}>
                     <div className={styles.nicknameContainer}>

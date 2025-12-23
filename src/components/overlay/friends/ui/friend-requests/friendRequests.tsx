@@ -68,7 +68,9 @@ export default function FriendRequests() {
             <span className={styles.tabText}>친구 요청</span>
             {friendRequests.length > 0 && (
               <div className={styles.badge}>
-                <span className={styles.badgeText}>{friendRequests.length}</span>
+                <span className={styles.badgeText}>
+                  {friendRequests.length}
+                </span>
               </div>
             )}
           </button>
@@ -122,4 +124,3 @@ export default function FriendRequests() {
     </div>
   );
 }
-
