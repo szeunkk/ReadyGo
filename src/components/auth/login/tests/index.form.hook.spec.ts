@@ -119,7 +119,7 @@ test.describe('로그인 폼', () => {
     });
 
     const email = 'test@example.com';
-    const password = 'wrongpassword';
+    const password = 'wrong1234'; // zod 검증 조건 통과: 8자리 이상, 영문+숫자 포함
 
     // 폼 입력
     const emailInput = page.locator('[data-testid="login-email-input"]');
@@ -211,8 +211,8 @@ test.describe('로그인 폼', () => {
       });
     });
 
-    const email = 'invalid-email';
-    const password = 'test1234';
+    const email = 'test@example.com'; // 올바른 이메일 형식 (zod 검증 통과)
+    const password = 'test1234'; // zod 검증 조건 통과: 8자리 이상, 영문+숫자 포함
 
     // 폼 입력
     const emailInput = page.locator('[data-testid="login-email-input"]');
@@ -289,6 +289,174 @@ test.describe('로그인 폼', () => {
       .isVisible({ timeout: 500 })
       .catch(() => false);
     expect(isModalVisible).toBe(false);
+  });
+
+  test('zod 검증 테스트: 이메일 형식 검증', async ({ page }) => {
+    // 잘못된 이메일 형식 입력
+    const emailInput = page.locator('[data-testid="login-email-input"]');
+    await emailInput.clear({ timeout: 500 });
+    await emailInput.type('invalid-email', { delay: 0, timeout: 500 });
+    await emailInput.evaluate((el) => {
+      el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+    });
+    await page.waitForTimeout(200);
+    await emailInput.blur({ timeout: 500 });
+    await page.waitForTimeout(200);
+
+    // 에러 메시지 확인 (페이지 전체에서 찾기)
+    const errorMessage = await page
+      .locator('text=/올바른 이메일 형식이 아닙니다\\./')
+      .isVisible({ timeout: 1000 })
+      .catch(() => false);
+    expect(errorMessage).toBe(true);
+
+    // 버튼이 비활성화되어 있는지 확인
+    const loginButton = page.locator('[data-testid="login-submit-button"]');
+    await expect(loginButton).toBeDisabled({ timeout: 500 });
+  });
+
+  test('zod 검증 테스트: 비밀번호 길이 검증', async ({ page }) => {
+    // 올바른 이메일 입력
+    const emailInput = page.locator('[data-testid="login-email-input"]');
+    await emailInput.clear({ timeout: 500 });
+    await emailInput.type('test@example.com', { delay: 0, timeout: 500 });
+    await emailInput.evaluate((el) => {
+      el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+    });
+    await page.waitForTimeout(200);
+    await emailInput.blur({ timeout: 500 });
+    await page.waitForTimeout(200);
+
+    // 7자리 비밀번호 입력 (8자리 미만)
+    const passwordInput = page.locator('[data-testid="login-password-input"]');
+    await passwordInput.clear({ timeout: 500 });
+    await passwordInput.type('test123', { delay: 0, timeout: 500 });
+    await passwordInput.evaluate((el) => {
+      el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+    });
+    await page.waitForTimeout(200);
+    await passwordInput.blur({ timeout: 500 });
+    await page.waitForTimeout(200);
+
+    // 에러 메시지 확인 (페이지 전체에서 찾기)
+    const errorMessage = await page
+      .locator('text=/비밀번호는 8자리 이상이어야 합니다\\./')
+      .isVisible({ timeout: 1000 })
+      .catch(() => false);
+    expect(errorMessage).toBe(true);
+
+    // 버튼이 비활성화되어 있는지 확인
+    const loginButton = page.locator('[data-testid="login-submit-button"]');
+    await expect(loginButton).toBeDisabled({ timeout: 500 });
+  });
+
+  test('zod 검증 테스트: 비밀번호 영문+숫자 포함 검증', async ({ page }) => {
+    // 올바른 이메일 입력
+    const emailInput = page.locator('[data-testid="login-email-input"]');
+    await emailInput.clear({ timeout: 500 });
+    await emailInput.type('test@example.com', { delay: 0, timeout: 500 });
+    await emailInput.evaluate((el) => {
+      el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+    });
+    await page.waitForTimeout(200);
+    await emailInput.blur({ timeout: 500 });
+    await page.waitForTimeout(200);
+
+    // 영문만 포함된 비밀번호 입력 (숫자 없음)
+    const passwordInput = page.locator('[data-testid="login-password-input"]');
+    await passwordInput.clear({ timeout: 500 });
+    await passwordInput.type('testpassword', { delay: 0, timeout: 500 });
+    await passwordInput.evaluate((el) => {
+      el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+    });
+    await page.waitForTimeout(200);
+    await passwordInput.blur({ timeout: 500 });
+    await page.waitForTimeout(200);
+
+    // 에러 메시지 확인 (페이지 전체에서 찾기)
+    const errorMessage = await page
+      .locator('text=/비밀번호는 영문과 숫자를 포함해야 합니다\\./')
+      .isVisible({ timeout: 1000 })
+      .catch(() => false);
+    expect(errorMessage).toBe(true);
+
+    // 버튼이 비활성화되어 있는지 확인
+    const loginButton = page.locator('[data-testid="login-submit-button"]');
+    await expect(loginButton).toBeDisabled({ timeout: 500 });
+  });
+
+  test('아이디 저장 기능 테스트: 체크박스 선택 시 localStorage 저장', async ({
+    page,
+  }) => {
+    // localStorage 초기화
+    await page.evaluate(() => {
+      localStorage.removeItem('rememberedEmail');
+    });
+
+    // 이메일 입력
+    const emailInput = page.locator('[data-testid="login-email-input"]');
+    await emailInput.clear({ timeout: 500 });
+    await emailInput.type('test@example.com', { delay: 0, timeout: 500 });
+    await emailInput.evaluate((el) => {
+      el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+    });
+    await page.waitForTimeout(200);
+    await emailInput.blur({ timeout: 500 });
+    await page.waitForTimeout(200);
+
+    // 체크박스 클릭 (아이디 저장) - label을 통해 클릭
+    const checkboxLabel = page.locator('label:has-text("아이디 저장")');
+    await checkboxLabel.click({ timeout: 1000 });
+    await page.waitForTimeout(200);
+
+    // localStorage에 이메일이 저장되었는지 확인
+    const rememberedEmail = await page.evaluate(() => {
+      return localStorage.getItem('rememberedEmail');
+    });
+    expect(rememberedEmail).toBe('test@example.com');
+  });
+
+  test('아이디 저장 기능 테스트: 체크박스 해제 시 localStorage 삭제', async ({
+    page,
+  }) => {
+    // localStorage에 이메일 저장
+    await page.evaluate(() => {
+      localStorage.setItem('rememberedEmail', 'test@example.com');
+    });
+
+    // 페이지 새로고침하여 localStorage에서 이메일 불러오기
+    await page.reload();
+    await page.waitForSelector('[data-testid="auth-login-page"]', {
+      timeout: 2000,
+    });
+    await page.waitForTimeout(500); // useEffect 실행 대기
+
+    // 이메일 입력 필드에 값이 채워져 있는지 확인
+    const emailInput = page.locator('[data-testid="login-email-input"]');
+    const emailValue = await emailInput.inputValue();
+    expect(emailValue).toBe('test@example.com');
+
+    // 체크박스가 선택되어 있는지 확인
+    const checkbox = page.locator('input[type="checkbox"]');
+    const isChecked = await checkbox.isChecked({ timeout: 1000 }).catch(() => false);
+    expect(isChecked).toBe(true);
+
+    // 체크박스 해제 - label을 통해 클릭
+    const checkboxLabel = page.locator('label:has-text("아이디 저장")');
+    await checkboxLabel.click({ timeout: 1000 });
+    await page.waitForTimeout(200);
+
+    // localStorage에서 이메일이 삭제되었는지 확인
+    const rememberedEmail = await page.evaluate(() => {
+      return localStorage.getItem('rememberedEmail');
+    });
+    expect(rememberedEmail).toBeNull();
   });
 });
 

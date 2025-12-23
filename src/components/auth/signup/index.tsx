@@ -1,12 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './styles.module.css';
 import Input from '@/commons/components/input';
 import Button from '@/commons/components/button';
 import { useSignupForm } from './hooks/index.form.hook';
 
 export default function Signup() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const { form, onSubmit, isFormValid, isSubmitting, errors } = useSignupForm();
   const {
     register,
@@ -49,16 +51,17 @@ export default function Signup() {
               placeholder="비밀번호를 입력하세요"
               required
               iconLeft="lock"
-              iconRight="eye"
+              iconRight={showPassword ? 'eye-slash' : 'eye'}
               iconSize={20}
               iconLeftColor="var(--color-icon-interactive-secondary)"
               iconRightColor="var(--color-icon-interactive-secondary)"
               gap={8}
               className={styles.input}
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               state={formErrors.password ? 'error' : 'Default'}
               additionalInfo={formErrors.password?.message}
               data-testid="signup-password-input"
+              onIconRightClick={() => setShowPassword(!showPassword)}
               {...register('password')}
             />
             <Input
@@ -68,16 +71,17 @@ export default function Signup() {
               placeholder="비밀번호를 다시 입력하세요"
               required
               iconLeft="lock"
-              iconRight="eye"
+              iconRight={showPasswordConfirm ? 'eye-slash' : 'eye'}
               iconSize={20}
               iconLeftColor="var(--color-icon-interactive-secondary)"
               iconRightColor="var(--color-icon-interactive-secondary)"
               gap={8}
               className={styles.input}
-              type="password"
+              type={showPasswordConfirm ? 'text' : 'password'}
               state={formErrors.passwordConfirm ? 'error' : 'Default'}
               additionalInfo={formErrors.passwordConfirm?.message}
               data-testid="signup-password-confirm-input"
+              onIconRightClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
               {...register('passwordConfirm')}
             />
           </div>

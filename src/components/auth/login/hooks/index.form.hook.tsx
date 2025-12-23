@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,16 +9,28 @@ import { z } from 'zod';
 import { supabase } from '@/lib/supabase/client';
 import { URL_PATHS } from '@/commons/constants/url';
 import { useModal } from '@/commons/providers/modal';
+import { CheckboxStatus } from '@/commons/components/checkbox';
 
 // Zod 스키마 정의
 const loginSchema = z.object({
-  email: z.string().refine((val) => val.includes('@'), {
-    message: '이메일에는 @가 포함되어야 합니다.',
-  }),
-  password: z.string().min(1, '비밀번호는 최소 1글자 이상이어야 합니다.'),
+  email: z
+    .string()
+    .email('올바른 이메일 형식이 아닙니다.')
+    .refine((val) => val.includes('@'), {
+      message: '이메일에는 @가 포함되어야 합니다.',
+    }),
+  password: z
+    .string()
+    .min(8, '비밀번호는 8자리 이상이어야 합니다.')
+    .refine(
+      (val) => /[a-zA-Z]/.test(val) && /[0-9]/.test(val),
+      '비밀번호는 영문과 숫자를 포함해야 합니다.'
+    ),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
+
+const REMEMBERED_EMAIL_KEY = 'rememberedEmail';
 
 export const useLoginForm = () => {
   const router = useRouter();
@@ -26,6 +38,18 @@ export const useLoginForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const hasShownSuccessModalRef = useRef(false);
   const hasShownErrorModalRef = useRef(false);
+
+  // localStorage에서 저장된 이메일 불러오기
+  const getRememberedEmail = (): string => {
+    if (typeof window === 'undefined') return '';
+    const rememberedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY);
+    return rememberedEmail || '';
+  };
+
+  // 초기 체크박스 상태는 항상 'unselected'로 설정 (hydration 오류 방지)
+  // 실제 값은 useEffect에서 클라이언트에서만 설정
+  const [rememberIdStatus, setRememberIdStatus] =
+    useState<CheckboxStatus>('unselected');
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -36,24 +60,61 @@ export const useLoginForm = () => {
     },
   });
 
-  const { handleSubmit, formState } = form;
-  const { errors } = formState;
+  const { handleSubmit, formState, setValue } = form;
+  const { errors, isValid } = formState;
+
+  // 클라이언트에서만 localStorage 확인하여 초기 상태 설정
+  useEffect(() => {
+    const rememberedEmail = getRememberedEmail();
+    if (rememberedEmail) {
+      setRememberIdStatus('selected');
+      setValue('email', rememberedEmail);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // watch를 사용하여 폼 값 변경 시 리렌더링 트리거
   // watch()를 인자 없이 호출하면 모든 필드를 감시하고 리렌더링을 트리거함
   const watchedValues = form.watch();
+  const watchedEmail = form.watch('email');
 
-  // 모든 필드가 입력되고 유효한지 확인
+  // 모든 필드가 입력되었는지 확인
   const email = watchedValues.email?.trim() || '';
   const password = watchedValues.password?.trim() || '';
-
-  // 간단한 validation: 필드가 모두 입력되면 유효
-  // react-hook-form의 errors는 onChange 모드에서 즉시 업데이트되지 않을 수 있으므로
-  // 필드 값만 확인하고, 실제 validation은 submit 시점에 수행
   const allFieldsFilled = Boolean(email) && Boolean(password);
 
-  // 에러가 있는 경우에만 비활성화 (에러가 없으면 활성화)
-  const isFormValid = allFieldsFilled;
+  // zod 검증을 통과하고 모든 필드가 채워져 있어야 버튼 활성화
+  // isValid는 zod 스키마 검증을 통과했는지 확인
+  const isFormValid = isValid && allFieldsFilled;
+
+  // 체크박스 상태 변경 핸들러
+  const handleRememberIdChange = (status: CheckboxStatus) => {
+    setRememberIdStatus(status);
+
+    if (status === 'selected') {
+      // 체크박스가 selected로 변경될 때: 현재 이메일 저장
+      const currentEmail = watchedEmail?.trim() || '';
+      if (currentEmail) {
+        localStorage.setItem(REMEMBERED_EMAIL_KEY, currentEmail);
+      }
+    } else {
+      // 체크박스가 unselected로 변경될 때: localStorage에서 삭제
+      localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+    }
+  };
+
+  // 이메일 값 변경 시 localStorage 업데이트 (체크박스가 selected일 때만)
+  useEffect(() => {
+    if (rememberIdStatus === 'selected') {
+      const currentEmail = watchedEmail?.trim() || '';
+      if (currentEmail) {
+        localStorage.setItem(REMEMBERED_EMAIL_KEY, currentEmail);
+      } else {
+        // 이메일이 비워지면 localStorage에서 삭제
+        localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+      }
+    }
+  }, [watchedEmail, rememberIdStatus]);
 
   const onSubmit = handleSubmit(async (data) => {
     if (isSubmitting) {
@@ -172,5 +233,7 @@ export const useLoginForm = () => {
     isFormValid,
     isSubmitting,
     errors,
+    rememberIdStatus,
+    handleRememberIdChange,
   };
 };

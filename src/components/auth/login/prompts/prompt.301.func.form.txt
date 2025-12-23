@@ -63,7 +63,7 @@
 
                 - zod 검증 조건
                     - email: '@' 포함
-                    - password: 최소 1글자 이상
+                    - password: 최소 8글자 이상
 
             2) 유저시나리오(로그인)
                 1. 모든 인풋이 입력되고 zod 검증을 통과하면 로그인 버튼을 활성화할 것.                
@@ -133,3 +133,52 @@
    - 실패 시나리오(Playwright route mocking) 통과 여부
    - data-testid 기반 페이지 로드 판별 준수 여부
    - timeout 규칙 준수 여부
+
+==============================================
+
+추가사항) 아이디 저장 기능 구현
+
+핵심요구사항) 아이디 저장 기능을 구현하고, 적용 결과를 체크리스트로 반환할 것.
+            1) 로컬스토리지 조건
+                - localStorage 키 이름: "rememberedEmail"
+                - 저장할 값: 이메일 인풋에 입력된 문자열 값 (email 필드 값)
+                - 저장 형식: 문자열(string)로 저장할 것.
+
+            2) 체크박스 상태 관리
+                2-1) 초기 상태
+                    - 페이지 로드 시 localStorage에 "rememberedEmail" 키가 존재하고 값이 있으면:
+                        1) 체크박스 상태를 'selected'로 설정할 것.
+                        2) 이메일 인풋의 기본값(defaultValue)을 저장된 이메일로 설정할 것.
+                    - localStorage에 "rememberedEmail" 키가 없거나 값이 없으면:
+                        1) 체크박스 상태를 'unselected'로 설정할 것.
+                        2) 이메일 인풋의 기본값을 빈 문자열로 설정할 것.
+
+                2-2) 체크박스 클릭 시 동작
+                    - 체크박스가 'unselected' → 'selected'로 변경될 때:
+                        1) 현재 이메일 인풋에 입력된 값을 localStorage에 "rememberedEmail" 키로 저장할 것.
+                        2) 이메일 인풋에 값이 없으면 저장하지 않을 것.
+                    - 체크박스가 'selected' → 'unselected'로 변경될 때:
+                        1) localStorage에서 "rememberedEmail" 키를 삭제할 것.
+
+            3) 이메일 입력 시 동작
+                - 체크박스가 'selected' 상태일 때:
+                    1) 사용자가 이메일 인풋에 값을 입력하거나 수정하면, 실시간으로 localStorage의 "rememberedEmail" 값을 업데이트할 것.
+                    2) 이메일 인풋이 비워지면 localStorage에서 "rememberedEmail" 키를 삭제할 것.
+
+            4) 구현 위치
+                4-1) Hook 책임 (src/components/auth/login/hooks/index.form.hook.tsx)
+                    - localStorage에서 저장된 이메일 불러오기 (초기화 시)
+                    - 체크박스 상태 변경 핸들러 제공
+                    - 이메일 값 변경 시 localStorage 업데이트 로직
+                    - react-hook-form의 watch를 활용하여 이메일 값 변경 감지
+
+                4-2) UI 컴포넌트 책임 (src/components/auth/login/index.tsx)
+                    - Hook에서 제공하는 체크박스 상태 및 핸들러를 사용할 것.
+                    - 체크박스 컴포넌트에 상태와 핸들러를 연결할 것.
+
+            5) 테스트 조건 (선택사항)
+                - Playwright 테스트에서 다음 시나리오를 검증할 수 있음:
+                    1) 체크박스 선택 후 이메일 입력 → localStorage에 저장되는지
+                    2) 페이지 새로고침 → 저장된 이메일이 인풋에 표시되고 체크박스가 선택 상태인지
+                    3) 체크박스 해제 → localStorage에서 삭제되는지
+                    4) 체크박스 선택 상태에서 이메일 수정 → localStorage 값이 업데이트되는지
