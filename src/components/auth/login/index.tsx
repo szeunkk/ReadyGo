@@ -7,6 +7,7 @@ import Button from '@/commons/components/button';
 import Checkbox from '@/commons/components/checkbox';
 import { useLoginForm } from './hooks/index.form.hook';
 import { useGoogleOAuth } from '../hooks/useGoogleOAuth.hook';
+import { useKakaoOAuth } from '../hooks/useKakaoOAuth.hook';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,6 +20,7 @@ export default function Login() {
     handleRememberIdChange,
   } = useLoginForm();
   const { handleGoogleOAuth } = useGoogleOAuth();
+  const { handleKakaoOAuth } = useKakaoOAuth();
   const {
     register,
     formState: { errors: formErrors },
@@ -137,7 +139,12 @@ export default function Login() {
               <span className={styles.socialButtonText}>Google로 로그인</span>
             </div>
           </button>
-          <button className={styles.kakaoButton} type="button">
+          <button
+            className={styles.kakaoButton}
+            type="button"
+            onClick={handleKakaoOAuth}
+            data-testid="login-kakao-button"
+          >
             <div className={styles.socialButtonContent}>
               <div className={styles.socialIcon}>
                 <svg
