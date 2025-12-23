@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Selectbox, { type SelectboxItem } from '@/commons/components/selectbox';
 import Searchbar from '@/commons/components/searchbar';
 import Button from '@/commons/components/button';
-import Card, { PartyCardProps } from './ui/card/card';
+import Card, { PartyCardProps } from './ui/card';
 import styles from './styles.module.css';
 
 // 임시 데이터 - 추후 API로 대체될 예정
@@ -157,3 +157,4 @@ export default function Party() {
     </div>
   );
 }
+
