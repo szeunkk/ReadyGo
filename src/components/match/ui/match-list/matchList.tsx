@@ -124,12 +124,10 @@ export default function Match() {
   };
 
   const handleRefresh = () => {
-    console.log('목록 갱신');
     // TODO: 실제 데이터 갱신 로직 구현
   };
 
-  const handleProfileClick = (id: number) => {
-    console.log('프로필 보기:', id);
+  const handleProfileClick = (_id: number) => {
     // TODO: 프로필 페이지 이동 로직 구현
   };
 

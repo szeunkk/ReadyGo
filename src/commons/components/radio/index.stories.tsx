@@ -42,7 +42,8 @@ const meta = {
     },
     name: {
       control: { type: 'text' },
-      description: '라디오 버튼 그룹 이름 (같은 name을 가진 radio는 하나만 선택 가능, 필수)',
+      description:
+        '라디오 버튼 그룹 이름 (같은 name을 가진 radio는 하나만 선택 가능, 필수)',
       table: {
         type: { summary: 'string' },
       },
@@ -143,15 +144,11 @@ export const SelectedDefault: Story = {
 };
 
 export const SelectedHover: Story = {
-  render: () => (
-    <Radio name="demo" value="demo" checked={true} state="hover" />
-  ),
+  render: () => <Radio name="demo" value="demo" checked={true} state="hover" />,
 };
 
 export const SelectedPress: Story = {
-  render: () => (
-    <Radio name="demo" value="demo" checked={true} state="press" />
-  ),
+  render: () => <Radio name="demo" value="demo" checked={true} state="press" />,
 };
 
 export const SelectedDisabled: Story = {
@@ -161,9 +158,7 @@ export const SelectedDisabled: Story = {
 };
 
 export const SelectedError: Story = {
-  render: () => (
-    <Radio name="demo" value="demo" checked={true} state="error" />
-  ),
+  render: () => <Radio name="demo" value="demo" checked={true} state="error" />,
 };
 
 // 조합 스토리
@@ -392,7 +387,3 @@ export const RadioGroup: Story = {
     },
   },
 };
-
-
-
-

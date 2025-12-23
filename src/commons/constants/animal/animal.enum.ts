@@ -60,4 +60,3 @@ export const getAnimalTypesByGroup = (_group: AnimalGroup): AnimalType[] => {
     return true;
   });
 };
-

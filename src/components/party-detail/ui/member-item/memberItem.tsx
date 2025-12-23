@@ -46,7 +46,7 @@ export default function MemberItem({
     <div className={containerClasses}>
       <div className={styles.avatarWrapper}>
         <Avatar
-          animalType={animalType as any}
+          animalType={animalType as AnimalType}
           alt={name || 'Member'}
           size="s"
           status="online"
@@ -60,6 +60,3 @@ export default function MemberItem({
     </div>
   );
 }
-
-
-

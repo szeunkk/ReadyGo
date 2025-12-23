@@ -62,9 +62,7 @@ export default function TierTag({
   }).catch(() => {});
   // #endregion
 
-  const tagClasses = [styles.tierTag, className]
-    .filter(Boolean)
-    .join(' ');
+  const tagClasses = [styles.tierTag, className].filter(Boolean).join(' ');
 
   // #region agent log
   fetch('http://127.0.0.1:7242/ingest/29c7f2c2-61fa-414f-962c-84e088badf45', {

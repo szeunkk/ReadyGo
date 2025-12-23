@@ -46,9 +46,7 @@ export default function AnimalCard({
 }: AnimalCardProps) {
   const animalMeta = getAnimalTypeMeta(animal);
 
-  const cardClasses = [styles.animalCard, className]
-    .filter(Boolean)
-    .join(' ');
+  const cardClasses = [styles.animalCard, className].filter(Boolean).join(' ');
 
   return (
     <div className={cardClasses} {...props}>

@@ -15,7 +15,6 @@ export default function Login() {
     onSubmit,
     isFormValid,
     isSubmitting,
-    errors,
     rememberIdStatus,
     handleRememberIdChange,
   } = useLoginForm();
@@ -96,9 +95,9 @@ export default function Login() {
         </form>
 
         <div className={styles.divider}>
-          <div className={styles.dividerLine}></div>
+          <div className={styles.dividerLine} />
           <span className={styles.dividerText}>또는</span>
-          <div className={styles.dividerLine}></div>
+          <div className={styles.dividerLine} />
         </div>
 
         <div className={styles.socialLoginGroup}>

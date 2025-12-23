@@ -169,9 +169,9 @@ export const URL_METADATA: Record<string, UrlMetadata> = {
  * @example
  * getChatRoomUrl('123') // '/chat/123'
  */
-export function getChatRoomUrl(roomId: string | number): string {
+export const getChatRoomUrl = (roomId: string | number): string => {
   return `/chat/${roomId}`;
-}
+};
 
 /**
  * 파티 상세 URL 생성
@@ -180,9 +180,9 @@ export function getChatRoomUrl(roomId: string | number): string {
  * @example
  * getPartyDetailUrl('456') // '/party/456'
  */
-export function getPartyDetailUrl(postId: string | number): string {
+export const getPartyDetailUrl = (postId: string | number): string => {
   return `/party/${postId}`;
-}
+};
 
 // ============================================
 // Utility Functions
@@ -193,7 +193,7 @@ export function getPartyDetailUrl(postId: string | number): string {
  * @param path - URL 경로
  * @returns URL 메타데이터 또는 undefined
  */
-export function getUrlMetadata(path: string): UrlMetadata | undefined {
+export const getUrlMetadata = (path: string): UrlMetadata | undefined => {
   // 정확한 경로 매칭
   if (URL_METADATA[path]) {
     return URL_METADATA[path];
@@ -234,44 +234,44 @@ export function getUrlMetadata(path: string): UrlMetadata | undefined {
   }
 
   return undefined;
-}
+};
 
 /**
  * 헤더에 노출 가능한 경로 목록 조회
  * @returns 헤더에 노출 가능한 경로 배열
  */
-export function getHeaderVisiblePaths(): string[] {
+export const getHeaderVisiblePaths = (): string[] => {
   return Object.values(URL_METADATA)
     .filter((metadata) => metadata.visibility.header)
     .map((metadata) => metadata.path);
-}
+};
 
 /**
  * 사이드바에 노출 가능한 경로 목록 조회
  * @returns 사이드바에 노출 가능한 경로 배열
  */
-export function getSidebarVisiblePaths(): string[] {
+export const getSidebarVisiblePaths = (): string[] => {
   return Object.values(URL_METADATA)
     .filter((metadata) => metadata.visibility.sidebar)
     .map((metadata) => metadata.path);
-}
+};
 
 /**
  * 회원 전용 경로인지 확인
  * @param path - URL 경로
  * @returns 회원 전용 여부
  */
-export function isMemberOnlyPath(path: string): boolean {
+export const isMemberOnlyPath = (path: string): boolean => {
   const metadata = getUrlMetadata(path);
   return metadata?.accessStatus === 'member-only';
-}
+};
 
 /**
  * 공개 경로인지 확인
  * @param path - URL 경로
  * @returns 공개 경로 여부
  */
-export function isPublicPath(path: string): boolean {
+export const isPublicPath = (path: string): boolean => {
   const metadata = getUrlMetadata(path);
   return metadata?.accessStatus === 'public';
-}
+};

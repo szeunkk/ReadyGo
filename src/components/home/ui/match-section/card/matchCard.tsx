@@ -102,7 +102,7 @@ export default function MatchCard({
           {/* 아바타 */}
           <div className={styles.avatarWrapper}>
             <Avatar
-              animalType={animalType as any}
+              animalType={animalType as AnimalType}
               alt={nickname}
               size="m"
               status={status}
