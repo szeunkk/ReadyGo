@@ -83,7 +83,14 @@ export default function FriendsContainer() {
       <div className={styles.content}>
         {/* Search Bar */}
         <div className={styles.searchContainer}>
-          <Searchbar placeholder="검색하기" />
+          <Searchbar placeholder="검색하기">
+            <Icon name="search" size={20} />
+            <input
+              type="text"
+              placeholder="검색하기"
+              className={styles.searchInput}
+            />
+          </Searchbar>
         </div>
 
         {/* Tabs */}
@@ -196,4 +203,3 @@ export default function FriendsContainer() {
     </div>
   );
 }
-
