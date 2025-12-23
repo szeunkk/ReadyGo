@@ -10,6 +10,7 @@ import { PartyCardProps } from './ui/party-section/card/partyCard';
 import { AnimalType } from '@/commons/constants/animal';
 import { TierType } from '@/commons/constants/tierType.enum';
 import { useGoogleOAuth } from '@/components/auth/hooks/useGoogleOAuth.hook';
+import { useKakaoOAuth } from '@/components/auth/hooks/useKakaoOAuth.hook';
 
 // 임시 데이터 - 추후 API로 대체될 예정
 const mockMatchData: MatchCardProps[] = [
@@ -128,6 +129,7 @@ const mockProfileData = {
 export default function Home() {
   // OAuth 콜백 처리를 위한 Hook 호출
   useGoogleOAuth();
+  useKakaoOAuth();
 
   return (
     <div className={styles.container}>
