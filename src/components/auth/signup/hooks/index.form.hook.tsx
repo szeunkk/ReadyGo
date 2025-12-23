@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,7 +12,7 @@ import { Database } from '@/types/supabase';
 import { generateNickname } from '@/lib/nickname/generateNickname';
 import { URL_PATHS } from '@/commons/constants/url';
 import { useModal } from '@/commons/providers/modal';
-import { AnimalType } from '@/commons/constants/animalType.enum';
+import { AnimalType } from '@/commons/constants/animal';
 import { TierType } from '@/commons/constants/tierType.enum';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -43,7 +43,7 @@ const signupSchema = z
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
-export function useSignupForm() {
+export const useSignupForm = () => {
   const router = useRouter();
   const { openModal, closeAllModals } = useModal();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,7 +81,9 @@ export function useSignupForm() {
   const isFormValid = allFieldsFilled;
 
   const onSubmit = handleSubmit(async (data) => {
-    if (isSubmitting) return;
+    if (isSubmitting) {
+      return;
+    }
 
     setIsSubmitting(true);
     hasShownErrorModalRef.current = false;
@@ -194,4 +196,4 @@ export function useSignupForm() {
     isSubmitting,
     errors,
   };
-}
+};
