@@ -8,6 +8,8 @@ import Input from '@/commons/components/input';
 import Button from '@/commons/components/button';
 import Searchbar from '@/commons/components/searchbar';
 import { mockChatRooms } from '../chat-list/chatList';
+import { AnimalType } from '@/commons/constants/animal';
+import { useSideProfilePanel } from '@/hooks/useSideProfilePanel';
 
 // Mock 데이터 타입 정의 (ERD 기반)
 interface ChatMessage {
@@ -396,6 +398,9 @@ interface ChatRoomProps {
 }
 
 export default function ChatRoom({ roomId }: ChatRoomProps) {
+  // 사이드 프로필 패널 제어
+  const { toggleProfile } = useSideProfilePanel();
+
   // roomId에 해당하는 mock 데이터 가져오기 또는 동적 생성
   const roomData = useMemo(() => {
     // 1. MOCK_ROOM_DATA에 roomId가 있으면 사용
@@ -514,10 +519,17 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
             aria-label="메시지 검색"
             className={styles.searchBar}
           />
+          {/* 
+            사이드 프로필 패널 토글 버튼
+            - 현재: MOCK_OTHER_USER.id (예: 'user-1')를 사용
+            - 실제 데이터 전환 시: roomData.otherUser.id가 실제 user ID를 가리키도록만 수정하면 됨
+            - toggleProfile() 함수는 수정 없이 그대로 동작
+          */}
           <button
             className={styles.menuButton}
             aria-label="사용자 메뉴"
             type="button"
+            onClick={() => toggleProfile(MOCK_OTHER_USER.id)}
           >
             <Icon name="userprofile" size={20} />
           </button>
