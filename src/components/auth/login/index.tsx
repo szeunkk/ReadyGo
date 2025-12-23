@@ -4,13 +4,20 @@ import React, { useState } from 'react';
 import styles from './styles.module.css';
 import Input from '@/commons/components/input';
 import Button from '@/commons/components/button';
-import Checkbox, { type CheckboxStatus } from '@/commons/components/checkbox';
+import Checkbox from '@/commons/components/checkbox';
 import { useLoginForm } from './hooks/index.form.hook';
 
 export default function Login() {
-  const [rememberId, setRememberId] = useState<CheckboxStatus>('unselected');
   const [showPassword, setShowPassword] = useState(false);
-  const { form, onSubmit, isFormValid, isSubmitting, errors } = useLoginForm();
+  const {
+    form,
+    onSubmit,
+    isFormValid,
+    isSubmitting,
+    errors,
+    rememberIdStatus,
+    handleRememberIdChange,
+  } = useLoginForm();
   const {
     register,
     formState: { errors: formErrors },
@@ -65,8 +72,8 @@ export default function Login() {
             />
             <div className={styles.checkboxWrapper}>
               <Checkbox
-                status={rememberId}
-                onStatusChange={setRememberId}
+                status={rememberIdStatus}
+                onStatusChange={handleRememberIdChange}
                 state="default"
               />
               <span className={styles.checkboxLabel}>아이디 저장</span>

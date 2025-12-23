@@ -60,25 +60,22 @@ export const useSignupForm = () => {
   });
 
   const { handleSubmit, formState } = form;
-  const { errors } = formState;
+  const { errors, isValid } = formState;
 
   // watch를 사용하여 폼 값 변경 시 리렌더링 트리거
   // watch()를 인자 없이 호출하면 모든 필드를 감시하고 리렌더링을 트리거함
   const watchedValues = form.watch();
 
-  // 모든 필드가 입력되고 유효한지 확인
+  // 모든 필드가 입력되었는지 확인
   const email = watchedValues.email?.trim() || '';
   const password = watchedValues.password?.trim() || '';
   const passwordConfirm = watchedValues.passwordConfirm?.trim() || '';
-
-  // 간단한 validation: 필드가 모두 입력되면 유효
-  // react-hook-form의 errors는 onChange 모드에서 즉시 업데이트되지 않을 수 있으므로
-  // 필드 값만 확인하고, 실제 validation은 submit 시점에 수행
   const allFieldsFilled =
     Boolean(email) && Boolean(password) && Boolean(passwordConfirm);
 
-  // 에러가 있는 경우에만 비활성화 (에러가 없으면 활성화)
-  const isFormValid = allFieldsFilled;
+  // zod 검증을 통과하고 모든 필드가 채워져 있어야 버튼 활성화
+  // isValid는 zod 스키마 검증을 통과했는지 확인
+  const isFormValid = isValid && allFieldsFilled;
 
   const onSubmit = handleSubmit(async (data) => {
     if (isSubmitting) {
