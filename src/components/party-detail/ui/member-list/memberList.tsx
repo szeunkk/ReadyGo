@@ -47,11 +47,16 @@ export default function MemberList() {
                   animalType: 'bear',
                 };
               }
-              return { userId: undefined, name: undefined, animalType: undefined };
+              return {
+                userId: undefined,
+                name: undefined,
+                animalType: undefined,
+              };
             };
 
             const memberData = getMemberData(index);
-            const type = index === 0 ? 'leader' : index < 4 ? 'member' : 'empty';
+            const type =
+              index === 0 ? 'leader' : index < 4 ? 'member' : 'empty';
 
             return (
               <MemberItem
