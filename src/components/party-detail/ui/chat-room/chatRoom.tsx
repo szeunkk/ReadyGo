@@ -214,79 +214,87 @@ export default function ChatRoom() {
                 </div>
               );
             }
+            return null;
+          })}
+          <div className={styles.messagesWrapper}>
+            {groupedMessages.map((item, index) => {
+              if ('type' in item && item.type === 'date-divider') {
+                return null;
+              }
 
-            const group = item as MessageGroup;
+              const group = item as MessageGroup;
 
-            if (group.isOwn) {
+              if (group.isOwn) {
+                return (
+                  <div
+                    key={`group-${group.sender_id}-${index}`}
+                    className={styles.messageGroup}
+                  >
+                    {group.messages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={styles.messageRow}
+                        aria-label={`내 메시지: ${message.content}`}
+                      >
+                        <div className={styles.ownMessageContainer}>
+                          <div className={styles.messageTime}>
+                            {formatMessageTime(message.created_at)}
+                          </div>
+                          <div className={styles.ownMessageBubble}>
+                            <span className={styles.messageContent}>
+                              {message.content}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+
               return (
                 <div
                   key={`group-${group.sender_id}-${index}`}
                   className={styles.messageGroup}
                 >
-                  {group.messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={styles.messageRow}
-                      aria-label={`내 메시지: ${message.content}`}
-                    >
-                      <div className={styles.ownMessageContainer}>
-                        <div className={styles.messageTime}>
-                          {formatMessageTime(message.created_at)}
+                  <div className={styles.messageRow}>
+                    <div className={styles.otherMessageContainer}>
+                      <Avatar
+                        animalType={group.sender_animalType}
+                        alt={group.sender_nickname}
+                        size="s"
+                        status="online"
+                        showStatus={true}
+                        className={styles.messageAvatar}
+                      />
+                      <div className={styles.otherMessageContent}>
+                        <div className={styles.senderNickname}>
+                          {group.sender_nickname}
                         </div>
-                        <div className={styles.ownMessageBubble}>
-                          <span className={styles.messageContent}>
-                            {message.content}
-                          </span>
+                        <div className={styles.messageBubbles}>
+                          {group.messages.map((message) => (
+                            <div
+                              key={message.id}
+                              className={styles.otherMessageWrapper}
+                            >
+                              <div className={styles.otherMessageBubble}>
+                                <span className={styles.messageContent}>
+                                  {message.content}
+                                </span>
+                              </div>
+                              <div className={styles.messageTime}>
+                                {formatMessageTime(message.created_at)}
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              );
-            }
-
-            return (
-              <div
-                key={`group-${group.sender_id}-${index}`}
-                className={styles.messageGroup}
-              >
-                <div className={styles.messageRow}>
-                  <div className={styles.otherMessageContainer}>
-                    <Avatar
-                      animalType={group.sender_animalType}
-                      alt={group.sender_nickname}
-                      size="s"
-                      status="online"
-                      showStatus={true}
-                      className={styles.messageAvatar}
-                    />
-                    <div className={styles.otherMessageContent}>
-                      <div className={styles.senderNickname}>
-                        {group.sender_nickname}
-                      </div>
-                      <div className={styles.messageBubbles}>
-                        {group.messages.map((message) => (
-                          <div
-                            key={message.id}
-                            className={styles.otherMessageWrapper}
-                          >
-                            <div className={styles.otherMessageBubble}>
-                              <span className={styles.messageContent}>
-                                {message.content}
-                              </span>
-                            </div>
-                            <div className={styles.messageTime}>
-                              {formatMessageTime(message.created_at)}
-                            </div>
-                          </div>
-                        ))}
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 

@@ -42,6 +42,12 @@
   gap: 10px;
 }
 
+.messagesWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .messageGroup {
   display: flex;
   flex-direction: column;
@@ -140,7 +146,7 @@
 .otherMessageWrapper {
   display: flex;
   gap: 12px;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .otherMessageBubble {
