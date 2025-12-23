@@ -56,11 +56,11 @@ export default function NotificationsPage({
   children: React.ReactNode;
 }) {
   const handleMarkAllAsRead = () => {
-    console.log('모두 읽음 클릭');
+    // TODO: 모두 읽음 처리 로직 구현
   };
 
-  const handleNotificationClick = (notification: NotificationItem) => {
-    console.log('알림 클릭:', notification);
+  const handleNotificationClick = (_notification: NotificationItem) => {
+    // TODO: 알림 클릭 처리 로직 구현
   };
 
   return (

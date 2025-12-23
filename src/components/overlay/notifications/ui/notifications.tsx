@@ -68,13 +68,13 @@ const getNotificationIcon = (type: NotificationType): IconName => {
 };
 
 // 단일 알림 아이템 컴포넌트
-function NotificationItemComponent({
+const NotificationItemComponent = ({
   notification,
   onClick,
 }: {
   notification: NotificationItem;
   onClick?: () => void;
-}) {
+}) => {
   const message = getNotificationMessage(
     notification.type,
     notification.nickname
@@ -99,7 +99,7 @@ function NotificationItemComponent({
       {!notification.isRead && <div className={styles.unreadDot} />}
     </button>
   );
-}
+};
 
 // 메인 알림 컴포넌트
 export default function Notifications({
