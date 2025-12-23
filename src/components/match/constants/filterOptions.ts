@@ -15,4 +15,3 @@ export const statusOptions: SelectboxItem[] = [
   { id: 'away', value: '자리비움' },
   { id: 'offline', value: '오프라인' },
 ];
-

@@ -99,4 +99,3 @@ export const matchData = [
 ];
 
 export type MatchData = (typeof matchData)[number];
-
