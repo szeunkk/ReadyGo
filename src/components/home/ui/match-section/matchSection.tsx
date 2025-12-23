@@ -37,8 +37,8 @@ export default function MatchSection({
 
       {/* 매치 카드 그리드 */}
       <div className={styles.gridContainer}>
-        {matches.map((match, index) => (
-          <MatchCard key={index} {...match} />
+        {matches.map((match) => (
+          <MatchCard key={match.userId} {...match} />
         ))}
       </div>
     </div>
