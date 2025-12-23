@@ -50,24 +50,20 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
     setCurrentStatus(status);
     setIsStatusOpen(false);
     // TODO: 실제 상태 변경 API 호출
-    console.log('상태 변경:', status);
   };
 
   const handleViewProfile = () => {
     // TODO: 프로필 페이지로 이동
-    console.log('프로필 보기');
     onClose();
   };
 
   const handleEditProfile = () => {
     // TODO: 프로필 수정 페이지로 이동
-    console.log('프로필 수정');
     onClose();
   };
 
   const handleLogout = () => {
     // TODO: 로그아웃 처리
-    console.log('로그아웃');
     onClose();
   };
 

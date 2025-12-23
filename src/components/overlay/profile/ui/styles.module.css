@@ -10,7 +10,7 @@
   box-shadow: 0px 25px 50px -12px rgba(0, 0, 0, 0.25);
   overflow: hidden;
   z-index: calc(var(--z-header) + 1);
-  
+
   /* 애니메이션 */
   animation: dropdownFadeIn 0.2s ease-out;
 }
@@ -312,4 +312,3 @@
 .logoutButton svg {
   color: var(--color-icon-interactive-secondary);
 }
-

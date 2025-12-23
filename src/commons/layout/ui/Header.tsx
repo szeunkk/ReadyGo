@@ -16,7 +16,9 @@ export const Header = () => {
 
   // 외부 클릭 감지 및 Escape 키 처리
   useEffect(() => {
-    if (!isProfileOpen) return;
+    if (!isProfileOpen) {
+      return;
+    }
 
     const handleClickOutside = (event: MouseEvent) => {
       if (
