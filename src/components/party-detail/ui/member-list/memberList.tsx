@@ -16,19 +16,53 @@ export default function MemberList() {
           </div>
         </div>
         <div className={styles.partyItemGroup}>
-          {Array.from({ length: 8 }).map((_, index) => (
-            <MemberItem
-              key={index}
-              type={index === 0 ? 'leader' : index < 4 ? 'member' : 'empty'}
-              name={
-                index === 0
-                  ? '까칠한까마귀'
-                  : index < 4
-                    ? '도라방돌핀'
-                    : undefined
+          {Array.from({ length: 8 }).map((_, index) => {
+            // Mock 데이터 (테스트용)
+            const getMemberData = (idx: number) => {
+              if (idx === 0) {
+                return {
+                  userId: 'user-1',
+                  name: '까칠한까마귀',
+                  animalType: 'raven',
+                };
               }
-            />
-          ))}
+              if (idx === 1) {
+                return {
+                  userId: 'user-2',
+                  name: '도라방돌핀',
+                  animalType: 'dolphin',
+                };
+              }
+              if (idx === 2) {
+                return {
+                  userId: 'user-3',
+                  name: '호쾌한망토',
+                  animalType: 'fox',
+                };
+              }
+              if (idx === 3) {
+                return {
+                  userId: 'user-4',
+                  name: '용감한사자',
+                  animalType: 'bear',
+                };
+              }
+              return { userId: undefined, name: undefined, animalType: undefined };
+            };
+
+            const memberData = getMemberData(index);
+            const type = index === 0 ? 'leader' : index < 4 ? 'member' : 'empty';
+
+            return (
+              <MemberItem
+                key={index}
+                type={type}
+                userId={memberData.userId}
+                name={memberData.name}
+                animalType={memberData.animalType}
+              />
+            );
+          })}
         </div>
       </div>
     </div>
