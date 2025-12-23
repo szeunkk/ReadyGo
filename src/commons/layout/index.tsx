@@ -22,7 +22,6 @@ export const Layout = ({ children }: LayoutProps) => {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
   const { isOpen, close } = useSidePanelStore();
-  const isHome = pathname.startsWith(URL_PATHS.HOME);
 
   // 현재 경로의 visibility 설정 가져오기
   const urlMetadata = getUrlMetadata(pathname);
@@ -43,6 +42,13 @@ export const Layout = ({ children }: LayoutProps) => {
     if (pathname.startsWith(URL_PATHS.PARTY)) {
       return 'party';
     }
+    // notifications와 friends는 overlay이므로 탭 변경으로 간주하지 않음
+    if (pathname.startsWith(URL_PATHS.NOTIFICATIONS)) {
+      return 'notifications';
+    }
+    if (pathname.startsWith(URL_PATHS.FRIENDS)) {
+      return 'friends';
+    }
     return 'etc';
   };
 
@@ -50,8 +56,26 @@ export const Layout = ({ children }: LayoutProps) => {
 
   useEffect(() => {
     const currentTop = getTopLevelRoute(pathname);
+    const prevTop = prevTopRouteRef.current;
 
-    if (prevTopRouteRef.current && prevTopRouteRef.current !== currentTop) {
+    // pathname에 notifications나 friends가 포함되어 있는 경우 side panel을 닫지 않음
+    const isOverlayPath =
+      pathname.includes('/notifications') || pathname.includes('/friends');
+
+    // overlay 경로인 경우 side panel을 닫지 않음
+    if (isOverlayPath) {
+      prevTopRouteRef.current = currentTop;
+      return;
+    }
+
+    // 이전 페이지가 notifications나 friends인 경우 side panel을 닫지 않음
+    if (prevTop === 'notifications' || prevTop === 'friends') {
+      prevTopRouteRef.current = currentTop;
+      return;
+    }
+
+    // 일반 탭 간 이동 시에만 side panel 닫기
+    if (prevTop && prevTop !== currentTop) {
       close();
     }
 
@@ -81,7 +105,17 @@ export const Layout = ({ children }: LayoutProps) => {
 
   const handleNavClick = (nav: NavigationButton, path: string) => {
     setActiveNav(nav);
-    router.push(path);
+
+    // overlay 페이지에서 다른 탭으로 이동할 때는 router.replace로 overlay를 닫고 이동
+    const isCurrentlyOnOverlay =
+      pathname.includes('/notifications') || pathname.includes('/friends');
+
+    if (isCurrentlyOnOverlay) {
+      // replace를 사용하여 히스토리를 대체하면서 overlay 닫기
+      router.replace(path);
+    } else {
+      router.push(path);
+    }
   };
 
   return (
@@ -149,7 +183,13 @@ export const Layout = ({ children }: LayoutProps) => {
             <div className={styles.menuButtons}>
               <button
                 className={styles.menuButton}
-                onClick={() => router.push(URL_PATHS.NOTIFICATIONS)}
+                onClick={() => {
+                  if (pathname.startsWith(URL_PATHS.NOTIFICATIONS)) {
+                    router.back();
+                  } else {
+                    router.push(URL_PATHS.NOTIFICATIONS);
+                  }
+                }}
               >
                 <div className={styles.menuButtonIcon}>
                   <Icon
@@ -163,7 +203,13 @@ export const Layout = ({ children }: LayoutProps) => {
 
               <button
                 className={styles.menuButton}
-                onClick={() => router.push(URL_PATHS.FRIENDS)}
+                onClick={() => {
+                  if (pathname.startsWith(URL_PATHS.FRIENDS)) {
+                    router.back();
+                  } else {
+                    router.push(URL_PATHS.FRIENDS);
+                  }
+                }}
               >
                 <div className={styles.menuButtonIcon}>
                   <Icon name="group" size={24} className={styles.themeIcon} />
@@ -205,7 +251,7 @@ export const Layout = ({ children }: LayoutProps) => {
         )}
         <div
           className={`${styles.contentWrapper} ${
-            isOpen && !isHome ? styles.panelOpen : ''
+            isOpen ? styles.panelOpen : ''
           }`}
         >
           <main

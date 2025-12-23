@@ -17,6 +17,8 @@
   align-items: center;
   gap: 28px;
   padding: 16px 0;
+  position: relative;
+  z-index: var(--z-sidemenu);
 }
 
 .logo {
@@ -159,6 +161,8 @@
   flex-direction: column;
   flex: 1;
   overflow: hidden;
+  position: relative;
+  height: 100%;
 }
 
 .main.fullWidth {
@@ -176,6 +180,8 @@
   align-items: center;
   justify-content: flex-end;
   padding: 20px;
+  position: relative;
+  z-index: var(--z-header);
 }
 
 .headerContent {
