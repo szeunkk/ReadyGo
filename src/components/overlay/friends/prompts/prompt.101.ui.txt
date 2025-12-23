@@ -1,0 +1,48 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - .cursor/rules/01-common.mdc
+            - .cursor/rules/02-wireframe.mdc
+            - .cursor/rules/03-ui.mdc
+
+==============================================
+
+조건-피그마) 활용할MCP: Figma Desktop
+조건-피그마) 구현될 Figma
+            - friend_requests: @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2428-17540&m=dev
+            - friend_lists: @https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2398-5034&m=dev
+
+조건-피그마) 반드시 MCP를 통해 다음 항목을 직접 확인하여 구현할 것.
+            - Auto Layout 방향 / gap / padding
+            - Typography (font-size, weight, line-height)
+            - Color token (semantic)
+            - Icon size 및 alignment
+            - Hover / Read / Unread 상태 차이
+
+==============================================
+
+조건-파일경로) 구현될 TSX 파일경로: src/components/overlay/friends/ui/friend-requests/friendRequests.tsx
+조건-파일경로) 구현될 TSX 파일경로: src/components/overlay/friends/ui/friend-lists/friendLists.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/overlay/friends/ui/friend-requests/styles.module.css
+조건-파일경로) 구현될 CSS 파일경로: src/components/overlay/friends/ui/friend-lists/styles.module.css
+
+==============================================
+
+조건-공통목록) 사용할 색상 목록(global.css에 명시된 변수 토큰 활용)
+            - 색상 토큰은 피그마와 동일하게 color-text-interaction-primary 의 예시와 같이 globals.css의 시멘틱 색상 토큰을 활용하여 구현할 것.
+
+조건-공통목록) 사용할 공통 컴포넌트 목록
+            - search-bar, avatar
+
+조건-공통목록) 사용할 icon의 경우 src/commons/components/icon/index.tsx 에서 import 하여 구현하며, size와 색상은 피그마와 동일하게 구현하도록 할 것.
+
+==============================================
+
+핵심요구사항) MCP를 연동하여 피그마의 디자인의 모든 속성과 변형을 확인하여 해당 컴포넌트를 구현할 것.
+
+핵심요구사항) 각각 친구리스트, 친구 요청탭에서 탭 목록을 누르면 전환이 될 수 있도록 탭 구조를 활용하여 구현할 것.
+
+핵심요구사항) 친구 요청 옆의 3 숫자는 추후 친구 요청의 숫자만큼 표시되는 뱃지이므로 고려해서 구현할 것.

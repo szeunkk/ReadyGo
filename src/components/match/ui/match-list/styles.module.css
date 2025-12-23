@@ -74,10 +74,19 @@
   width: 100%;
 }
 
+/* side-panel이 열렸을 때 그리드 (3열 x 4행) */
+.gridWithPanel {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 /* 반응형 레이아웃 */
 @media (max-width: 1920px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  .gridWithPanel {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -85,10 +94,15 @@
   .grid {
     grid-template-columns: repeat(3, 1fr);
   }
+
+  .gridWithPanel {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 1024px) {
-  .grid {
+  .grid,
+  .gridWithPanel {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -126,7 +140,8 @@
     width: 100%;
   }
 
-  .grid {
+  .grid,
+  .gridWithPanel {
     grid-template-columns: 1fr;
     gap: 16px;
   }

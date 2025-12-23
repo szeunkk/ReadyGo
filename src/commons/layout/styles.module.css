@@ -216,6 +216,10 @@
   color: var(--color-icon-interactive-secondary-pressed);
 }
 
+.profileContainer {
+  position: relative;
+}
+
 .userAvatar {
   width: 40px;
   height: 40px;
@@ -228,6 +232,8 @@
   cursor: pointer;
   transition: all 0.2s ease;
   overflow: hidden;
+  border: none;
+  padding: 0;
 }
 
 .userAvatar:hover {

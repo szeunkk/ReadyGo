@@ -2,7 +2,7 @@
 
 import styles from './styles.module.css';
 
-export default function overlayContainer({
+export default function OverlayContainer({
   children,
   onClose,
 }: {

@@ -112,6 +112,47 @@
   color: var(--color-icon-primary);
 }
 
+/* 알림 타입별 색상 */
+.reviewReceived {
+  background-color: var(--color-bg-primary);
+}
+
+.reviewReceived .icon {
+  color: var(--color-text-danger);
+}
+
+.reviewRequested {
+  background-color: var(--color-bg-primary);
+}
+
+.reviewRequested .icon {
+  color: var(--color-text-warning);
+}
+
+.friendRequested {
+  background-color: var(--color-bg-primary);
+}
+
+.friendRequested .icon {
+  color: var(--color-icon-interactive-primary);
+}
+
+.partyInvited {
+  background-color: var(--color-bg-primary);
+}
+
+.partyInvited .icon {
+  color: #c27aff;
+}
+
+.chatReceived {
+  background-color: var(--color-bg-primary);
+}
+
+.chatReceived .icon {
+  color: var(--color-text-info);
+}
+
 /* 텍스트 컨테이너 */
 .textContainer {
   display: flex;

@@ -53,17 +53,35 @@ const getNotificationMessage = (
 const getNotificationIcon = (type: NotificationType): IconName => {
   switch (type) {
     case 'REVIEW_RECEIVED':
-      return 'review';
+      return 'mail-open';
     case 'REVIEW_REQUESTED':
-      return 'edit';
+      return 'review';
     case 'FRIEND_REQUESTED':
       return 'add-user';
     case 'PARTY_INVITED':
-      return 'group';
+      return 'gamepad';
     case 'CHAT_RECEIVED':
       return 'message-circle-dots';
     default:
       return 'notification';
+  }
+};
+
+// 알림 타입별 색상 클래스
+const getNotificationColorClass = (type: NotificationType): string => {
+  switch (type) {
+    case 'REVIEW_RECEIVED':
+      return styles.reviewReceived;
+    case 'REVIEW_REQUESTED':
+      return styles.reviewRequested;
+    case 'FRIEND_REQUESTED':
+      return styles.friendRequested;
+    case 'PARTY_INVITED':
+      return styles.partyInvited;
+    case 'CHAT_RECEIVED':
+      return styles.chatReceived;
+    default:
+      return '';
   }
 };
 
@@ -80,6 +98,7 @@ const NotificationItemComponent = ({
     notification.nickname
   );
   const iconName = getNotificationIcon(notification.type);
+  const colorClass = getNotificationColorClass(notification.type);
 
   return (
     <button
@@ -88,7 +107,7 @@ const NotificationItemComponent = ({
       type="button"
     >
       <div className={styles.notificationContent}>
-        <div className={styles.iconContainer}>
+        <div className={`${styles.iconContainer} ${colorClass}`}>
           <Icon name={iconName} size={20} className={styles.icon} />
         </div>
         <div className={styles.textContainer}>
