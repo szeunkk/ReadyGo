@@ -1,5 +1,6 @@
 import OverlayContainer from '@/commons/components/overlay';
 import Notifications from '@/components/overlay/notifications/ui';
+import { FriendsContainer } from '@/components/overlay/friends';
 import { mockNotifications } from '../constants/mockData';
 
 interface LayoutOverlaysProps {
@@ -30,10 +31,7 @@ export const LayoutOverlays = ({
   if (currentOverlay === 'friends') {
     return (
       <OverlayContainer onClose={onClose}>
-        <div style={{ padding: '24px' }}>
-          {/* TODO: Friends 컴포넌트 구현 */}
-          <h2>Friends (준비 중)</h2>
-        </div>
+        <FriendsContainer />
       </OverlayContainer>
     );
   }

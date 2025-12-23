@@ -114,43 +114,43 @@
 
 /* 알림 타입별 색상 */
 .reviewReceived {
-  background-color: rgba(34, 197, 94, 0.1) !important;
+  background-color: var(--color-bg-primary);
 }
 
 .reviewReceived .icon {
-  color: rgb(34, 197, 94);
+  color: var(--color-text-danger);
 }
 
 .reviewRequested {
-  background-color: rgba(249, 115, 22, 0.1) !important;
+  background-color: var(--color-bg-primary);
 }
 
 .reviewRequested .icon {
-  color: rgb(249, 115, 22);
+  color: var(--color-text-warning);
 }
 
 .friendRequested {
-  background-color: rgba(59, 130, 246, 0.1) !important;
+  background-color: var(--color-bg-primary);
 }
 
 .friendRequested .icon {
-  color: rgb(59, 130, 246);
+  color: var(--color-icon-interactive-primary);
 }
 
 .partyInvited {
-  background-color: rgba(168, 85, 247, 0.1) !important;
+  background-color: var(--color-bg-primary);
 }
 
 .partyInvited .icon {
-  color: rgb(168, 85, 247);
+  color: #c27aff;
 }
 
 .chatReceived {
-  background-color: rgba(236, 72, 153, 0.1) !important;
+  background-color: var(--color-bg-primary);
 }
 
 .chatReceived .icon {
-  color: rgb(236, 72, 153);
+  color: var(--color-text-info);
 }
 
 /* 텍스트 컨테이너 */
