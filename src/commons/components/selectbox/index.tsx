@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import Icon from '../icon';
+import Icon, { type IconName } from '../icon';
 import styles from './styles.module.css';
 
 export type SelectboxState =
@@ -160,7 +160,7 @@ export default function Selectbox({
         </div>
         <div className={styles.chevron}>
           {icon ? (
-            <Icon name={icon as any} size={16} />
+            <Icon name={icon as IconName} size={16} />
           ) : (
             <svg
               width="16"
