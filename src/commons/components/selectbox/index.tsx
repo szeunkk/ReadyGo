@@ -27,6 +27,7 @@ export interface SelectboxProps {
   required?: boolean;
   className?: string;
   children?: React.ReactNode;
+  icon?: string;
 }
 
 export default function Selectbox({
@@ -39,6 +40,7 @@ export default function Selectbox({
   required = false,
   className = '',
   children,
+  icon,
 }: SelectboxProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalState, setInternalState] = useState<SelectboxState>(state);
@@ -157,21 +159,25 @@ export default function Selectbox({
           )}
         </div>
         <div className={styles.chevron}>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M4 6L8 10L12 6"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          {icon ? (
+            <Icon name={icon as any} size={16} />
+          ) : (
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M4 6L8 10L12 6"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
         </div>
       </div>
       {isOpen && (

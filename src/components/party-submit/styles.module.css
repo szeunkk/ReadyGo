@@ -1,43 +1,412 @@
+/* Container */
 .container {
   display: flex;
   flex-direction: column;
   width: 672px;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-transparent-16);
+  border-radius: 16px;
+  box-shadow:
+    0px 10px 15px -3px var(--color-shadow-subtle),
+    0px 4px 6px -4px var(--color-shadow-subtle);
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.titleArea {
-  width: 672px;
-  height: 98px;
-  background-color: #e0e0e0;
+/* Header */
+.header {
+  background-color: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-transparent-16);
+  padding: 24px 16px;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.title {
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-size: var(--typo-heading-md-font-size);
+  line-height: var(--typo-heading-md-line-height);
+  font-weight: var(--typo-heading-md-font-weight);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-font-weight);
+  color: var(--color-text-interactive-secondary);
+  margin: 0;
+}
+
+.closeButton {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-bg-secondary);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  padding: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
-.inputArea {
-  width: 672px;
-  height: 964px;
-  background-color: #f5f5f5;
+.closeButton:hover {
+  background-color: var(--color-bg-interactive-teritiary-hover);
+}
+
+/* Body */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+
+/* Section */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionTitle {
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-size: var(--typo-body-lg-semibold-font-size);
+  line-height: var(--typo-body-lg-semibold-line-height);
+  font-weight: var(--typo-body-lg-semibold-font-weight);
+  color: var(--color-text-interactive-primary);
+  margin: 0;
+  padding: 4px 0;
+}
+
+/* Form Group */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-size: var(--typo-body-md-semibold-font-size);
+  line-height: var(--typo-body-md-semibold-line-height);
+  font-weight: var(--typo-body-md-semibold-font-weight);
+  color: var(--color-text-primary);
+}
+
+.required {
+  color: var(--color-text-danger);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Game Search Wrapper */
+.gameSearchWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Game Options Group */
+.gameOptionsGroup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+  padding: 8px 0;
+  border-radius: var(--border-radius-12, 12px);
+  overflow: hidden;
+  box-shadow:
+    0 2px 8px 0 rgba(0, 0, 0, 0.12),
+    0 0 2px 0 rgba(0, 0, 0, 0.08);
+  width: 100%;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border-secondary);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+/* Game Option Item */
+.gameOptionItem {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  height: 36px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.gameOptionItem:hover {
+  background-color: var(--color-transparent-12);
+}
+
+.gameOptionItem.selected {
+  background-color: var(--color-transparent-12);
+}
+
+.checkIcon {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--color-icon-interactive-primary);
 }
 
-.buttonArea {
-  width: 672px;
-  height: 96px;
-  background-color: #d0d0d0;
+.gameOptionValue {
+  flex: 1 1 0%;
+  min-width: 0;
+  margin-left: 22px;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-font-weight);
+  color: var(--color-text-primary);
+}
+
+.checkIcon ~ .gameOptionValue {
+  margin-left: 0;
+}
+
+/* Row/Col Layout */
+.row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Character Count */
+.charCount {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-size: var(--typo-body-sm-medium-font-size);
+  line-height: var(--typo-body-sm-medium-line-height);
+  font-weight: var(--typo-body-sm-medium-font-weight);
+  color: var(--color-text-interactive-secondary);
+}
+
+/* Party Count Input */
+.partyCountInput {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.partyCountInputField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 56px;
+  padding: 0 16px;
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--border-radius-12, 12px);
+  box-sizing: border-box;
+}
+
+.partyCountLabel {
+  flex: 1;
+  min-width: 0;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  font-weight: var(--typo-body-lg-font-weight);
+  color: var(--color-text-interactive-secondary);
+}
+
+.partyCountControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.countButton {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
+  width: 34px;
+  height: 34px;
+  border-radius: 99999px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-text-interactive-primary);
+  padding: 9px;
+  box-sizing: border-box;
 }
 
+.countButton:hover {
+  background-color: var(--color-bg-interactive-selected-hover);
+}
 
+.countValue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-size: var(--typo-heading-sm-font-size);
+  line-height: var(--typo-heading-sm-line-height);
+  font-weight: var(--typo-heading-sm-font-weight);
+  color: var(--color-text-primary);
+}
+
+/* Voice Chat Group */
+.voiceChatGroup {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.voiceChatButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  padding: 16px;
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-12, 12px);
+  background-color: var(--color-bg-secondary);
+  cursor: pointer;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-size: var(--typo-body-lg-medium-font-size);
+  line-height: var(--typo-body-lg-medium-line-height);
+  font-weight: var(--typo-body-lg-medium-font-weight);
+  color: var(--color-text-tertiary);
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.voiceChatButton:hover {
+  background-color: var(--color-bg-interactive-teritiary-hover);
+}
+
+.voiceChatButton.active {
+  background-color: var(--color-transparent-12);
+  border-color: var(--color-brand-500);
+  color: var(--color-text-interactive-primary);
+  box-shadow:
+    0px 10px 15px -3px var(--color-shadow-bold),
+    0px 4px 6px -4px var(--color-shadow-bold);
+  border-radius: var(--border-radius-12, 12px);
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 24px;
+  background-color: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-transparent-16);
+}
+
+.cancelButton,
+.submitButton {
+  flex: 1;
+  height: 48px;
+}
