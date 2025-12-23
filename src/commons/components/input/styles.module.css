@@ -75,8 +75,12 @@
   font-size: inherit;
   font-weight: inherit;
   line-height: inherit;
-  color: inherit;
+  color: var(--color-text-interactive-secondary);
   width: 100%;
+}
+
+.inputField[readonly] {
+  cursor: default;
 }
 
 .inputField::placeholder {
@@ -165,12 +169,51 @@
   background-color: var(--color-bg-secondary);
   border-radius: var(--border-radius-12, 12px);
   color: var(--color-text-primary);
+  border: 1px solid transparent;
 }
 
-.variant-primary.state-Default {
-  border: none;
+/* Hover state - CSS pseudo-class */
+.variant-primary.state-Default:hover:not(.state-disabled):not(.disabled):not(
+    :has(.inputField:focus)
+  ):not(.state-error),
+.variant-primary.state-filled:hover:not(.state-disabled):not(.disabled):not(
+    :has(.inputField:focus)
+  ):not(.state-error) {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-interactive-secondary);
+  border-radius: var(--border-radius-12, 12px);
 }
 
+/* Active state (focus) - CSS pseudo-class */
+.variant-primary.state-Default:has(.inputField:focus):not(.state-disabled):not(
+    .disabled
+  ):not(.state-error),
+.variant-primary.state-filled:has(.inputField:focus):not(.state-disabled):not(
+    .disabled
+  ):not(.state-error) {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-interactive-primary);
+  border-radius: var(--border-radius-12, 12px);
+}
+
+/* Filled state - CSS pseudo-class (placeholder 기반) */
+.variant-primary.state-Default:has(.inputField:not(:placeholder-shown)):not(
+    .state-disabled
+  ):not(.disabled):not(:has(.inputField:focus)):not(:hover):not(.state-error) {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-12, 12px);
+  color: var(--color-text-primary);
+}
+
+.variant-primary.state-Default:has(.inputField:not(:placeholder-shown)):not(
+    .state-disabled
+  ):not(.disabled):not(:has(.inputField:focus)):not(:hover):not(.state-error)
+  .inputField {
+  color: var(--color-text-primary);
+}
+
+/* Legacy state classes (하위 호환성 유지) */
 .variant-primary.state-hover {
   background-color: var(--color-bg-secondary);
   border: 1px solid var(--color-border-interactive-secondary);
@@ -185,8 +228,12 @@
 
 .variant-primary.state-filled {
   background-color: var(--color-bg-secondary);
-  border: none;
+  border: 1px solid transparent;
   border-radius: var(--border-radius-12, 12px);
+  color: var(--color-text-primary);
+}
+
+.variant-primary.state-filled .inputField {
   color: var(--color-text-primary);
 }
 
@@ -197,10 +244,14 @@
   color: var(--color-text-primary);
 }
 
+.variant-primary.state-error .inputField {
+  color: var(--color-text-primary);
+}
+
 .variant-primary.state-disabled,
 .disabled {
   background-color: var(--color-bg-disabled);
-  border: none;
+  border: 1px solid transparent;
   border-radius: var(--border-radius-12, 12px);
   color: var(--color-text-disabled);
 }
@@ -227,6 +278,43 @@
   border-color: var(--color-border-primary);
 }
 
+/* Hover state - CSS pseudo-class */
+.variant-secondary.state-Default:hover:not(.state-disabled):not(.disabled):not(
+    :has(.inputField:focus)
+  ):not(.state-error),
+.variant-secondary.state-filled:hover:not(.state-disabled):not(.disabled):not(
+    :has(.inputField:focus)
+  ):not(.state-error) {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border-interactive-secondary);
+}
+
+/* Active state (focus) - CSS pseudo-class */
+.variant-secondary.state-Default:has(.inputField:focus):not(
+    .state-disabled
+  ):not(.disabled):not(.state-error),
+.variant-secondary.state-filled:has(.inputField:focus):not(.state-disabled):not(
+    .disabled
+  ):not(.state-error) {
+  border-color: var(--color-border-interactive-primary);
+}
+
+/* Filled state - CSS pseudo-class (placeholder 기반) */
+.variant-secondary.state-Default:has(.inputField:not(:placeholder-shown)):not(
+    .state-disabled
+  ):not(.disabled):not(:has(.inputField:focus)):not(:hover):not(.state-error) {
+  border-color: var(--color-border-primary);
+  color: var(--color-text-primary);
+}
+
+.variant-secondary.state-Default:has(.inputField:not(:placeholder-shown)):not(
+    .state-disabled
+  ):not(.disabled):not(:has(.inputField:focus)):not(:hover):not(.state-error)
+  .inputField {
+  color: var(--color-text-primary);
+}
+
+/* Legacy state classes (하위 호환성 유지) */
 .variant-secondary.state-hover {
   background-color: var(--color-bg-secondary);
   border-color: var(--color-border-interactive-secondary);
@@ -241,8 +329,16 @@
   color: var(--color-text-primary);
 }
 
+.variant-secondary.state-filled .inputField {
+  color: var(--color-text-primary);
+}
+
 .variant-secondary.state-error {
   border-color: var(--color-border-danger);
+  color: var(--color-text-primary);
+}
+
+.variant-secondary.state-error .inputField {
   color: var(--color-text-primary);
 }
 

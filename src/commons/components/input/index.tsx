@@ -85,6 +85,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       if (state === 'error') {
         return 'error';
       }
+      // hover, active, filled는 CSS pseudo-class로 자동 처리되므로
+      // prop으로 전달된 경우에만 클래스 적용 (하위 호환성 유지)
       if (state === 'filled') {
         return 'filled';
       }
@@ -147,9 +149,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               />
             )}
             <div className={styles.inputTextContainer}>
-              {actualState === 'active' && (
-                <span className={styles.cursor}>|</span>
-              )}
               <input
                 ref={ref}
                 type={type || 'text'}

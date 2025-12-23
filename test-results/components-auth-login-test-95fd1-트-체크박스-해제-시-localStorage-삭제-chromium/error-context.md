@@ -1,46 +1,51 @@
 # Page snapshot
 
 ```yaml
-- main [ref=e4]:
-    - generic [ref=e6]:
-        - generic [ref=e7]:
-            - heading "ㄹㄷㄱ" [level=1] [ref=e8]
-            - paragraph [ref=e9]: 로그인하고 게임 친구를 찾아보세요
-        - generic [ref=e10]:
-            - generic [ref=e11]:
-                - generic [ref=e12]:
-                    - generic [ref=e13]:
-                        - generic [ref=e14]: 이메일
-                        - generic [ref=e15]: '*'
-                    - generic [ref=e17]:
-                        - img [ref=e19]
-                        - textbox "이메일을 입력하세요" [ref=e22]: test@example.com
-                - generic [ref=e23]:
-                    - generic [ref=e24]:
-                        - generic [ref=e25]: 비밀번호
-                        - generic [ref=e26]: '*'
-                    - generic [ref=e28]:
-                        - img [ref=e30]
-                        - textbox "비밀번호를 입력하세요" [ref=e33]
-                        - button "Toggle password visibility" [ref=e34] [cursor=pointer]:
-                            - img [ref=e36]
-                - generic [ref=e39]:
-                    - generic [ref=e40] [cursor=pointer]:
-                        - checkbox
-                    - generic [ref=e43]: 아이디 저장
-            - button "로그인" [disabled] [ref=e44]:
-                - generic [ref=e45]: 로그인
-        - generic [ref=e48]: 또는
-        - generic [ref=e50]:
-            - button "Google로 로그인" [ref=e51] [cursor=pointer]:
-                - generic [ref=e52]:
-                    - img [ref=e54]
-                    - generic [ref=e59]: Google로 로그인
-            - button "Kakao로 로그인" [ref=e60] [cursor=pointer]:
-                - generic [ref=e61]:
-                    - img [ref=e63]
-                    - generic [ref=e65]: Kakao로 로그인
-        - generic [ref=e66]:
-            - generic [ref=e67]: 아직 계정이 없다면?
-            - button "회원가입 하기" [ref=e68] [cursor=pointer]
+- generic [active] [ref=e1]:
+    - generic [ref=e4]:
+        - main [ref=e5]:
+            - generic [ref=e7]:
+                - generic [ref=e8]:
+                    - heading "ㄹㄷㄱ" [level=1] [ref=e9]
+                    - paragraph [ref=e10]: 로그인하고 게임 친구를 찾아보세요
+                - generic [ref=e11]:
+                    - generic [ref=e12]:
+                        - generic [ref=e13]:
+                            - generic [ref=e14]:
+                                - generic [ref=e15]: 이메일
+                                - generic [ref=e16]: '*'
+                            - generic [ref=e18]:
+                                - img [ref=e20]
+                                - textbox "이메일을 입력하세요" [ref=e23]: test@example.com
+                        - generic [ref=e24]:
+                            - generic [ref=e25]:
+                                - generic [ref=e26]: 비밀번호
+                                - generic [ref=e27]: '*'
+                            - generic [ref=e29]:
+                                - img [ref=e31]
+                                - textbox "비밀번호를 입력하세요" [ref=e34]
+                                - button "Toggle password visibility" [ref=e35] [cursor=pointer]:
+                                    - img [ref=e37]
+                        - generic [ref=e40]:
+                            - generic [ref=e41] [cursor=pointer]:
+                                - checkbox [checked]
+                                - img [ref=e44]
+                            - generic [ref=e46]: 아이디 저장
+                    - button "로그인" [disabled] [ref=e47]:
+                        - generic [ref=e48]: 로그인
+                - generic [ref=e51]: 또는
+                - generic [ref=e53]:
+                    - button "Google로 로그인" [ref=e54] [cursor=pointer]:
+                        - generic [ref=e55]:
+                            - img [ref=e57]
+                            - generic [ref=e62]: Google로 로그인
+                    - button "Kakao로 로그인" [ref=e63] [cursor=pointer]:
+                        - generic [ref=e64]:
+                            - img [ref=e66]
+                            - generic [ref=e68]: Kakao로 로그인
+                - generic [ref=e69]:
+                    - generic [ref=e70]: 아직 계정이 없다면?
+                    - button "회원가입 하기" [ref=e71] [cursor=pointer]
+        - complementary [ref=e72]
+    - alert [ref=e73]
 ```
