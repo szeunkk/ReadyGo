@@ -8,6 +8,7 @@ import BarChart, { BarChartDataItem } from '../../components/bar-chart';
 import Button from '../../components/button';
 import { AnimalType } from '../../constants/animal';
 import { TierType } from '../../constants/tierType.enum';
+import { usePathname } from 'next/navigation';
 
 export interface ProfilePanelProps {
   userId: string;
@@ -35,6 +36,8 @@ export default function ProfilePanel({
 }: ProfilePanelProps) {
   const [profileData, setProfileData] = useState<UserProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const pathname = usePathname();
+  const isChatPage = pathname?.startsWith('/chat/');
 
   useEffect(() => {
     // TODO: userId를 사용하여 실제 사용자 데이터 페칭
@@ -147,7 +150,8 @@ export default function ProfilePanel({
 
         // userId에 해당하는 Mock 데이터 가져오기, 없으면 기본 데이터 사용
         const mockData = mockDataMap[userId] ||
-          mockDataMap['user-3'] || { // 기본값으로 user-3 데이터 사용
+          mockDataMap['user-3'] || {
+            // 기본값으로 user-3 데이터 사용
             nickname: '알 수 없는 사용자',
             tier: TierType.bronze,
             animal: AnimalType.rabbit,
@@ -254,15 +258,17 @@ export default function ProfilePanel({
       </div>
 
       {/* 채팅 하기 버튼 */}
-      <Button
-        variant="primary"
-        size="m"
-        shape="round"
-        className={styles.chatButton}
-        onClick={handleChatClick}
-      >
-        채팅 하기
-      </Button>
+      {!isChatPage && (
+        <Button
+          variant="primary"
+          size="m"
+          shape="round"
+          className={styles.chatButton}
+          onClick={handleChatClick}
+        >
+          채팅 하기
+        </Button>
+      )}
     </div>
   );
 }
