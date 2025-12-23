@@ -14,17 +14,17 @@ import {
 } from 'chart.js';
 import { Radar } from 'react-chartjs-2';
 import styles from './styles.module.css';
-import {
-  RadarTraitKey,
-  radarTraitLabels,
-} from '../../constants/animal';
+import { RadarTraitKey, radarTraitLabels } from '../../constants/animal';
 
 // 점선 그리드를 위한 커스텀 플러그인
 const dashedGridPlugin: Plugin<'radar'> = {
   id: 'dashedGrid',
   beforeDraw(chart) {
     const { ctx, chartArea, scales } = chart;
-    const scale = scales.r as any; // RadialLinearScale 타입 캐스팅
+    const scale = scales.r as {
+      max: number;
+      getDistanceFromCenterForValue: (value: number) => number;
+    };
 
     if (!scale || !chartArea) {
       return;
@@ -147,8 +147,18 @@ export default function RadarChart({
     {
       label: '내 프로필',
       data: orderedMyData,
-      backgroundColor: (context: any) => {
-        const chart = context.chart;
+      backgroundColor: (context: {
+        chart: {
+          ctx: CanvasRenderingContext2D;
+          chartArea: {
+            top: number;
+            bottom: number;
+            left: number;
+            right: number;
+          };
+        };
+      }) => {
+        const { chart } = context;
         const { ctx, chartArea } = chart;
 
         if (!chartArea) {
@@ -184,8 +194,18 @@ export default function RadarChart({
     datasets.push({
       label: '상대 프로필',
       data: orderedUserData,
-      backgroundColor: (context: any) => {
-        const chart = context.chart;
+      backgroundColor: (context: {
+        chart: {
+          ctx: CanvasRenderingContext2D;
+          chartArea: {
+            top: number;
+            bottom: number;
+            left: number;
+            right: number;
+          };
+        };
+      }) => {
+        const { chart } = context;
         const { ctx, chartArea } = chart;
 
         if (!chartArea) {

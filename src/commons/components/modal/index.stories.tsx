@@ -130,7 +130,8 @@ export const DarkThemeExample: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Dark 테마 배경에서 모달이 어떻게 표시되는지 확인할 수 있습니다.',
+        story:
+          'Dark 테마 배경에서 모달이 어떻게 표시되는지 확인할 수 있습니다.',
       },
     },
   },

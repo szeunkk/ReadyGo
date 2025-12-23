@@ -6,7 +6,9 @@ import ProfilePanel from './ui/profilePanel';
 export const SidePanel = () => {
   const { isOpen, targetUserId } = useSidePanelStore();
 
-  if (!isOpen || !targetUserId) return null;
+  if (!isOpen || !targetUserId) {
+    return null;
+  }
 
   return <ProfilePanel userId={targetUserId} />;
 };

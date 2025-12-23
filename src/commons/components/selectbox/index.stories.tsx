@@ -278,7 +278,3 @@ export const WithCustomChildren: Story = {
     },
   },
 };
-
-
-
-

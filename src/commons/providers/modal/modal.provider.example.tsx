@@ -10,8 +10,8 @@
 import React from 'react';
 import { useModal } from './modal.provider';
 
-export function ModalExample() {
-  const { openModal, closeModal, modalCount } = useModal();
+export const ModalExample = () => {
+  const { openModal, modalCount } = useModal();
 
   // 단일 모달 예제
   const handleSingleModal = () => {
@@ -21,7 +21,7 @@ export function ModalExample() {
       description: '단일 버튼 모달입니다.',
       confirmText: '확인',
       onConfirm: () => {
-        console.log('확인 클릭');
+        // 확인 클릭 처리
       },
     });
   };
@@ -35,10 +35,10 @@ export function ModalExample() {
       confirmText: '확인',
       cancelText: '취소',
       onConfirm: () => {
-        console.log('친구 추가 확인');
+        // 친구 추가 확인 처리
       },
       onCancel: () => {
-        console.log('친구 추가 취소');
+        // 친구 추가 취소 처리
       },
     });
   };
@@ -80,7 +80,7 @@ export function ModalExample() {
         '최종 모달입니다. ESC 키를 누르거나 배경을 클릭하면 닫힙니다.',
       confirmText: '완료',
       onConfirm: () => {
-        console.log('중첩 모달 완료');
+        // 중첩 모달 완료 처리
       },
     });
   };
@@ -153,4 +153,4 @@ export function ModalExample() {
       </div>
     </div>
   );
-}
+};

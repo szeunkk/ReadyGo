@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase/client';
 import { URL_PATHS } from '@/commons/constants/url';
 import { useModal } from '@/commons/providers/modal';
 
-export function useSignupSuccess() {
+export const useSignupSuccess = () => {
   const router = useRouter();
   const { openModal, closeAllModals } = useModal();
   const [nickname, setNickname] = useState<string>('');
@@ -60,7 +60,7 @@ export function useSignupSuccess() {
     };
 
     fetchNickname();
-  }, []);
+  }, [router]);
 
   const handleTraitsTest = () => {
     router.push(URL_PATHS.TRAITS);
@@ -89,4 +89,4 @@ export function useSignupSuccess() {
     handleSteamLink,
     handleLater,
   };
-}
+};

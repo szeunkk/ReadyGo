@@ -98,7 +98,7 @@ export default function Card({
                 style={{ zIndex: displayAvatars.length - index }}
               >
                 <Avatar
-                  animalType={avatar as any}
+                  animalType={avatar as AnimalType}
                   alt={`Member ${index + 1}`}
                   size="s"
                   showStatus={false}

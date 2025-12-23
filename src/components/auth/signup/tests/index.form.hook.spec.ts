@@ -26,7 +26,9 @@ test.describe('회원가입 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await emailInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     // React 상태 업데이트를 위한 짧은 대기 (timeout이 아닌 단순 대기)
     await page.waitForTimeout(50);
@@ -40,7 +42,9 @@ test.describe('회원가입 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await passwordInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     // React 상태 업데이트를 위한 짧은 대기 (timeout이 아닌 단순 대기)
     await page.waitForTimeout(50);
@@ -56,7 +60,9 @@ test.describe('회원가입 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await passwordConfirmInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     // React 상태 업데이트를 위한 짧은 대기 (timeout이 아닌 단순 대기)
     await page.waitForTimeout(50);
@@ -212,7 +218,9 @@ test.describe('회원가입 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await emailInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     await emailInput.press('Tab', { timeout: 500 });
 
@@ -222,7 +230,9 @@ test.describe('회원가입 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await passwordInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     await passwordInput.press('Tab', { timeout: 500 });
 
@@ -234,7 +244,9 @@ test.describe('회원가입 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await passwordConfirmInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     await passwordConfirmInput.press('Tab', { timeout: 500 });
 
@@ -301,7 +313,9 @@ test.describe('회원가입 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await emailInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     await emailInput.press('Tab', { timeout: 500 });
 
@@ -311,7 +325,9 @@ test.describe('회원가입 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await passwordInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     await passwordInput.press('Tab', { timeout: 500 });
 
@@ -323,7 +339,9 @@ test.describe('회원가입 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await passwordConfirmInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     await passwordConfirmInput.press('Tab', { timeout: 500 });
 

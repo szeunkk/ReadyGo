@@ -475,6 +475,3 @@ export const AllSizes: Story = {
     },
   },
 };
-
-
-

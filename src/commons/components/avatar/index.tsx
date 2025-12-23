@@ -24,14 +24,13 @@ export interface AvatarProps {
 
 export default function Avatar({
   animalType,
-  alt = 'Avatar',
   size = 'm',
   status = 'offline',
   showStatus = true,
   className = '',
   color = 'var(--color-icon-primary)',
 }: AvatarProps) {
-  const [imageError, setImageError] = useState(false);
+  const [imageError] = useState(false);
   const defaultImage = '/images/bird.svg';
 
   // 이미지 경로 결정: animalType > defaultImage
@@ -71,8 +70,6 @@ export default function Avatar({
         return '';
     }
   };
-
-  const imageSize = size === 's' ? 40 : size === 'm' ? 64 : 100;
 
   return (
     <div className={wrapperClasses}>

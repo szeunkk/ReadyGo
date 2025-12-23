@@ -561,7 +561,7 @@ export const AnimalTypes: Story = {
           }}
         >
           <Avatar
-            animalType={animal as any}
+            animalType={animal as AnimalType}
             status="online"
             showStatus={false}
           />

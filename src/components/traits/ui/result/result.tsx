@@ -5,10 +5,7 @@ import Image from 'next/image';
 import RadarChart, { RadarChartData } from '@/commons/components/radar-chart';
 import Icon from '@/commons/components/icon';
 import Button from '@/commons/components/button';
-import {
-  AnimalType,
-  animalTypeMeta,
-} from '@/commons/constants/animal';
+import { AnimalType, animalTypeMeta } from '@/commons/constants/animal';
 import styles from './styles.module.css';
 
 export interface ResultProps {

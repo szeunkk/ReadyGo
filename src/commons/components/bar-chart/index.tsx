@@ -8,9 +8,7 @@ import {
   BarElement,
   Tooltip,
   Legend,
-  ChartOptions,
 } from 'chart.js';
-import { Bar } from 'react-chartjs-2';
 import styles from './styles.module.css';
 
 // Chart.js 등록
@@ -47,7 +45,6 @@ export default function BarChart({
 
   // 데이터 값 배열
   const values = data.map((item) => item.value);
-  const labels = data.map((item) => item.label);
   const colors = data.map(
     (item, index) =>
       item.color || defaultColorVars[index % defaultColorVars.length]
@@ -55,51 +52,6 @@ export default function BarChart({
 
   // 최대값 계산 (막대 길이 정규화용)
   const maxValue = Math.max(...values);
-
-  const chartData = {
-    labels,
-    datasets: [
-      {
-        data: values,
-        backgroundColor: colors,
-        borderRadius: 999, // 완전히 둥근 모서리
-        barThickness: size === 's' ? 16 : 38,
-        borderSkipped: false,
-      },
-    ],
-  };
-
-  const options: ChartOptions<'bar'> = {
-    indexAxis: 'y' as const, // 가로 막대 차트
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        enabled: false,
-      },
-    },
-    scales: {
-      x: {
-        display: false,
-        max: maxValue * 1.1, // 여유 공간 추가
-        grid: {
-          display: false,
-        },
-      },
-      y: {
-        display: false,
-        grid: {
-          display: false,
-        },
-      },
-    },
-    layout: {
-      padding: 0,
-    },
-  };
 
   // 값을 시간 형식으로 변환 (예: 23.6h)
   const formatValue = (value: number): string => {

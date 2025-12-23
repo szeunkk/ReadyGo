@@ -77,4 +77,3 @@ export const getCompatibilityLevel = (
 
   return 'unknown';
 };
-

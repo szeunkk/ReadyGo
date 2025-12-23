@@ -9,7 +9,7 @@ import { useSignupForm } from './hooks/index.form.hook';
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  const { form, onSubmit, isFormValid, isSubmitting, errors } = useSignupForm();
+  const { form, onSubmit, isFormValid, isSubmitting } = useSignupForm();
   const {
     register,
     formState: { errors: formErrors },
@@ -81,7 +81,9 @@ export default function Signup() {
               state={formErrors.passwordConfirm ? 'error' : 'Default'}
               additionalInfo={formErrors.passwordConfirm?.message}
               data-testid="signup-password-confirm-input"
-              onIconRightClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+              onIconRightClick={() =>
+                setShowPasswordConfirm(!showPasswordConfirm)
+              }
               {...register('passwordConfirm')}
             />
           </div>
@@ -100,9 +102,9 @@ export default function Signup() {
         </form>
 
         <div className={styles.divider}>
-          <div className={styles.dividerLine}></div>
+          <div className={styles.dividerLine} />
           <span className={styles.dividerText}>또는</span>
-          <div className={styles.dividerLine}></div>
+          <div className={styles.dividerLine} />
         </div>
 
         <div className={styles.socialLoginGroup}>
