@@ -27,6 +27,7 @@ const statusOptions: SelectboxItem[] = [
 const matchData = [
   {
     id: 1,
+    userId: 'user-1',
     nickname: '까칠한까마귀',
     matchRate: 94,
     status: 'online' as const,
@@ -34,6 +35,7 @@ const matchData = [
   },
   {
     id: 2,
+    userId: 'user-2',
     nickname: '기분좋은곰',
     matchRate: 94,
     status: 'online' as const,
@@ -41,6 +43,7 @@ const matchData = [
   },
   {
     id: 3,
+    userId: 'user-3',
     nickname: '상쾌한고양이',
     matchRate: 94,
     status: 'online' as const,
@@ -48,6 +51,7 @@ const matchData = [
   },
   {
     id: 4,
+    userId: 'user-4',
     nickname: '날뛰는기린',
     matchRate: 85,
     status: 'online' as const,
@@ -55,6 +59,7 @@ const matchData = [
   },
   {
     id: 5,
+    userId: 'user-5',
     nickname: '신비로운팬더',
     matchRate: 94,
     status: 'online' as const,
@@ -62,6 +67,7 @@ const matchData = [
   },
   {
     id: 6,
+    userId: 'user-6',
     nickname: '친절한사자',
     matchRate: 88,
     status: 'online' as const,
@@ -69,6 +75,7 @@ const matchData = [
   },
   {
     id: 7,
+    userId: 'user-7',
     nickname: '날뛰는기린',
     matchRate: 85,
     status: 'online' as const,
@@ -76,6 +83,7 @@ const matchData = [
   },
   {
     id: 8,
+    userId: 'user-8',
     nickname: '날뛰는기린',
     matchRate: 85,
     status: 'online' as const,
@@ -83,6 +91,7 @@ const matchData = [
   },
   {
     id: 9,
+    userId: 'user-9',
     nickname: '춤추는강아지',
     matchRate: 94,
     status: 'online' as const,
@@ -90,6 +99,7 @@ const matchData = [
   },
   {
     id: 10,
+    userId: 'user-10',
     nickname: '기분좋은곰',
     matchRate: 94,
     status: 'online' as const,
@@ -97,6 +107,7 @@ const matchData = [
   },
   {
     id: 11,
+    userId: 'user-11',
     nickname: '상쾌한고양이',
     matchRate: 94,
     status: 'online' as const,
@@ -104,6 +115,7 @@ const matchData = [
   },
   {
     id: 12,
+    userId: 'user-12',
     nickname: '친절한사자',
     matchRate: 88,
     status: 'online' as const,
@@ -125,10 +137,6 @@ export default function Match() {
 
   const handleRefresh = () => {
     // TODO: 실제 데이터 갱신 로직 구현
-  };
-
-  const handleProfileClick = (_id: number) => {
-    // TODO: 프로필 페이지 이동 로직 구현
   };
 
   return (
@@ -168,11 +176,11 @@ export default function Match() {
         {matchData.map((match) => (
           <MatchCard
             key={match.id}
+            userId={match.userId}
             nickname={match.nickname}
             matchRate={match.matchRate}
             status={match.status}
             tags={match.tags}
-            onProfileClick={() => handleProfileClick(match.id)}
           />
         ))}
       </div>
