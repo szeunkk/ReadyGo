@@ -6,7 +6,11 @@ import Tag from '@/commons/components/tag';
 import Button from '@/commons/components/button';
 import styles from './styles.module.css';
 
-export default function PartyInfo() {
+interface PartyInfoProps {
+  onJoinClick?: () => void;
+}
+
+export default function PartyInfo({ onJoinClick }: PartyInfoProps) {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -63,6 +67,7 @@ export default function PartyInfo() {
         size="m"
         shape="round"
         className={styles.button}
+        onClick={onJoinClick}
       >
         참여하기
       </Button>

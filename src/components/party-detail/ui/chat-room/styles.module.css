@@ -1,0 +1,214 @@
+.chatRoom {
+  width: 824px;
+  height: 1230px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+  background-color: var(--color-bg-primary);
+  border-radius: 36px;
+  border: 1px solid var(--color-border-secondary);
+}
+
+.messageList {
+  width: 760px;
+  height: 1094px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 24px;
+  border-radius: 20px;
+  background: var(--color-bg-secondary);
+}
+
+.dateDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--typo-body-sm-medium-font-family);
+  font-size: var(--typo-body-sm-medium-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  font-weight: var(--typo-body-sm-medium-font-weight);
+  color: var(--color-text-interactive-secondary);
+  text-align: center;
+}
+
+.messagesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.messagesWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.messageGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.messageRow {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ownMessageContainer {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-left: auto;
+  max-width: 70%;
+}
+
+.ownMessageBubble {
+  display: inline-flex;
+  padding: 12px 20px;
+  border-radius: 24px;
+  background: var(--color-bg-interactive-primary-hover);
+  box-sizing: border-box;
+}
+
+.messageContent {
+  font-family: var(--typo-body-lg-font-family);
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  font-weight: var(--typo-body-lg-font-weight);
+  color: var(--color-text-primary);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.messageTime {
+  display: flex;
+  align-items: center;
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  font-weight: var(--typo-body-sm-font-weight);
+  color: var(--color-text-interactive-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-bottom: 14px;
+}
+
+.otherMessageContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 70%;
+}
+
+.otherMessageContainer.consecutive {
+  padding-left: 48px;
+}
+
+.messageAvatar {
+  flex-shrink: 0;
+}
+
+.avatarSpacer {
+  width: 40px;
+  flex-shrink: 0;
+}
+
+.otherMessageContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.otherMessageContent .messageTime {
+  padding-bottom: 0;
+}
+
+.senderNickname {
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: var(--typo-body-sm-medium-font-weight);
+  line-height: var(--typo-body-md-semibold-line-height);
+  color: var(--color-text-primary);
+}
+
+.messageBubbles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.otherMessageWrapper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.otherMessageBubble {
+  display: inline-flex;
+  padding: 12px 20px;
+  border-radius: 24px;
+  background: var(--color-bg-tertiary);
+  box-sizing: border-box;
+}
+
+.otherMessageBubble .messageContent {
+  color: var(--color-text-primary);
+  font-size: var(--typo-body-lg-font-size);
+  font-style: normal;
+  font-weight: var(--typo-body-lg-font-weight);
+  line-height: var(--typo-body-lg-line-height);
+  white-space: nowrap;
+  word-wrap: normal;
+}
+
+.ownMessageBubble .messageContent {
+  color: var(--color-text-interactive-inverse);
+  font-size: var(--typo-body-lg-font-size);
+  font-weight: var(--typo-body-lg-font-weight);
+  line-height: var(--typo-body-lg-line-height);
+  white-space: nowrap;
+  word-wrap: normal;
+}
+
+.inputArea {
+  width: 760px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+.inputWrapper {
+  flex: 1;
+  height: 100%;
+}
+
+.messageInput {
+  width: 100%;
+  height: 100%;
+}
+
+.sendButton {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: var(--color-bg-secondary);
+}
+
+.sendIcon {
+  /* width: 20px;
+  height: 20px; */
+  color: var(--color-icon-disabled);
+}
