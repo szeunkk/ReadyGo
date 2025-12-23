@@ -13,157 +13,161 @@
 조건-파일경로) 참고할 UI 컴포넌트 파일경로: src/components/auth/login/index.tsx
 조건-파일경로) 참고할 폼 로그인 HOOK 파일경로: src/components/auth/login/hooks/index.form.hook.tsx
 조건-파일경로) 참고할 구글 OAuth HOOK 파일경로: src/components/auth/hooks/useGoogleOAuth.hook.ts
-조건-파일경로) 참고할 회원가입 HOOK 파일경로: src/components/auth/signup/hooks/index.form.hook.tsx (초기 데이터 생성 로직 참고)
-조건-파일경로) 참고할 닉네임 생성 함수 파일경로: src/lib/nickname/generateNickname.ts
 조건-파일경로) 참고할 Supabase 클라이언트 파일경로: src/lib/supabase/client.ts
 조건-파일경로) 구현될 HOOK 파일경로: src/components/auth/hooks/useKakaoOAuth.hook.ts
+
+조건-구현참고) 반드시 참고할 사항:
+            - 현재 구현된 useGoogleOAuth.hook.ts의 로직, 코드 구조, 플로우를 반드시 참고하여 동일한 방식으로 구현할 것.
+            - useGoogleOAuth.hook.ts에서 사용하는 패턴들을 그대로 적용할 것:
+                * OAUTH_PROCESSING_KEY를 사용한 OAuth 처리 상태 추적 (localStorage)
+                * useEffect 내에서 초기 세션 확인 (checkInitialSession)
+                * onAuthStateChange를 사용한 세션 변경 감지
+                * processOAuthCallback 함수로 세션 처리 로직 분리
+                * hasShownErrorModalRef, hasProcessedSessionRef를 사용한 중복 처리 방지
+                * redirectTo는 LOGIN 페이지로 설정 (URL_PATHS.LOGIN 사용)
+                * 최초 로그인 시 signup-success로 이동, 기존 유저는 home으로 이동
 
 ==============================================
 
 핵심요구사항) 다음의 기능을 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
-            1) 라이브러리조건
+            1. 라이브러리조건
                 - Supabase: 이미 설치되어있는 @supabase/supabase-js를 사용할 것.
                 - 라우팅: Next.js의 useRouter를 사용할 것.
                 - 모달: 이미 셋팅되어있는 modal.provider를 사용할 것.
 
-            2) 유저시나리오(카카오톡 로그인)
-                2-1) 카카오톡 로그인 버튼 클릭 시 처리
-                    - 카카오톡 로그인 버튼을 클릭하면 아래 순서로 처리할 것.
+            2. 유저시나리오(카카오 로그인)
+                2-1) 카카오 로그인 버튼 클릭 시 처리
+                    - 카카오 로그인 버튼을 클릭하면 아래 순서로 처리할 것.
                     
-                    2-1-1) Supabase OAuth 로그인 호출
-                        - API: supabase.auth.signInWithOAuth
-                        - provider: 'kakao'
-                        - options:
-                            - redirectTo: 현재 도메인 + '/home' 경로
-                                - 예: 'http://localhost:3000/home' (개발 환경)
-                                - 예: 'https://yourdomain.com/home' (프로덕션 환경)
-                                - URL_PATHS.HOME 상수를 사용하여 경로를 구성할 것.
-                                - window.location.origin을 사용하여 현재 도메인을 가져올 것.
-                            - queryParams: (선택사항) 필요시 추가 설정
+                2-2) supabase의 카카오 로그인 API를 호출할 것.
+                    - API: supabase.auth.signInWithOAuth
+                    - provider: 'kakao'
+                    - options:
+                        - redirectTo: 현재 도메인 + URL_PATHS.LOGIN 경로
+                            - 예: 'http://localhost:3000/login' (개발 환경)
+                            - 예: 'https://yourdomain.com/login' (프로덕션 환경)
+                            - URL_PATHS.LOGIN 상수를 사용하여 경로를 구성할 것.
+                            - window.location.origin을 사용하여 현재 도메인을 가져올 것.
+                    - OAuth 처리 상태 추적을 위해 localStorage에 OAUTH_PROCESSING_KEY를 설정할 것.
+                        - 키 이름: 'kakao_oauth_processing'
+                        - 값: 'true'
+                        - useGoogleOAuth.hook.ts의 패턴을 참고할 것.
+
+            3. 최초 로그인" vs "기존 유저" 분기 로직
+                요구사항에 따라 아래 분기 로직을 반드시 반영한다.
+                - "최초 로그인" 판단 기준:
+                    - Supabase auth user 존재 여부만으로는 최초/기존을 확정하지 말 것.
+                    - supabase 테이블(user_profiles / user_settings)에 id(uuid)레코드가 존재 여부로 판단할 것.
+                3-A) 최초 로그인(= user_profiles/user_settings 레코드 없음)
+                    아래 "초기 데이터 생성(필수)" 수행 성공 시:
+                        즉시 성공 페이지로 이동: /(auth)/signup-success
+                        페이지 이동 경로는 반드시 commons/constants/url.ts에 정의된 URL 상수를 사용
+
+                3-B) 기존 유저(= user_profiles 레코드가 이미 존재)
+                    즉시 홈으로 이동: /(main)/home
+                    페이지 이동 경로는 반드시 commons/constants/url.ts에 정의된 URL 상수를 사용
+
+            4. OAuth 콜백 처리 (리다이렉트 후)
+                - useGoogleOAuth.hook.ts의 구현 방식을 참고하여 동일한 패턴으로 구현할 것.
+                - useEffect 내에서 다음 로직을 구현할 것:
+                    4-1) 초기 세션 확인 (checkInitialSession)
+                        - 페이지 로드 시 localStorage의 OAUTH_PROCESSING_KEY를 확인할 것.
+                        - OAuth 처리 중인 경우에만 세션을 확인할 것.
+                        - supabase.auth.getSession()을 호출하여 세션 확인
+                        - 세션이 존재하고 아직 처리하지 않은 경우 processOAuthCallback 호출
                     
-                    2-1-2) OAuth 리다이렉트 처리
-                        - Supabase OAuth는 브라우저를 카카오톡 인증 페이지로 리다이렉트함.
-                        - 인증 완료 후 Supabase가 redirectTo로 지정한 URL로 리다이렉트함.
-                        - 리다이렉트된 페이지에서 세션을 확인하고 처리할 것.
+                    4-2) Auth State Change 감지 (onAuthStateChange)
+                        - supabase.auth.onAuthStateChange를 구독할 것.
+                        - SIGNED_IN 이벤트이고 OAuth 처리 중이며 아직 처리하지 않은 경우 processOAuthCallback 호출
+                        - useEffect cleanup에서 subscription.unsubscribe() 호출
                     
-                2-2) OAuth 콜백 처리 (리다이렉트 후)
-                    - 카카오톡 인증 완료 후 redirectTo로 리다이렉트된 페이지에서:
-                    
-                    2-2-1) 세션 확인
-                        - supabase.auth.getSession() 또는 supabase.auth.getUser()를 호출하여 세션 확인
-                        - 세션이 존재하면 로그인 성공으로 간주할 것.
-                    
-                    2-2-2) 로그인 성공 후 처리
-                        - 세션 확인 후 아래 데이터를 localStorage에 저장할 것.
-                            - key: "accessToken", value: session.access_token
-                            - key: "user", value: { id, email, _id, name }
-                        - user 정보는 supabase.auth.getUser()로 가져올 것.
-                        - user_profiles 테이블에서 _id(id), name(nickname)을 조회할 것.
-                            - API: supabase.from('user_profiles').select('id, nickname').eq('id', user.id).single()
-                            - 프로필 조회 성공 시: 조회된 데이터를 사용하여 localStorage에 저장할 것.
-                            - 프로필 조회 실패 시 (프로필이 없는 경우): 초기 데이터 생성(2-2-2-1)을 수행할 것.
-                    
-                    2-2-2-1) 초기 데이터 생성(프로필이 없는 경우)
-                        - OAuth 로그인 사용자가 최초 로그인하여 user_profiles가 없는 경우, 아래 테이블에 기본 레코드를 생성할 것.
-                            1. user_profiles
-                            2. user_settings
-                        
-                        - user_profiles 기본 생성 데이터(필수 컬럼만 최소 구성하되 ERD와 충돌 없이 동작하도록 설계):
-                            - id: userId
-                            - nickname: 기본 닉네임 자동 생성 => lib/nickname/generateNickname.ts 
-                            - avatar_url: null
-                            - bio: 빈 문자열 또는 null
-                            - animal_type: bear
-                            - tier: silver
-                            - temperature_score: 30
-                            - status_message: 빈 문자열 또는 null
-                            - created_at/updated_at은 DB default(now())를 우선 사용하되, 스키마에 따라 필요한 경우에만 전달
-                            - user_profiles insert payload는 실제 Supabase 테이블 컬럼/타입과 일치하도록 최소 필드로 구성하고(필수/존재 컬럼만), 존재하지 않는 컬럼은 제거할 것. tier 타입이 text가 아니면 DB 타입에 맞춰 값 변환할 것.
-                        
-                        - user_settings 기본 생성 데이터:
-                            - id: userId
-                            - theme_mode : dark
-                            - notification_push: true
-                            - notification_chat: true
-                            - notification_party : true
-                            - language: ko
-                            - created_at/updated_at은 DB default(now()) 우선
-                        
-                        - 초기 데이터 생성은 가능한 한 "원자적으로" 보이도록 처리할 것:
-                            - profiles insert 성공 후 settings insert 실패 시, 최종 실패로 처리하고 로그인실패모달을 띄울 것.
-                            - (가능하면) 실패 시 생성된 일부 데이터 롤백 전략을 고려하되, 프론트 단에서 완전 롤백이 어렵다면 최소한 사용자에게 실패를 명확히 안내하고 재시도 가능하게 할 것.
-                        
-                        - 초기 데이터 생성 성공 후, 생성된 프로필 정보를 사용하여 localStorage에 저장할 것.
-                            - key: "user", value: { id, email, _id: id, name: nickname }
-                        
-                        - 초기 데이터 생성 실패 시:
-                            - 로그인실패모달을 노출할 것.
-                            - 에러 메시지는 한글로 변환하여 표시할 것.
-                            - 로그인 프로세스를 중단할 것.
-                    
-                    2-2-3) 홈 페이지로 이동
-                        - localStorage 저장 완료 후 홈 페이지로 이동할 것.
-                        - router.push(URL_PATHS.HOME) 사용
-                        - 로그인완료모달은 표시하지 않을 것 (OAuth 플로우 특성상)
-                    
-                    2-2-4) 로그인 실패 처리
-                        - 세션이 없거나 에러가 발생하면 로그인실패모달을 노출할 것.
-                        - 에러 메시지는 한글로 변환하여 표시할 것.
+                    4-3) OAuth 콜백 처리 로직 (processOAuthCallback)
+                        - 세션에서 access_token을 가져와 localStorage에 'accessToken'으로 저장
+                        - supabase.auth.getUser()로 user 정보 가져오기
+                        - user_profiles 테이블에서 레코드 존재 여부 확인 (maybeSingle 사용)
+                            - API: supabase.from('user_profiles').select('id, nickname').eq('id', userId).maybeSingle()
+                        - 프로필이 없는 경우: 초기 데이터 생성 수행 (4-4 참고)
+                        - 프로필이 있는 경우: 기존 유저로 처리하여 localStorage에 user 정보 저장 후 홈으로 이동
+                        - 모든 처리 완료 후 OAUTH_PROCESSING_KEY 제거
+                        - 에러 발생 시 에러 모달 표시 및 OAUTH_PROCESSING_KEY 제거
+
+            5. 초기 데이터 생성(최초 로그인 필수)                
+                1. user_profiles 생성                
+                - user_profiles 기본 생성 데이터(필수 컬럼만 최소 구성하되 ERD와 충돌 없이 동작하도록 설계):
+                    - id: userId
+                    - nickname: 기본 닉네임 자동 생성 => lib/nickname/generateNickname.ts 
+                    - avatar_url: null
+                    - bio: 빈 문자열 또는 null
+                    - animal_type: bear (AnimalType.bear 사용)
+                    - tier: silver (TierType.silver 사용)
+                    - temperature_score: 30
+                    - status_message: 빈 문자열 또는 null
+                    - created_at/updated_at은 DB default(now())를 우선 사용하되, 스키마에 따라 필요한 경우에만 전달
+                    user_profiles insert payload는 실제 Supabase 테이블 컬럼/타입과 일치하도록 최소 필드로 구성하고(필수/존재 컬럼만), 존재하지 않는 컬럼은 제거할 것. tier 타입이 text가 아니면 DB 타입에 맞춰 값 변환할 것.
+
+                2. user_settings 생성
+                - user_settings 기본 생성 데이터:
+                    - id: userId
+                    - theme_mode : dark
+                    - notification_push: true
+                    - notification_chat: true
+                    - notification_party : true
+                    - language: ko
+                    - created_at/updated_at은 DB default(now()) 우선
+
+                - 초기 데이터 생성은 가능한 한 "원자적으로" 보이도록 처리할 것:
+                    - profiles insert 성공 후 settings insert 실패 시, 최종 실패로 처리하고 가입실패모달을 띄울 것.
+                    - (가능하면) 실패 시 생성된 일부 데이터 롤백 전략을 고려하되, 프론트 단에서 완전 롤백이 어렵다면 최소한 사용자에게 실패를 명확히 안내하고 재시도 가능하게 할 것.
+
+                3. 전체 플로우가 성공하면:
+                    - 최초 로그인: `/(auth)/signup-success`
+                    - 기존 유저: `/(main)/home`
+                    - 페이지 이동 경로는 commons/constants/url.ts에 정의된 URL을 사용해서 이동할 것.
+
+                4. 전체 플로우가 실패하면:
+                    - 가입실패모달을 노출할 것.
+                
+                5. 모달 조건(실패 모달에만 적용)
+                    5-1) 모달조건
+                        - 모달 프로바이더 경로: src/commons/providers/modal/modal.provider.tsx
+                        - 이미 셋팅되어있는 modal.provider를 사용할 것.
+                        - 이미 셋팅되어있는 modal.provider를 수정하지 말 것.
                         - 모달은 한 번만 보여야 하며, 닫힌 뒤에는 같은 상황에서 다시 나타나지 않도록 할 것.
+                            - 실패 모달은 hasShownErrorModalRef 같은 ref 플래그로 제어하여 동일 실패 상태 재렌더에서도 자동 재오픈 금지
 
-            3) 모달조건
-                3-1) 모달 프로바이더
-                    - 모달 프로바이더 경로: src/commons/providers/modal/modal.provider.tsx
-                    - 이미 셋팅되어있는 modal.provider를 사용할 것.
-                    - 이미 셋팅되어있는 modal.provider를 수정하지 말 것.
-                    - 모달은 한 번만 보여야 하며, 닫힌 뒤에는 같은 상황에서 다시 나타나지 않도록 할 것.
+                    5-2) 공통컴포넌트조건                        
+                        - 가입실패모달: <Modal />, variant: 'single'
 
-                3-2) 공통컴포넌트조건
-                    - 로그인실패모달: <Modal />, variant: 'single'
-                    - 로그인완료모달: OAuth 플로우에서는 표시하지 않을 것.
-
-                3-3) 페이지이동조건
-                    - commons/constants/url.ts의 페이지URL에 정의된 경로로 이동할 것.
-                    - 로그인 성공 시: URL_PATHS.HOME (/(main)/home)로 이동
-                    - 로그인실패모달:
-                        1. '확인' 클릭
-                        2. 열려있는 모든 모달을 닫기
+                    5-3) 실패 모달 확인 클릭 동작        
+                        - 가입실패모달:
+                            1. '확인' 클릭
+                            2. 열려있는 모든 모달을 닫기
+                            3. 페이지 이동 없음(현재 페이지 유지)
 
 ==============================================
 
 핵심요구사항) Hook 책임 분리
             Hook(src/components/auth/hooks/useKakaoOAuth.hook.ts)은 다음 책임을 가진다.
-            - 카카오톡 로그인 버튼 클릭 핸들러 제공
-            - Supabase OAuth 로그인 호출 (signInWithOAuth)
-            - OAuth 콜백 처리 (리다이렉트 후 세션 확인)
+            - 카카오 로그인 버튼 클릭 핸들러 제공 (handleKakaoOAuth)
+            - Supabase OAuth 로그인 호출 (signInWithOAuth, provider: 'kakao')
+            - OAuth 처리 상태 추적 (localStorage의 OAUTH_PROCESSING_KEY 사용)
+            - useEffect 내에서 OAuth 콜백 처리:
+                * 초기 세션 확인 (checkInitialSession)
+                * Auth State Change 감지 (onAuthStateChange)
+                * OAuth 콜백 처리 로직 (processOAuthCallback)
             - localStorage 저장 처리 (accessToken, user)
-            - user_profiles 조회 처리
+            - user_profiles 조회 처리 (maybeSingle 사용)
             - 프로필이 없는 경우 초기 데이터 생성 처리 (user_profiles, user_settings)
-            - 실패 모달 오픈 및 중복 방지
-            - 성공 시 라우팅 처리
-            - 구글 OAuth 훅(useGoogleOAuth.hook.ts)과 동일한 구조 및 플로우로 구현할 것.
+            - 실패 모달 오픈 및 중복 방지 (hasShownErrorModalRef 사용)
+            - 세션 처리 중복 방지 (hasProcessedSessionRef 사용)
+            - 성공 시 라우팅 처리 (최초 로그인: signup-success, 기존 유저: home)
+            - 구글 OAuth 훅(useGoogleOAuth.hook.ts)과 동일한 구조, 플로우, 패턴으로 구현할 것.
 
 핵심요구사항) UI 컴포넌트 책임
             UI(src/components/auth/login/index.tsx)는 Hook을 사용하여:
-            - 카카오톡 로그인 버튼에 onClick 핸들러를 연결할 것.
-            - 기존 카카오톡 로그인 버튼(data-testid는 필요시 추가)에 핸들러를 연결할 것.
-            - Hook에서 제공하는 핸들러를 사용할 것.
-
-==============================================
-
-핵심요구사항) OAuth 리다이렉트 처리 방식
-            Supabase OAuth는 다음과 같은 플로우를 가진다:
-            1. signInWithOAuth 호출 → 브라우저가 카카오톡 인증 페이지로 이동
-            2. 사용자가 카카오톡에서 인증 완료 → Supabase가 redirectTo로 지정한 URL로 리다이렉트
-            3. 리다이렉트된 페이지에서 세션 확인 및 처리
-            
-            구현 시 고려사항:
-            - signInWithOAuth는 Promise를 반환하지만, 실제 인증은 브라우저 리다이렉트로 처리됨.
-            - 리다이렉트 후 홈 페이지(/(main)/home)에서 세션을 확인하고 처리할 수 있도록 구현할 것.
-            - 또는 로그인 페이지에서 URL 파라미터(code, state 등)를 확인하여 콜백을 처리할 수도 있음.
-            - 기존 구글 OAuth 훅(useGoogleOAuth.hook.ts)의 구조와 플로우를 참고하여 동일한 방식으로 구현할 것.
-            - 기존 폼 로그인(index.form.hook.tsx)의 로그인 성공 후 처리 로직을 참고하여 동일한 방식으로 localStorage 저장 및 user_profiles 조회를 수행할 것.
-            - 기존 회원가입 훅(index.form.hook.tsx)의 초기 데이터 생성 로직을 참고하여, 프로필이 없는 OAuth 사용자의 경우 user_profiles와 user_settings에 초기 데이터를 생성할 것.
+            - 카카오 로그인 버튼에 onClick 핸들러를 연결할 것.
+            - 기존 카카오 로그인 버튼(data-testid는 필요시 추가)에 핸들러를 연결할 것.
+            - Hook에서 제공하는 handleKakaoOAuth 핸들러를 사용할 것.
 
 ==============================================
 
@@ -171,21 +175,33 @@
 
 1) 커서룰(@01-common.mdc, @04-func.mdc) 적용 결과 체크리스트
 2) 기능 요구사항 체크리스트
-   - 카카오톡 로그인 버튼 클릭 시 signInWithOAuth 호출 여부
-   - redirectTo 경로가 올바르게 설정되었는지 (URL_PATHS.HOME 사용)
+   - 카카오 로그인 버튼 클릭 시 signInWithOAuth 호출 여부
+   - provider가 'kakao'로 설정되었는지 여부
+   - redirectTo 경로가 올바르게 설정되었는지 (URL_PATHS.LOGIN 사용, window.location.origin과 결합)
+   - OAUTH_PROCESSING_KEY를 사용한 OAuth 처리 상태 추적 구현 여부 (키 이름: 'kakao_oauth_processing')
+   - useEffect 내에서 초기 세션 확인 로직 구현 여부 (checkInitialSession)
+   - onAuthStateChange를 사용한 세션 변경 감지 구현 여부
+   - processOAuthCallback 함수로 세션 처리 로직 분리 여부
+   - hasShownErrorModalRef를 사용한 에러 모달 중복 방지 구현 여부
+   - hasProcessedSessionRef를 사용한 세션 처리 중복 방지 구현 여부
    - OAuth 콜백 후 세션 확인 및 처리 여부
-   - localStorage 저장 처리 여부 (accessToken, user)
-   - user_profiles 조회 및 처리 여부
+   - localStorage에 accessToken 저장 처리 여부
+   - localStorage에 user 정보 저장 처리 여부 (id, email, _id, name)
+   - user_profiles 조회 시 maybeSingle 사용 여부
+   - 최초 로그인 판단 기준이 user_profiles 레코드 존재 여부로 구현되었는지 여부
    - 프로필이 없는 경우 초기 데이터 생성 처리 여부 (user_profiles, user_settings)
-   - 초기 데이터 생성 시 user_profiles 기본값 설정 여부 (nickname 자동 생성, animal_type, tier, temperature_score 등)
-   - 초기 데이터 생성 시 user_settings 기본값 설정 여부 (theme_mode, notification_*, language 등)
-   - 초기 데이터 생성 실패 시 로그인실패모달 표시 및 프로세스 중단 여부
-   - 로그인 실패 시 모달 표시 여부
-   - 모달 중복 방지 로직 구현 여부
-   - 성공 시 홈 페이지로 이동 여부
+   - 초기 데이터 생성 시 user_profiles 기본값 설정 여부 (nickname 자동 생성, AnimalType.bear, TierType.silver, temperature_score: 30 등)
+   - 초기 데이터 생성 시 user_settings 기본값 설정 여부 (theme_mode: 'dark', notification_*: true, language: 'ko' 등)
+   - 초기 데이터 생성 실패 시 가입실패모달 표시 및 프로세스 중단 여부
+   - 최초 로그인 시 signup-success 페이지로 이동 여부 (URL_PATHS.SIGNUP_SUCCESS 사용)
+   - 기존 유저 시 home 페이지로 이동 여부 (URL_PATHS.HOME 사용)
+   - 로그인 실패 시 가입실패모달 표시 여부
+   - 모달 중복 방지 로직 구현 여부 (hasShownErrorModalRef 사용)
+   - OAuth 처리 완료 후 OAUTH_PROCESSING_KEY 제거 여부
+   - useEffect cleanup에서 subscription.unsubscribe() 호출 여부
    - Hook과 UI 컴포넌트 책임 분리 준수 여부
    - 공통 hooks 위치(src/components/auth/hooks/)에 Hook 파일 생성 여부
-   - 구글 OAuth 훅과 동일한 구조 및 플로우로 구현되었는지 여부
+   - 구글 OAuth 훅(useGoogleOAuth.hook.ts)과 동일한 구조, 플로우, 패턴으로 구현되었는지 여부
 
 ==============================================
 

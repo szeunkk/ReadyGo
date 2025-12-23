@@ -6,12 +6,14 @@ import Input from '@/commons/components/input';
 import Button from '@/commons/components/button';
 import { useSignupForm } from './hooks/index.form.hook';
 import { useGoogleOAuth } from '../hooks/useGoogleOAuth.hook';
+import { useKakaoOAuth } from '../hooks/useKakaoOAuth.hook';
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const { form, onSubmit, isFormValid, isSubmitting } = useSignupForm();
   const { handleGoogleOAuth } = useGoogleOAuth();
+  const { handleKakaoOAuth } = useKakaoOAuth();
   const {
     register,
     formState: { errors: formErrors },
@@ -148,7 +150,12 @@ export default function Signup() {
             </div>
           </button>
 
-          <button className={styles.kakaoButton} type="button">
+          <button
+            className={styles.kakaoButton}
+            type="button"
+            onClick={handleKakaoOAuth}
+            data-testid="signup-kakao-button"
+          >
             <div className={styles.socialButtonContent}>
               <div className={styles.socialIcon}>
                 {/* Kakao Icon */}
