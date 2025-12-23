@@ -226,7 +226,7 @@ export default function RadarChart({
         gradient.addColorStop(0.05, 'rgba(98, 155, 248, 0.40)');
         gradient.addColorStop(0.95, 'rgba(98, 155, 248, 0.10)');
         return gradient;
-      }) as any,
+      }) as string | CanvasGradient,
       borderColor: '#629BF8',
       borderWidth: 3,
       pointBackgroundColor: '#629BF8',

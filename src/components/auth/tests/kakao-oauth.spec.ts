@@ -28,8 +28,8 @@ test.describe('카카오 OAuth 로그인', () => {
       url: string;
       method: string;
       status?: number;
-      requestBody?: any;
-      responseBody?: any;
+      requestBody?: unknown;
+      responseBody?: unknown;
     }[] = [];
 
     page.on('request', (request) => {
@@ -62,7 +62,7 @@ test.describe('카카오 OAuth 로그인', () => {
     const kakaoButton = page.locator('[data-testid="login-kakao-button"]');
 
     // 버튼 클릭 시 새 창이 열릴 수 있으므로 Promise.all 사용
-    const [newPage] = await Promise.all([
+    const [_newPage] = await Promise.all([
       context.waitForEvent('page', { timeout: 5000 }).catch(() => null),
       kakaoButton.click({ timeout: 500 }),
     ]);
@@ -281,7 +281,7 @@ test.describe('카카오 OAuth 로그인', () => {
     const kakaoButton = page.locator('[data-testid="login-kakao-button"]');
 
     // 버튼 클릭 시 새 창이 열릴 수 있으므로 Promise.all 사용
-    const [newPage] = await Promise.all([
+    const [_newPage] = await Promise.all([
       context.waitForEvent('page', { timeout: 5000 }).catch(() => null),
       kakaoButton.click({ timeout: 500 }),
     ]);
