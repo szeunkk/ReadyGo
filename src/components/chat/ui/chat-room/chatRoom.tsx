@@ -27,19 +27,19 @@ interface ChatMessageRead {
   read_at: string | null;
 }
 
-interface ChatRoomMember {
-  id: number;
-  room_id: number | null;
-  user_id: string | null;
-  joined_at: string | null;
-}
+// interface ChatRoomMember {
+//   id: number;
+//   room_id: number | null;
+//   user_id: string | null;
+//   joined_at: string | null;
+// }
 
-interface ChatBlock {
-  id: number;
-  user_id: string | null;
-  blocked_user_id: string | null;
-  created_at: string | null;
-}
+// interface ChatBlock {
+//   id: number;
+//   user_id: string | null;
+//   blocked_user_id: string | null;
+//   created_at: string | null;
+// }
 
 // Mock 데이터 - chatList의 mock 데이터와 매핑
 // 현재 사용자 ID (chatList의 mock 데이터와 다른 ID 사용)
@@ -321,8 +321,10 @@ const DEFAULT_MOCK_DATA = {
 };
 
 // 메시지 시간 포맷팅 함수
-function formatMessageTime(dateString: string | null): string {
-  if (!dateString) return '';
+const formatMessageTime = (dateString: string | null): string => {
+  if (!dateString) {
+    return '';
+  }
 
   const date = new Date(dateString);
   const hours = date.getHours();
@@ -334,11 +336,13 @@ function formatMessageTime(dateString: string | null): string {
     .padStart(2, '0')}`;
 
   return timeString;
-}
+};
 
 // 날짜 구분선 포맷팅 함수
-function formatDateDivider(dateString: string | null): string {
-  if (!dateString) return '';
+const formatDateDivider = (dateString: string | null): string => {
+  if (!dateString) {
+    return '';
+  }
 
   const date = new Date(dateString);
   const weekdays = [
@@ -352,14 +356,16 @@ function formatDateDivider(dateString: string | null): string {
   ];
   const weekday = weekdays[date.getDay()];
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 ${weekday}`;
-}
+};
 
 // 날짜가 변경되었는지 확인하는 함수
-function isNewDate(
+const isNewDate = (
   currentDate: string | null,
   previousDate: string | null
-): boolean {
-  if (!currentDate || !previousDate) return true;
+): boolean => {
+  if (!currentDate || !previousDate) {
+    return true;
+  }
 
   const current = new Date(currentDate);
   const previous = new Date(previousDate);
@@ -369,19 +375,21 @@ function isNewDate(
     current.getMonth() !== previous.getMonth() ||
     current.getDate() !== previous.getDate()
   );
-}
+};
 
 // 연속된 메시지인지 확인하는 함수
-function isConsecutiveMessage(
+const isConsecutiveMessage = (
   currentMessage: ChatMessage,
   previousMessage: ChatMessage | null
-): boolean {
-  if (!previousMessage) return false;
+): boolean => {
+  if (!previousMessage) {
+    return false;
+  }
   return (
     currentMessage.sender_id === previousMessage.sender_id &&
     currentMessage.content_type !== 'system'
   );
-}
+};
 
 interface ChatRoomProps {
   roomId?: string;
@@ -402,8 +410,8 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
       );
 
       if (chatRoomData) {
-        const otherMember = chatRoomData.members[0];
-        const isBlocked = chatRoomData.isBlocked;
+        const [otherMember] = chatRoomData.members;
+        const { isBlocked } = chatRoomData;
 
         // chatList의 데이터를 기반으로 chatRoom mock 데이터 생성
         return {
@@ -446,7 +454,7 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
 
   const MOCK_MESSAGES = roomData.messages;
   const MOCK_MESSAGE_READS = roomData.messageReads;
-  const isBlocked = roomData.isBlocked;
+  const { isBlocked } = roomData;
 
   // 메시지를 날짜별로 그룹화
   const groupedMessages = MOCK_MESSAGES.reduce(
@@ -484,7 +492,7 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
       <header className={styles.header} aria-label="채팅방 헤더">
         <div className={styles.headerLeft}>
           <Avatar
-            animalType={MOCK_OTHER_USER.animalType as any}
+            animalType={MOCK_OTHER_USER.animalType as AnimalType}
             alt={MOCK_OTHER_USER.nickname}
             size="s"
             status={MOCK_OTHER_USER.status}
@@ -598,7 +606,7 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
               >
                 {!isConsecutive && (
                   <Avatar
-                    animalType={MOCK_OTHER_USER.animalType as any}
+                    animalType={MOCK_OTHER_USER.animalType as AnimalType}
                     alt={MOCK_OTHER_USER.nickname}
                     size="s"
                     status={MOCK_OTHER_USER.status}

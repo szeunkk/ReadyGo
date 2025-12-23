@@ -326,7 +326,7 @@ const ChatListItem = ({
       <div className={styles.chatItemContent}>
         <div className={styles.avatarWrapper}>
           <Avatar
-            animalType={members[0]?.animalType as any}
+            animalType={members[0]?.animalType as AnimalType}
             alt={roomName}
             size="s"
             status={members[0]?.status || 'offline'}

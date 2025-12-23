@@ -3,12 +3,12 @@ import styles from './styles.module.css';
 
 /**
  * AnalysisLoading Component
- * 
+ *
  * 사용자의 성향 분석 중 표시되는 로딩 화면 컴포넌트
  * - 회전하는 스피너 애니메이션
  * - 분석 진행 상태 메시지
  */
-export function AnalysisLoading() {
+export const AnalysisLoading = () => {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -60,7 +60,6 @@ export function AnalysisLoading() {
       </div>
     </div>
   );
-}
+};
 
 export default AnalysisLoading;
-

@@ -86,7 +86,6 @@ export default function ProfilePanel({
 
   const handleChatClick = () => {
     // TODO: 채팅 시작 로직 구현
-    console.log('채팅 시작:', userId);
   };
 
   if (isLoading) {

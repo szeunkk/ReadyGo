@@ -100,7 +100,3 @@ export const CompleteExample: Story = {
     },
   },
 };
-
-
-
-

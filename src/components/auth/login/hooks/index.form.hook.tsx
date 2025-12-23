@@ -41,7 +41,9 @@ export const useLoginForm = () => {
 
   // localStorage에서 저장된 이메일 불러오기
   const getRememberedEmail = (): string => {
-    if (typeof window === 'undefined') return '';
+    if (typeof window === 'undefined') {
+      return '';
+    }
     const rememberedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY);
     return rememberedEmail || '';
   };

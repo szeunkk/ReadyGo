@@ -20,11 +20,7 @@ export default function Tag({
   className = '',
   ...props
 }: TagProps) {
-  const tagClasses = [
-    styles.tag,
-    styles[`style-${style}`],
-    className,
-  ]
+  const tagClasses = [styles.tag, styles[`style-${style}`], className]
     .filter(Boolean)
     .join(' ');
 
@@ -34,7 +30,3 @@ export default function Tag({
     </div>
   );
 }
-
-
-
-

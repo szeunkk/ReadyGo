@@ -880,8 +880,12 @@ export const WithLabels: Story = {
     const selectAllStatus: CheckboxStatus = (() => {
       const values = Object.values(checkedItems);
       const checkedCount = values.filter(Boolean).length;
-      if (checkedCount === 0) return 'unselected';
-      if (checkedCount === values.length) return 'selected';
+      if (checkedCount === 0) {
+        return 'unselected';
+      }
+      if (checkedCount === values.length) {
+        return 'selected';
+      }
       return 'partial';
     })();
 

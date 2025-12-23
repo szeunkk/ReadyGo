@@ -4,7 +4,10 @@ import React, { useState, useEffect } from 'react';
 import styles from './styles.module.css';
 
 interface QuestionScheduleProps {
-  onAnswerSelect?: (answer: { dayTypes: string[]; timeSlots: string[] }) => void;
+  onAnswerSelect?: (answer: {
+    dayTypes: string[];
+    timeSlots: string[];
+  }) => void;
   currentStep?: number;
   selectedAnswer?: { dayTypes: string[]; timeSlots: string[] };
 }
@@ -43,7 +46,7 @@ export default function QuestionSchedule({
     const newSelected = selectedDayTypes.includes(dayTypeId)
       ? selectedDayTypes.filter((id) => id !== dayTypeId)
       : [...selectedDayTypes, dayTypeId];
-    
+
     setSelectedDayTypes(newSelected);
 
     // 요일과 시간대가 모두 1개 이상 선택되었으면 300ms 후 자동 제출
@@ -63,7 +66,7 @@ export default function QuestionSchedule({
     const newSelected = selectedTimeSlots.includes(timeSlotId)
       ? selectedTimeSlots.filter((id) => id !== timeSlotId)
       : [...selectedTimeSlots, timeSlotId];
-    
+
     setSelectedTimeSlots(newSelected);
 
     // 요일과 시간대가 모두 1개 이상 선택되었으면 300ms 후 자동 제출
@@ -141,4 +144,3 @@ export default function QuestionSchedule({
     </div>
   );
 }
-

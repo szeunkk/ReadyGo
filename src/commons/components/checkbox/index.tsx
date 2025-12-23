@@ -72,7 +72,9 @@ export default function Checkbox({
   }, [isAdvancedMode, status]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (isDisabled) return;
+    if (isDisabled) {
+      return;
+    }
 
     // 표준 onChange 항상 호출 (react-hook-form 호환)
     onChange?.(e);

@@ -33,17 +33,9 @@ export {
 // ============================================
 // Copy Data
 // ============================================
-import {
-  type AnimalCopy,
-  animalCopies,
-  getAnimalCopy,
-} from './animal.copy';
+import { type AnimalCopy, animalCopies, getAnimalCopy } from './animal.copy';
 
-export {
-  type AnimalCopy,
-  animalCopies,
-  getAnimalCopy,
-};
+export { type AnimalCopy, animalCopies, getAnimalCopy };
 
 // ============================================
 // Assets Data
@@ -54,11 +46,7 @@ import {
   getAnimalAssets,
 } from './animal.assets';
 
-export {
-  type AnimalAssets,
-  animalAssets,
-  getAnimalAssets,
-};
+export { type AnimalAssets, animalAssets, getAnimalAssets };
 
 // ============================================
 // Compatibility Data
@@ -136,4 +124,3 @@ export const animalTypeMeta: Record<AnimalType, AnimalTypeMeta> =
 export const getAnimalTypeMeta = (type: AnimalType): AnimalTypeMeta => {
   return animalTypeMeta[type];
 };
-

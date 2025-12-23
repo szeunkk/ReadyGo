@@ -40,169 +40,175 @@ export interface InputProps extends Omit<
   'data-testid'?: string;
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  {
-    variant = 'primary',
-    state = 'Default',
-    size = 'm',
-    label,
-    additionalInfo,
-    required = false,
-    iconLeft,
-    iconRight,
-    iconSize = 20,
-    iconLeftColor,
-    iconRightColor,
-    labelIcon,
-    labelIconColor,
-    additionalInfoIcon,
-    additionalInfoIconColor,
-    gap = 4,
-    className = '',
-    disabled,
-    onIconRightClick,
-    'data-testid': dataTestId,
-    type,
-    ...props
-  },
-  ref
-) {
-  const isDisabled = disabled || state === 'disabled';
+const Input = forwardRef<HTMLInputElement, InputProps>(
+  (
+    {
+      variant = 'primary',
+      state = 'Default',
+      size = 'm',
+      label,
+      additionalInfo,
+      required = false,
+      iconLeft,
+      iconRight,
+      iconSize = 20,
+      iconLeftColor,
+      iconRightColor,
+      labelIcon,
+      labelIconColor,
+      additionalInfoIcon,
+      additionalInfoIconColor,
+      gap = 4,
+      className = '',
+      disabled,
+      onIconRightClick,
+      'data-testid': dataTestId,
+      type,
+      ...props
+    },
+    ref
+  ) => {
+    const isDisabled = disabled || state === 'disabled';
 
-  // variant와 state를 기반으로 실제 적용할 클래스 결정
-  const getVariantClass = () => {
-    if (variant === 'secondary') {
-      return 'secondary';
-    }
-    return 'primary';
-  };
+    // variant와 state를 기반으로 실제 적용할 클래스 결정
+    const getVariantClass = () => {
+      if (variant === 'secondary') {
+        return 'secondary';
+      }
+      return 'primary';
+    };
 
-  const getStateClass = () => {
-    if (isDisabled) {
-      return 'disabled';
-    }
-    if (state === 'error') {
-      return 'error';
-    }
-    if (state === 'filled') {
-      return 'filled';
-    }
-    if (state === 'active') {
-      return 'active';
-    }
-    if (state === 'hover') {
-      return 'hover';
-    }
-    return 'Default';
-  };
+    const getStateClass = () => {
+      if (isDisabled) {
+        return 'disabled';
+      }
+      if (state === 'error') {
+        return 'error';
+      }
+      if (state === 'filled') {
+        return 'filled';
+      }
+      if (state === 'active') {
+        return 'active';
+      }
+      if (state === 'hover') {
+        return 'hover';
+      }
+      return 'Default';
+    };
 
-  const actualVariant = getVariantClass();
-  const actualState = getStateClass();
+    const actualVariant = getVariantClass();
+    const actualState = getStateClass();
 
-  const inputClasses = [
-    styles.input,
-    styles[`size-${size}`],
-    styles[`variant-${actualVariant}`],
-    styles[`state-${actualState}`],
-    isDisabled && styles.disabled,
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
+    const inputClasses = [
+      styles.input,
+      styles[`size-${size}`],
+      styles[`variant-${actualVariant}`],
+      styles[`state-${actualState}`],
+      isDisabled && styles.disabled,
+      className,
+    ]
+      .filter(Boolean)
+      .join(' ');
 
-  const labelClasses = [styles.label].filter(Boolean).join(' ');
+    const labelClasses = [styles.label].filter(Boolean).join(' ');
 
-  const additionalInfoClasses = [
-    styles.additionalInfo,
-    actualState === 'error' && styles.error,
-  ]
-    .filter(Boolean)
-    .join(' ');
+    const additionalInfoClasses = [
+      styles.additionalInfo,
+      actualState === 'error' && styles.error,
+    ]
+      .filter(Boolean)
+      .join(' ');
 
-  return (
-    <div className={styles.container}>
-      {label && (
-        <div className={labelClasses} style={{ gap: `${gap}px` }}>
-          {labelIcon && (
-            <Icon
-              name={labelIcon}
-              size={iconSize}
-              className={styles.labelIcon}
-              style={labelIconColor ? { color: labelIconColor } : undefined}
-            />
-          )}
-          <span className={styles.labelText}>{label}</span>
-          {required && <span className={styles.required}>*</span>}
-        </div>
-      )}
-      <div className={inputClasses}>
-        <div className={styles.inputContent} style={{ gap: `${gap}px` }}>
-          {iconLeft && (
-            <Icon
-              name={iconLeft}
-              size={iconSize}
-              className={styles.inputIcon}
-              style={iconLeftColor ? { color: iconLeftColor } : undefined}
-            />
-          )}
-          <div className={styles.inputTextContainer}>
-            {actualState === 'active' && (
-              <span className={styles.cursor}>|</span>
-            )}
-            <input
-              ref={ref}
-              type={type || 'text'}
-              className={styles.inputField}
-              disabled={isDisabled}
-              data-testid={dataTestId}
-              {...props}
-            />
-          </div>
-          {iconRight && (
-            <button
-              type="button"
-              onClick={onIconRightClick}
-              disabled={isDisabled}
-              style={{
-                background: 'none',
-                border: 'none',
-                padding: 0,
-                cursor: isDisabled ? 'not-allowed' : 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              aria-label={onIconRightClick ? 'Toggle password visibility' : undefined}
-            >
+    return (
+      <div className={styles.container}>
+        {label && (
+          <div className={labelClasses} style={{ gap: `${gap}px` }}>
+            {labelIcon && (
               <Icon
-                name={iconRight}
+                name={labelIcon}
+                size={iconSize}
+                className={styles.labelIcon}
+                style={labelIconColor ? { color: labelIconColor } : undefined}
+              />
+            )}
+            <span className={styles.labelText}>{label}</span>
+            {required && <span className={styles.required}>*</span>}
+          </div>
+        )}
+        <div className={inputClasses}>
+          <div className={styles.inputContent} style={{ gap: `${gap}px` }}>
+            {iconLeft && (
+              <Icon
+                name={iconLeft}
                 size={iconSize}
                 className={styles.inputIcon}
-                style={iconRightColor ? { color: iconRightColor } : undefined}
+                style={iconLeftColor ? { color: iconLeftColor } : undefined}
               />
-            </button>
-          )}
+            )}
+            <div className={styles.inputTextContainer}>
+              {actualState === 'active' && (
+                <span className={styles.cursor}>|</span>
+              )}
+              <input
+                ref={ref}
+                type={type || 'text'}
+                className={styles.inputField}
+                disabled={isDisabled}
+                data-testid={dataTestId}
+                {...props}
+              />
+            </div>
+            {iconRight && (
+              <button
+                type="button"
+                onClick={onIconRightClick}
+                disabled={isDisabled}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  cursor: isDisabled ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                aria-label={
+                  onIconRightClick ? 'Toggle password visibility' : undefined
+                }
+              >
+                <Icon
+                  name={iconRight}
+                  size={iconSize}
+                  className={styles.inputIcon}
+                  style={iconRightColor ? { color: iconRightColor } : undefined}
+                />
+              </button>
+            )}
+          </div>
         </div>
+        {additionalInfo && (
+          <div className={additionalInfoClasses} style={{ gap: `${gap}px` }}>
+            {additionalInfoIcon && (
+              <Icon
+                name={additionalInfoIcon}
+                size={iconSize}
+                className={styles.additionalInfoIcon}
+                style={
+                  additionalInfoIconColor
+                    ? { color: additionalInfoIconColor }
+                    : undefined
+                }
+              />
+            )}
+            <span className={styles.additionalInfoText}>{additionalInfo}</span>
+          </div>
+        )}
       </div>
-      {additionalInfo && (
-        <div className={additionalInfoClasses} style={{ gap: `${gap}px` }}>
-          {additionalInfoIcon && (
-            <Icon
-              name={additionalInfoIcon}
-              size={iconSize}
-              className={styles.additionalInfoIcon}
-              style={
-                additionalInfoIconColor
-                  ? { color: additionalInfoIconColor }
-                  : undefined
-              }
-            />
-          )}
-          <span className={styles.additionalInfoText}>{additionalInfo}</span>
-        </div>
-      )}
-    </div>
-  );
-});
+    );
+  }
+);
+
+Input.displayName = 'Input';
 
 export default Input;

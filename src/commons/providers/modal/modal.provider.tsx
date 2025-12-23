@@ -47,7 +47,7 @@ const generateModalId = () => {
   return `modal-${modalIdCounter}-${Date.now()}`;
 };
 
-export function ModalProvider({ children }: ModalProviderProps) {
+export const ModalProvider = ({ children }: ModalProviderProps) => {
   const [modalStack, setModalStack] = useState<ModalItem[]>([]);
   const [mounted, setMounted] = useState(false);
 
@@ -73,7 +73,9 @@ export function ModalProvider({ children }: ModalProviderProps) {
   const closeModal = useCallback((id?: string) => {
     setModalStack((prev) => {
       const targetId = id || prev[prev.length - 1]?.id;
-      if (!targetId) return prev;
+      if (!targetId) {
+        return prev;
+      }
 
       // 해당 모달을 isClosing 상태로 변경
       const updated = prev.map((modal) =>
@@ -195,4 +197,4 @@ export function ModalProvider({ children }: ModalProviderProps) {
         createPortal(modalContent, document.body)}
     </ModalContext.Provider>
   );
-}
+};

@@ -24,7 +24,9 @@ test.describe('로그인 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await emailInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     // React 상태 업데이트를 위한 짧은 대기 (timeout이 아닌 단순 대기)
     await page.waitForTimeout(50);
@@ -38,7 +40,9 @@ test.describe('로그인 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await passwordInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     // React 상태 업데이트를 위한 짧은 대기 (timeout이 아닌 단순 대기)
     await page.waitForTimeout(50);
@@ -105,7 +109,9 @@ test.describe('로그인 폼', () => {
     await expect(page).toHaveURL(/.*\/home/, { timeout: 2000 });
   });
 
-  test.skip('실패 시나리오 1: 로그인 실패 (401 Unauthorized)', async ({ page }) => {
+  test.skip('실패 시나리오 1: 로그인 실패 (401 Unauthorized)', async ({
+    page,
+  }) => {
     // Supabase Auth 로그인 요청 모킹
     await page.route('**/auth/v1/token?grant_type=password', async (route) => {
       await route.fulfill({
@@ -128,7 +134,9 @@ test.describe('로그인 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await emailInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     // React 상태 업데이트를 위한 짧은 대기 (timeout이 아닌 단순 대기)
     await page.waitForTimeout(50);
@@ -140,7 +148,9 @@ test.describe('로그인 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await passwordInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     // React 상태 업데이트를 위한 짧은 대기 (timeout이 아닌 단순 대기)
     await page.waitForTimeout(50);
@@ -198,7 +208,9 @@ test.describe('로그인 폼', () => {
     expect(isModalVisible).toBe(false);
   });
 
-  test.skip('실패 시나리오 2: 로그인 실패 (400 Bad Request)', async ({ page }) => {
+  test.skip('실패 시나리오 2: 로그인 실패 (400 Bad Request)', async ({
+    page,
+  }) => {
     // Supabase Auth 로그인 요청 모킹
     await page.route('**/auth/v1/token?grant_type=password', async (route) => {
       await route.fulfill({
@@ -221,7 +233,9 @@ test.describe('로그인 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await emailInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     // React 상태 업데이트를 위한 짧은 대기 (timeout이 아닌 단순 대기)
     await page.waitForTimeout(50);
@@ -233,7 +247,9 @@ test.describe('로그인 폼', () => {
     // react-hook-form의 onChange를 트리거하기 위해 명시적 이벤트 dispatch
     await passwordInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     // React 상태 업데이트를 위한 짧은 대기 (timeout이 아닌 단순 대기)
     await page.waitForTimeout(50);
@@ -298,7 +314,9 @@ test.describe('로그인 폼', () => {
     await emailInput.type('invalid-email', { delay: 0, timeout: 500 });
     await emailInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     await page.waitForTimeout(200);
     await emailInput.blur({ timeout: 500 });
@@ -323,7 +341,9 @@ test.describe('로그인 폼', () => {
     await emailInput.type('test@example.com', { delay: 0, timeout: 500 });
     await emailInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     await page.waitForTimeout(200);
     await emailInput.blur({ timeout: 500 });
@@ -335,7 +355,9 @@ test.describe('로그인 폼', () => {
     await passwordInput.type('test123', { delay: 0, timeout: 500 });
     await passwordInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     await page.waitForTimeout(200);
     await passwordInput.blur({ timeout: 500 });
@@ -360,7 +382,9 @@ test.describe('로그인 폼', () => {
     await emailInput.type('test@example.com', { delay: 0, timeout: 500 });
     await emailInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     await page.waitForTimeout(200);
     await emailInput.blur({ timeout: 500 });
@@ -372,7 +396,9 @@ test.describe('로그인 폼', () => {
     await passwordInput.type('testpassword', { delay: 0, timeout: 500 });
     await passwordInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     await page.waitForTimeout(200);
     await passwordInput.blur({ timeout: 500 });
@@ -404,7 +430,9 @@ test.describe('로그인 폼', () => {
     await emailInput.type('test@example.com', { delay: 0, timeout: 500 });
     await emailInput.evaluate((el) => {
       el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
     });
     await page.waitForTimeout(200);
     await emailInput.blur({ timeout: 500 });
@@ -444,7 +472,9 @@ test.describe('로그인 폼', () => {
 
     // 체크박스가 선택되어 있는지 확인
     const checkbox = page.locator('input[type="checkbox"]');
-    const isChecked = await checkbox.isChecked({ timeout: 1000 }).catch(() => false);
+    const isChecked = await checkbox
+      .isChecked({ timeout: 1000 })
+      .catch(() => false);
     expect(isChecked).toBe(true);
 
     // 체크박스 해제 - label을 통해 클릭
@@ -459,4 +489,3 @@ test.describe('로그인 폼', () => {
     expect(rememberedEmail).toBeNull();
   });
 });
-

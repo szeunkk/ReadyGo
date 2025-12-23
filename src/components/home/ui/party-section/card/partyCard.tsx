@@ -102,7 +102,7 @@ export default function PartyCard({
                 style={{ zIndex: displayMembers.length - index }}
               >
                 <Avatar
-                  animalType={member.animalType as any}
+                  animalType={member.animalType as AnimalType}
                   alt={member.nickname}
                   size="s"
                   showStatus={false}
