@@ -1,252 +1,283 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { supabase } from '@/lib/supabase/client';
 import { URL_PATHS } from '@/commons/constants/url';
 import { useModal } from '@/commons/providers/modal';
+import { generateNickname } from '@/lib/nickname/generateNickname';
+import { AnimalType } from '@/commons/constants/animal';
+import { TierType } from '@/commons/constants/tierType.enum';
 
-/**
- * 구글 OAuth Hook
- * - 구글 로그인/회원가입 버튼 클릭 핸들러 제공
- * - Supabase OAuth 로그인 호출 (signInWithOAuth)
- * - OAuth 콜백 처리 (리다이렉트 후 세션 확인)
- * - localStorage 저장 처리 (accessToken, user)
- * - user_profiles 조회 처리
- * - 실패 모달 오픈 및 중복 방지
- */
+const OAUTH_PROCESSING_KEY = 'google_oauth_processing';
+
 export const useGoogleOAuth = () => {
+  const router = useRouter();
   const { openModal, closeAllModals } = useModal();
   const hasShownErrorModalRef = useRef(false);
-  const hasProcessedCallbackRef = useRef(false);
+  const hasProcessedSessionRef = useRef(false);
 
-  /**
-   * 에러 메시지를 한글로 변환
-   */
-  const translateErrorMessage = (errorMessage: string): string => {
-    if (
-      errorMessage.includes('Invalid login credentials') ||
-      errorMessage.includes('invalid_grant')
-    ) {
-      return '로그인에 실패했습니다. 다시 시도해주세요.';
-    } else if (errorMessage.includes('Email not confirmed')) {
-      return '이메일 인증이 완료되지 않았습니다.';
-    } else if (errorMessage.includes('Too many requests')) {
-      return '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
-    } else if (errorMessage.includes('OAuth')) {
-      return '구글 로그인에 실패했습니다. 다시 시도해주세요.';
-    }
-    return errorMessage || '로그인에 실패했습니다.';
-  };
-
-  /**
-   * OAuth 콜백 처리 (리다이렉트 후 세션 확인 및 처리)
-   * - 세션 확인
-   * - localStorage 저장 (accessToken, user)
-   * - user_profiles 조회
-   * - 실패 시 모달 표시
-   */
-  const handleOAuthCallback = async (): Promise<void> => {
-    try {
-      // 세션 확인
-      const { data: sessionData, error: sessionError } =
-        await supabase.auth.getSession();
-
-      if (sessionError || !sessionData.session?.access_token) {
-        throw new Error(sessionError?.message || '세션을 받지 못했습니다.');
-      }
-
-      const { session } = sessionData;
-
-      // localStorage에 accessToken 저장
-      localStorage.setItem('accessToken', session.access_token);
-
-      // user 정보 가져오기
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError || !user) {
-        throw new Error(
-          userError?.message || '사용자 정보를 가져오지 못했습니다.'
-        );
-      }
-
-      // user_profiles에서 _id(id), name(nickname) 조회
-      const { data: userProfile, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('id, nickname')
-        .eq('id', user.id)
-        .single();
-
-      // 프로필 조회 실패해도 로그인은 성공으로 처리
-      if (profileError) {
-        console.error('Profile fetch error:', profileError);
-      }
-
-      // localStorage에 user 정보 저장
-      localStorage.setItem(
-        'user',
-        JSON.stringify({
-          id: user.id,
-          email: user.email,
-          _id: userProfile?.id || user.id,
-          name: userProfile?.nickname || null,
-        })
-      );
-
-      // 성공 시 홈 페이지로 이동 (이미 홈 페이지에 있으므로 리다이렉트는 필요 없음)
-      // 단, 다른 페이지에서 호출된 경우를 대비하여 처리
-    } catch (error) {
-      // 에러 모달 표시 (한 번만)
-      if (!hasShownErrorModalRef.current) {
-        hasShownErrorModalRef.current = true;
-        const errorMessage =
-          error instanceof Error ? error.message : '로그인에 실패했습니다.';
-        openModal({
-          variant: 'single',
-          title: '로그인실패',
-          description: translateErrorMessage(errorMessage),
-          confirmText: '확인',
-          onConfirm: () => {
-            closeAllModals();
-            hasShownErrorModalRef.current = false;
-          },
-        });
-      }
-      throw error;
-    }
-  };
-
-  /**
-   * 구글 OAuth 버튼 클릭 핸들러 (로그인/회원가입 공통)
-   * - Supabase OAuth 로그인 호출
-   * - redirectTo 경로 설정 (현재 도메인 + /home)
-   */
-  const handleGoogleOAuth = async (): Promise<void> => {
-    try {
-      hasShownErrorModalRef.current = false;
-
-      // 현재 도메인 가져오기
-      const origin =
-        typeof window !== 'undefined' ? window.location.origin : '';
-      const redirectTo = `${origin}${URL_PATHS.HOME}`;
-
-      // Supabase OAuth 로그인 호출
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo,
-        },
-      });
-
-      if (error) {
-        throw new Error(error.message || '구글 로그인에 실패했습니다.');
-      }
-
-      // signInWithOAuth는 Promise를 반환하지만, 실제 인증은 브라우저 리다이렉트로 처리됨
-      // 리다이렉트 후 홈 페이지에서 handleOAuthCallback을 호출하여 세션 확인 및 처리
-    } catch (error) {
-      // 에러 모달 표시 (한 번만)
-      if (!hasShownErrorModalRef.current) {
-        hasShownErrorModalRef.current = true;
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : '구글 로그인에 실패했습니다.';
-        openModal({
-          variant: 'single',
-          title: '로그인실패',
-          description: translateErrorMessage(errorMessage),
-          confirmText: '확인',
-          onConfirm: () => {
-            closeAllModals();
-            hasShownErrorModalRef.current = false;
-          },
-        });
-      }
-    }
-  };
-
-  // OAuth 콜백 자동 처리 (Hook이 마운트될 때 실행)
+  // OAuth 콜백 처리: auth state change 감지 및 페이지 로드 시 세션 확인
   useEffect(() => {
-    // 이미 처리했으면 스킵
-    if (hasProcessedCallbackRef.current) {
-      return;
-    }
-
-    const processOAuthCallback = async () => {
+    // 페이지 로드 시 현재 세션 확인 (OAuth 콜백 후 페이지 재로드된 경우)
+    const checkInitialSession = async () => {
       try {
-        if (typeof window === 'undefined') {
+        // OAuth 처리 중인지 확인 (localStorage 사용)
+        const isProcessingOAuth =
+          typeof window !== 'undefined' &&
+          localStorage.getItem(OAUTH_PROCESSING_KEY) === 'true';
+
+        if (!isProcessingOAuth) {
           return;
         }
 
-        // 현재 경로가 홈 페이지인지 확인
-        const currentPath = window.location.pathname;
-        if (currentPath !== URL_PATHS.HOME) {
-          return;
-        }
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-        // hash fragment가 있으면 제거 (깔끔한 URL 유지)
-        if (window.location.hash) {
-          const cleanUrl =
-            window.location.pathname + (window.location.search || '');
-          window.history.replaceState({}, '', cleanUrl);
-        }
-
-        // URL에 OAuth 콜백 파라미터가 있는지 확인 (code 파라미터)
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const isOAuthCallback = code !== null;
-
-        // OAuth 콜백이 아니면 스킵
-        if (!isOAuthCallback) {
-          return;
-        }
-
-        // 세션이 있는지 확인
-        const { data: sessionData } = await supabase.auth.getSession();
-
-        // 세션이 있고, localStorage에 accessToken이 없는 경우에만 처리
-        // (OAuth 콜백인 경우)
-        if (sessionData.session?.access_token) {
-          const existingAccessToken = localStorage.getItem('accessToken');
-          if (!existingAccessToken) {
-            hasProcessedCallbackRef.current = true;
-            await handleOAuthCallback();
-
-            // URL에서 code 파라미터 제거 (깔끔한 URL 유지)
-            urlParams.delete('code');
-            const newUrl =
-              window.location.pathname +
-              (urlParams.toString() ? `?${urlParams.toString()}` : '');
-            // hash fragment 제거 (OAuth 콜백 처리 후 불필요, 보안상 이미 사용된 정보)
-            window.history.replaceState({}, '', newUrl);
-
-            // hash fragment가 여전히 남아있는 경우 명시적으로 제거
-            if (window.location.hash) {
-              window.history.replaceState(
-                {},
-                '',
-                window.location.pathname +
-                  (urlParams.toString() ? `?${urlParams.toString()}` : '')
-              );
-            }
-          }
+        if (session?.user && !hasProcessedSessionRef.current) {
+          hasProcessedSessionRef.current = true;
+          await processOAuthCallback(session.user.id);
         }
       } catch (error) {
-        console.error('OAuth callback error:', error);
-        // 에러는 handleOAuthCallback 내부에서 모달로 처리됨
+        console.error('Initial session check error:', error);
+        // 에러 발생 시 플래그 제거
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(OAUTH_PROCESSING_KEY);
+        }
       }
     };
 
-    processOAuthCallback();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 빈 배열로 한 번만 실행
+    // OAuth 콜백 처리 로직
+    const processOAuthCallback = async (userId: string) => {
+      try {
+        // 현재 세션 정보 가져오기 (localStorage 저장용)
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session?.access_token) {
+          throw new Error('세션을 받지 못했습니다.');
+        }
+
+        // localStorage에 accessToken 저장 (기존 로그인 폼과 일관성 유지)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('accessToken', session.access_token);
+        }
+
+        // user 정보 가져오기
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          throw new Error('사용자 정보를 가져오지 못했습니다.');
+        }
+
+        // user_profiles 테이블에서 레코드 존재 여부 확인
+        const { data: existingProfile, error: profileCheckError } =
+          await supabase
+            .from('user_profiles')
+            .select('id, nickname')
+            .eq('id', userId)
+            .maybeSingle();
+
+        if (profileCheckError) {
+          console.error('Profile check error:', profileCheckError);
+          throw new Error('프로필 확인 중 오류가 발생했습니다.');
+        }
+
+        // 최초 로그인: user_profiles 레코드가 없음
+        if (!existingProfile) {
+          const nickname = generateNickname();
+
+          // 1. user_profiles 생성
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: userId,
+              nickname,
+              avatar_url: null,
+              bio: null,
+              animal_type: AnimalType.bear,
+              tier: TierType.silver,
+              temperature_score: 30,
+              status_message: null,
+            });
+
+          if (profileError) {
+            console.error('Profile creation error:', profileError);
+            throw new Error(
+              profileError.message ||
+                '프로필 생성에 실패했습니다. RLS 정책을 확인하세요.'
+            );
+          }
+
+          // 2. user_settings 생성
+          const { error: settingsError } = await supabase
+            .from('user_settings')
+            .insert({
+              id: userId,
+              theme_mode: 'dark',
+              notification_push: true,
+              notification_chat: true,
+              notification_party: true,
+              language: 'ko',
+            });
+
+          if (settingsError) {
+            console.error('Settings creation error:', settingsError);
+            // profiles는 생성되었지만 settings 생성 실패
+            throw new Error(
+              settingsError.message ||
+                '설정 생성에 실패했습니다. RLS 정책을 확인하세요.'
+            );
+          }
+
+          // localStorage에 user 정보 저장 (기존 로그인 폼과 일관성 유지)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(
+              'user',
+              JSON.stringify({
+                id: user.id,
+                email: user.email,
+                _id: userId,
+                name: nickname,
+              })
+            );
+          }
+
+          // 초기 데이터 생성 성공 → signup-success로 이동
+          // OAuth 처리 플래그 제거
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(OAUTH_PROCESSING_KEY);
+          }
+          router.push(URL_PATHS.SIGNUP_SUCCESS);
+        } else {
+          // 기존 유저: localStorage에 user 정보 저장 (기존 로그인 폼과 일관성 유지)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(
+              'user',
+              JSON.stringify({
+                id: user.id,
+                email: user.email,
+                _id: existingProfile.id,
+                name: existingProfile.nickname || null,
+              })
+            );
+          }
+
+          // 기존 유저: user_profiles 레코드가 이미 존재 → home으로 이동
+          // OAuth 처리 플래그 제거
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(OAUTH_PROCESSING_KEY);
+          }
+          router.push(URL_PATHS.HOME);
+        }
+      } catch (error) {
+        // 에러 모달 표시 (한 번만)
+        if (!hasShownErrorModalRef.current) {
+          hasShownErrorModalRef.current = true;
+          openModal({
+            variant: 'single',
+            title: '가입실패',
+            description:
+              error instanceof Error
+                ? error.message
+                : '구글 로그인 처리 중 오류가 발생했습니다.',
+            confirmText: '확인',
+            onConfirm: () => {
+              closeAllModals();
+            },
+          });
+        }
+        // OAuth 처리 플래그 제거
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(OAUTH_PROCESSING_KEY);
+        }
+      }
+    };
+
+    // 초기 세션 확인
+    checkInitialSession();
+
+    // auth state change 감지
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // OAuth 처리 중인지 확인
+      const isProcessingOAuth =
+        typeof window !== 'undefined' &&
+        localStorage.getItem(OAUTH_PROCESSING_KEY) === 'true';
+
+      // 세션이 있고 SIGNED_IN 이벤트이고 OAuth 처리 중이며 아직 처리하지 않은 경우
+      if (
+        event === 'SIGNED_IN' &&
+        session?.user &&
+        isProcessingOAuth &&
+        !hasProcessedSessionRef.current
+      ) {
+        hasProcessedSessionRef.current = true;
+        await processOAuthCallback(session.user.id);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router, openModal, closeAllModals]);
+
+  const handleGoogleOAuth = async () => {
+    // 에러 모달 플래그 리셋
+    hasShownErrorModalRef.current = false;
+    hasProcessedSessionRef.current = false;
+
+    try {
+      // OAuth 처리 시작 플래그 설정 (localStorage 사용하여 리다이렉트 후에도 유지)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(OAUTH_PROCESSING_KEY, 'true');
+      }
+
+      // Supabase 구글 OAuth 로그인 API 호출
+      const { error: authError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}${URL_PATHS.LOGIN}`,
+        },
+      });
+
+      if (authError) {
+        // 에러 발생 시 플래그 제거
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(OAUTH_PROCESSING_KEY);
+        }
+        throw new Error(authError.message || '구글 로그인에 실패했습니다.');
+      }
+
+      // signInWithOAuth는 리다이렉트를 수행하므로,
+      // 실제 처리는 onAuthStateChange에서 수행됨
+    } catch (error) {
+      // 에러 모달 표시 (한 번만)
+      if (!hasShownErrorModalRef.current) {
+        hasShownErrorModalRef.current = true;
+        openModal({
+          variant: 'single',
+          title: '가입실패',
+          description:
+            error instanceof Error
+              ? error.message
+              : '구글 로그인에 실패했습니다.',
+          confirmText: '확인',
+          onConfirm: () => {
+            closeAllModals();
+          },
+        });
+      }
+    }
+  };
 
   return {
     handleGoogleOAuth,
-    handleOAuthCallback,
   };
 };
