@@ -48,9 +48,8 @@ export const useLoginForm = () => {
 
   // 초기 체크박스 상태는 항상 'unselected'로 설정 (hydration 오류 방지)
   // 실제 값은 useEffect에서 클라이언트에서만 설정
-  const [rememberIdStatus, setRememberIdStatus] = useState<CheckboxStatus>(
-    'unselected'
-  );
+  const [rememberIdStatus, setRememberIdStatus] =
+    useState<CheckboxStatus>('unselected');
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
