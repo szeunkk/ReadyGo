@@ -5,41 +5,61 @@ import styles from './styles.module.css';
 import Input from '@/commons/components/input';
 import Button from '@/commons/components/button';
 import Checkbox, { type CheckboxStatus } from '@/commons/components/checkbox';
+import { useLoginForm } from './hooks/index.form.hook';
 
 export default function Login() {
   const [rememberId, setRememberId] = useState<CheckboxStatus>('unselected');
+  const { form, onSubmit, isFormValid, isSubmitting, errors } = useLoginForm();
+  const {
+    register,
+    formState: { errors: formErrors },
+  } = form;
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} data-testid="auth-login-page">
       <div className={styles.container}>
         <div className={styles.titleSection}>
           <h1 className={styles.title}>ㄹㄷㄱ</h1>
           <p className={styles.subtitle}>로그인하고 게임 친구를 찾아보세요</p>
         </div>
 
-        <div className={styles.formSection}>
+        <form className={styles.formSection} onSubmit={onSubmit}>
           <div className={styles.inputGroup}>
             <Input
               variant="primary"
               size="m"
               label="이메일"
               placeholder="이메일을 입력하세요"
+              required
               iconLeft="envelope"
               iconSize={20}
               iconLeftColor="var(--color-icon-interactive-secondary)"
+              gap={8}
               className={styles.input}
+              type="email"
+              state={formErrors.email ? 'error' : 'Default'}
+              additionalInfo={formErrors.email?.message}
+              data-testid="login-email-input"
+              {...register('email')}
             />
             <Input
               variant="primary"
               size="m"
               label="비밀번호"
               placeholder="비밀번호를 입력하세요"
+              required
               iconLeft="lock"
               iconRight="eye"
               iconSize={20}
               iconLeftColor="var(--color-icon-interactive-secondary)"
               iconRightColor="var(--color-icon-interactive-secondary)"
+              gap={8}
               className={styles.input}
+              type="password"
+              state={formErrors.password ? 'error' : 'Default'}
+              additionalInfo={formErrors.password?.message}
+              data-testid="login-password-input"
+              {...register('password')}
             />
             <div className={styles.checkboxWrapper}>
               <Checkbox
@@ -56,9 +76,13 @@ export default function Login() {
             size="m"
             shape="rectangle"
             className={styles.loginButton}
+            type="submit"
+            disabled={!isFormValid || isSubmitting}
+            data-testid="login-submit-button"
           >
-            로그인
+            {isSubmitting ? '처리 중...' : '로그인'}
           </Button>
+        </form>
 
           <div className={styles.divider}>
             <div className={styles.dividerLine}></div>
@@ -125,7 +149,6 @@ export default function Login() {
               회원가입 하기
             </button>
           </div>
-        </div>
       </div>
     </div>
   );

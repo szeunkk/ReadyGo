@@ -8,6 +8,7 @@
 
 # testing
 /coverage
+playwright-report/
 
 # next.js
 /.next/
@@ -41,3 +42,4 @@ next-env.d.ts
 #ㅎㅎ
 *storybook.log
 storybook-static
+
