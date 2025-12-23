@@ -9,6 +9,7 @@
 
 /* 헤더 섹션 */
 .header {
+  background-color: var(--color-bg-primary);
   display: flex;
   flex-direction: column;
   gap: 8px;
