@@ -6,6 +6,7 @@ import Avatar from '@/commons/components/avatar';
 import Button from '@/commons/components/button';
 import Icon, { IconName } from '@/commons/components/icon';
 import { useSideProfilePanel } from '@/hooks/useSideProfilePanel';
+import { AnimalType } from '@/commons/constants/animal';
 
 export interface MatchCardProps {
   /**

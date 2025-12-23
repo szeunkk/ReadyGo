@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Avatar from '@/commons/components/avatar';
 import { getChatRoomUrl } from '@/commons/constants/url';
 import styles from './styles.module.css';
+import { AnimalType } from '@/commons/constants/animal';
 
 // ERD 기반 Mock 데이터 타입 정의
 interface ChatRoom {
