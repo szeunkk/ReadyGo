@@ -47,7 +47,7 @@ export interface MatchCardProps {
 }
 
 export default function MatchCard({
-  userId,
+  userId: _userId,
   nickname,
   matchRate,
   status = 'online',

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { SelectboxItem } from '@/commons/components/selectbox';
 
-export function useMatchFilters() {
+export const useMatchFilters = () => {
   const [selectedMatchRate, setSelectedMatchRate] = useState<string>('75');
   const [selectedStatus, setSelectedStatus] = useState<string>('online');
 
@@ -15,7 +15,6 @@ export function useMatchFilters() {
 
   const handleRefresh = () => {
     // TODO: 실제 데이터 갱신 로직 구현
-    console.log('Refreshing match list...');
   };
 
   return {
@@ -25,5 +24,5 @@ export function useMatchFilters() {
     handleStatusChange,
     handleRefresh,
   };
-}
+};
 
