@@ -1,0 +1,103 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 참고할 PAGE 파일경로: src/app/(auth)/login/page.tsx
+조건-파일경로) 참고할 UI 컴포넌트 파일경로: src/components/auth/login/index.tsx
+조건-파일경로) 참고할 폼 로그인 HOOK 파일경로: src/components/auth/login/hooks/index.form.hook.tsx
+조건-파일경로) 참고할 Supabase 클라이언트 파일경로: src/lib/supabase/client.ts
+조건-파일경로) 구현될 HOOK 파일경로: src/components/auth/hooks/useGoogleOAuth.hook.ts
+==============================================
+
+핵심요구사항) 다음의 기능을 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+            1. 라이브러리조건
+                - Supabase: 이미 설치되어있는 @supabase/supabase-js를 사용할 것.
+                - 라우팅: Next.js의 useRouter를 사용할 것.
+                - 모달: 이미 셋팅되어있는 modal.provider를 사용할 것.
+
+            2. 유저시나리오(구글 로그인)
+                2-1) 구글 로그인 버튼 클릭 시 처리
+                    - 구글 로그인 버튼을 클릭하면 아래 순서로 처리할 것.
+                    
+                2-2) supabase의 구글로그인 API를 호출할 것.
+
+
+            3. 최초 로그인” vs “기존 유저” 분기 로직
+                요구사항에 따라 아래 분기 로직을 반드시 반영한다.
+                - “최초 로그인” 판단 기준:
+                    - Supabase auth user 존재 여부만으로는 최초/기존을 확정하지 말 것.
+                    - supabase 테이블(user_profiles / user_settings)에 id(uuid)레코드가 존재 여부로 판단할 것.
+                3-A) 최초 로그인(= user_profiles/user_settings 레코드 없음)
+                    아래 “초기 데이터 생성(필수)” 수행 성공 시:
+                        즉시 성공 페이지로 이동: /(auth)/signup-success
+                        페이지 이동 경로는 반드시 commons/constants/url.ts에 정의된 URL 상수를 사용
+
+                3-B) 기존 유저(= user_profiles 레코드가 이미 존재)
+                    즉시 홈으로 이동: /(main)/home
+                    페이지 이동 경로는 반드시 commons/constants/url.ts에 정의된 URL 상수를 사용
+
+            4. 초기 데이터 생성(최초 로그인 필수)                
+                1. user_profiles 생성                
+                - user_profiles 기본 생성 데이터(필수 컬럼만 최소 구성하되 ERD와 충돌 없이 동작하도록 설계):
+                    - id: userId
+                    - nickname: 기본 닉네임 자동 생성 => lib/nickname/generateNickname.ts 
+                    - avatar_url: null
+                    - bio: 빈 문자열 또는 null
+                    - animal_type: bear
+                    - tier: silver
+                    - temperature_score: 30
+                    - status_message: 빈 문자열 또는 null
+                    - created_at/updated_at은 DB default(now())를 우선 사용하되, 스키마에 따라 필요한 경우에만 전달
+                    user_profiles insert payload는 실제 Supabase 테이블 컬럼/타입과 일치하도록 최소 필드로 구성하고(필수/존재 컬럼만), 존재하지 않는 컬럼은 제거할 것. tier 타입이 text가 아니면 DB 타입에 맞춰 값 변환할 것.
+
+                2. user_settings 생성
+                - user_settings 기본 생성 데이터:
+                    - id: userId
+                    - theme_mode : dark
+                    - notification_push: true
+                    - notification_chat: true
+                    - notification_party : true
+                    - language: ko
+                    - created_at/updated_at은 DB default(now()) 우선
+
+                - 초기 데이터 생성은 가능한 한 “원자적으로” 보이도록 처리할 것:
+                    - profiles insert 성공 후 settings insert 실패 시, 최종 실패로 처리하고 가입실패모달을 띄울 것.
+                    - (가능하면) 실패 시 생성된 일부 데이터 롤백 전략을 고려하되, 프론트 단에서 완전 롤백이 어렵다면 최소한 사용자에게 실패를 명확히 안내하고 재시도 가능하게 할 것.
+
+
+
+                3. 전체 플로우가 성공하면:
+                    - 최초 로그인: `/(auth)/signup-success`
+                    - 기존 유저: `/(main)/home`
+                    - 페이지 이동 경로는 commons/constants/url.ts에 정의된 URL을 사용해서 이동할 것.
+
+                4. 전체 플로우가 실패하면:
+                    - 가입실패모달을 노출할 것.
+                
+                5. 모달 조건(실패 모달에만 적용)
+                    5-1) 모달조건
+                        - 모달 프로바이더 경로: src/commons/providers/modal/modal.provider.tsx
+                        - 이미 셋팅되어있는 modal.provider를 사용할 것.
+                        - 이미 셋팅되어있는 modal.provider를 수정하지 말 것.
+                        - 모달은 한 번만 보여야 하며, 닫힌 뒤에는 같은 상황에서 다시 나타나지 않도록 할 것.
+                            - 실패 모달은 hasShownErrorModal 같은 ref/state 플래그로 제어하여 동일 실패 상태 재렌더에서도 자동 재오픈 금지
+
+                    5-2) 공통컴포넌트조건                        
+                        - 가입실패모달: <Modal />, variant: 'single'
+
+                    5-3) 실패 모달 확인 클릭 동작        
+                        - 가입실패모달:
+                            1. '확인' 클릭
+                            2. 열려있는 모든 모달을 닫기
+                            3. 페이지 이동 없음(현재 페이지 유지)   
+
+
+        
+                     

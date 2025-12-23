@@ -12,8 +12,11 @@
 조건-파일경로) 참고할 PAGE 파일경로: src/app/(auth)/login/page.tsx
 조건-파일경로) 참고할 UI 컴포넌트 파일경로: src/components/auth/login/index.tsx
 조건-파일경로) 참고할 폼 로그인 HOOK 파일경로: src/components/auth/login/hooks/index.form.hook.tsx
+조건-파일경로) 참고할 구글 OAuth HOOK 파일경로: src/components/auth/hooks/useGoogleOAuth.hook.ts
+조건-파일경로) 참고할 회원가입 HOOK 파일경로: src/components/auth/signup/hooks/index.form.hook.tsx (초기 데이터 생성 로직 참고)
+조건-파일경로) 참고할 닉네임 생성 함수 파일경로: src/lib/nickname/generateNickname.ts
 조건-파일경로) 참고할 Supabase 클라이언트 파일경로: src/lib/supabase/client.ts
-조건-파일경로) 구현될 HOOK 파일경로: src/components/auth/login/hooks/index.login.google.hook.ts
+조건-파일경로) 구현될 HOOK 파일경로: src/components/auth/hooks/useKakaoOAuth.hook.ts
 
 ==============================================
 
@@ -23,13 +26,13 @@
                 - 라우팅: Next.js의 useRouter를 사용할 것.
                 - 모달: 이미 셋팅되어있는 modal.provider를 사용할 것.
 
-            2) 유저시나리오(구글 로그인)
-                2-1) 구글 로그인 버튼 클릭 시 처리
-                    - 구글 로그인 버튼을 클릭하면 아래 순서로 처리할 것.
+            2) 유저시나리오(카카오톡 로그인)
+                2-1) 카카오톡 로그인 버튼 클릭 시 처리
+                    - 카카오톡 로그인 버튼을 클릭하면 아래 순서로 처리할 것.
                     
                     2-1-1) Supabase OAuth 로그인 호출
                         - API: supabase.auth.signInWithOAuth
-                        - provider: 'google'
+                        - provider: 'kakao'
                         - options:
                             - redirectTo: 현재 도메인 + '/home' 경로
                                 - 예: 'http://localhost:3000/home' (개발 환경)
@@ -39,12 +42,12 @@
                             - queryParams: (선택사항) 필요시 추가 설정
                     
                     2-1-2) OAuth 리다이렉트 처리
-                        - Supabase OAuth는 브라우저를 구글 인증 페이지로 리다이렉트함.
+                        - Supabase OAuth는 브라우저를 카카오톡 인증 페이지로 리다이렉트함.
                         - 인증 완료 후 Supabase가 redirectTo로 지정한 URL로 리다이렉트함.
                         - 리다이렉트된 페이지에서 세션을 확인하고 처리할 것.
                     
                 2-2) OAuth 콜백 처리 (리다이렉트 후)
-                    - 구글 인증 완료 후 redirectTo로 리다이렉트된 페이지에서:
+                    - 카카오톡 인증 완료 후 redirectTo로 리다이렉트된 페이지에서:
                     
                     2-2-1) 세션 확인
                         - supabase.auth.getSession() 또는 supabase.auth.getUser()를 호출하여 세션 확인
@@ -57,8 +60,46 @@
                         - user 정보는 supabase.auth.getUser()로 가져올 것.
                         - user_profiles 테이블에서 _id(id), name(nickname)을 조회할 것.
                             - API: supabase.from('user_profiles').select('id, nickname').eq('id', user.id).single()
-                            - 프로필 조회 실패해도 로그인은 성공으로 처리할 것.
-                            - 프로필이 없을 경우 user.id를 _id로, null을 name으로 사용할 것.
+                            - 프로필 조회 성공 시: 조회된 데이터를 사용하여 localStorage에 저장할 것.
+                            - 프로필 조회 실패 시 (프로필이 없는 경우): 초기 데이터 생성(2-2-2-1)을 수행할 것.
+                    
+                    2-2-2-1) 초기 데이터 생성(프로필이 없는 경우)
+                        - OAuth 로그인 사용자가 최초 로그인하여 user_profiles가 없는 경우, 아래 테이블에 기본 레코드를 생성할 것.
+                            1. user_profiles
+                            2. user_settings
+                        
+                        - user_profiles 기본 생성 데이터(필수 컬럼만 최소 구성하되 ERD와 충돌 없이 동작하도록 설계):
+                            - id: userId
+                            - nickname: 기본 닉네임 자동 생성 => lib/nickname/generateNickname.ts 
+                            - avatar_url: null
+                            - bio: 빈 문자열 또는 null
+                            - animal_type: bear
+                            - tier: silver
+                            - temperature_score: 30
+                            - status_message: 빈 문자열 또는 null
+                            - created_at/updated_at은 DB default(now())를 우선 사용하되, 스키마에 따라 필요한 경우에만 전달
+                            - user_profiles insert payload는 실제 Supabase 테이블 컬럼/타입과 일치하도록 최소 필드로 구성하고(필수/존재 컬럼만), 존재하지 않는 컬럼은 제거할 것. tier 타입이 text가 아니면 DB 타입에 맞춰 값 변환할 것.
+                        
+                        - user_settings 기본 생성 데이터:
+                            - id: userId
+                            - theme_mode : dark
+                            - notification_push: true
+                            - notification_chat: true
+                            - notification_party : true
+                            - language: ko
+                            - created_at/updated_at은 DB default(now()) 우선
+                        
+                        - 초기 데이터 생성은 가능한 한 "원자적으로" 보이도록 처리할 것:
+                            - profiles insert 성공 후 settings insert 실패 시, 최종 실패로 처리하고 로그인실패모달을 띄울 것.
+                            - (가능하면) 실패 시 생성된 일부 데이터 롤백 전략을 고려하되, 프론트 단에서 완전 롤백이 어렵다면 최소한 사용자에게 실패를 명확히 안내하고 재시도 가능하게 할 것.
+                        
+                        - 초기 데이터 생성 성공 후, 생성된 프로필 정보를 사용하여 localStorage에 저장할 것.
+                            - key: "user", value: { id, email, _id: id, name: nickname }
+                        
+                        - 초기 데이터 생성 실패 시:
+                            - 로그인실패모달을 노출할 것.
+                            - 에러 메시지는 한글로 변환하여 표시할 것.
+                            - 로그인 프로세스를 중단할 것.
                     
                     2-2-3) 홈 페이지로 이동
                         - localStorage 저장 완료 후 홈 페이지로 이동할 것.
@@ -91,34 +132,38 @@
 ==============================================
 
 핵심요구사항) Hook 책임 분리
-            Hook(src/components/auth/login/hooks/index.login.google.hook.ts)은 다음 책임을 가진다.
-            - 구글 로그인 버튼 클릭 핸들러 제공
+            Hook(src/components/auth/hooks/useKakaoOAuth.hook.ts)은 다음 책임을 가진다.
+            - 카카오톡 로그인 버튼 클릭 핸들러 제공
             - Supabase OAuth 로그인 호출 (signInWithOAuth)
             - OAuth 콜백 처리 (리다이렉트 후 세션 확인)
             - localStorage 저장 처리 (accessToken, user)
             - user_profiles 조회 처리
+            - 프로필이 없는 경우 초기 데이터 생성 처리 (user_profiles, user_settings)
             - 실패 모달 오픈 및 중복 방지
             - 성공 시 라우팅 처리
+            - 구글 OAuth 훅(useGoogleOAuth.hook.ts)과 동일한 구조 및 플로우로 구현할 것.
 
 핵심요구사항) UI 컴포넌트 책임
             UI(src/components/auth/login/index.tsx)는 Hook을 사용하여:
-            - 구글 로그인 버튼에 onClick 핸들러를 연결할 것.
-            - 기존 구글 로그인 버튼(data-testid는 필요시 추가)에 핸들러를 연결할 것.
+            - 카카오톡 로그인 버튼에 onClick 핸들러를 연결할 것.
+            - 기존 카카오톡 로그인 버튼(data-testid는 필요시 추가)에 핸들러를 연결할 것.
             - Hook에서 제공하는 핸들러를 사용할 것.
 
 ==============================================
 
 핵심요구사항) OAuth 리다이렉트 처리 방식
             Supabase OAuth는 다음과 같은 플로우를 가진다:
-            1. signInWithOAuth 호출 → 브라우저가 구글 인증 페이지로 이동
-            2. 사용자가 구글에서 인증 완료 → Supabase가 redirectTo로 지정한 URL로 리다이렉트
+            1. signInWithOAuth 호출 → 브라우저가 카카오톡 인증 페이지로 이동
+            2. 사용자가 카카오톡에서 인증 완료 → Supabase가 redirectTo로 지정한 URL로 리다이렉트
             3. 리다이렉트된 페이지에서 세션 확인 및 처리
             
             구현 시 고려사항:
             - signInWithOAuth는 Promise를 반환하지만, 실제 인증은 브라우저 리다이렉트로 처리됨.
             - 리다이렉트 후 홈 페이지(/(main)/home)에서 세션을 확인하고 처리할 수 있도록 구현할 것.
             - 또는 로그인 페이지에서 URL 파라미터(code, state 등)를 확인하여 콜백을 처리할 수도 있음.
+            - 기존 구글 OAuth 훅(useGoogleOAuth.hook.ts)의 구조와 플로우를 참고하여 동일한 방식으로 구현할 것.
             - 기존 폼 로그인(index.form.hook.tsx)의 로그인 성공 후 처리 로직을 참고하여 동일한 방식으로 localStorage 저장 및 user_profiles 조회를 수행할 것.
+            - 기존 회원가입 훅(index.form.hook.tsx)의 초기 데이터 생성 로직을 참고하여, 프로필이 없는 OAuth 사용자의 경우 user_profiles와 user_settings에 초기 데이터를 생성할 것.
 
 ==============================================
 
@@ -126,14 +171,21 @@
 
 1) 커서룰(@01-common.mdc, @04-func.mdc) 적용 결과 체크리스트
 2) 기능 요구사항 체크리스트
-   - 구글 로그인 버튼 클릭 시 signInWithOAuth 호출 여부
+   - 카카오톡 로그인 버튼 클릭 시 signInWithOAuth 호출 여부
    - redirectTo 경로가 올바르게 설정되었는지 (URL_PATHS.HOME 사용)
    - OAuth 콜백 후 세션 확인 및 처리 여부
    - localStorage 저장 처리 여부 (accessToken, user)
    - user_profiles 조회 및 처리 여부
+   - 프로필이 없는 경우 초기 데이터 생성 처리 여부 (user_profiles, user_settings)
+   - 초기 데이터 생성 시 user_profiles 기본값 설정 여부 (nickname 자동 생성, animal_type, tier, temperature_score 등)
+   - 초기 데이터 생성 시 user_settings 기본값 설정 여부 (theme_mode, notification_*, language 등)
+   - 초기 데이터 생성 실패 시 로그인실패모달 표시 및 프로세스 중단 여부
    - 로그인 실패 시 모달 표시 여부
    - 모달 중복 방지 로직 구현 여부
    - 성공 시 홈 페이지로 이동 여부
    - Hook과 UI 컴포넌트 책임 분리 준수 여부
+   - 공통 hooks 위치(src/components/auth/hooks/)에 Hook 파일 생성 여부
+   - 구글 OAuth 훅과 동일한 구조 및 플로우로 구현되었는지 여부
 
 ==============================================
+
