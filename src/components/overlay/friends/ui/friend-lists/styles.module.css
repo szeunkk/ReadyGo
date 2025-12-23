@@ -210,11 +210,11 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  color: var(--color-icon-primary);
+  color: var(--color-icon-interactive-secondary);
 }
 
 .actionButton:hover {
-  color: var(--color-icon-interactive-primary-hover);
+  color: var(--color-icon-primary);
 }
 
 .moreIcon {

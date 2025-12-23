@@ -211,14 +211,19 @@
   border-radius: 99999px;
   cursor: pointer;
   padding: 0;
-  color: var(--color-icon-primary);
+  color: var(--color-icon-interactive-secondary);
 }
 
 .actionButton:hover {
   background-color: var(--color-bg-interactive-teritiary-hover);
+  color: var(--color-icon-interactive-primary);
 }
 
 .rejectButton {
+  color: var(--color-icon-danger);
+}
+
+.rejectButton:hover {
   color: var(--color-icon-danger);
 }
 
