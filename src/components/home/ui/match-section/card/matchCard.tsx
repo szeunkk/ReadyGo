@@ -5,8 +5,13 @@ import styles from './styles.module.css';
 import Avatar from '@/commons/components/avatar';
 import Button from '@/commons/components/button';
 import Icon, { IconName } from '@/commons/components/icon';
+import { useSideProfilePanel } from '@/hooks/useSideProfilePanel';
 
 export interface MatchCardProps {
+  /**
+   * 사용자 ID
+   */
+  userId: string;
   /**
    * 사용자 닉네임
    */
@@ -40,16 +45,13 @@ export interface MatchCardProps {
    */
   skillLevel?: string;
   /**
-   * 프로필 보기 버튼 클릭 핸들러
-   */
-  onProfileClick?: () => void;
-  /**
    * 추가 클래스명
    */
   className?: string;
 }
 
 export default function MatchCard({
+  userId,
   nickname,
   matchRate,
   status = 'online',
@@ -58,9 +60,11 @@ export default function MatchCard({
   gamePreference,
   playTime,
   skillLevel,
-  onProfileClick,
   className = '',
 }: MatchCardProps) {
+  const { toggleProfile, isOpen, targetUserId } = useSideProfilePanel();
+  const isActive = isOpen && targetUserId === userId;
+
   const containerClasses = [styles.container, className]
     .filter(Boolean)
     .join(' ');
@@ -85,6 +89,10 @@ export default function MatchCard({
   ].filter((pref) => pref.value); // 값이 있는 항목만 표시
 
   const hasPreferences = preferences.length > 0;
+
+  const handleProfileClick = () => {
+    toggleProfile(userId);
+  };
 
   return (
     <div className={containerClasses}>
@@ -147,9 +155,9 @@ export default function MatchCard({
           size="m"
           shape="round"
           className={styles.button}
-          onClick={onProfileClick}
+          onClick={handleProfileClick}
         >
-          프로필 보기
+          {isActive ? '프로필 닫기' : '프로필 보기'}
         </Button>
       </div>
     </div>
