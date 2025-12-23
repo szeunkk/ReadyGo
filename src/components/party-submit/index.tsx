@@ -91,20 +91,17 @@ export default function PartySubmit() {
   ];
 
   // 시간 옵션 (10분 간격)
-  const timeOptions: SelectboxItem[] = (() => {
-    const options: SelectboxItem[] = [];
-    for (let hour = 0; hour < 24; hour++) {
-      for (let minute = 0; minute < 60; minute += 10) {
-        const period = hour < 12 ? '오전' : '오후';
-        const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-        const displayMinute = minute.toString().padStart(2, '0');
-        const timeString = `${period} ${displayHour}:${displayMinute}`;
-        const timeId = `${hour.toString().padStart(2, '0')}:${displayMinute}`;
-        options.push({ id: timeId, value: timeString });
-      }
-    }
-    return options;
-  })();
+  const timeOptions: SelectboxItem[] = Array.from({ length: 24 }, (_, hour) =>
+    Array.from({ length: 6 }, (_, minuteIndex) => {
+      const minute = minuteIndex * 10;
+      const period = hour < 12 ? '오전' : '오후';
+      const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+      const displayMinute = minute.toString().padStart(2, '0');
+      const timeString = `${period} ${displayHour}:${displayMinute}`;
+      const timeId = `${hour.toString().padStart(2, '0')}:${displayMinute}`;
+      return { id: timeId, value: timeString };
+    })
+  ).flat();
 
   const handlePartyCountDecrease = () => {
     if (partyCount > 1) {
