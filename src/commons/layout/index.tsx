@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState, useEffect } from 'react';
+import { ReactNode, useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import Icon from '@/commons/components/icon';
@@ -21,13 +21,44 @@ export const Layout = ({ children }: LayoutProps) => {
   const [activeNav, setActiveNav] = useState<NavigationButton>('home');
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
-  const { isOpen } = useSidePanelStore();
+  const { isOpen, close } = useSidePanelStore();
+  const isHome = pathname.startsWith(URL_PATHS.HOME);
 
   // 현재 경로의 visibility 설정 가져오기
   const urlMetadata = getUrlMetadata(pathname);
   const showSidebar = urlMetadata?.visibility.sidebar ?? false;
   const showHeader = urlMetadata?.visibility.header ?? false;
 
+  // 현재 탭 계산 -> 이전 탭과 비교해서 side panel 닫기
+  const getTopLevelRoute = (pathname: string) => {
+    if (pathname.startsWith(URL_PATHS.HOME)) {
+      return 'home';
+    }
+    if (pathname.startsWith(URL_PATHS.CHAT)) {
+      return 'chat';
+    }
+    if (pathname.startsWith(URL_PATHS.MATCH)) {
+      return 'match';
+    }
+    if (pathname.startsWith(URL_PATHS.PARTY)) {
+      return 'party';
+    }
+    return 'etc';
+  };
+
+  const prevTopRouteRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const currentTop = getTopLevelRoute(pathname);
+
+    if (prevTopRouteRef.current && prevTopRouteRef.current !== currentTop) {
+      close();
+    }
+
+    prevTopRouteRef.current = currentTop;
+  }, [pathname, close]);
+
+  // 마운트 완료 후 테마 설정
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -174,7 +205,7 @@ export const Layout = ({ children }: LayoutProps) => {
         )}
         <div
           className={`${styles.contentWrapper} ${
-            isOpen ? styles.panelOpen : ''
+            isOpen && !isHome ? styles.panelOpen : ''
           }`}
         >
           <main
