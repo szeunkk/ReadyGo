@@ -36,6 +36,7 @@ export interface InputProps extends Omit<
   additionalInfoIcon?: IconName;
   additionalInfoIconColor?: string;
   gap?: number;
+  onIconRightClick?: () => void;
   'data-testid'?: string;
 }
 
@@ -59,6 +60,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     gap = 4,
     className = '',
     disabled,
+    onIconRightClick,
     'data-testid': dataTestId,
     type,
     ...props
@@ -157,12 +159,28 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             />
           </div>
           {iconRight && (
-            <Icon
-              name={iconRight}
-              size={iconSize}
-              className={styles.inputIcon}
-              style={iconRightColor ? { color: iconRightColor } : undefined}
-            />
+            <button
+              type="button"
+              onClick={onIconRightClick}
+              disabled={isDisabled}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                cursor: isDisabled ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              aria-label={onIconRightClick ? 'Toggle password visibility' : undefined}
+            >
+              <Icon
+                name={iconRight}
+                size={iconSize}
+                className={styles.inputIcon}
+                style={iconRightColor ? { color: iconRightColor } : undefined}
+              />
+            </button>
           )}
         </div>
       </div>
