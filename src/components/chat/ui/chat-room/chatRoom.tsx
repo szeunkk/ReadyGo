@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import styles from './styles.module.css';
 import Avatar from '@/commons/components/avatar';
 import Icon from '@/commons/components/icon';
@@ -399,7 +399,8 @@ interface ChatRoomProps {
 
 export default function ChatRoom({ roomId }: ChatRoomProps) {
   // 사이드 프로필 패널 제어
-  const { toggleProfile } = useSideProfilePanel();
+  const { toggleProfile, openProfile, isOpen, targetUserId } =
+    useSideProfilePanel();
 
   // roomId에 해당하는 mock 데이터 가져오기 또는 동적 생성
   const roomData = useMemo(() => {
@@ -456,6 +457,17 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
     status: roomData.otherUser.status,
     is_online: roomData.otherUser.status === 'online',
   };
+
+  // 채팅방이 변경될 때 사이드 패널이 열려있다면 새로운 상대방의 프로필로 자동 업데이트
+  useEffect(() => {
+    if (isOpen && targetUserId && targetUserId !== MOCK_OTHER_USER.id) {
+      // 다른 사용자의 프로필이 열려있을 때만 자동으로 변경
+      openProfile(MOCK_OTHER_USER.id);
+    }
+  }, [roomId, MOCK_OTHER_USER.id, isOpen, targetUserId, openProfile]);
+
+  // 현재 사용자의 프로필이 열려있는지 확인
+  const isProfileActive = isOpen && targetUserId === MOCK_OTHER_USER.id;
 
   const MOCK_MESSAGES = roomData.messages;
   const MOCK_MESSAGE_READS = roomData.messageReads;
@@ -526,7 +538,7 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
             - toggleProfile() 함수는 수정 없이 그대로 동작
           */}
           <button
-            className={styles.menuButton}
+            className={`${styles.menuButton} ${isProfileActive ? styles.active : ''}`}
             aria-label="사용자 메뉴"
             type="button"
             onClick={() => toggleProfile(MOCK_OTHER_USER.id)}

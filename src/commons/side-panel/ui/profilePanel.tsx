@@ -41,35 +41,131 @@ export default function ProfilePanel({
     const fetchUserProfile = async () => {
       setIsLoading(true);
       try {
-        // 임시 데이터 (실제로는 API 호출)
-        const mockData: UserProfileData = {
-          nickname: '까칠한까마귀',
-          tier: TierType.platinum,
-          animal: AnimalType.raven,
-          favoriteGenre: 'FPS',
-          activeTime: '20 - 24시',
-          gameStyle: '전략적',
-          weeklyAverage: '5.4 시간',
-          matchPercentage: 94,
-          matchReasons: ['동일 게임 선호', '유사한 플레이 시간대'],
-          playStyleData: [
-            { trait: 'leadership', value: 75 },
-            { trait: 'cooperation', value: 85 },
-            { trait: 'strategy', value: 90 },
-            { trait: 'exploration', value: 60 },
-            { trait: 'social', value: 70 },
-          ],
-          recentPlayPattern: [
-            { label: 'FPS', value: 23.6, color: 'var(--color-bg-brand)' },
-            {
-              label: '생존',
-              value: 12.5,
-              color: 'var(--color-icon-interactive-primary-hover)',
-            },
-            { label: '모험', value: 7.2, color: 'var(--color-text-info-bold)' },
-            { label: '캐주얼', value: 3.8, color: 'var(--color-icon-info)' },
-          ],
+        // userId별 Mock 데이터 매핑 (테스트용)
+        const mockDataMap: Record<string, UserProfileData> = {
+          'user-1': {
+            nickname: '게이머호랑이',
+            tier: TierType.diamond,
+            animal: AnimalType.tiger,
+            favoriteGenre: 'FPS',
+            activeTime: '18 - 22시',
+            gameStyle: '공격적',
+            weeklyAverage: '12.3 시간',
+            matchPercentage: 94,
+            matchReasons: [
+              '동일 게임 선호',
+              '유사한 플레이 시간대',
+              '비슷한 실력대',
+            ],
+            playStyleData: [
+              { trait: 'leadership', value: 90 },
+              { trait: 'cooperation', value: 70 },
+              { trait: 'strategy', value: 85 },
+              { trait: 'exploration', value: 75 },
+              { trait: 'social', value: 65 },
+            ],
+            recentPlayPattern: [
+              { label: 'FPS', value: 35.2, color: 'var(--color-bg-brand)' },
+              {
+                label: '전략',
+                value: 8.5,
+                color: 'var(--color-icon-interactive-primary-hover)',
+              },
+              {
+                label: 'RPG',
+                value: 5.3,
+                color: 'var(--color-text-info-bold)',
+              },
+              { label: '생존', value: 2.1, color: 'var(--color-icon-info)' },
+            ],
+          },
+          'user-2': {
+            nickname: '호쾌한망토',
+            tier: TierType.gold,
+            animal: AnimalType.fox,
+            favoriteGenre: 'RPG',
+            activeTime: '22 - 02시',
+            gameStyle: '탐험 지향',
+            weeklyAverage: '8.7 시간',
+            matchPercentage: 87,
+            matchReasons: ['유사한 플레이 시간대', '같은 장르 선호'],
+            playStyleData: [
+              { trait: 'leadership', value: 60 },
+              { trait: 'cooperation', value: 80 },
+              { trait: 'strategy', value: 70 },
+              { trait: 'exploration', value: 95 },
+              { trait: 'social', value: 85 },
+            ],
+            recentPlayPattern: [
+              { label: 'RPG', value: 28.4, color: 'var(--color-bg-brand)' },
+              {
+                label: '모험',
+                value: 15.6,
+                color: 'var(--color-icon-interactive-primary-hover)',
+              },
+              {
+                label: '캐주얼',
+                value: 8.9,
+                color: 'var(--color-text-info-bold)',
+              },
+              { label: 'FPS', value: 4.2, color: 'var(--color-icon-info)' },
+            ],
+          },
+          'user-3': {
+            nickname: '까칠한까마귀',
+            tier: TierType.platinum,
+            animal: AnimalType.raven,
+            favoriteGenre: 'FPS',
+            activeTime: '20 - 24시',
+            gameStyle: '전략적',
+            weeklyAverage: '5.4 시간',
+            matchPercentage: 94,
+            matchReasons: ['동일 게임 선호', '유사한 플레이 시간대'],
+            playStyleData: [
+              { trait: 'leadership', value: 75 },
+              { trait: 'cooperation', value: 85 },
+              { trait: 'strategy', value: 90 },
+              { trait: 'exploration', value: 60 },
+              { trait: 'social', value: 70 },
+            ],
+            recentPlayPattern: [
+              { label: 'FPS', value: 23.6, color: 'var(--color-bg-brand)' },
+              {
+                label: '생존',
+                value: 12.5,
+                color: 'var(--color-icon-interactive-primary-hover)',
+              },
+              {
+                label: '모험',
+                value: 7.2,
+                color: 'var(--color-text-info-bold)',
+              },
+              { label: '캐주얼', value: 3.8, color: 'var(--color-icon-info)' },
+            ],
+          },
         };
+
+        // userId에 해당하는 Mock 데이터 가져오기, 없으면 기본 데이터 사용
+        const mockData = mockDataMap[userId] ||
+          mockDataMap['user-3'] || { // 기본값으로 user-3 데이터 사용
+            nickname: '알 수 없는 사용자',
+            tier: TierType.bronze,
+            animal: AnimalType.rabbit,
+            favoriteGenre: '알 수 없음',
+            activeTime: '알 수 없음',
+            gameStyle: '알 수 없음',
+            weeklyAverage: '0 시간',
+            matchPercentage: 0,
+            matchReasons: [],
+            playStyleData: [
+              { trait: 'leadership', value: 50 },
+              { trait: 'cooperation', value: 50 },
+              { trait: 'strategy', value: 50 },
+              { trait: 'exploration', value: 50 },
+              { trait: 'social', value: 50 },
+            ],
+            recentPlayPattern: [],
+          };
 
         // API 호출 시뮬레이션
         await new Promise((resolve) => setTimeout(resolve, 500));
