@@ -21,4 +21,3 @@ export const useOverlayStore = create<OverlayStore>((set, get) => ({
 
   isOpen: (type: OverlayType) => get().currentOverlay === type,
 }));
-
