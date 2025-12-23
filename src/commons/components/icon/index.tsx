@@ -58,7 +58,7 @@ export type IconName =
   | 'x'
   | 'readygo-fox';
 
-export interface IconProps {
+export interface IconProps extends React.HTMLAttributes<HTMLDivElement> {
   name: IconName;
   size?: number;
   className?: string;
@@ -1140,7 +1140,7 @@ const icons: Record<IconName, React.FC<{ className?: string }>> = {
   ),
 };
 
-export default function Icon({ name, size = 20, className, style }: IconProps) {
+export default function Icon({ name, size = 20, className, style, ...props }: IconProps) {
   const IconComponent = icons[name];
 
   if (!IconComponent) {
@@ -1159,6 +1159,7 @@ export default function Icon({ name, size = 20, className, style }: IconProps) {
         ...style,
       }}
       className={className}
+      {...props}
     >
       <IconComponent />
     </div>

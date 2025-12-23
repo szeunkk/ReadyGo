@@ -50,11 +50,7 @@ const mockNotifications: NotificationItem[] = [
   },
 ];
 
-export default function NotificationsPage({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function NotificationsPage() {
   const handleMarkAllAsRead = () => {
     // TODO: 모두 읽음 처리 로직 구현
   };
@@ -64,15 +60,12 @@ export default function NotificationsPage({
   };
 
   return (
-    <>
-      {children}
-      <OverlayContainer onClose={() => history.back()}>
-        <Notifications
-          notifications={mockNotifications}
-          onMarkAllAsRead={handleMarkAllAsRead}
-          onNotificationClick={handleNotificationClick}
-        />
-      </OverlayContainer>
-    </>
+    <OverlayContainer onClose={() => history.back()}>
+      <Notifications
+        notifications={mockNotifications}
+        onMarkAllAsRead={handleMarkAllAsRead}
+        onNotificationClick={handleNotificationClick}
+      />
+    </OverlayContainer>
   );
 }

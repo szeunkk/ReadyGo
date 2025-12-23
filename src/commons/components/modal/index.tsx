@@ -51,7 +51,6 @@ export default function Modal({
               variant="secondary"
               size="m"
               shape="rectangle"
-              theme="dark"
               onClick={onCancel}
             >
               {cancelText}
@@ -60,7 +59,6 @@ export default function Modal({
               variant="primary"
               size="m"
               shape="rectangle"
-              theme="dark"
               onClick={onConfirm}
             >
               {confirmText}
@@ -71,7 +69,6 @@ export default function Modal({
             variant="primary"
             size="m"
             shape="rectangle"
-            theme="dark"
             onClick={onConfirm}
           >
             {confirmText}

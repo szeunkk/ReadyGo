@@ -120,7 +120,10 @@ export const ManyItems: Story = {
 
 // 모든 사이즈 비교
 export const AllSizes: Story = {
-  render: () => (
+  args: {
+    data: defaultData,
+  },
+  render: (args) => (
     <div
       style={{
         display: 'flex',
@@ -135,7 +138,7 @@ export const AllSizes: Story = {
         >
           Size: s
         </h3>
-        <BarChart data={defaultData} size="s" />
+        <BarChart data={args.data} size="s" />
       </div>
       <div>
         <h3
@@ -143,7 +146,7 @@ export const AllSizes: Story = {
         >
           Size: m
         </h3>
-        <BarChart data={defaultData} size="m" />
+        <BarChart data={args.data} size="m" />
       </div>
     </div>
   ),
@@ -158,7 +161,16 @@ export const AllSizes: Story = {
 
 // 실제 사용 예시
 export const GamePlayPattern: Story = {
-  render: () => (
+  args: {
+    data: [
+      { label: 'FPS', value: 23.6 },
+      { label: '생존', value: 12.5 },
+      { label: '모험', value: 7.2 },
+      { label: '캐주얼', value: 3.8 },
+    ],
+    size: 's' as const,
+  },
+  render: (args) => (
     <div style={{ width: '360px', padding: '20px', backgroundColor: '#fff' }}>
       <h2
         style={{
@@ -171,15 +183,7 @@ export const GamePlayPattern: Story = {
       >
         최근 플레이 패턴
       </h2>
-      <BarChart
-        data={[
-          { label: 'FPS', value: 23.6 },
-          { label: '생존', value: 12.5 },
-          { label: '모험', value: 7.2 },
-          { label: '캐주얼', value: 3.8 },
-        ]}
-        size="s"
-      />
+      <BarChart data={args.data} size={args.size} />
     </div>
   ),
   parameters: {
