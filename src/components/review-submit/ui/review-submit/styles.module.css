@@ -160,7 +160,7 @@
   width: 24px;
   height: 24px;
   border: 2px solid var(--color-border-secondary);
-  border-radius: 4px;
+  border-radius: 8px;
   background-color: var(--color-bg-primary);
   display: flex;
   align-items: center;
@@ -172,7 +172,7 @@
   flex-shrink: 0;
 }
 
-.checkbox:hover {
+.optionItem:hover {
   border-color: var(--color-border-interactive-secondary);
 }
 
@@ -205,7 +205,6 @@
 }
 
 .optionTextSelected {
-  font-weight: var(--font-weight-medium);
   color: var(--color-text-interactive-primary);
 }
 
@@ -215,14 +214,6 @@
   flex-direction: column;
   gap: 12px;
 }
-
-/* .inputLabel {
-  font-family: var(--typo-body-lg-font-family);
-  font-size: var(--typo-body-lg-font-size);
-  line-height: var(--typo-body-lg-line-height);
-  font-weight: var(--font-weight-regular);
-  color: var(--color-text-interactive-secondary);
-} */
 
 /* Footer */
 .buttonArea {

@@ -5,6 +5,7 @@ import styles from './styles.module.css';
 import Button from '@/commons/components/button';
 import Input from '@/commons/components/input';
 import Avatar from '@/commons/components/avatar';
+import Icon from '@/commons/components/icon';
 
 interface ReviewOption {
   id: string;
@@ -93,21 +94,11 @@ export default function ReviewSubmit() {
                     }`}
                   >
                     {option.checked && (
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M13.3333 4L6 11.3333L2.66667 8"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
+                      <Icon
+                        name="check"
+                        size={16}
+                        style={{ color: 'var(--color-bg-primary)' }}
+                      />
                     )}
                   </div>
                 </div>
