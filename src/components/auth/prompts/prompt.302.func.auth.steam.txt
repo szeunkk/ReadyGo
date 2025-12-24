@@ -1,0 +1,192 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+
+- Steam 연동 CTA UI(이미 존재하는 화면/컴포넌트): singup-success에서 handleSteamLink 클릭 시
+
+조건-파일경로) URL 상수: src/commons/constants/url.ts
+조건-파일경로) 참고할 Supabase 클라이언트 파일경로: src/lib/supabase/client.ts
+조건-파일경로) 구현될 HOOK 파일경로: src/components/auth/hooks/useSteamOAuth.hook.ts
+조건-파일경로) 구현될 콜백 컴포넌트 파일경로: src/components/auth/steam-callback/index.tsx
+조건-파일경로) 구현될 콜백 HOOK 파일경로: src/components/auth/steam-callback/hooks/index.steam-callback.hook.tsx
+조건-파일경로) 구현될 콜백 PAGE 파일경로: src/app/(auth)/steam/callback/page.tsx
+
+==============================================
+
+핵심요구사항) 다음의 기능을 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+            1. 라이브러리/기술 조건
+                - Supabase: 이미 설치되어있는 @supabase/supabase-js를 사용할 것.
+                - 라우팅: Next.js의 useRouter를 사용할 것.
+                - 모달: 이미 셋팅되어있는 modal.provider를 사용할 것.
+                - 인증/세션: 이미 로그인된 ReadyGo 계정의 세션을 기준으로 Steam을 “연동”할 것 (새 계정 생성 로직 금지)
+                - Steam 인증: Steam OpenID(외부 로그인) 플로우를 사용할 것
+                - 외부 로그인 페이지로 이동: `https://steamcommunity.com/openid/login` (Steam OpenID 엔드포인트)
+                - 서버 검증: OpenID 검증은 클라이언트에서 하지 말고, 서버(API route)에서 검증하도록 구현할 것
+                - Steam OpenID 필수 파라미터:
+                    - openid.mode: 'checkid_setup' (초기 요청 시)
+                    - openid.return_to: 콜백 URL (예: `${window.location.origin}/steam/callback`)
+                    - openid.realm: 도메인 (예: `${window.location.origin}`)
+                    - openid.ns: 'http://specs.openid.net/auth/2.0'
+                    - openid.claimed_id: 'http://specs.openid.net/auth/2.0/identifier_select'
+                    - openid.identity: 'http://specs.openid.net/auth/2.0/identifier_select'
+                - 보안: CSRF 방지를 위해 state 파라미터 사용 권장 (선택사항)
+
+            2. 유저시나리오(Steam 연동)
+                2-1) Steam 연동 CTA 클릭 시 처리 (즉시 외부 로그인으로 이동)
+                    - Steam 연동 CTA 화면에서 "스팀 계정 연동하기" 버튼 클릭 시:
+                        1) 훅의 핸들러 실행 (예: `handleSteamLink()`)
+                        2) Steam OpenID 로그인 URL을 생성
+                            - return_to: URL_PATHS.STEAM_CALLBACK 사용 (url.ts에 추가 필요)
+                            - return_to는 반드시 ${window.location.origin}${URL_PATHS.STEAM_CALLBACK} 형태로 구성
+                            - realm: window.location.origin 사용
+                        3) **즉시 Steam 외부 로그인 페이지로 redirect** (window.location.assign 등)
+                    - CTA 클릭 시점에는 DB 저장을 하지 말 것(steamId 확보 전)
+                    - URL_PATHS에 STEAM_CALLBACK 경로 추가 필요: '/steam/callback'
+                    
+                2-2) OAuth(OpenID) 완료 후 콜백 처리
+                    - Steam 로그인/승인 완료 후 우리 서비스 콜백 URL로 리다이렉트될 것
+                    - 사용자는 Steam 외부 페이지에서 로그인 후 우리 서비스로 돌아온다(return_to)
+                    - 콜백 페이지(`/steam/callback`)에서:
+                        1) 콜백 컴포넌트(src/components/auth/steam-callback/index.tsx)가 렌더링됨
+                        2) 콜백 Hook(src/components/auth/steam-callback/hooks/index.steam-callback.hook.tsx)에서:
+                            a) URL query로 전달된 OpenID 파라미터 수집 (useSearchParams 사용)
+                            b) 서버(API route: /api/auth/steam/callback)로 파라미터 전달하여 OpenID 검증 요청
+                            c) 검증 성공 시 SteamID 확보
+                            d) "현재 로그인된 ReadyGo 유저"와 SteamID를 supabase DB에 매핑 저장 (서버에서 수행)
+                        3) 성공/실패에 따라 라우팅/모달 처리
+                            - 성공 시 홈으로 이동 (URL_PATHS.HOME 사용, router.push)
+                            - 실패 시 상황별 모달 표시
+                    - 콜백 페이지는 로딩 화면만 표시하고, 처리 후 즉시 리다이렉트할 것
+                    
+            3. 연동 처리 (DB 매핑) 요구사항
+                3-1) 연동 대상
+                - "현재 로그인된 ReadyGo 유저"를 기준으로 SteamID를 연결할 것
+                - 현재 로그인 유저 식별:
+                    - 클라이언트: supabase.auth.getUser() 프로젝트 표준에 맞는 방식을 사용
+                    - 서버는 cookies 기반 Supabase SSR 서버 클라이언트로 auth.getUser()를 호출해 userId를 확보할 것. 
+                        클라이언트가 전달한 userId는 절대 사용하지 말 것.
+                    - 단, 보안상 최종 저장/검증은 서버에서 수행해야 함 (클라 데이터만 신뢰 금지)
+                    - 서버 API Route에서 클라이언트가 전달한 userId를 그대로 사용하지 말고, 서버에서 직접 세션을 확인하여 userId를 확보할 것
+                
+                3-2) 서버 API Route 구현 세부사항
+                    - API Route: /api/auth/steam/callback (POST 또는 GET)
+                    - 요청 처리:
+                        1) OpenID 파라미터 수신 (query string 또는 request body)
+                        2) Steam OpenID 검증 수행
+                            - Steam OpenID 응답을 Steam 서버로 재검증 요청
+                            - openid.mode='check_authentication'으로 Steam에 검증 요청
+                            - SteamID 추출: claimed_id 또는 identity에서 SteamID 추출
+                                - 예: 'https://steamcommunity.com/openid/id/76561198000000000' → '76561198000000000'
+                        3) 현재 로그인 유저 세션 확인 (서버에서 직접)
+                            - Request의 cookies 또는 Authorization 헤더에서 세션 추출
+                            - Supabase 서버 클라이언트로 세션 검증 및 userId 확보
+                        4) 중복 연결 방지 검사
+                        5) DB 저장 (트랜잭션)
+                    - 응답 형식:
+                        - 성공: { success: true, steamId: string }
+                        - 실패: { success: false, error: string, errorCode?: string }
+                            - errorCode: 'duplicate_steam_id', 'invalid_session', 'verification_failed' 등
+                
+                3-3) DB 저장 규칙(현재 단계 기준, user_social_links 사용 안함)
+                    - user_profiles에 steam_id 컬럼이 존재하므로, 연동 성공 시 아래를 수행할 것.
+                    Step A) 중복 연결 방지(필수)
+                        - 쿼리: select id from user_profiles where steam_id = :steamId limit 1
+                        - 결과가 있고 id != currentUserId면 "이미 다른 계정에 연결됨"으로 실패 처리
+
+                    Step B) 연결 상태 저장(서버 트랜잭션 필수)
+                        - 서버 API Route(/api/auth/steam/callback)에서 수행할 것
+                        1) user_profiles 업데이트:
+                            - update user_profiles set steam_id = :steamId where id = :currentUserId
+                        2) steam_sync_logs insert(이력):
+                            - user_id = currentUserId
+                            - status = 'linked'
+                            - synced_games_count = 0
+                            - synced_at = now()
+                        - user_social_links는 현재 단계에서는 저장하지 말 것
+                        - 서버에서 트랜잭션으로 처리하여, 하나라도 실패하면 전체 롤백할 것
+
+            4. 실패/예외 시나리오(모달 요구사항)
+                4-1) 이미 다른 ReadyGo 계정에 연결된 Steam 계정
+                    - 서버가 "duplicate_steam_id" 같은 명확한 에러 코드를 반환할 것
+                    - 클라이언트는 공통 <Modal /> 사용, variant: 'single'
+                    - title: 적절히(예: '연동 실패')
+                    - description: "이 Steam 계정은 이미 다른 계정에 연결되어 있습니다."
+                    - confirmText: '확인'
+                    - 확인 클릭: closeAllModals(), 페이지 이동 없음
+
+                4-2) 사용자가 Steam 로그인 취소/거부/파라미터 누락(연동 취소로 판단)
+                    - 공통 <Modal /> 사용, variant: 'dual'
+                    - title: 적절히(예: '연동 취소')
+                    - description: "연동이 취소되었습니다."
+                    - confirmText: '다시 시도' (Steam 연동 재시작)
+                    - cancelText: '나중에 하기' (모달 닫기, 페이지 유지)
+                    - 다시 시도 클릭 시 handleSteamLink() 재호출
+                    - 나중에 하기 클릭 시 closeAllModals(), 페이지 이동 없음
+
+                4-3) 기타 서버/검증 오류
+                    - 공통 <Modal /> 사용, variant: 'single'
+                    - 모달은 한 번만 보여야 함(재렌더 자동 재오픈 방지)
+                    - hasShownErrorModalRef 같은 ref/state 플래그로 제어
+
+            5. Hook 책임 분리
+                5-1) CTA Hook (src/components/auth/hooks/useSteamOAuth.hook.ts)
+                    - CTA 버튼 onClick 핸들러 제공(handleSteamLink)
+                    - Steam 외부 로그인 redirect 수행
+                    - Steam OpenID URL 생성 및 파라미터 구성
+                    - 콜백 페이지로의 리다이렉트는 하지 않음 (Steam이 직접 콜백 URL로 리다이렉트)
+                
+                5-2) 콜백 Hook (src/components/auth/steam-callback/hooks/index.steam-callback.hook.tsx)
+                    - URL query 파라미터 수집 (useSearchParams 사용)
+                    - 서버 API Route(/api/auth/steam/callback) 호출
+                    - 성공/실패 처리
+                    - 모달 오픈 및 중복 방지(ref)
+                    - 성공 시 URL_PATHS.HOME으로 라우팅 (router.push)
+                    - useEffect에서 마운트 시 자동 실행
+
+            6. UI 컴포넌트 책임
+                6-1) CTA 컴포넌트 (signup-success)
+                    - "스팀 계정 연동하기" 버튼은 useSteamOAuth의 handleSteamLink만 연결할 것
+                    - 기존 UI 구조를 훼손하지 말고 최소 변경으로 연결할 것
+                
+                6-2) 콜백 컴포넌트 (src/components/auth/steam-callback/index.tsx)
+                    - 콜백 Hook을 사용하여 처리 로직 실행
+                    - 로딩 화면만 표시 (예: "연동 처리 중...")
+                    - 페이지 구조는 프로젝트 표준에 맞게 최소한으로 구성할 것
+
+==============================================
+
+구현 완료 후 아래 2가지 체크리스트를 반환할 것.
+
+1) 커서룰(@01-common.mdc, @04-func.mdc) 적용 결과 체크리스트
+
+2) 기능 요구사항 체크리스트
+    - URL_PATHS에 STEAM_CALLBACK: '/steam/callback' 경로가 추가되었는지
+    - Steam CTA 클릭 시 DB 저장 없이 Steam 외부 로그인으로 즉시 이동하는지
+    - Steam OpenID URL에 필수 파라미터(return_to, realm, openid.mode 등)가 포함되어 있는지
+    - 콜백 페이지(/steam/callback)가 src/app/(auth)/steam/callback/page.tsx로 생성되었는지
+    - 콜백 컴포넌트(src/components/auth/steam-callback/index.tsx)가 생성되었는지
+    - 콜백 Hook에서 useSearchParams로 openid 파라미터를 수집하여 서버 검증을 호출하는지
+    - 서버 API Route(/api/auth/steam/callback)에서 OpenID 검증을 수행하는지
+    - 서버에서 OpenID 검증 후 steamId를 반환하는지
+    - 서버에서 현재 로그인 유저를 세션으로 직접 확인하는지 (클라이언트 전달 userId 신뢰 금지)
+    - 중복 연결 방지(user_profiles.steam_id 중복 검사)가 서버에서 구현되어 있는지
+    - 서버에서 트랜잭션으로 user_profiles 업데이트와 steam_sync_logs insert를 처리하는지
+    - 중복 연결 시 single 모달로 안내되는지
+    - 취소/파라미터 누락 시 dual 모달(다시 시도/나중에 하기)이 노출되는지
+    - 연동 성공 시 user_profiles.steam_id가 저장되는지
+    - 연동 성공 시 steam_sync_logs에 status='linked'가 기록되는지
+    - 성공 시 URL_PATHS.HOME으로 이동하는지
+    - 모달 중복 방지(ref/state) 로직이 적용되어 있는지
+    - modal.provider를 수정하지 않았는지
+    - 콜백 페이지는 로딩 화면만 표시하고 처리 후 즉시 리다이렉트하는지
+
+
+            
