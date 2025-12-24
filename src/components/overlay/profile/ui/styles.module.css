@@ -1,0 +1,314 @@
+/* 드롭다운 컨테이너 */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 315px;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 14px;
+  box-shadow: 0px 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  z-index: calc(var(--z-header) + 1);
+
+  /* 애니메이션 */
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 사용자 정보 섹션 */
+.userInfo {
+  background-color: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border-secondary);
+  padding: 16px;
+}
+
+.userInfoContent {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 24px;
+  background-color: var(--color-bg-primary);
+  border: 2px solid var(--color-border-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-icon-interactive-secondary);
+}
+
+.userText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.nickname {
+  font-family: var(--typo-body-lg-font-family);
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.username {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-interactive-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 섹션 스타일 */
+.section {
+  border-bottom: 1px solid var(--color-border-secondary);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 상태 컨테이너 */
+.statusContainer {
+  position: relative;
+  width: 100%;
+}
+
+/* 온라인 상태 버튼 */
+.statusButton {
+  width: 100%;
+  height: 40px;
+  background-color: var(--color-bg-secondary);
+  border: none;
+  border-radius: 10px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.statusButton:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.statusContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusIndicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.statusText {
+  font-family: var(--typo-body-lg-font-family);
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.statusChevron {
+  transition: transform 0.2s ease;
+  color: var(--color-icon-interactive-secondary);
+}
+
+.statusChevronOpen {
+  transform: rotate(90deg);
+}
+
+/* 상태 옵션 목록 */
+.statusOptions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+}
+
+.statusOption {
+  width: 100%;
+  height: 40px;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.statusOption:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.statusOptionActive {
+  /* 선택된 상태 */
+}
+
+.statusOptionText {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-primary);
+}
+
+.statusOption svg {
+  color: var(--color-icon-interactive-primary);
+}
+
+/* 메뉴 아이템 */
+.menuItem {
+  width: 100%;
+  height: 36px;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: var(--color-text-primary);
+}
+
+.menuItem:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.menuItem span {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--font-weight-medium);
+}
+
+.menuItem svg {
+  color: var(--color-icon-interactive-secondary);
+}
+
+/* 스팀 연동 */
+.steamConnection {
+  height: 52px;
+  background-color: var(--color-bg-secondary);
+  border-radius: 10px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.steamContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.steamIconContainer {
+  width: 32px;
+  height: 32px;
+  background-color: var(--color-bg-primary);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-icon-interactive-secondary);
+}
+
+.steamText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.steamLabel {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-primary);
+}
+
+.steamStatus {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-interactive-secondary);
+}
+
+.connectedIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-icon-success);
+  flex-shrink: 0;
+}
+
+/* 로그아웃 섹션 */
+.logoutSection {
+  padding: 12px;
+}
+
+.logoutButton {
+  width: 100%;
+  height: 36px;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: var(--color-text-interactive-secondary);
+}
+
+.logoutButton:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.logoutButton span {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--font-weight-regular);
+}
+
+.logoutButton svg {
+  color: var(--color-icon-interactive-secondary);
+}

@@ -46,8 +46,7 @@ export const URL_PATHS = {
   MATCH: '/match',
   PARTY: '/party',
   PARTY_NEW: '/party/new',
-  FRIENDS: '/friends',
-  NOTIFICATIONS: '/notifications',
+  // FRIENDS와 NOTIFICATIONS는 이제 상태 관리로 처리 (URL 라우트 아님)
   TRAITS: '/traits',
   TRAITS_RESULT: '/traits/result',
 } as const;
@@ -118,22 +117,6 @@ export const URL_METADATA: Record<string, UrlMetadata> = {
   },
   [URL_PATHS.PARTY_NEW]: {
     path: URL_PATHS.PARTY_NEW,
-    accessStatus: 'member-only',
-    visibility: {
-      header: true,
-      sidebar: true,
-    },
-  },
-  [URL_PATHS.FRIENDS]: {
-    path: URL_PATHS.FRIENDS,
-    accessStatus: 'member-only',
-    visibility: {
-      header: true,
-      sidebar: true,
-    },
-  },
-  [URL_PATHS.NOTIFICATIONS]: {
-    path: URL_PATHS.NOTIFICATIONS,
     accessStatus: 'member-only',
     visibility: {
       header: true,

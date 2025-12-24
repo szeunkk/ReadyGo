@@ -1,144 +1,67 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './styles.module.css';
 import MatchCard from '@/components/match/ui/match-card/matchCard';
 import Selectbox, { SelectboxItem } from '@/commons/components/selectbox';
 import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
+import {
+  matchRateOptions,
+  statusOptions,
+} from '@/components/match/constants/filterOptions';
+import { MatchData } from '@/components/match/constants/mockData';
 
-// 매치률 필터 옵션
-const matchRateOptions: SelectboxItem[] = [
-  { id: 'all', value: '전체' },
-  { id: '50', value: '매칭률 50% 이상' },
-  { id: '75', value: '매칭률 75% 이상' },
-  { id: '90', value: '매칭률 90% 이상' },
-];
+export interface MatchListProps {
+  /**
+   * 매치 데이터 목록
+   */
+  matches: MatchData[];
+  /**
+   * 선택된 매칭률 필터 ID
+   */
+  selectedMatchRate: string;
+  /**
+   * 선택된 온라인 상태 필터 ID
+   */
+  selectedStatus: string;
+  /**
+   * side-panel이 열려있는지 여부
+   */
+  isSidePanelOpen: boolean;
+  /**
+   * 현재 열려있는 프로필의 userId
+   */
+  activeProfileUserId?: string;
+  /**
+   * 매칭률 필터 변경 핸들러
+   */
+  onMatchRateChange: (item: SelectboxItem) => void;
+  /**
+   * 온라인 상태 필터 변경 핸들러
+   */
+  onStatusChange: (item: SelectboxItem) => void;
+  /**
+   * 목록 갱신 버튼 클릭 핸들러
+   */
+  onRefresh: () => void;
+  /**
+   * 프로필 보기 버튼 클릭 핸들러
+   */
+  onProfileClick: (userId: string) => void;
+}
 
-// 온라인 상태 필터 옵션
-const statusOptions: SelectboxItem[] = [
-  { id: 'all', value: '전체' },
-  { id: 'online', value: '온라인' },
-  { id: 'away', value: '자리비움' },
-  { id: 'offline', value: '오프라인' },
-];
-
-// 더미 매치 데이터
-const matchData = [
-  {
-    id: 1,
-    userId: 'user-1',
-    nickname: '까칠한까마귀',
-    matchRate: 94,
-    status: 'online' as const,
-    tags: ['FPS 마스터', '새벽 플레이어', '협력 지향'],
-  },
-  {
-    id: 2,
-    userId: 'user-2',
-    nickname: '기분좋은곰',
-    matchRate: 94,
-    status: 'online' as const,
-    tags: ['FPS 마스터', '새벽 플레이어', '협력 지향'],
-  },
-  {
-    id: 3,
-    userId: 'user-3',
-    nickname: '상쾌한고양이',
-    matchRate: 94,
-    status: 'online' as const,
-    tags: ['FPS 마스터', '새벽 플레이어', '협력 지향'],
-  },
-  {
-    id: 4,
-    userId: 'user-4',
-    nickname: '날뛰는기린',
-    matchRate: 85,
-    status: 'online' as const,
-    tags: ['캐주얼 게임', '주말 플레이어', '소셜'],
-  },
-  {
-    id: 5,
-    userId: 'user-5',
-    nickname: '신비로운팬더',
-    matchRate: 94,
-    status: 'online' as const,
-    tags: ['FPS 마스터', '새벽 플레이어', '협력 지향'],
-  },
-  {
-    id: 6,
-    userId: 'user-6',
-    nickname: '친절한사자',
-    matchRate: 88,
-    status: 'online' as const,
-    tags: ['RPG 마니아', '저녁 플레이어', '전략적'],
-  },
-  {
-    id: 7,
-    userId: 'user-7',
-    nickname: '날뛰는기린',
-    matchRate: 85,
-    status: 'online' as const,
-    tags: ['캐주얼 게임', '주말 플레이어', '소셜'],
-  },
-  {
-    id: 8,
-    userId: 'user-8',
-    nickname: '날뛰는기린',
-    matchRate: 85,
-    status: 'online' as const,
-    tags: ['캐주얼 게임', '주말 플레이어', '소셜'],
-  },
-  {
-    id: 9,
-    userId: 'user-9',
-    nickname: '춤추는강아지',
-    matchRate: 94,
-    status: 'online' as const,
-    tags: ['FPS 마스터', '새벽 플레이어', '협력 지향'],
-  },
-  {
-    id: 10,
-    userId: 'user-10',
-    nickname: '기분좋은곰',
-    matchRate: 94,
-    status: 'online' as const,
-    tags: ['FPS 마스터', '새벽 플레이어', '협력 지향'],
-  },
-  {
-    id: 11,
-    userId: 'user-11',
-    nickname: '상쾌한고양이',
-    matchRate: 94,
-    status: 'online' as const,
-    tags: ['FPS 마스터', '새벽 플레이어', '협력 지향'],
-  },
-  {
-    id: 12,
-    userId: 'user-12',
-    nickname: '친절한사자',
-    matchRate: 88,
-    status: 'online' as const,
-    tags: ['RPG 마니아', '저녁 플레이어', '전략적'],
-  },
-];
-
-export default function Match() {
-  const [selectedMatchRate, setSelectedMatchRate] = useState<string>('75');
-  const [selectedStatus, setSelectedStatus] = useState<string>('online');
-
-  const handleMatchRateChange = (item: SelectboxItem) => {
-    setSelectedMatchRate(item.id);
-  };
-
-  const handleStatusChange = (item: SelectboxItem) => {
-    setSelectedStatus(item.id);
-  };
-
-  const handleRefresh = () => {
-    // TODO: 실제 데이터 갱신 로직 구현
-  };
-
+export default function MatchList({
+  matches,
+  selectedMatchRate,
+  selectedStatus,
+  isSidePanelOpen,
+  activeProfileUserId,
+  onMatchRateChange,
+  onStatusChange,
+  onRefresh,
+  onProfileClick,
+}: MatchListProps) {
   return (
     <div className={styles.container}>
       {/* 필터 섹션 */}
@@ -147,14 +70,14 @@ export default function Match() {
           <Selectbox
             items={matchRateOptions}
             selectedId={selectedMatchRate}
-            onSelect={handleMatchRateChange}
+            onSelect={onMatchRateChange}
             placeholder="매칭률 75% 이상"
             className={styles.selectbox}
           />
           <Selectbox
             items={statusOptions}
             selectedId={selectedStatus}
-            onSelect={handleStatusChange}
+            onSelect={onStatusChange}
             placeholder="온라인"
             className={styles.selectbox}
           />
@@ -164,7 +87,7 @@ export default function Match() {
           size="m"
           shape="rectangle"
           className={styles.refreshButton}
-          onClick={handleRefresh}
+          onClick={onRefresh}
         >
           <Icon name="refresh" size={20} />
           <span>목록갱신</span>
@@ -172,8 +95,10 @@ export default function Match() {
       </div>
 
       {/* 매치 카드 그리드 */}
-      <div className={styles.grid}>
-        {matchData.map((match) => (
+      <div
+        className={`${styles.grid} ${isSidePanelOpen ? styles.gridWithPanel : ''}`}
+      >
+        {matches.map((match) => (
           <MatchCard
             key={match.id}
             userId={match.userId}
@@ -181,6 +106,8 @@ export default function Match() {
             matchRate={match.matchRate}
             status={match.status}
             tags={match.tags}
+            onProfileClick={() => onProfileClick(match.userId)}
+            isProfileOpen={activeProfileUserId === match.userId}
           />
         ))}
       </div>
