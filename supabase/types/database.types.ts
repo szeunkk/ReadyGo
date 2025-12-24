@@ -739,7 +739,7 @@ export type Database = {
       }
       user_profiles: {
         Row: {
-          animal_type: string | null
+          animal_type: string
           avatar_url: string | null
           bio: string | null
           created_at: string | null
@@ -747,12 +747,12 @@ export type Database = {
           nickname: string | null
           status_message: string | null
           steam_id: string | null
-          temperature_score: number | null
-          tier: string | null
+          temperature_score: number
+          tier: string
           updated_at: string | null
         }
         Insert: {
-          animal_type?: string | null
+          animal_type?: string
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
@@ -760,12 +760,12 @@ export type Database = {
           nickname?: string | null
           status_message?: string | null
           steam_id?: string | null
-          temperature_score?: number | null
-          tier?: string | null
+          temperature_score?: number
+          tier?: string
           updated_at?: string | null
         }
         Update: {
-          animal_type?: string | null
+          animal_type?: string
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
@@ -773,8 +773,8 @@ export type Database = {
           nickname?: string | null
           status_message?: string | null
           steam_id?: string | null
-          temperature_score?: number | null
-          tier?: string | null
+          temperature_score?: number
+          tier?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -894,35 +894,32 @@ export type Database = {
       }
       user_traits: {
         Row: {
+          cooperation: number
+          exploration: number
           id: number
-          trait_action: number | null
-          trait_casual: number | null
-          trait_competitive: number | null
-          trait_flex: number | null
-          trait_strategy: number | null
-          trait_teamwork: number | null
+          leadership: number
+          social: number
+          strategy: number
           updated_at: string | null
           user_id: string | null
         }
         Insert: {
+          cooperation?: number
+          exploration?: number
           id?: number
-          trait_action?: number | null
-          trait_casual?: number | null
-          trait_competitive?: number | null
-          trait_flex?: number | null
-          trait_strategy?: number | null
-          trait_teamwork?: number | null
+          leadership?: number
+          social?: number
+          strategy?: number
           updated_at?: string | null
           user_id?: string | null
         }
         Update: {
+          cooperation?: number
+          exploration?: number
           id?: number
-          trait_action?: number | null
-          trait_casual?: number | null
-          trait_competitive?: number | null
-          trait_flex?: number | null
-          trait_strategy?: number | null
-          trait_teamwork?: number | null
+          leadership?: number
+          social?: number
+          strategy?: number
           updated_at?: string | null
           user_id?: string | null
         }

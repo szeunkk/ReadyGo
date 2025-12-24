@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styles from './styles.module.css';
 import MatchSection from './ui/match-section/matchSection';
 import PartySection from './ui/party-section/partySection';
@@ -169,25 +169,6 @@ export default function Home() {
   useKakaoOAuth();
 
   const { isOpen } = useSidePanelStore();
-  const [isLargeScreen, setIsLargeScreen] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setIsLargeScreen(width >= 1440);
-    };
-
-    // 초기 실행
-    handleResize();
-
-    // 리사이즈 이벤트 리스너 등록
-    window.addEventListener('resize', handleResize);
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // 1440px 이상에서는 항상 프로필 표시, 미만에서는 사이드패널 상태에 따라 표시
-  const shouldShowProfile = isLargeScreen || !isOpen;
 
   return (
     <div className={styles.container}>
