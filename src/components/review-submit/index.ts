@@ -1,3 +1,2 @@
-export { default as ReviewSubmit } from './ReviewSubmit';
-export { default } from './ReviewSubmit';
-
+export { default as ReviewSubmit } from './reviewSubmit';
+export { default } from './reviewSubmit';
