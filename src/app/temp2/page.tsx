@@ -1,4 +1,4 @@
-import ReviewReceived from '@/components/review-received/reviewReceived';
+import ReviewReceived from '@/components/review-received';
 
 export default function Temp2Page() {
   return (
