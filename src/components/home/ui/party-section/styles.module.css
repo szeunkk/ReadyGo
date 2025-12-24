@@ -37,6 +37,31 @@
   width: 100%;
 }
 
+/* 반응형 디자인 - 중형 데스크탑 (1440px ~ 1920px) */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .gridContainer {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-template-rows: repeat(2, auto);
+    gap: 24px;
+  }
+
+  /* 4개까지만 표시 */
+  .gridContainer > *:nth-child(n + 5) {
+    display: none;
+  }
+}
+
+/* 반응형 디자인 - 대형 데스크탑 (1920px 이상) */
+@media (min-width: 1920px) {
+  .gridContainer {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    grid-template-rows: repeat(2, auto);
+    gap: 24px;
+  }
+}
+
 /* 반응형 디자인 - 태블릿 */
 @media (max-width: 1024px) {
   .container {

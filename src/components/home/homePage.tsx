@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './styles.module.css';
 import MatchSection from './ui/match-section/matchSection';
 import PartySection from './ui/party-section/partySection';
@@ -43,6 +43,16 @@ const mockMatchData: MatchCardProps[] = [
     animalType: AnimalType.owl,
     gamePreference: 'Overwatch, Valorant',
     playTime: '밤 시간대',
+    skillLevel: '플래티넘',
+  },
+  {
+    userId: 'user-4',
+    nickname: '민첩한토끼',
+    matchRate: 85,
+    status: 'online',
+    animalType: AnimalType.rabbit,
+    gamePreference: 'League of Legends, Valorant',
+    playTime: '저녁 시간대',
     skillLevel: '플래티넘',
   },
 ];
@@ -100,6 +110,32 @@ const mockPartyData: PartyCardProps[] = [
     ],
     tags: ['캐주얼', '소셜', '평일'],
   },
+  {
+    title: '공포 게임 탐험대',
+    gameName: '포비아',
+    description: '공포 게임을 함께 즐기는 용감한 게이머들',
+    currentMembers: 5,
+    maxMembers: 8,
+    members: [
+      { animalType: AnimalType.cat, nickname: '겁많은고양이' },
+      { animalType: AnimalType.dog, nickname: '용감한강아지' },
+      { animalType: AnimalType.hedgehog, nickname: '조심스러운고슴도치' },
+    ],
+    tags: ['공포', '협동', '야간'],
+  },
+  {
+    title: '스포츠 게임 리그',
+    gameName: 'FC 온라인',
+    description: '스포츠 게임으로 함께 즐기는 리그전',
+    currentMembers: 5,
+    maxMembers: 8,
+    members: [
+      { animalType: AnimalType.deer, nickname: '빠른사슴' },
+      { animalType: AnimalType.dolphin, nickname: '영민한돌고래' },
+      { animalType: AnimalType.leopard, nickname: '민첩한표범' },
+    ],
+    tags: ['스포츠', '경쟁', '주말'],
+  },
 ];
 
 // 프로필 섹션 임시 데이터
@@ -133,6 +169,25 @@ export default function Home() {
   useKakaoOAuth();
 
   const { isOpen } = useSidePanelStore();
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setIsLargeScreen(width >= 1440);
+    };
+
+    // 초기 실행
+    handleResize();
+
+    // 리사이즈 이벤트 리스너 등록
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 1440px 이상에서는 항상 프로필 표시, 미만에서는 사이드패널 상태에 따라 표시
+  const shouldShowProfile = isLargeScreen || !isOpen;
 
   return (
     <div className={styles.container}>
