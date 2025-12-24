@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation';
 
 import { supabase } from '@/lib/supabase/client';
 import { URL_PATHS } from '@/commons/constants/url';
-import { useModal } from '@/commons/providers/modal';
+import { useSteamOAuth } from '@/components/auth/hooks/useSteamOAuth.hook';
 
 export const useSignupSuccess = () => {
   const router = useRouter();
-  const { openModal, closeAllModals } = useModal();
+  const { handleSteamLink } = useSteamOAuth();
   const [nickname, setNickname] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -66,17 +66,7 @@ export const useSignupSuccess = () => {
     router.push(URL_PATHS.TRAITS);
   };
 
-  const handleSteamLink = () => {
-    openModal({
-      variant: 'single',
-      title: '준비 중입니다',
-      description: '스팀 계정 연동 기능은 곧 제공될 예정입니다.',
-      confirmText: '확인',
-      onConfirm: () => {
-        closeAllModals();
-      },
-    });
-  };
+  // handleSteamLink는 useSteamOAuth에서 제공됨
 
   const handleLater = () => {
     router.push(URL_PATHS.HOME);

@@ -49,6 +49,7 @@ export const URL_PATHS = {
   // FRIENDS와 NOTIFICATIONS는 이제 상태 관리로 처리 (URL 라우트 아님)
   TRAITS: '/traits',
   TRAITS_RESULT: '/traits/result',
+  STEAM_CALLBACK: '/steam/callback',
 } as const;
 
 // ============================================
