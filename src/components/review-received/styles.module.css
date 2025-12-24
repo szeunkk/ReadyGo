@@ -73,7 +73,7 @@
 /* Main Area */
 .mainArea {
   width: 100%;
-  min-height: 724px;
+  min-height: 534px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -92,7 +92,6 @@
   gap: 24px;
   align-items: center;
   justify-content: center;
-  padding: 0 74px;
 }
 
 .titleTextSection {
@@ -109,7 +108,6 @@
   font-weight: var(--typo-heading-lg-font-weight);
   color: var(--color-text-primary);
   text-align: center;
-  white-space: nowrap;
   margin: 0;
 }
 
@@ -120,106 +118,82 @@
   font-weight: var(--typo-body-lg-font-weight);
   color: var(--color-text-interactive-secondary);
   text-align: center;
-  white-space: nowrap;
   margin: 0;
 }
 
-/* Options Section */
-.optionsSection {
+/* Review Section */
+.reviewSection {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  width: 100%;
 }
 
-.optionItem {
+.reviewBox {
   display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 16px;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
   background-color: var(--color-bg-secondary);
   border: 1px solid var(--color-border-secondary);
   border-radius: 16px;
-  min-height: 56px;
-  cursor: pointer;
-  transition:
-    background-color 0.2s,
-    border-color 0.2s,
-    box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.checkboxContainer {
+.quoteBox {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
-.checkbox {
-  width: 24px;
-  height: 24px;
-  border: 2px solid var(--color-border-secondary);
-  border-radius: 8px;
+  padding: 24px 8px;
   background-color: var(--color-bg-primary);
+  border-radius: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.quoteText {
+  font-family: var(--typo-body-lg-semibold-font-family);
+  font-size: var(--typo-body-lg-semibold-font-size);
+  line-height: var(--typo-body-lg-semibold-line-height);
+  font-weight: var(--typo-body-lg-semibold-font-weight);
+  color: var(--color-text-interactive-primary);
+  text-align: center;
+  margin: 0;
+}
+
+.pointsList {
   display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pointItem {
+  display: flex;
+  gap: 10px;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition:
-    background-color 0.2s,
-    border-color 0.2s;
+  width: 100%;
+}
+
+.pointDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--color-text-secondary);
   flex-shrink: 0;
 }
 
-.optionItem:hover {
-  border-color: var(--color-border-interactive-secondary);
-}
-
-.checkboxChecked {
-  background-color: var(--color-bg-interactive-primary);
-  border-color: var(--color-border-interactive-primary);
-  color: var(--color-text-on-interactive-primary);
-}
-
-.checkboxChecked:hover {
-  background-color: var(--color-bg-interactive-primary-hover);
-  border-color: var(--color-border-interactive-primary);
-}
-
-.optionItemSelected {
-  background-color: var(--color-transparent-12);
-  border: 1px solid var(--color-border-interactive-primary);
-  box-shadow:
-    0px 10px 15px -3px var(--color-shadow-bold),
-    0px 4px 6px -4px var(--color-shadow-bold);
-}
-
-.optionItemSelected:hover {
-  border-color: var(--color-border-interactive-primary);
-}
-
-.optionText {
+.pointText {
   font-family: var(--typo-body-lg-font-family);
   font-size: var(--typo-body-lg-font-size);
   line-height: var(--typo-body-lg-line-height);
   font-weight: var(--typo-body-lg-font-weight);
   color: var(--color-text-tertiary);
-  flex: 1;
 }
 
-.optionTextSelected {
-  color: var(--color-text-interactive-primary);
-}
-
-/* Input Section */
-.inputSection {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Footer */
+/* Button Area */
 .buttonArea {
   width: 100%;
   min-height: 96px;
@@ -232,16 +206,6 @@
   box-sizing: border-box;
 }
 
-.buttonWrapper {
-  display: flex;
-  gap: 16px;
+.confirmButton {
   width: 100%;
-}
-
-.cancelButton {
-  flex: 1;
-}
-
-.submitButton {
-  flex: 1;
 }

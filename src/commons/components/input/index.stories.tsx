@@ -17,15 +17,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: [
-        'primary',
-        'hover',
-        'active',
-        'filled',
-        'danger',
-        'disabled',
-        'secondary',
-      ],
+      options: ['primary', 'secondary'],
       description: '인풋의 변형 스타일',
       table: {
         type: { summary: 'InputVariant' },
@@ -67,12 +59,124 @@ const meta = {
       },
     },
     iconLeft: {
-      control: 'text',
-      description: '왼쪽 아이콘 경로',
+      control: 'select',
+      options: [
+        'add-user',
+        'alert',
+        'arrow-left',
+        'arrow-right',
+        'bar-chart-square',
+        'calendar',
+        'check',
+        'chevron-down',
+        'chevron-left',
+        'chevron-right',
+        'chevron-up',
+        'clover',
+        'crown',
+        'dice',
+        'edit',
+        'envelope',
+        'eye',
+        'eye-slash',
+        'gamepad',
+        'gaming',
+        'group',
+        'handheld',
+        'home',
+        'home-circle',
+        'joystick-alt',
+        'lightbulb',
+        'lock',
+        'log-out',
+        'mail-open',
+        'match',
+        'message-bubble',
+        'message-circle-dots',
+        'message-circle-dots-outline',
+        'mic',
+        'minus',
+        'moon',
+        'notification',
+        'pencil',
+        'plus',
+        'refresh',
+        'review',
+        'search',
+        'send',
+        'settings',
+        'steam',
+        'sun',
+        'sword-alt',
+        'time',
+        'trophy',
+        'user',
+        'userprofile',
+        'warning',
+        'x',
+        'readygo-fox',
+      ],
+      description: '왼쪽 아이콘 이름',
     },
     iconRight: {
-      control: 'text',
-      description: '오른쪽 아이콘 경로',
+      control: 'select',
+      options: [
+        'add-user',
+        'alert',
+        'arrow-left',
+        'arrow-right',
+        'bar-chart-square',
+        'calendar',
+        'check',
+        'chevron-down',
+        'chevron-left',
+        'chevron-right',
+        'chevron-up',
+        'clover',
+        'crown',
+        'dice',
+        'edit',
+        'envelope',
+        'eye',
+        'eye-slash',
+        'gamepad',
+        'gaming',
+        'group',
+        'handheld',
+        'home',
+        'home-circle',
+        'joystick-alt',
+        'lightbulb',
+        'lock',
+        'log-out',
+        'mail-open',
+        'match',
+        'message-bubble',
+        'message-circle-dots',
+        'message-circle-dots-outline',
+        'mic',
+        'minus',
+        'moon',
+        'notification',
+        'pencil',
+        'plus',
+        'refresh',
+        'review',
+        'search',
+        'send',
+        'settings',
+        'steam',
+        'sun',
+        'sword-alt',
+        'time',
+        'trophy',
+        'user',
+        'userprofile',
+        'warning',
+        'x',
+        'readygo-fox',
+      ],
+      description: '오른쪽 아이콘 이름',
     },
     iconSize: {
       control: 'select',
@@ -83,13 +187,188 @@ const meta = {
         defaultValue: { summary: '20' },
       },
     },
-    labelIcon: {
+    iconLeftColor: {
       control: 'text',
-      description: '라벨 아이콘 경로',
+      description: '왼쪽 아이콘 색상 (CSS 값)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    iconRightColor: {
+      control: 'text',
+      description: '오른쪽 아이콘 색상 (CSS 값)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    labelIcon: {
+      control: 'select',
+      options: [
+        'add-user',
+        'alert',
+        'arrow-left',
+        'arrow-right',
+        'bar-chart-square',
+        'calendar',
+        'check',
+        'chevron-down',
+        'chevron-left',
+        'chevron-right',
+        'chevron-up',
+        'clover',
+        'crown',
+        'dice',
+        'edit',
+        'envelope',
+        'eye',
+        'eye-slash',
+        'gamepad',
+        'gaming',
+        'group',
+        'handheld',
+        'home',
+        'home-circle',
+        'joystick-alt',
+        'lightbulb',
+        'lock',
+        'log-out',
+        'mail-open',
+        'match',
+        'message-bubble',
+        'message-circle-dots',
+        'message-circle-dots-outline',
+        'mic',
+        'minus',
+        'moon',
+        'notification',
+        'pencil',
+        'plus',
+        'refresh',
+        'review',
+        'search',
+        'send',
+        'settings',
+        'steam',
+        'sun',
+        'sword-alt',
+        'time',
+        'trophy',
+        'user',
+        'userprofile',
+        'warning',
+        'x',
+        'readygo-fox',
+      ],
+      description: '라벨 아이콘 이름',
+    },
+    labelIconColor: {
+      control: 'text',
+      description: '라벨 아이콘 색상 (CSS 값)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    labelColor: {
+      control: 'text',
+      description: '라벨의 폰트 색상 (CSS 값)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    labelSize: {
+      control: 'text',
+      description: '라벨의 폰트 크기 (CSS 값)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    labelWeight: {
+      control: 'text',
+      description: '라벨의 폰트 굵기 (CSS 값)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    labelLineHeight: {
+      control: 'text',
+      description: '라벨의 줄 간격 (CSS 값)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    labelClassName: {
+      control: 'text',
+      description: '라벨에 적용할 추가 CSS 클래스',
+      table: {
+        type: { summary: 'string' },
+      },
     },
     additionalInfoIcon: {
+      control: 'select',
+      options: [
+        'add-user',
+        'alert',
+        'arrow-left',
+        'arrow-right',
+        'bar-chart-square',
+        'calendar',
+        'check',
+        'chevron-down',
+        'chevron-left',
+        'chevron-right',
+        'chevron-up',
+        'clover',
+        'crown',
+        'dice',
+        'edit',
+        'envelope',
+        'eye',
+        'eye-slash',
+        'gamepad',
+        'gaming',
+        'group',
+        'handheld',
+        'home',
+        'home-circle',
+        'joystick-alt',
+        'lightbulb',
+        'lock',
+        'log-out',
+        'mail-open',
+        'match',
+        'message-bubble',
+        'message-circle-dots',
+        'message-circle-dots-outline',
+        'mic',
+        'minus',
+        'moon',
+        'notification',
+        'pencil',
+        'plus',
+        'refresh',
+        'review',
+        'search',
+        'send',
+        'settings',
+        'steam',
+        'sun',
+        'sword-alt',
+        'time',
+        'trophy',
+        'user',
+        'userprofile',
+        'warning',
+        'x',
+        'readygo-fox',
+      ],
+      description: '추가 정보 아이콘 이름',
+    },
+    additionalInfoIconColor: {
       control: 'text',
-      description: '추가 정보 아이콘 경로',
+      description: '추가 정보 아이콘 색상 (CSS 값)',
+      table: {
+        type: { summary: 'string' },
+      },
     },
     gap: {
       control: { type: 'number' },
@@ -97,6 +376,13 @@ const meta = {
       table: {
         type: { summary: 'number' },
         defaultValue: { summary: '4' },
+      },
+    },
+    onIconRightClick: {
+      action: 'iconRightClicked',
+      description: '오른쪽 아이콘 클릭 핸들러',
+      table: {
+        type: { summary: '() => void' },
       },
     },
     disabled: {
@@ -107,9 +393,38 @@ const meta = {
         defaultValue: { summary: 'false' },
       },
     },
+    type: {
+      control: 'select',
+      options: [
+        'text',
+        'password',
+        'email',
+        'number',
+        'tel',
+        'url',
+        'search',
+        'date',
+        'time',
+        'datetime-local',
+        'month',
+        'week',
+      ],
+      description: '인풋 타입',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: 'text' },
+      },
+    },
     placeholder: {
       control: 'text',
       description: '플레이스홀더 텍스트',
+    },
+    'data-testid': {
+      control: 'text',
+      description: '테스트 ID',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof Input>;
@@ -161,10 +476,10 @@ export const Filled: Story = {
   },
 };
 
-export const Danger: Story = {
+export const Error: Story = {
   args: {
     state: 'error',
-    placeholder: 'Danger Input',
+    placeholder: 'Error Input',
   },
 };
 
@@ -279,6 +594,48 @@ export const WithLabelIcon: Story = {
   },
 };
 
+export const WithCustomLabelStyle: Story = {
+  args: {
+    label: '커스텀 스타일 라벨',
+    labelColor: 'var(--color-text-danger)',
+    labelSize: '18px',
+    labelWeight: '600',
+    labelLineHeight: '1.5',
+    placeholder: '입력하세요',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '라벨의 색상, 크기, 굵기, 줄 간격을 커스터마이징할 수 있습니다.',
+      },
+    },
+  },
+};
+
+export const WithCustomLabelColor: Story = {
+  args: {
+    label: '빨간색 라벨',
+    labelColor: 'var(--color-text-danger)',
+    placeholder: '입력하세요',
+  },
+};
+
+export const WithCustomLabelSize: Story = {
+  args: {
+    label: '큰 라벨',
+    labelSize: '20px',
+    placeholder: '입력하세요',
+  },
+};
+
+export const WithCustomLabelWeight: Story = {
+  args: {
+    label: '굵은 라벨',
+    labelWeight: '700',
+    placeholder: '입력하세요',
+  },
+};
+
 // AdditionalInfo 스토리
 export const WithAdditionalInfo: Story = {
   args: {
@@ -318,6 +675,23 @@ export const WithRightIcon: Story = {
   args: {
     iconRight: 'x',
     placeholder: '입력하세요',
+  },
+};
+
+export const WithRightIconClickable: Story = {
+  args: {
+    iconRight: 'x',
+    placeholder: '입력하세요',
+    onIconRightClick: () => {
+      console.log('Right icon clicked');
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '오른쪽 아이콘 클릭 핸들러가 있는 인풋입니다.',
+      },
+    },
   },
 };
 
