@@ -280,3 +280,82 @@
 .contentWrapper.panelOpen .children {
   margin-right: 456px;
 }
+
+/* Steam Alert Styles */
+.steamAlert {
+  width: 100%;
+  max-width: 1776px;
+  height: 82px;
+  display: flex;
+  align-items: center;
+  background-color: var(--color-transparent-12);
+  border: 1px solid var(--color-border-interactive-primary);
+  border-radius: 24px;
+  padding: 24px 32px;
+  gap: 16px;
+}
+
+.steamAlertContent {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.steamAlertLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.steamAlertIcon {
+  color: var(--color-icon-interactive-primary);
+  flex-shrink: 0;
+}
+
+.steamAlertText {
+  font-family: var(--typo-heading-sm-font-family);
+  font-size: var(--typo-heading-sm-font-size);
+  line-height: var(--typo-heading-sm-line-height);
+  font-weight: var(--typo-heading-sm-font-weight);
+  color: var(--color-text-primary);
+  margin: 0;
+  flex: 1;
+}
+
+.steamAlertButton {
+  flex-shrink: 0;
+}
+
+.steamAlertButton .content {
+  gap: 4px;
+}
+
+.steamButtonIcon {
+  color: var(--color-text-interactive-inverse);
+  flex-shrink: 0;
+}
+
+.steamAlertClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+}
+
+.steamAlertClose:hover {
+  opacity: 0.7;
+}
+
+.steamAlertCloseIcon {
+  color: var(--color-icon-primary);
+}
