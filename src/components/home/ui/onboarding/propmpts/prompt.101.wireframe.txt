@@ -9,8 +9,8 @@
 
 ==============================================
 
-조건-파일경로) 구현될 TSX 파일경로: src/components/home/ui/steam-link/steamLink.tsx
-조건-파일경로) 구현될 CSS 파일경로: src/components/home/ui/steam-link/styles.module.css
+조건-파일경로) 구현될 TSX 파일경로: src/components/home/ui/onboarding/onboardingPage.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/home/ui/onboarding/styles.module.css
 
 ==============================================
 
