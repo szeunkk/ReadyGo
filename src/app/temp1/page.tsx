@@ -1,4 +1,4 @@
-import ReviewSubmit from '@/components/review-submit/ui/review-submit/reviewSubmit';
+import ReviewSubmit from '@/components/review-submit';
 
 export default function Temp1Page() {
   return (
@@ -7,4 +7,3 @@ export default function Temp1Page() {
     </div>
   );
 }
-
