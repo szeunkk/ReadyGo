@@ -1,5 +1,5 @@
 아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
-구현 결과를 체크리스트로 반환할 것.ㅎ
+구현 결과를 체크리스트로 반환할 것.
 
 ==============================================
 
@@ -11,11 +11,10 @@
 ==============================================
 
 조건-피그마) 활용할MCP: Figma Desktop
-조건-피그마) 구현될 figma: https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2654-8375&m=dev
+조건-피그마) 구현될 figma: https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2654-9411&m=dev
 
-조건-파일경로) 구현될 TSX 파일경로: src/components/home/ui/onboarding/onboardingPage.tsx
-조건-파일경로) 구현될 CSS 파일경로: src/components/home/ui/onboarding/styles.module.css
-
+조건-파일경로) 구현될 TSX 파일경로: src/commons/layout/ui/steamAlert.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/commons/layout/styles.module.css
 
 ==============================================
 
@@ -28,4 +27,3 @@
 ==============================================
 
 핵심요구사항) MCP를 연동하여 피그마의 디자인의 모든 속성과 변형을 확인하여 해당 컴포넌트를 구현할 것.
-
