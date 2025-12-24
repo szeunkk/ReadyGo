@@ -33,6 +33,11 @@ export interface InputProps extends Omit<
   iconRightColor?: string;
   labelIcon?: IconName;
   labelIconColor?: string;
+  labelColor?: string;
+  labelSize?: string;
+  labelWeight?: string;
+  labelLineHeight?: string;
+  labelClassName?: string;
   additionalInfoIcon?: IconName;
   additionalInfoIconColor?: string;
   gap?: number;
@@ -56,6 +61,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       iconRightColor,
       labelIcon,
       labelIconColor,
+      labelColor,
+      labelSize,
+      labelWeight,
+      labelLineHeight,
+      labelClassName,
       additionalInfoIcon,
       additionalInfoIconColor,
       gap = 4,
@@ -113,7 +123,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       .filter(Boolean)
       .join(' ');
 
-    const labelClasses = [styles.label].filter(Boolean).join(' ');
+    const labelClasses = [styles.label, labelClassName]
+      .filter(Boolean)
+      .join(' ');
 
     const additionalInfoClasses = [
       styles.additionalInfo,
@@ -134,7 +146,17 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 style={labelIconColor ? { color: labelIconColor } : undefined}
               />
             )}
-            <span className={styles.labelText}>{label}</span>
+            <span
+              className={styles.labelText}
+              style={{
+                ...(labelColor && { color: labelColor }),
+                ...(labelSize && { fontSize: labelSize }),
+                ...(labelWeight && { fontWeight: labelWeight }),
+                ...(labelLineHeight && { lineHeight: labelLineHeight }),
+              }}
+            >
+              {label}
+            </span>
             {required && <span className={styles.required}>*</span>}
           </div>
         )}
