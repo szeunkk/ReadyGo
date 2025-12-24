@@ -79,8 +79,8 @@
   grid-template-columns: repeat(3, 1fr);
 }
 
-/* 반응형 레이아웃 */
-@media (max-width: 1920px) {
+/* 반응형 레이아웃 - 대형 데스크탑 (1920px 이상) */
+@media (min-width: 1920px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -90,7 +90,19 @@
   }
 }
 
-@media (max-width: 1440px) {
+/* 반응형 레이아웃 - 중형 데스크탑 (1440px ~ 1920px) */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .gridWithPanel {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 반응형 레이아웃 - 소형 데스크탑 (1024px ~ 1440px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
   }
