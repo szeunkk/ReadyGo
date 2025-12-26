@@ -311,7 +311,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 #### 22. steam_sync_logs
 
-- 동기화 로그
+- 유저 단위 Steam 동기화 세션 로그
 
 | Column             | Type        | Nullable | Description    |
 | ------------------ | ----------- | -------- | -------------- |
@@ -320,6 +320,19 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | status             | text        | ⭕       | 동기화 상태    |
 | synced_games_count | int         | ⭕       | 동기화 게임 수 |
 | synced_at          | timestamptz | ⭕       | 동기화 시각    |
+
+#### 22-1. steam_game_sync_logs
+
+- 게임 단위 Steam 메타 동기화 상세 로그
+
+| Column     | Type        | Nullable | Description                |
+| ---------- | ----------- | -------- | -------------------------- |
+| id         | bigint      | ❌       | PK                         |
+| app_id     | bigint      | ⭕       | Steam App ID               |
+| user_id    | uuid        | ⭕       | 유저(유저 기반 동기화 시)  |
+| status     | text        | ❌       | success / skipped / failed |
+| reason     | text        | ⭕       | 실패 또는 스킵 사유        |
+| created_at | timestamptz | ⭕       | 처리 시각                  |
 
 ---
 
@@ -495,8 +508,9 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 ## Version History
 
-| Version | Date       | Description                                                   |
-| ------: | ---------- | ------------------------------------------------------------- |
-|  v1.0.0 | 2025-12-24 | Detailed table & column documentation (33 tables)             |
-|  v1.0.1 | 2025-12-26 | steam_game_info 테이블 컬럼 추가 및 수정                      |
-|  v1.0.2 | 2025-12-26 | steam_game_info categories, genres 컬럼 수정(jsonb[], text[]) |
+| Version | Date       | Description                                                                        |
+| ------: | ---------- | ---------------------------------------------------------------------------------- |
+|  v1.0.0 | 2025-12-24 | Detailed table & column documentation (33 tables)                                  |
+|  v1.0.1 | 2025-12-26 | steam_game_info 테이블 컬럼 추가 및 수정                                           |
+|  v1.0.2 | 2025-12-26 | steam_game_info categories, genres 컬럼 수정(jsonb[], text[])                      |
+|  v1.0.3 | 2025-12-26 | 게임 단위 Steam 메타 동기화 상세 로그 확인을 위한 steam_game_sync_logs 테이블 추가 |

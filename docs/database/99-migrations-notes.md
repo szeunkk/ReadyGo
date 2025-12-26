@@ -45,3 +45,15 @@
 
 - ADD COLUMN categories (jsonb[]), EDIT COLUMN genres (text[])
 - 이유: 게임 카테고리 컬럼 추가 및 수정
+
+---
+
+## v1.0.2
+
+**Date**: 2025-12-26  
+**Author**: ReadyGo / Eunkyoung Kim(김은경)
+
+### steam_game_sync_logs
+
+- ADD TABLE
+- 이유: 게임 단위 steam 메타 동기화 상세 로그 기록을 위한 테이블 추가

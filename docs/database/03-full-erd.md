@@ -76,7 +76,11 @@ erDiagram
   %% =========================
   user_profiles ||--o{ steam_user_games : owns
   steam_game_info ||--o{ steam_user_games : referenced_by
+
   user_profiles ||--o{ steam_sync_logs : syncs
+  steam_sync_logs ||--o{ steam_game_sync_logs : contains
+  steam_game_info ||--o{ steam_game_sync_logs : logged_for
+
 
   %% =========================
   %% Social / Interaction Domain
@@ -171,7 +175,7 @@ erDiagram
 
 - **Author**: ReadyGo / Eunkyoung Kim(김은경)
 - **Created At**: 2025-12-24
-- **Last Updated At**: 2025-12-24
+- **Last Updated At**: 2025-12-26
 - **Document Version**: v1.0.0
 - **Status**: Active
 - **Source of Truth**:
@@ -180,6 +184,7 @@ erDiagram
 
 ## Version History
 
-| Version | Date       | Description         |
-| ------: | ---------- | ------------------- |
-|  v1.0.0 | 2025-12-24 | Full integrated ERD |
+| Version | Date       | Description                                      |
+| ------: | ---------- | ------------------------------------------------ |
+|  v1.0.0 | 2025-12-24 | Full integrated ERD                              |
+|  v1.0.1 | 2025-12-26 | steam_game_sync_logs 테이블 추가에 따른 ERD 수정 |

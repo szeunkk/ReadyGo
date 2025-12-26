@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
+import { AuthProvider } from '../commons/providers/auth/auth.provider';
 import { NextThemesProvider } from '../commons/providers/next-themes/next-themes.provider';
 import { ModalProvider } from '../commons/providers/modal/modal.provider';
+import { AuthGuard } from '../commons/providers/auth/auth.guard';
 import { Layout } from '../commons/layout';
 
 const pretendard = localFont({
@@ -24,12 +26,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${pretendard.variable}  antialiased`}>
-        <NextThemesProvider>
-          <ModalProvider>
-            <Layout>{children}</Layout>
-          </ModalProvider>
-        </NextThemesProvider>
+      <body
+        className={`${pretendard.variable}  antialiased`}
+        suppressHydrationWarning
+      >
+        <AuthProvider>
+          <NextThemesProvider>
+            <ModalProvider>
+              <AuthGuard>
+                <Layout>{children}</Layout>
+              </AuthGuard>
+            </ModalProvider>
+          </NextThemesProvider>
+        </AuthProvider>
       </body>
     </html>
   );

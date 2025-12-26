@@ -617,6 +617,33 @@ export type Database = {
         }
         Relationships: []
       }
+      steam_game_sync_logs: {
+        Row: {
+          app_id: number | null
+          created_at: string | null
+          id: number
+          reason: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          app_id?: number | null
+          created_at?: string | null
+          id?: never
+          reason?: string | null
+          status: string
+          user_id?: string | null
+        }
+        Update: {
+          app_id?: number | null
+          created_at?: string | null
+          id?: never
+          reason?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       steam_sync_logs: {
         Row: {
           id: number

@@ -1,12 +1,16 @@
-// POST /api/steam/sync-games?limit=200
-
 import { NextResponse } from 'next/server';
 import { syncSteamGames } from '@/services/steam/steamGame.service';
 
 export const POST = async (req: Request) => {
-  const url = new URL(req.url);
-  const limit = Number(url.searchParams.get('limit') ?? '200');
+  // const secret = req.headers.get('x-cron-secret');
+  // if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
+  //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // }
 
-  const result = await syncSteamGames(Number.isFinite(limit) ? limit : 200);
+  const { searchParams } = new URL(req.url);
+  const limit = Number(searchParams.get('limit') ?? 200);
+
+  const result = await syncSteamGames(limit);
+
   return NextResponse.json(result);
 };
