@@ -1,132 +1,133 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth.store';
-import { useAuth } from './auth.provider';
 import { useModal } from '../modal/modal.provider';
 import { isMemberOnlyPath, URL_PATHS } from '@/commons/constants/url';
+import { UnauthorizedPage } from './ui/UnauthorizedPage';
 
 interface AuthGuardProps {
   children: React.ReactNode;
 }
 
-export const AuthGuard = ({ children }: AuthGuardProps) => {
-  const pathname = usePathname();
+/**
+ * 페이지 접근 권한을 제어하는 가드 컴포넌트
+ * - 초기 인가 완료 전까지는 빈 화면 유지
+ * - 비회원의 회원 전용 경로 접근 시, 1회 모달 노출 후 로그인 페이지로 안내
+ * - 테스트 환경(NEXT_PUBLIC_TEST_ENV=test)에서는 항상 통과
+ */
+export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const router = useRouter();
-  const { accessToken } = useAuthStore();
-  const { isLoggedIn } = useAuth();
+  const pathname = usePathname();
+  const accessToken = useAuthStore((s) => s.accessToken);
   const { openModal, closeAllModals } = useModal();
 
-  // 공개 경로는 초기 상태에서도 허용
-  const isPublicPath = !isMemberOnlyPath(pathname);
-  const [isAuthorized, setIsAuthorized] = useState(isPublicPath);
-  const [isChecking, setIsChecking] = useState(!isPublicPath);
-  const hasShownModalRef = useRef(false);
-  const isSessionSyncedRef = useRef(false);
-  const hasCheckedSessionRef = useRef(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [didAuthorize, setDidAuthorize] = useState(false);
+  const hasPromptedRef = useRef(false);
 
-  // 테스트 환경 변수 확인
-  const isTestEnv = process.env.NEXT_PUBLIC_TEST_ENV === 'test';
-
-  // 세션 동기화 완료 확인 (auth.provider의 세션 동기화 완료 대기)
-  useEffect(() => {
-    if (isSessionSyncedRef.current) {
-      return;
+  const isTestEnv = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return false;
     }
 
-    if (!hasCheckedSessionRef.current) {
-      hasCheckedSessionRef.current = true;
-      // auth.provider의 세션 동기화 완료 대기 (최대 300ms)
-      // 회원 전용 경로만 세션 동기화를 기다림
-      const timer = setTimeout(() => {
-        isSessionSyncedRef.current = true;
-      }, 300);
-
-      return () => {
-        clearTimeout(timer);
-      };
+    if (
+      typeof process !== 'undefined' &&
+      process.env.NEXT_PUBLIC_TEST_ENV === 'test'
+    ) {
+      return true;
     }
+
+    return false;
   }, []);
 
-  // 세션 동기화 완료 후 인가 진행 및 경로 변경 시 인가 재검증
+  // 클라이언트 마운트 체크
   useEffect(() => {
-    if (!isSessionSyncedRef.current) {
+    setIsMounted(true);
+  }, []);
+
+  // AuthProvider 초기화 시점 이후에 인가 진행을 보장하기 위해 다음 틱으로 미룸
+  useEffect(() => {
+    if (!isMounted) {
       return;
     }
 
-    setIsChecking(true);
-    hasShownModalRef.current = false;
-
-    // 테스트 환경: 모든 페이지 접근 허용
-    if (isTestEnv) {
-      setIsAuthorized(true);
-      setIsChecking(false);
-      return;
-    }
-
-    // 공개 경로: 인가 검증 건너뛰기
-    if (!isMemberOnlyPath(pathname)) {
-      setIsAuthorized(true);
-      setIsChecking(false);
-      return;
-    }
-
-    // 회원 전용 경로: 로그인 여부 확인
-    const isAuthenticated = Boolean(accessToken) || isLoggedIn;
-
-    if (isAuthenticated) {
-      setIsAuthorized(true);
-      setIsChecking(false);
-      hasShownModalRef.current = false;
-    } else {
-      setIsAuthorized(false);
-      setIsChecking(false);
-
-      // 모달은 한 번만 표시
-      if (!hasShownModalRef.current) {
-        hasShownModalRef.current = true;
-
-        openModal({
-          variant: 'single',
-          title: '로그인이 필요합니다',
-          description: '이 페이지에 접근하려면 로그인이 필요합니다.',
-          confirmText: '확인',
-          onConfirm: () => {
-            closeAllModals();
-            router.push(URL_PATHS.LOGIN);
-          },
-        });
+    // AuthProvider의 세션 동기화를 기다리기 위해 약간의 지연 추가
+    let raf = 0;
+    raf = window.requestAnimationFrame(() => {
+      // 추가 지연으로 AuthProvider의 초기 세션 동기화 완료 대기
+      setTimeout(() => {
+        setDidAuthorize(true);
+      }, 100);
+    });
+    return () => {
+      if (raf) {
+        window.cancelAnimationFrame(raf);
       }
-    }
-  }, [
-    pathname,
-    accessToken,
-    isLoggedIn,
-    isTestEnv,
-    openModal,
-    closeAllModals,
-    router,
-  ]);
+    };
+  }, [isMounted]);
 
-  // 공개 경로는 세션 동기화를 기다리지 않고 즉시 표시
+  // 경로 변경 시 모달 플래그 리셋
   useEffect(() => {
-    if (!isMemberOnlyPath(pathname)) {
-      setIsAuthorized(true);
-      setIsChecking(false);
-    }
+    hasPromptedRef.current = false;
   }, [pathname]);
 
-  // 인가 진행 중이거나 인가 실패 시 빈 화면 표시
-  // 단, 공개 경로는 세션 동기화를 기다리지 않고 표시
-  if (isChecking || !isAuthorized) {
-    // 공개 경로는 세션 동기화를 기다리지 않음
-    if (!isMemberOnlyPath(pathname)) {
-      return <>{children}</>;
+  // 회원 전용 페이지 접근 제어
+  useEffect(() => {
+    if (!isMounted || !didAuthorize) {
+      return;
     }
+
+    const isMemberPath = isMemberOnlyPath(pathname);
+
+    // 공개 경로는 인가 검증 불필요
+    if (!isMemberPath) {
+      return;
+    }
+
+    // 로그인 상태면 인가 허용
+    if (accessToken) {
+      // 로그인 상태로 변경된 경우 모달 닫기
+      if (hasPromptedRef.current) {
+        closeAllModals();
+        hasPromptedRef.current = false;
+      }
+      return;
+    }
+
+    // 비로그인 상태: 테스트 환경이 아니면 모달 표시
+    if (!isTestEnv && !hasPromptedRef.current) {
+      hasPromptedRef.current = true;
+
+      openModal({
+        variant: 'single',
+        title: '로그인이 필요합니다',
+        description: '이 페이지에 접근하려면 로그인이 필요합니다.',
+        confirmText: '확인',
+        onConfirm: () => {
+          closeAllModals();
+          router.push(URL_PATHS.LOGIN);
+        },
+      });
+    }
+  }, [isMounted, didAuthorize, pathname, accessToken, isTestEnv, openModal, closeAllModals, router]);
+
+  // 테스트 환경: 항상 통과
+  if (isTestEnv) {
+    return <>{children}</>;
+  }
+
+  // 초기 마운트 또는 인가 전: 빈 화면
+  if (!isMounted || !didAuthorize) {
     return null;
   }
 
-  // 인가 성공 시 children 표시
+  // 회원 전용 페이지 접근 제어
+  if (pathname && isMemberOnlyPath(pathname) && !accessToken) {
+    // 빈 화면 유지 (모달은 useEffect에서 표시)
+    return <UnauthorizedPage />;
+  }
+
   return <>{children}</>;
 };
