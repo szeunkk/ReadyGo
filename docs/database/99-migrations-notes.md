@@ -33,3 +33,15 @@
 - 02-domain-erd.md
 - 03-full-erd.md
 - 04-table-details.md
+
+---
+
+## v1.0.1
+
+**Date**: 2025-12-26  
+**Author**: ReadyGo / Eunkyoung Kim(김은경)
+
+### steam_game_info
+
+- ADD COLUMN categories (jsonb[]), EDIT COLUMN genres (text[])
+- 이유: 게임 카테고리 컬럼 추가 및 수정
