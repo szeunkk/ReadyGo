@@ -58,6 +58,7 @@ Generated from: database.types.ts
 - push_tokens
 - reviews
 - steam_game_info
+- steam_game_sync_logs
 - steam_sync_logs
 - steam_user_games
 - tags
@@ -71,7 +72,7 @@ Generated from: database.types.ts
 - user_traits
 ```
 
-📌 총 33개 (public schema 기준)
+📌 총 34개 (public schema 기준)
 
 ## Column Definition Rules
 
@@ -116,6 +117,7 @@ Generated from: database.types.ts
 ## Indexes
 
 - 본 단계에서는 인덱스 존재 여부만 확인
+- 일부 컬럼(steam_game_info.genres, categories)에 대해 GIN 인덱스가 추가되어 있음
 - 성능 최적화 목적의 인덱스 설계는 다음 단계에서 진행
 
 ---
@@ -141,3 +143,4 @@ Generated from: database.types.ts
 | Version | Date       | Description                                       |
 | ------: | ---------- | ------------------------------------------------- |
 |  v1.0.0 | 2025-12-24 | Public schema analysis based on database.types.ts |
+|  v1.0.1 | 2025-12-26 | 테이블 추가에 따른 테이블 목록 요약 수정          |
