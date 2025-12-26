@@ -27,7 +27,9 @@ export const insertSteamGameSyncLog = async (params: {
  * SELECT: SUCCESS APP IDS
  * ========================= */
 export const getSuccessAppIds = async (appIds: number[]) => {
-  if (appIds.length === 0) return new Set<number>();
+  if (appIds.length === 0) {
+    return new Set<number>();
+  }
 
   const { data, error } = await supabaseAdmin
     .from('steam_game_sync_logs')
@@ -35,7 +37,9 @@ export const getSuccessAppIds = async (appIds: number[]) => {
     .eq('status', 'success')
     .in('app_id', appIds);
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
   return new Set<number>((data ?? []).map((r) => r.app_id));
 };
