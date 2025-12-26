@@ -11,10 +11,12 @@ export type SteamGameUpsertInput = {
   categories: SteamCategoryJson[];
 };
 
-export async function upsertSteamGame(input: SteamGameUpsertInput) {
+export const upsertSteamGame = async (input: SteamGameUpsertInput) => {
   const { error } = await supabaseAdmin
     .from('steam_game_info')
     .upsert(input, { onConflict: 'app_id' });
 
-  if (error) throw error;
-}
+  if (error) {
+    throw error;
+  }
+};

@@ -474,7 +474,8 @@ const verifySteamOpenId = async (
 
     if (error instanceof TypeError && error.message.includes('fetch')) {
       // 네트워크 에러 또는 fetch 관련 에러
-      errorMessage = 'Steam 서버와의 통신에 실패했습니다. 네트워크 연결을 확인해주세요.';
+      errorMessage =
+        'Steam 서버와의 통신에 실패했습니다. 네트워크 연결을 확인해주세요.';
       errorCode = 'network_error';
     } else if (error instanceof ReferenceError) {
       // 코드 버그 관련 에러 (예: 변수 미정의)
@@ -483,8 +484,13 @@ const verifySteamOpenId = async (
     } else if (error instanceof Error) {
       // 기타 예상치 못한 에러
       const errorMsg = error.message.toLowerCase();
-      if (errorMsg.includes('network') || errorMsg.includes('fetch') || errorMsg.includes('timeout')) {
-        errorMessage = 'Steam 서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.';
+      if (
+        errorMsg.includes('network') ||
+        errorMsg.includes('fetch') ||
+        errorMsg.includes('timeout')
+      ) {
+        errorMessage =
+          'Steam 서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.';
         errorCode = 'network_error';
       } else {
         errorMessage = 'Steam 인증 검증 중 오류가 발생했습니다.';

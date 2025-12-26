@@ -7,4 +7,3 @@ export default function Temp4Page() {
     </div>
   );
 }
-
