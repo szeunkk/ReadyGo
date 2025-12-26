@@ -1,14 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './styles.module.css';
 import Input from '@/commons/components/input';
 import Button from '@/commons/components/button';
 import { useSignupForm } from './hooks/index.form.hook';
 import { useGoogleOAuth } from '../hooks/useGoogleOAuth.hook';
 import { useKakaoOAuth } from '../hooks/useKakaoOAuth.hook';
+import { URL_PATHS } from '@/commons/constants/url';
 
 export default function Signup() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const { form, onSubmit, isFormValid, isSubmitting } = useSignupForm();
@@ -18,6 +21,10 @@ export default function Signup() {
     register,
     formState: { errors: formErrors },
   } = form;
+
+  const handleLoginClick = () => {
+    router.push(URL_PATHS.LOGIN);
+  };
 
   return (
     <div className={styles.wrapper} data-testid="auth-signup-page">
@@ -179,7 +186,11 @@ export default function Signup() {
 
         <div className={styles.loginLink}>
           <span className={styles.loginText}>이미 계정이 있다면?</span>
-          <button className={styles.loginButtonLink} type="button">
+          <button
+            className={styles.loginButtonLink}
+            type="button"
+            onClick={handleLoginClick}
+          >
             로그인 하기
           </button>
         </div>
