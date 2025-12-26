@@ -590,6 +590,7 @@ export type Database = {
       steam_game_info: {
         Row: {
           app_id: number
+          categories: Json | null
           created_at: string | null
           description: string | null
           genre: string | null
@@ -598,6 +599,7 @@ export type Database = {
         }
         Insert: {
           app_id: number
+          categories?: Json | null
           created_at?: string | null
           description?: string | null
           genre?: string | null
@@ -606,6 +608,7 @@ export type Database = {
         }
         Update: {
           app_id?: number
+          categories?: Json | null
           created_at?: string | null
           description?: string | null
           genre?: string | null

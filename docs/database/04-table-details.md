@@ -299,14 +299,15 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 - 게임 메타
 
-| Column       | Type        | Nullable | Description  |
-| ------------ | ----------- | -------- | ------------ |
-| app_id       | int         | ❌       | Steam App ID |
-| name         | text        | ⭕       | 게임명       |
-| genre        | text        | ⭕       | 장르         |
-| description  | text        | ⭕       | 설명         |
-| header_image | text        | ⭕       | 헤더 이미지  |
-| created_at   | timestamptz | ⭕       | 생성 시각    |
+| Column       | Type        | Nullable | Description         |
+| ------------ | ----------- | -------- | ------------------- |
+| app_id       | int         | ❌       | Steam App ID        |
+| name         | text        | ⭕       | 게임명              |
+| genre        | text        | ⭕       | 장르                |
+| categories   | jsonb       | ⭕       | Steam 카테고리 목록 |
+| description  | text        | ⭕       | 설명                |
+| header_image | text        | ⭕       | 헤더 이미지         |
+| created_at   | timestamptz | ⭕       | 생성 시각           |
 
 #### 22. steam_sync_logs
 
@@ -497,3 +498,4 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | Version | Date       | Description                                       |
 | ------: | ---------- | ------------------------------------------------- |
 |  v1.0.0 | 2025-12-24 | Detailed table & column documentation (33 tables) |
+|  v1.0.1 | 2025-12-26 | steam_game_info 테이블 컬럼 추가(33 tables)       |
