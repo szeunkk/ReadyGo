@@ -115,6 +115,8 @@ export const useSteamCallback = (initialParams?: Record<string, string>) => {
               onConfirm: () => {
                 closeAllModals();
                 hasShownErrorModalRef.current = false;
+                // 스팀 로그인 페이지로 다시 이동
+                handleSteamLink();
               },
             });
           } else {
@@ -127,6 +129,8 @@ export const useSteamCallback = (initialParams?: Record<string, string>) => {
               onConfirm: () => {
                 closeAllModals();
                 hasShownErrorModalRef.current = false;
+                // 스팀 로그인 페이지로 다시 이동
+                handleSteamLink();
               },
             });
           }
@@ -148,6 +152,8 @@ export const useSteamCallback = (initialParams?: Record<string, string>) => {
               closeAllModals();
               hasShownErrorModalRef.current = false;
               isProcessingRef.current = false; // 플래그 리셋
+              // 스팀 로그인 페이지로 다시 이동
+              handleSteamLink();
             },
           });
         }
