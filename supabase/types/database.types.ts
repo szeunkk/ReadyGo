@@ -592,28 +592,28 @@ export type Database = {
           app_id: number
           categories: Json | null
           created_at: string | null
-          description: string | null
           genre: string | null
           header_image: string | null
           name: string | null
+          short_description: string | null
         }
         Insert: {
           app_id: number
           categories?: Json | null
           created_at?: string | null
-          description?: string | null
           genre?: string | null
           header_image?: string | null
           name?: string | null
+          short_description?: string | null
         }
         Update: {
           app_id?: number
           categories?: Json | null
           created_at?: string | null
-          description?: string | null
           genre?: string | null
           header_image?: string | null
           name?: string | null
+          short_description?: string | null
         }
         Relationships: []
       }
