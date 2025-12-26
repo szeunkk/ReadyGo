@@ -156,44 +156,14 @@ export const useLoginForm = () => {
       }
 
       // 2. 로그인 성공 판단
+      // Supabase가 자동으로 세션을 localStorage에 저장하므로 별도 저장 불필요
       if (!authData.session?.access_token) {
         throw new Error('로그인에 실패했습니다. 세션을 받지 못했습니다.');
       }
 
       // 3. 로그인 성공 후 처리
-      // localStorage에 저장
-      localStorage.setItem('accessToken', authData.session.access_token);
-
-      // user 정보 가져오기
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        throw new Error('사용자 정보를 가져오지 못했습니다.');
-      }
-
-      // fetchUserLoggedIn API: user_profiles에서 _id, name 조회
-      const { data: userProfile, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('id, nickname')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) {
-        console.error('Profile fetch error:', profileError);
-        // 프로필 조회 실패해도 로그인은 성공으로 처리
-      }
-
-      localStorage.setItem(
-        'user',
-        JSON.stringify({
-          id: user.id,
-          email: user.email,
-          _id: userProfile?.id || user.id,
-          name: userProfile?.nickname || null,
-        })
-      );
+      // Supabase Auth가 자동으로 세션을 관리하므로 별도 localStorage 저장 불필요
+      // 세션 정보는 supabase.auth.getSession()으로 조회 가능
 
       // 로그인완료모달 노출 (한 번만)
       if (!hasShownSuccessModalRef.current) {

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
+import { AuthProvider } from '../commons/providers/auth/auth.provider';
 import { NextThemesProvider } from '../commons/providers/next-themes/next-themes.provider';
 import { ModalProvider } from '../commons/providers/modal/modal.provider';
 import { Layout } from '../commons/layout';
@@ -25,11 +26,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${pretendard.variable}  antialiased`}>
-        <NextThemesProvider>
-          <ModalProvider>
-            <Layout>{children}</Layout>
-          </ModalProvider>
-        </NextThemesProvider>
+        <AuthProvider>
+          <NextThemesProvider>
+            <ModalProvider>
+              <Layout>{children}</Layout>
+            </ModalProvider>
+          </NextThemesProvider>
+        </AuthProvider>
       </body>
     </html>
   );
