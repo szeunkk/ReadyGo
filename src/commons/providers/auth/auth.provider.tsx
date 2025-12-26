@@ -1,6 +1,12 @@
 'use client';
 
-import { useEffect, useRef, createContext, useContext, useCallback } from 'react';
+import {
+  useEffect,
+  useRef,
+  createContext,
+  useContext,
+  useCallback,
+} from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import type { User } from '@supabase/supabase-js';
 
@@ -70,7 +76,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const newUser = session?.user ?? null;
 
       // 무한 루프 방지: 값이 변경된 경우에만 업데이트
-      const { accessToken: currentAccessToken, user: currentUser } = storeRef.current;
+      const { accessToken: currentAccessToken, user: currentUser } =
+        storeRef.current;
       if (
         currentAccessToken !== newAccessToken ||
         currentUser?.id !== newUser?.id ||
@@ -107,7 +114,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const newUser = session?.user ?? null;
 
       // 무한 루프 방지: ref의 현재 값과 비교
-      const { accessToken: currentAccessToken, user: currentUser } = storeRef.current;
+      const { accessToken: currentAccessToken, user: currentUser } =
+        storeRef.current;
       if (
         currentAccessToken !== newAccessToken ||
         currentUser?.id !== newUser?.id ||
