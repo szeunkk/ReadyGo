@@ -495,7 +495,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 ## Version History
 
-| Version | Date       | Description                                       |
-| ------: | ---------- | ------------------------------------------------- |
-|  v1.0.0 | 2025-12-24 | Detailed table & column documentation (33 tables) |
-|  v1.0.1 | 2025-12-26 | steam_game_info 테이블 컬럼 추가(33 tables)       |
+| Version | Date       | Description                                         |
+| ------: | ---------- | --------------------------------------------------- |
+|  v1.0.0 | 2025-12-24 | Detailed table & column documentation (33 tables)   |
+|  v1.0.1 | 2025-12-26 | steam_game_info 테이블 컬럼 추가 및 수정(33 tables) |
