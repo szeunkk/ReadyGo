@@ -7,19 +7,25 @@ import React, {
   useCallback,
   ReactNode,
   useEffect,
+  ComponentType,
 } from 'react';
 import { createPortal } from 'react-dom';
 import Modal, { ModalProps } from '../../components/modal';
 import styles from './styles.module.css';
 
+interface ExtendedModalProps extends ModalProps {
+  component?: ComponentType<Record<string, unknown>>;
+  componentProps?: Record<string, unknown>;
+}
+
 interface ModalItem {
   id: string;
-  props: ModalProps;
+  props: ExtendedModalProps;
   isClosing: boolean;
 }
 
 interface ModalContextType {
-  openModal: (props: ModalProps) => string;
+  openModal: (props: ExtendedModalProps) => string;
   closeModal: (id?: string) => void;
   closeAllModals: () => void;
   isOpen: boolean;
@@ -56,7 +62,7 @@ export const ModalProvider = ({ children }: ModalProviderProps) => {
   }, []);
 
   // 모달 열기 - 스택에 추가
-  const openModal = useCallback((props: ModalProps): string => {
+  const openModal = useCallback((props: ExtendedModalProps): string => {
     const id = generateModalId();
     setModalStack((prev) => [
       ...prev,
@@ -148,6 +154,10 @@ export const ModalProvider = ({ children }: ModalProviderProps) => {
       closeModal(modal.id);
     };
 
+    const handleClose = () => {
+      closeModal(modal.id);
+    };
+
     const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
       if (e.target === e.currentTarget) {
         closeModal(modal.id);
@@ -157,6 +167,14 @@ export const ModalProvider = ({ children }: ModalProviderProps) => {
     // z-index 계산: 베이스 9999 + (인덱스 * 10)
     const zIndex = 9999 + index * 10;
     const isOpen = !modal.isClosing;
+
+    // 커스텀 컴포넌트가 있는지 확인
+    const CustomComponent = modal.props.component;
+    const {
+      component: _component,
+      componentProps,
+      ...modalProps
+    } = modal.props;
 
     return (
       <div
@@ -170,11 +188,20 @@ export const ModalProvider = ({ children }: ModalProviderProps) => {
         <div
           className={`${styles.modalWrapper} ${isOpen ? styles.modalOpen : ''}`}
         >
-          <Modal
-            {...modal.props}
-            onConfirm={handleConfirm}
-            onCancel={handleCancel}
-          />
+          {CustomComponent ? (
+            <CustomComponent
+              {...componentProps}
+              onClose={handleClose}
+              onConfirm={handleConfirm}
+              onCancel={handleCancel}
+            />
+          ) : (
+            <Modal
+              {...modalProps}
+              onConfirm={handleConfirm}
+              onCancel={handleCancel}
+            />
+          )}
         </div>
       </div>
     );

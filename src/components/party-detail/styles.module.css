@@ -1,13 +1,14 @@
 .container {
-  width: 1840px;
+  width: 100%;
   height: 1466px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  margin: 0 auto;
 }
 
 .titleArea {
-  width: 1840px;
+  width: 100%;
   height: 172px;
   padding: 32px 60px 40px 60px;
   display: flex;
@@ -61,7 +62,7 @@
 }
 
 .mainArea {
-  width: 1840px;
+  width: 100%;
   height: 1466px;
   padding: 32px;
   display: flex;
@@ -72,6 +73,37 @@
   background-color: var(--color-bg-secondary);
 }
 
+.chatArea {
+  width: 824px;
+  height: 1230px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background-color: var(--color-blue-100);
+  padding: 32px;
+  gap: 24px;
+}
+
+.chatLog {
+  width: 760px;
+  height: 1094px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background-color: var(--color-purple-100);
+}
+
+.messageArea {
+  width: 760px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background-color: var(--color-orange-100);
+}
+
 .sideArea {
   width: 464px;
   height: 1230px;
@@ -79,6 +111,17 @@
   flex-direction: column;
   gap: 24px;
   box-sizing: border-box;
+}
+
+.memberList {
+  width: 464px;
+  height: 754px;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background-color: var(--color-green-100);
 }
 
 .partyInfo {

@@ -5,6 +5,7 @@ import Selectbox, { type SelectboxItem } from '@/commons/components/selectbox';
 import Searchbar from '@/commons/components/searchbar';
 import Button from '@/commons/components/button';
 import Card, { PartyCardProps } from './ui/card';
+import { useLinkModal } from './hooks/index.link.modal.hook';
 import styles from './styles.module.css';
 
 // 임시 데이터 - 추후 API로 대체될 예정
@@ -99,6 +100,7 @@ export default function Party() {
   const [selectedGenre, setSelectedGenre] = useState<string | undefined>(
     undefined
   );
+  const { openPartySubmitModal } = useLinkModal();
 
   const genreItems: SelectboxItem[] = [
     { id: 'all', value: '모든 게임 장르' },
@@ -113,7 +115,7 @@ export default function Party() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="party-page">
       <div className={styles.titleArea}>
         <h1 className={styles.title}>파티 모집</h1>
         <p className={styles.subtitle}>함께 게임할 파티를 찾거나 모집하세요</p>
@@ -143,6 +145,7 @@ export default function Party() {
               size="m"
               shape="rectangle"
               className={styles.buttonWidth}
+              onClick={openPartySubmitModal}
             >
               새 파티 만들기
             </Button>

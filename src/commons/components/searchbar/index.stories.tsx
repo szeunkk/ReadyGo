@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import Searchbar from './index';
-import Icon from '../icon';
 
 const meta = {
   title: 'Commons/Components/Searchbar',
@@ -10,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '검색바 컴포넌트입니다. children을 통해 아이콘과 입력 필드를 유연하게 배치할 수 있으며, state prop으로 다양한 상태를 표현할 수 있습니다. 테마는 globals.css의 시맨틱 컬러 시스템으로 자동 관리됩니다.',
+          '검색바 컴포넌트입니다. state prop으로 다양한 상태를 표현할 수 있으며, 테마는 globals.css의 시맨틱 컬러 시스템으로 자동 관리됩니다.',
       },
     },
   },
@@ -25,9 +24,27 @@ const meta = {
         defaultValue: { summary: 'default' },
       },
     },
+    icon: {
+      control: 'select',
+      options: ['left', 'right'],
+      description: '아이콘 위치',
+      table: {
+        type: { summary: 'SearchbarIcon' },
+        defaultValue: { summary: 'left' },
+      },
+    },
+    size: {
+      control: 'select',
+      options: ['m', 'l'],
+      description: '검색바 크기',
+      table: {
+        type: { summary: 'SearchbarSize' },
+        defaultValue: { summary: 'm' },
+      },
+    },
     children: {
       control: false,
-      description: '검색바 내부 콘텐츠 (아이콘, input 등을 포함한 유연한 배치)',
+      description: '검색바 내부 콘텐츠',
     },
     placeholder: {
       control: 'text',
@@ -98,100 +115,73 @@ export const Filled: Story = {
   },
 };
 
-// Children을 통한 아이콘 배치
-export const WithIconLeft: Story = {
-  render: () => (
-    <Searchbar state="default" placeholder="게이머 이름으로 검색...">
-      <Icon name="search" size={20} />
-      <input
-        type="text"
-        placeholder="게이머 이름으로 검색..."
-        style={{
-          flex: 1,
-          border: 'none',
-          outline: 'none',
-          background: 'transparent',
-        }}
-      />
-    </Searchbar>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: '왼쪽에 검색 아이콘이 있는 검색바입니다.',
-      },
-    },
-  },
-};
-
-export const WithIconRight: Story = {
-  render: () => (
-    <Searchbar state="default" placeholder="게이머 이름으로 검색...">
-      <input
-        type="text"
-        placeholder="게이머 이름으로 검색..."
-        defaultValue="검색어"
-        style={{
-          flex: 1,
-          border: 'none',
-          outline: 'none',
-          background: 'transparent',
-        }}
-      />
-      <Icon
-        name="x"
-        size={20}
-        style={{ cursor: 'pointer' }}
-        onClick={() => alert('삭제 클릭')}
-      />
-    </Searchbar>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: '오른쪽에 삭제 아이콘이 있는 검색바입니다.',
-      },
-    },
-  },
-};
-
-export const WithIconsBoth: Story = {
-  render: () => (
-    <Searchbar state="active" placeholder="게이머 이름으로 검색...">
-      <Icon name="search" size={20} />
-      <input
-        type="text"
-        placeholder="게이머 이름으로 검색..."
-        defaultValue="검색어"
-        style={{
-          flex: 1,
-          border: 'none',
-          outline: 'none',
-          background: 'transparent',
-        }}
-      />
-      <Icon
-        name="x"
-        size={20}
-        style={{ cursor: 'pointer' }}
-        onClick={() => alert('삭제 클릭')}
-      />
-    </Searchbar>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: '왼쪽과 오른쪽 모두에 아이콘이 있는 검색바입니다.',
-      },
-    },
-  },
-};
-
 // Disabled 스토리
 export const Disabled: Story = {
   args: {
     disabled: true,
     placeholder: '비활성화된 검색바',
+  },
+};
+
+// Icon Variants
+export const IconLeft: Story = {
+  args: {
+    icon: 'left',
+    state: 'default',
+    placeholder: '게이머 이름으로 검색...',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '아이콘이 왼쪽에 위치한 검색바입니다.',
+      },
+    },
+  },
+};
+
+export const IconRight: Story = {
+  args: {
+    icon: 'right',
+    state: 'default',
+    placeholder: '게이머 이름으로 검색...',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '아이콘이 오른쪽에 위치한 검색바입니다.',
+      },
+    },
+  },
+};
+
+// Size Variants
+export const SizeM: Story = {
+  args: {
+    size: 'm',
+    state: 'default',
+    placeholder: '게이머 이름으로 검색...',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '중간 크기(m) 검색바입니다. 높이 48px.',
+      },
+    },
+  },
+};
+
+export const SizeL: Story = {
+  args: {
+    size: 'l',
+    state: 'default',
+    placeholder: '게이머 이름으로 검색...',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '큰 크기(l) 검색바입니다. 높이 56px.',
+      },
+    },
   },
 };
 
@@ -236,96 +226,156 @@ export const AllStates: Story = {
     docs: {
       description: {
         story:
-          '모든 state 변형을 확인할 수 있습니다. children을 통해 아이콘과 입력 필드를 자유롭게 배치할 수 있으며, 테마는 Storybook 툴바에서 전환 가능합니다.',
+          '모든 state 변형을 확인할 수 있습니다. 테마는 Storybook 툴바에서 전환 가능합니다.',
       },
     },
   },
 };
 
-// All Variants with Icons
-export const AllVariantsWithIcons: Story = {
+// All Variants 스토리
+export const AllVariants: Story = {
   render: () => (
     <div
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '16px',
-        width: '320px',
+        gap: '24px',
+        width: '400px',
       }}
     >
       <div>
-        <div style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-          With Icon Left (Default)
+        <div
+          style={{ marginBottom: '12px', fontSize: '16px', fontWeight: 600 }}
+        >
+          Icon & Size Variants
         </div>
-        <Searchbar state="default" placeholder="게이머 이름으로 검색...">
-          <Icon name="search" size={20} />
-          <input
-            type="text"
-            placeholder="게이머 이름으로 검색..."
-            style={{
-              flex: 1,
-              border: 'none',
-              outline: 'none',
-              background: 'transparent',
-            }}
-          />
-        </Searchbar>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}
+        >
+          <div>
+            <div
+              style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}
+            >
+              Icon Left, Size M
+            </div>
+            <Searchbar
+              icon="left"
+              size="m"
+              state="default"
+              placeholder="게이머 이름으로 검색..."
+            />
+          </div>
+          <div>
+            <div
+              style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}
+            >
+              Icon Left, Size L
+            </div>
+            <Searchbar
+              icon="left"
+              size="l"
+              state="default"
+              placeholder="게이머 이름으로 검색..."
+            />
+          </div>
+          <div>
+            <div
+              style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}
+            >
+              Icon Right, Size M
+            </div>
+            <Searchbar
+              icon="right"
+              size="m"
+              state="default"
+              placeholder="게이머 이름으로 검색..."
+            />
+          </div>
+          <div>
+            <div
+              style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}
+            >
+              Icon Right, Size L
+            </div>
+            <Searchbar
+              icon="right"
+              size="l"
+              state="default"
+              placeholder="게이머 이름으로 검색..."
+            />
+          </div>
+        </div>
       </div>
       <div>
-        <div style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-          With Icon Right (Hover)
+        <div
+          style={{ marginBottom: '12px', fontSize: '16px', fontWeight: 600 }}
+        >
+          Combined Variants (Icon Right + Size L + States)
         </div>
-        <Searchbar state="hover" placeholder="게이머 이름으로 검색...">
-          <input
-            type="text"
-            placeholder="게이머 이름으로 검색..."
-            style={{
-              flex: 1,
-              border: 'none',
-              outline: 'none',
-              background: 'transparent',
-            }}
-          />
-          <Icon name="x" size={20} style={{ cursor: 'pointer' }} />
-        </Searchbar>
-      </div>
-      <div>
-        <div style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-          With Icons Both (Active)
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}
+        >
+          <div>
+            <div
+              style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}
+            >
+              Default
+            </div>
+            <Searchbar
+              icon="right"
+              size="l"
+              state="default"
+              placeholder="게이머 이름으로 검색..."
+            />
+          </div>
+          <div>
+            <div
+              style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}
+            >
+              Hover
+            </div>
+            <Searchbar
+              icon="right"
+              size="l"
+              state="hover"
+              placeholder="게이머 이름으로 검색..."
+            />
+          </div>
+          <div>
+            <div
+              style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}
+            >
+              Active
+            </div>
+            <Searchbar
+              icon="right"
+              size="l"
+              state="active"
+              placeholder="게이머 이름으로 검색..."
+            />
+          </div>
+          <div>
+            <div
+              style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}
+            >
+              Filled
+            </div>
+            <Searchbar
+              icon="right"
+              size="l"
+              state="filled"
+              defaultValue="검색어"
+            />
+          </div>
         </div>
-        <Searchbar state="active" placeholder="게이머 이름으로 검색...">
-          <Icon name="search" size={20} />
-          <input
-            type="text"
-            placeholder="게이머 이름으로 검색..."
-            style={{
-              flex: 1,
-              border: 'none',
-              outline: 'none',
-              background: 'transparent',
-            }}
-          />
-          <Icon name="x" size={20} style={{ cursor: 'pointer' }} />
-        </Searchbar>
-      </div>
-      <div>
-        <div style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-          With Icons Both (Filled)
-        </div>
-        <Searchbar state="filled">
-          <Icon name="search" size={20} />
-          <input
-            type="text"
-            defaultValue="검색어"
-            style={{
-              flex: 1,
-              border: 'none',
-              outline: 'none',
-              background: 'transparent',
-            }}
-          />
-          <Icon name="x" size={20} style={{ cursor: 'pointer' }} />
-        </Searchbar>
       </div>
     </div>
   ),
@@ -333,7 +383,7 @@ export const AllVariantsWithIcons: Story = {
     docs: {
       description: {
         story:
-          '아이콘과 함께 사용하는 다양한 state 변형입니다. children을 통해 아이콘을 왼쪽, 오른쪽, 양쪽 모두 배치할 수 있습니다.',
+          '모든 variant 조합을 확인할 수 있습니다. icon, size, state의 모든 조합을 테스트해보세요.',
       },
     },
   },

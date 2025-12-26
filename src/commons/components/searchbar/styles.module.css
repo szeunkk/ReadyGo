@@ -13,9 +13,17 @@
     border-color 0.2s,
     color 0.2s;
   box-sizing: border-box;
-  height: 48px;
   border-radius: 12px;
   padding: 0;
+}
+
+/* Size Variants */
+.searchbar.size-m {
+  height: 48px;
+}
+
+.searchbar.size-l {
+  height: 56px;
 }
 
 .searchbarContent {
@@ -25,6 +33,25 @@
   width: 100%;
   height: 100%;
   padding: 14px;
+}
+
+/* Icon Position Variants */
+.searchbar.icon-left .searchbarContent {
+  flex-direction: row;
+}
+
+.searchbar.icon-right .searchbarContent {
+  flex-direction: row;
+}
+
+.searchIcon {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+/* Icon Left - Primary Interactive Color */
+.searchbar.icon-left .searchIcon {
+  color: var(--color-icon-interactive-primary);
 }
 
 .inputField {
