@@ -76,9 +76,8 @@
                     - signIn 결과에서 session.access_token이 존재하면 로그인 성공으로 간주할 것.
                     - error가 존재하거나 예외 발생 시 실패 처리로 진행할 것.
                     2-3) 로그인 성공 후 처리
-                    - 로그인 성공 시 아래 데이터를 localStorage에 저장할 것.
-                        - key: "accessToken", value: session.access_token
-                        - key: "user", value: { id, email }
+                    - Supabase Auth가 자동으로 세션을 localStorage에 저장하므로 별도 저장 불필요
+                    - 세션 정보는 supabase.auth.getSession()으로 조회 가능
                     - 이후 로그인완료모달을 노출할 것.
                     2-4) 로그인 실패 처리
                         - 로그인에 실패하면 로그인실패모달을 노출할 것.

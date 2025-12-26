@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Icon from '@/commons/components/icon';
+import { useAuth } from '@/commons/providers/auth/auth.provider';
 import styles from './styles.module.css';
 
 type UserStatus = 'online' | 'away' | 'dnd' | 'offline';
@@ -31,6 +32,7 @@ const STATUS_CONFIG = {
 } as const;
 
 export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
+  const { logout } = useAuth();
   const [isStatusOpen, setIsStatusOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<UserStatus>('online');
 
@@ -62,8 +64,8 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
     onClose();
   };
 
-  const handleLogout = () => {
-    // TODO: 로그아웃 처리
+  const handleLogout = async () => {
+    await logout();
     onClose();
   };
 
