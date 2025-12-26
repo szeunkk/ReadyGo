@@ -43,5 +43,5 @@
 
 ### steam_game_info
 
-- ADD COLUMN categories (jsonb)
-- 이유: 게임 카테고리 컬럼 추가
+- ADD COLUMN categories (jsonb[]), EDIT COLUMN genres (text[])
+- 이유: 게임 카테고리 컬럼 추가 및 수정
