@@ -323,7 +323,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 #### 22-1. steam_game_sync_logs
 
-- 게임 단위 Steam 메타 동기화 상세 록,
+- 게임 단위 Steam 메타 동기화 상세 로그
 
 | Column     | Type        | Nullable | Description                |
 | ---------- | ----------- | -------- | -------------------------- |
