@@ -18,8 +18,10 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
   const { isLoggedIn } = useAuth();
   const { openModal, closeAllModals } = useModal();
 
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
+  // 공개 경로는 초기 상태에서도 허용
+  const isPublicPath = !isMemberOnlyPath(pathname);
+  const [isAuthorized, setIsAuthorized] = useState(isPublicPath);
+  const [isChecking, setIsChecking] = useState(!isPublicPath);
   const hasShownModalRef = useRef(false);
   const isSessionSyncedRef = useRef(false);
   const hasCheckedSessionRef = useRef(false);
@@ -35,9 +37,11 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
 
     if (!hasCheckedSessionRef.current) {
       hasCheckedSessionRef.current = true;
+      // auth.provider의 세션 동기화 완료 대기 (최대 300ms)
+      // 회원 전용 경로만 세션 동기화를 기다림
       const timer = setTimeout(() => {
         isSessionSyncedRef.current = true;
-      }, 150);
+      }, 300);
 
       return () => {
         clearTimeout(timer);
@@ -105,8 +109,21 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
     router,
   ]);
 
+  // 공개 경로는 세션 동기화를 기다리지 않고 즉시 표시
+  useEffect(() => {
+    if (!isMemberOnlyPath(pathname)) {
+      setIsAuthorized(true);
+      setIsChecking(false);
+    }
+  }, [pathname]);
+
   // 인가 진행 중이거나 인가 실패 시 빈 화면 표시
+  // 단, 공개 경로는 세션 동기화를 기다리지 않고 표시
   if (isChecking || !isAuthorized) {
+    // 공개 경로는 세션 동기화를 기다리지 않음
+    if (!isMemberOnlyPath(pathname)) {
+      return <>{children}</>;
+    }
     return null;
   }
 

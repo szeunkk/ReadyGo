@@ -26,7 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${pretendard.variable}  antialiased`}>
+      <body
+        className={`${pretendard.variable}  antialiased`}
+        suppressHydrationWarning
+      >
         <AuthProvider>
           <NextThemesProvider>
             <ModalProvider>
