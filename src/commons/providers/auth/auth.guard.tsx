@@ -111,7 +111,16 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
         },
       });
     }
-  }, [isMounted, didAuthorize, pathname, accessToken, isTestEnv, openModal, closeAllModals, router]);
+  }, [
+    isMounted,
+    didAuthorize,
+    pathname,
+    accessToken,
+    isTestEnv,
+    openModal,
+    closeAllModals,
+    router,
+  ]);
 
   // 테스트 환경: 항상 통과
   if (isTestEnv) {
