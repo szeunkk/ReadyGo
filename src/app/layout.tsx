@@ -4,6 +4,7 @@ import './globals.css';
 import { AuthProvider } from '../commons/providers/auth/auth.provider';
 import { NextThemesProvider } from '../commons/providers/next-themes/next-themes.provider';
 import { ModalProvider } from '../commons/providers/modal/modal.provider';
+import { AuthGuard } from '../commons/providers/auth/auth.guard';
 import { Layout } from '../commons/layout';
 
 const pretendard = localFont({
@@ -29,7 +30,9 @@ export default function RootLayout({
         <AuthProvider>
           <NextThemesProvider>
             <ModalProvider>
-              <Layout>{children}</Layout>
+              <AuthGuard>
+                <Layout>{children}</Layout>
+              </AuthGuard>
             </ModalProvider>
           </NextThemesProvider>
         </AuthProvider>
