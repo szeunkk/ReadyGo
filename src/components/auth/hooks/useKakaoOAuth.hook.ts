@@ -52,18 +52,14 @@ export const useKakaoOAuth = () => {
     // OAuth 콜백 처리 로직
     const processOAuthCallback = async (userId: string) => {
       try {
-        // 현재 세션 정보 가져오기 (localStorage 저장용)
+        // 현재 세션 정보 확인
+        // Supabase가 자동으로 세션을 localStorage에 저장하므로 별도 저장 불필요
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
         if (!session?.access_token) {
           throw new Error('세션을 받지 못했습니다.');
-        }
-
-        // localStorage에 accessToken 저장 (기존 로그인 폼과 일관성 유지)
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('accessToken', session.access_token);
         }
 
         // user 정보 가져오기
@@ -135,19 +131,7 @@ export const useKakaoOAuth = () => {
             );
           }
 
-          // localStorage에 user 정보 저장 (기존 로그인 폼과 일관성 유지)
-          if (typeof window !== 'undefined') {
-            localStorage.setItem(
-              'user',
-              JSON.stringify({
-                id: user.id,
-                email: user.email,
-                _id: userId,
-                name: nickname,
-              })
-            );
-          }
-
+          // Supabase 세션이 자동으로 관리되므로 별도 localStorage 저장 불필요
           // 초기 데이터 생성 성공 → signup-success로 이동
           // OAuth 처리 플래그 제거
           if (typeof window !== 'undefined') {
@@ -155,19 +139,7 @@ export const useKakaoOAuth = () => {
           }
           router.push(URL_PATHS.SIGNUP_SUCCESS);
         } else {
-          // 기존 유저: localStorage에 user 정보 저장 (기존 로그인 폼과 일관성 유지)
-          if (typeof window !== 'undefined') {
-            localStorage.setItem(
-              'user',
-              JSON.stringify({
-                id: user.id,
-                email: user.email,
-                _id: existingProfile.id,
-                name: existingProfile.nickname || null,
-              })
-            );
-          }
-
+          // 기존 유저: Supabase 세션이 자동으로 관리되므로 별도 localStorage 저장 불필요
           // 기존 유저: user_profiles 레코드가 이미 존재 → home으로 이동
           // OAuth 처리 플래그 제거
           if (typeof window !== 'undefined') {
