@@ -16,3 +16,10 @@
                 - 연결될 경로: src/app/layout.tsx
 
 핵심요구사항) modal-portal을 사용하여 기본적인 modal 셋팅을 구현할 것.
+
+==============================================
+
+1차 추가요구사항) import Modal, { ModalProps } from '../../components/modal'로 import된 공통 Modal 컴포넌트를 무조건 사용하는 것이 아니라, openModal 함수 호출 시 선택적으로 사용할 수 있도록 구현할 것.
+                  - openModal 함수의 props에 커스텀 React 컴포넌트를 전달할 수 있는 옵션을 추가할 것 (예: component 또는 render prop 형태)
+                  - 커스텀 컴포넌트가 전달되지 않은 경우에만 기본 Modal 컴포넌트를 사용하도록 구현할 것
+                  - 커스텀 컴포넌트가 전달된 경우 해당 컴포넌트를 렌더링하되, 기본 Modal의 기능(닫기, ESC 키 처리 등)은 유지할 것

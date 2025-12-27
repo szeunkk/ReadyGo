@@ -36,11 +36,17 @@
 
 ==============================================
 
-1차추가요구사항) 아이콘 위치는 children으로 좌,우 위치를 유연하게 조정할 수 있게 수정할 것. 
-
 1차추가요구사항) 현재 variant가 없는데 추가할 것. (현재 구현된 컴포넌트는 default)
             - state: 'default' | 'hover' | 'active' | 'filled'
             - 활용할MCP: Figma MCP
             - 참고할 공통컴포넌트 피그마링크(hover): https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=3013-12276&m=dev
             - 참고할 공통컴포넌트 피그마링크(active): https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=3013-12281&m=dev
             - 참고할 공통컴포넌트 피그마링크(filled): https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=3013-12287&m=dev
+
+==============================================
+
+2차추가요구사항) variant 추가할 것.
+            - icon: 'left' | 'right'
+            - size: 'm' | 'l'
+            - 활용할MCP: Figma MCP
+            - 참고할 공통컴포넌트 피그마링크: https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=3013-12260&m=dev

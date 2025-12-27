@@ -8,7 +8,11 @@ import Selectbox, { SelectboxItem } from '@/commons/components/selectbox';
 import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
 
-export default function PartySubmit() {
+interface PartySubmitProps {
+  onClose?: () => void;
+}
+
+export default function PartySubmit({ onClose }: PartySubmitProps) {
   const [partyCount, setPartyCount] = useState(4);
   const [voiceChat, setVoiceChat] = useState<'required' | 'optional' | null>(
     null
@@ -126,7 +130,12 @@ export default function PartySubmit() {
               파티 정보를 입력하고 멤버를 모집하세요
             </p>
           </div>
-          <button className={styles.closeButton} type="button">
+          <button
+            className={styles.closeButton}
+            type="button"
+            onClick={onClose}
+            data-testid="party-submit-close-button"
+          >
             <Icon name="x" size={24} />
           </button>
         </div>
@@ -334,6 +343,7 @@ export default function PartySubmit() {
           variant="secondary"
           shape="rectangle"
           className={styles.cancelButton}
+          onClick={onClose}
         >
           취소
         </Button>
