@@ -493,40 +493,49 @@ export type Database = {
       }
       party_posts: {
         Row: {
-          created_at: string | null
-          creator_id: string | null
-          description: string | null
-          game_title: string | null
+          control_level: string
+          created_at: string
+          creator_id: string
+          description: string
+          difficulty: string
           id: number
-          max_members: number | null
-          platform: string | null
-          required_tier: string | null
-          status: string | null
-          title: string | null
+          max_members: number
+          party_title: string
+          start_date: string
+          start_time: string
+          tags: Json | null
+          title: string
+          voice_chat: string | null
         }
         Insert: {
-          created_at?: string | null
-          creator_id?: string | null
-          description?: string | null
-          game_title?: string | null
+          control_level?: string
+          created_at?: string
+          creator_id?: string
+          description: string
+          difficulty: string
           id?: number
-          max_members?: number | null
-          platform?: string | null
-          required_tier?: string | null
-          status?: string | null
-          title?: string | null
+          max_members: number
+          party_title: string
+          start_date: string
+          start_time: string
+          tags?: Json | null
+          title: string
+          voice_chat?: string | null
         }
         Update: {
-          created_at?: string | null
-          creator_id?: string | null
-          description?: string | null
-          game_title?: string | null
+          control_level?: string
+          created_at?: string
+          creator_id?: string
+          description?: string
+          difficulty?: string
           id?: number
-          max_members?: number | null
-          platform?: string | null
-          required_tier?: string | null
-          status?: string | null
-          title?: string | null
+          max_members?: number
+          party_title?: string
+          start_date?: string
+          start_time?: string
+          tags?: Json | null
+          title?: string
+          voice_chat?: string | null
         }
         Relationships: []
       }

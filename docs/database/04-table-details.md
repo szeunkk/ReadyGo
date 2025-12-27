@@ -187,18 +187,22 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 - 파티 모집글
 
-| Column        | Type        | Nullable | Description |
-| ------------- | ----------- | -------- | ----------- |
-| id            | bigint      | ❌       | PK          |
-| creator_id    | uuid        | ⭕       | 작성자      |
-| title         | text        | ⭕       | 제목        |
-| game_title    | text        | ⭕       | 게임명      |
-| platform      | text        | ⭕       | 플랫폼      |
-| required_tier | text        | ⭕       | 요구 티어   |
-| max_members   | int         | ⭕       | 최대 인원   |
-| description   | text        | ⭕       | 설명        |
-| status        | text        | ⭕       | 모집 상태   |
-| created_at    | timestamptz | ⭕       | 생성 시각   |
+| Column        | Type        | Nullable | Description                                      |
+| ------------- | ----------- | -------- | ------------------------------------------------ |
+| id            | bigint      | ❌       | PK (자동 증가)                                   |
+| creator_id    | uuid        | ❌       | 작성자 ID (로그인 유저만 가능)                   |
+| game_title    | text        | ❌       | 게임명                                           |
+| party_title   | text        | ❌       | 파티 제목                                        |
+| start_date    | date        | ❌       | 시작일                                           |
+| start_time    | time        | ❌       | 시작 시간                                        |
+| description   | text        | ❌       | 모집 설명                                        |
+| max_member    | int4        | ❌       | 파티 최대 인원                                   |
+| control_level | text        | ❌       | 컨트롤 수준                                      |
+| difficulty    | text        | ❌       | 난이도                                           |
+| voice_chat    | text        | ⭕       | 보이스챗 사용 여부(required \| optional \| null) |
+| tags          | jsonb       | ⭕       | 태그 배열(string[] 권장)                         |
+| status        | text        | ❌       | 모집 상태(default: recruiting)                   |
+| created_at    | timestamptz | ❌       | 생성 시각(default: now())                        |
 
 #### 14. party_members
 
@@ -508,9 +512,10 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 ## Version History
 
-| Version | Date       | Description                                                                        |
-| ------: | ---------- | ---------------------------------------------------------------------------------- |
-|  v1.0.0 | 2025-12-24 | Detailed table & column documentation (33 tables)                                  |
-|  v1.0.1 | 2025-12-26 | steam_game_info 테이블 컬럼 추가 및 수정                                           |
-|  v1.0.2 | 2025-12-26 | steam_game_info categories, genres 컬럼 수정(jsonb[], text[])                      |
-|  v1.0.3 | 2025-12-26 | 게임 단위 Steam 메타 동기화 상세 로그 확인을 위한 steam_game_sync_logs 테이블 추가 |
+| Version | Date       | Description                                                                              |
+| ------: | ---------- | ---------------------------------------------------------------------------------------- | --- |
+|  v1.0.0 | 2025-12-24 | Detailed table & column documentation (33 tables)                                        |
+|  v1.0.1 | 2025-12-26 | steam_game_info 테이블 컬럼 추가 및 수정                                                 |
+|  v1.0.2 | 2025-12-26 | steam_game_info categories, genres 컬럼 수정(jsonb[], text[])                            |
+|  v1.0.3 | 2025-12-26 | 게임 단위 Steam 메타 동기화 상세 로그 확인을 위한 steam_game_sync_logs 테이블 추가       |
+|  v1.0.4 | 2025-12-27 | party_posts 컬럼 NOT NULL 정리 및 RLS 정책 적용(생성자만 수정 가능, 인증 유저 조회 허용) |     |
