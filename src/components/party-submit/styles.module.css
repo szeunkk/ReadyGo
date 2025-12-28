@@ -498,3 +498,18 @@
 .datePickerPopup {
   z-index: 10000 !important;
 }
+
+/* Error Message */
+.errorMessage {
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-size: var(--typo-body-sm-medium-font-size);
+  line-height: var(--typo-body-sm-medium-line-height);
+  font-weight: var(--typo-body-sm-medium-font-weight);
+  color: var(--color-text-danger);
+  margin-top: 4px;
+}

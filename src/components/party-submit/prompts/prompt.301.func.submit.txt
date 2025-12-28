@@ -53,7 +53,13 @@
                     - party_title: text (필수) - 파티 제목
                     - game_title: text (필수) - 게임명
                     - start_date: date (필수) - 시작일
+                        - 입력 형식: antd DatePicker에서 "yy-mm-dd" 형식으로 값이 들어옴 (예: "24-12-25")
+                        - 변환 필요: Supabase date 타입에 맞게 변환하여 저장할 것
                     - start_time: time (필수) - 시작시간
+                        - 입력 형식: 텍스트로 "오후 11:00", "오전 09:30" 같은 형식으로 값이 들어옴
+                        - 변환 필요: Supabase time 타입(HH:mm:ss 또는 HH:mm) 형식으로 변환하여 저장할 것
+                            - "오후 11:00" → "23:00:00" 또는 "23:00"
+                            - "오전 09:30" → "09:30:00" 또는 "09:30"
                     - description: text (필수) - 설명
                     - max_members: int4 (필수) - 최대 인원
                     - control_level: text (필수) - 컨트롤 수준
@@ -76,6 +82,9 @@
                    - 선택: voice_chat, tags
 
                 2. 등록하기 버튼 클릭 시, party_posts에 insert를 수행할 것.
+                   - insert 전 데이터 변환:
+                     - start_date: antd DatePicker의 "yy-mm-dd" 형식을 Supabase date 형식으로 변환
+                     - start_time: "오후 11:00", "오전 09:30" 같은 텍스트 형식을 Supabase time 형식(HH:mm:ss 또는 HH:mm)으로 변환
                    - 성공 시: insert 결과로 생성된 id를 확보할 것.
                    - 실패 시: 에러 메시지를 사용자에게 노출할 것.
                      2-1) 에러 메시지 노출 방법
