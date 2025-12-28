@@ -25,6 +25,15 @@ const meta = {
         defaultValue: { summary: 'default' },
       },
     },
+    size: {
+      control: 'select',
+      options: ['m', 'l'],
+      description: '셀렉트박스의 크기',
+      table: {
+        type: { summary: 'SelectboxSize' },
+        defaultValue: { summary: 'm' },
+      },
+    },
     label: {
       control: 'text',
       description: '셀렉트박스의 레이블',
@@ -274,6 +283,56 @@ export const WithCustomChildren: Story = {
     docs: {
       description: {
         story: 'children을 사용하여 커스텀 콘텐츠를 표시할 수 있습니다.',
+      },
+    },
+  },
+};
+
+// Size 스토리
+export const SizeM: Story = {
+  args: {
+    size: 'm',
+    label: 'Medium Size (48px)',
+    items: sampleItems,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Medium 크기의 셀렉트박스입니다. 기본 크기입니다.',
+      },
+    },
+  },
+};
+
+export const SizeL: Story = {
+  args: {
+    size: 'l',
+    label: 'Large Size (56px)',
+    items: sampleItems,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Large 크기의 셀렉트박스입니다.',
+      },
+    },
+  },
+};
+
+export const SizeComparison: Story = {
+  args: {
+    items: sampleItems,
+  },
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <Selectbox size="m" label="Medium Size (48px)" items={sampleItems} />
+      <Selectbox size="l" label="Large Size (56px)" items={sampleItems} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: '크기별 셀렉트박스를 비교할 수 있습니다.',
       },
     },
   },

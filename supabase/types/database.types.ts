@@ -498,28 +498,28 @@ export type Database = {
           creator_id: string
           description: string
           difficulty: string
+          game_title: string
           id: number
           max_members: number
           party_title: string
           start_date: string
           start_time: string
           tags: Json | null
-          title: string
           voice_chat: string | null
         }
         Insert: {
-          control_level?: string
+          control_level: string
           created_at?: string
           creator_id?: string
           description: string
           difficulty: string
+          game_title: string
           id?: number
           max_members: number
           party_title: string
           start_date: string
           start_time: string
           tags?: Json | null
-          title: string
           voice_chat?: string | null
         }
         Update: {
@@ -528,13 +528,13 @@ export type Database = {
           creator_id?: string
           description?: string
           difficulty?: string
+          game_title?: string
           id?: number
           max_members?: number
           party_title?: string
           start_date?: string
           start_time?: string
           tags?: Json | null
-          title?: string
           voice_chat?: string | null
         }
         Relationships: []

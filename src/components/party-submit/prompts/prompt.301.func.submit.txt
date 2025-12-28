@@ -23,53 +23,90 @@
 
             2) 테스트 조건
                 - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
-                - /diaries 페이지가 완전히 로드된 후 일기쓰기버튼을 클릭한 이후 테스트할 것.
+                - /party 페이지가 완전히 로드된 후 파티 모집 글 작성 버튼을 클릭한 이후 테스트할 것.
                     - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
                     - 페이지 로드 식별 금지사항: networkidle 대기 방법
+                    - 파티 모집 글 작성 버튼의 data-testid: "party-create-button" (src/components/party/party.tsx의 "새 파티 만들기" 버튼에 추가 필요)
 
-            3) 테스트 로컬스토리지 조건
+            3) 테스트 데이터 조건
                 3-1) 데이터
                     - 실제데이터를 사용할 것.
                     - Mock데이터 사용하지 말 것.
 
                 3-2) 성공시나리오
-                    - 로컬스토리지 모킹하지 말 것.
+                    - Supabase 모킹하지 말 것.
 
                 3-3) 실패시나리오
-                    - 로컬스토리지 모킹하지 말 것.
+                    - Supabase 모킹하지 말 것.
 
-핵심요구사항) 다음의 조건에 맞게 일기쓰기 폼 등록 기능을 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+핵심요구사항) 다음의 조건에 맞게 파티 모집 글 등록 기능을 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
             1) 라이브러리조건
                 - 폼: 이미 설치되어있는 react-hook-form, @hookform/resolvers를 사용할 것.
                 - 검증: 이미 설치되어있는 zod를 사용할 것.
 
             2) 데이터조건
-                - 저장소: 로컬스토리지
-                - key: diaries
-                - value: [{ 
-                    id: number,
-                    title: string, 
-                    content: string, 
-                    emotion: enum.ts 경로에 정의된 emotion enum 타입을 import하여 사용할 것.
-                    createdAt: string
-                }]
-            
-            3) 유저시나리오(등록하기)
-                1. 모든 인풋이 입력되면 등록하기버튼을 활성화 할 것.
-                2. 등록하기버튼을 클릭시, 로컬스토리지에 이미 diaries가 존재하는지 확인하고,
-                   존재하면 기존의 diaries에 push하되, id를 가장큰 id+1로 설정하여 재등록하고, 
-                   존재하지 않으면 새로운 diaries 배열을 생성하여 id는 1로 설정하여 등록할 것.
-                3. 등록이 완료되면, 등록완료모달을 노출할 것.
-                4. 등록완료모달의 확인을 누르면, 상세페이지로 이동하고, 열려있는 모든 모달을 닫을 것.
+                - 저장소: Supabase
+                - Supabase 클라이언트 경로: src/lib/supabase/client.ts의 supabase 사용
+                - 테이블: party_posts
+                - 컬럼 스키마(현재 테이블 기준으로 사용할 것)
+                    - creator_id: uuid (RLS/Default/Policy에 의해 인증 유저로 처리)
+                    - party_title: text (필수) - 파티 제목
+                    - game_title: text (필수) - 게임명
+                    - start_date: date (필수) - 시작일
+                    - start_time: time (필수) - 시작시간
+                    - description: text (필수) - 설명
+                    - max_members: int4 (필수) - 최대 인원
+                    - control_level: text (필수) - 컨트롤 수준
+                    - difficulty: text (필수) - 난이도
+                    - voice_chat: text (선택: 'required' | 'optional' | null) - 보이스챗 사용 여부
+                    - tags: jsonb (선택: string[] 형태 권장) - 태그
+                    - created_at: timestamptz (권장: default now())
+
+            3) 인증/권한 조건 (RLS 전제)
+                - 인증되지 않은 유저는 등록이 불가해야 한다.
+                - 인증된 유저만 등록이 가능해야 한다.
+                - 인증 상태 확인 방법: src/commons/providers/auth/auth.provider.tsx의 useAuth() 훅 사용
+                    - useAuth()의 isLoggedIn 또는 user를 확인하여 인증 상태를 판단할 것.
+                - 정책 조건: creator_id = auth.uid()를 만족해야 insert가 성공해야 한다.
+                - 테스트에서는 mock auth 금지. 실제 개발 환경의 로그인 흐름을 이용할 것(프로젝트 기존 로그인 방식을 따를 것).
+
+            4) 유저시나리오(등록하기)
+                1. 필수 입력값이 모두 유효하면 등록하기 버튼을 활성화 할 것.
+                   - 필수: game_title, party_title, start_date, start_time, description, max_members, control_level, difficulty
+                   - 선택: voice_chat, tags
+
+                2. 등록하기 버튼 클릭 시, party_posts에 insert를 수행할 것.
+                   - 성공 시: insert 결과로 생성된 id를 확보할 것.
+                   - 실패 시: 에러 메시지를 사용자에게 노출할 것.
+                     2-1) 에러 메시지 노출 방법
+                         - Modal 컴포넌트를 사용하여 에러 모달을 표시할 것.
+                         - 에러 모달: <Modal variant="dual" title="등록 실패" description="파티 등록 중 오류가 발생했습니다. {에러메시지}" />
+                         - 에러 모달의 확인 버튼 클릭 시 모달만 닫고, 페이지 이동하지 않을 것.
+                         - UX는 기존 프로젝트 스타일을 따를 것.
+
+                3. 등록 성공 시, 등록완료 모달을 노출할 것.
+
+                4. 등록완료 모달에서 확인을 누르면, 상세 페이지로 이동하고 열려있는 모든 모달을 닫을 것.
                     4-1) 모달조건
                         - 모달 프로바이더 경로: src/commons/providers/modal/modal.provider.tsx
                         - 이미 셋팅되어있는 modal.provider를 사용할 것.
                         - 이미 셋팅되어있는 modal.provider를 수정하지 말 것.
 
                     4-2) 공통컴포넌트조건
-                        - 등록완료모달: <Modal />,커스텀 모달
+                        - 등록완료모달: <Modal variant="dual" title="등록 완료" description="파티가 성공적으로 등록되었습니다." />
 
                     4-3) 페이지이동조건
                         - commons/constants/url.ts의 페이지URL에 정의된 경로로 이동할 것.
-                        - 등록된 id를 사용하여 일기상세페이지로 다이나믹라우팅 할 것.
-                        - 일기상세페이지: url.ts에 정의된 일기상세페이지 => /diaries/[id]
+                        - 등록된 id를 사용하여 상세페이지로 다이나믹라우팅 할 것.
+                        - 파티상세페이지: url.ts에 정의된 파티상세페이지 => /party/[id]
+
+            5) 테스트 검증 포인트(Playwright)
+                - /party 페이지 로드 후 data-testid="party-page"로 대기
+                - data-testid="party-create-button"으로 작성 버튼 대기 → 클릭
+                - 필수 필드 입력 전: 등록 버튼 비활성 확인
+                - 필수 필드 입력 후: 등록 버튼 활성 확인
+                - 등록 버튼 클릭 후: 등록완료 모달 노출 확인
+                - 모달 확인 클릭 후: /party/[id]로 이동 확인
+                - 이동 후: 모달이 모두 닫혀있는 상태 확인
+                - 인증되지 않은 유저 시나리오: 로그인하지 않은 상태에서 등록 시도 시 적절한 처리 확인
+                - DB 반영 확인: 등록 성공 후 생성된 id로 올바른 URL(/party/[id])로 이동했는지 확인

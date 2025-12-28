@@ -12,6 +12,8 @@ export type SelectboxState =
   | 'disabled'
   | 'active';
 
+export type SelectboxSize = 'm' | 'l';
+
 export interface SelectboxItem {
   id: string;
   value: string;
@@ -19,6 +21,7 @@ export interface SelectboxItem {
 
 export interface SelectboxProps {
   state?: SelectboxState;
+  size?: SelectboxSize;
   label?: string;
   items: SelectboxItem[];
   selectedId?: string;
@@ -32,6 +35,7 @@ export interface SelectboxProps {
 
 export default function Selectbox({
   state = 'default',
+  size = 'm',
   label,
   items,
   selectedId,
@@ -114,6 +118,7 @@ export default function Selectbox({
 
   const selectboxClasses = [
     styles.selectbox,
+    styles[`size-${size}`],
     styles[`state-${actualState}`],
     isDisabled && styles.disabled,
     isFilled && styles.filled,

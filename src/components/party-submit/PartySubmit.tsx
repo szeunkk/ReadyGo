@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import type { DatePickerProps } from 'antd';
+import { DatePicker } from 'antd';
+import type { Dayjs } from 'dayjs';
 import styles from './styles.module.css';
 import Searchbar from '@/commons/components/searchbar';
 import Input from '@/commons/components/input';
@@ -21,6 +24,17 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
   const [selectedGame, setSelectedGame] = useState<SelectboxItem | null>(null);
   const [isGameOptionsOpen, setIsGameOptionsOpen] = useState(false);
   const gameSearchRef = useRef<HTMLDivElement>(null);
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [selectedStartTime, setSelectedStartTime] = useState<string | null>(
+    null
+  );
+  const [selectedControlLevel, setSelectedControlLevel] = useState<
+    string | null
+  >(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(
+    null
+  );
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   // 게임 목업 데이터
   const gameMockData: SelectboxItem[] = [
@@ -119,6 +133,27 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
     }
   };
 
+  // DatePicker onChange 핸들러
+  const handleDateChange: DatePickerProps<Dayjs, false>['onChange'] = (
+    date,
+    _dateString
+  ) => {
+    setStartDate(date);
+  };
+
+  // Selectbox 옵션 선택 핸들러
+  const handleStartTimeSelect = (item: SelectboxItem) => {
+    setSelectedStartTime(item.id);
+  };
+
+  const handleControlLevelSelect = (item: SelectboxItem) => {
+    setSelectedControlLevel(item.id);
+  };
+
+  const handleDifficultySelect = (item: SelectboxItem) => {
+    setSelectedDifficulty(item.id);
+  };
+
   return (
     <div className={styles.container}>
       {/* 헤더 영역 */}
@@ -142,7 +177,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
       </div>
 
       {/* 본문 영역 */}
-      <div className={styles.body}>
+      <div className={styles.body} ref={bodyRef}>
         {/* 파티 정보 섹션 */}
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>파티 정보</h2>
@@ -221,21 +256,36 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
 
           <div className={styles.row}>
             <div className={styles.col}>
-              <Input
-                label="시작일"
-                required
-                size="l"
-                placeholder="날짜 선택"
-                iconRight="calendar"
-                readOnly
-              />
+              <div className={styles.formGroup}>
+                <label className={styles.label}>
+                  시작일
+                  <span className={styles.required}>*</span>
+                </label>
+                <DatePicker
+                  className={styles.datePicker}
+                  placeholder="날짜 선택"
+                  value={startDate}
+                  onChange={handleDateChange}
+                  format="YYYY-MM-DD"
+                  suffixIcon={<Icon name="calendar" size={20} />}
+                  getPopupContainer={(trigger) => {
+                    return (
+                      bodyRef.current || trigger.parentElement || document.body
+                    );
+                  }}
+                  popupClassName={styles.datePickerPopup}
+                />
+              </div>
             </div>
             <div className={styles.col}>
               <Selectbox
                 label="시작시간"
+                size="l"
                 required
                 placeholder="시간 선택"
                 items={timeOptions}
+                selectedId={selectedStartTime || undefined}
+                onSelect={handleStartTimeSelect}
               />
             </div>
           </div>
@@ -291,6 +341,8 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
                 required
                 placeholder="옵션 선택"
                 items={controlLevelOptions}
+                selectedId={selectedControlLevel || undefined}
+                onSelect={handleControlLevelSelect}
               />
             </div>
             <div className={styles.col}>
@@ -299,6 +351,8 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
                 required
                 placeholder="난이도 선택"
                 items={difficultyOptions}
+                selectedId={selectedDifficulty || undefined}
+                onSelect={handleDifficultySelect}
               />
             </div>
           </div>
