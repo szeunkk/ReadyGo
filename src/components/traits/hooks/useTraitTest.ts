@@ -1,104 +1,70 @@
-import { useState, useMemo } from 'react';
-import { QUESTIONS } from '../data/questions';
+import { useState } from 'react';
+import { QUESTIONS } from '@/components/traits/data/questions';
+import { SCHEDULE_QUESTION } from '@/components/traits/data/questionSchedule';
+
+/**
+ * 배열을 랜덤하게 섞는 함수
+ */
+function shuffle<T>(arr: T[]): T[] {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
 
 /**
  * 전체 테스트 흐름 관리 Hook
- * - 질문 진행 상태 (currentStep)
+ * - 질문 랜덤 섞기 (스케줄 질문은 마지막에 고정)
+ * - 현재 인덱스 관리 (0-based)
  * - 페이지 이동 (다음/이전)
  * - 완료 판단
- * - 진행률 계산
  */
 export function useTraitTest() {
-  const [currentStep, setCurrentStep] = useState(1);
+  // 일반 질문들을 섞고, 스케줄 질문을 마지막에 고정
+  const [questions] = useState(() => {
+    return [...shuffle(QUESTIONS), SCHEDULE_QUESTION];
+  });
 
-  // 총 단계 수: 질문 10개 + 스케줄 질문 1개 = 11개
-  const totalSteps = useMemo(() => QUESTIONS.length + 1, []);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  /**
-   * 이전 단계로 이동
-   */
-  const goToPrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prev) => prev - 1);
-    }
-  };
+  // 현재 질문
+  const currentQuestion = questions[currentIndex];
+
+  // 총 단계 수
+  const totalSteps = questions.length;
+
+  // 테스트 완료 여부
+  const isFinished = currentIndex === totalSteps - 1;
+
+  // 스케줄 질문 판별 헬퍼
+  const isScheduleQuestion = currentQuestion?.id === SCHEDULE_QUESTION.id;
 
   /**
    * 다음 단계로 이동
    */
-  const goToNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep((prev) => prev + 1);
-    }
+  const next = () => {
+    setCurrentIndex((i) => Math.min(i + 1, totalSteps));
   };
 
   /**
-   * 특정 단계로 이동
+   * 이전 단계로 이동
    */
-  const goToStep = (step: number) => {
-    if (step >= 1 && step <= totalSteps) {
-      setCurrentStep(step);
-    }
+  const prev = () => {
+    setCurrentIndex((i) => Math.max(i - 1, 0));
   };
-
-  /**
-   * 테스트 완료 여부
-   */
-  const isCompleted = currentStep > totalSteps;
-
-  /**
-   * 마지막 질문 여부
-   */
-  const isLastStep = currentStep === totalSteps;
-
-  /**
-   * 첫 번째 질문 여부
-   */
-  const isFirstStep = currentStep === 1;
-
-  /**
-   * 진행률 계산 (퍼센트)
-   */
-  const progressPercentage = useMemo(() => {
-    return Math.round(((currentStep - 1) / totalSteps) * 100);
-  }, [currentStep, totalSteps]);
-
-  /**
-   * 진행률 계산 (0-100 사이의 실수)
-   */
-  const progressWidth = useMemo(() => {
-    return ((currentStep - 1) / totalSteps) * 100;
-  }, [currentStep, totalSteps]);
-
-  /**
-   * 팩맨 위치 (0부터 시작)
-   */
-  const pacmanPosition = currentStep - 1;
 
   /**
    * 테스트 초기화
    */
-  const resetTest = () => {
-    setCurrentStep(1);
+  const reset = () => {
+    setCurrentIndex(0);
   };
 
   return {
-    // 상태
-    currentStep,
+    currentQuestion,
+    isScheduleQuestion,
+    currentIndex,
     totalSteps,
-    isCompleted,
-    isLastStep,
-    isFirstStep,
-
-    // 진행률
-    progressPercentage,
-    progressWidth,
-    pacmanPosition,
-
-    // 액션
-    goToPrevious,
-    goToNext,
-    goToStep,
-    resetTest,
+    isFinished,
+    next,
+    prev,
+    reset,
   };
 }

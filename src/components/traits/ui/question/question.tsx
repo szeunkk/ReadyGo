@@ -7,45 +7,38 @@ import Icon from '@/commons/components/icon';
 import Image from 'next/image';
 import QuestionList from './question-list/questionList';
 import QuestionSchedule from './question-schedule/questionSchedule';
-import { useTraitTest, useTraitAnswers, type AnswerType } from '../../hooks';
+import { useTraitSurvey, type AnswerType } from '../../hooks';
 
 interface QuestionProps {
   onComplete?: () => void;
 }
 
-export default function Question({ onComplete }: QuestionProps) {
-  // 테스트 흐름 관리
-  const {
-    currentStep,
-    totalSteps,
-    isLastStep,
-    progressPercentage,
-    progressWidth,
-    pacmanPosition,
-    goToPrevious,
-    goToNext,
-  } = useTraitTest();
+// 팩맨 애니메이션 상수
+const PACMAN_STEP_WIDTH = 21; // px per step
 
-  // 답변 상태 관리
-  const { saveAnswer, getAnswer } = useTraitAnswers();
+export default function Question({ onComplete }: QuestionProps) {
+  // 통합 훅 사용
+  const {
+    currentQuestion,
+    currentIndex,
+    totalSteps,
+    progressPercentage,
+    isScheduleQuestion,
+    selectedAnswer,
+    selectAnswer,
+    prev,
+  } = useTraitSurvey(onComplete);
+
+  // 현재 단계 (1부터 시작)
+  const currentStep = currentIndex + 1;
 
   const handleBack = () => {
     // 뒤로가기 로직 (실제 구현 시 router.back() 등 사용)
   };
 
   const handleAnswerSelect = (answer: AnswerType) => {
-    // 선택된 답변 저장
-    saveAnswer(currentStep, answer);
-
-    // 다음 단계로 이동
-    if (isLastStep) {
-      // 마지막 질문 완료 - 분석 로딩 화면 표시
-      if (onComplete) {
-        onComplete();
-      }
-    } else {
-      goToNext();
-    }
+    // 답변 선택 및 다음 단계로 자동 이동
+    selectAnswer(answer);
   };
 
   return (
@@ -69,13 +62,13 @@ export default function Question({ onComplete }: QuestionProps) {
             <div className={styles.progressHeader}>
               <span className={styles.progressLabel}>진행률</span>
               <span className={styles.progressPercentage}>
-                {progressPercentage}%
+                {Math.round(progressPercentage)}%
               </span>
             </div>
             <div className={styles.progressBarWrapper}>
               <div
                 className={styles.progressBar}
-                style={{ width: `${progressWidth}%` }}
+                style={{ width: `${progressPercentage}%` }}
               />
             </div>
           </div>
@@ -97,23 +90,24 @@ export default function Question({ onComplete }: QuestionProps) {
         </div>
 
         {/* 질문 본문 */}
-        {currentStep === 11 ? (
+        {isScheduleQuestion ? (
           <QuestionSchedule
             onAnswerSelect={handleAnswerSelect}
-            currentStep={currentStep}
             selectedAnswer={
-              getAnswer(currentStep) as
+              selectedAnswer as
                 | { dayTypes: string[]; timeSlots: string[] }
                 | undefined
             }
           />
-        ) : (
+        ) : currentQuestion && 'choices' in currentQuestion ? (
           <QuestionList
+            questionId={currentQuestion.id}
+            questionText={currentQuestion.text}
+            choices={currentQuestion.choices}
             onAnswerSelect={handleAnswerSelect}
-            currentStep={currentStep}
-            selectedAnswer={getAnswer(currentStep) as number | undefined}
+            selectedAnswer={selectedAnswer as number | undefined}
           />
-        )}
+        ) : null}
 
         {/* 질문 카드 푸터 (팩맨 진행률) */}
         <div className={styles.questionCardFooter}>
@@ -121,7 +115,7 @@ export default function Question({ onComplete }: QuestionProps) {
             <div
               className={styles.pacmanIcon}
               style={{
-                transform: `translateX(${pacmanPosition * 21}px)`,
+                transform: `translateX(${currentIndex * PACMAN_STEP_WIDTH}px)`,
               }}
             >
               <Image
@@ -136,7 +130,7 @@ export default function Question({ onComplete }: QuestionProps) {
                 <div
                   key={index}
                   className={`${styles.progressDot} ${
-                    index < pacmanPosition ? styles.progressDotEaten : ''
+                    index < currentIndex ? styles.progressDotEaten : ''
                   }`}
                 />
               ))}
@@ -151,8 +145,8 @@ export default function Question({ onComplete }: QuestionProps) {
           variant="outline"
           size="m"
           shape="rectangle"
-          onClick={goToPrevious}
-          disabled={currentStep === 1}
+          onClick={prev}
+          disabled={currentIndex === 0}
         >
           <Icon name="chevron-left" size={20} />
           이전

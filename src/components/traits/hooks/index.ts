@@ -1,4 +1,2 @@
-export { useTraitTest } from './useTraitTest';
-export { useTraitAnswers, type AnswerType } from './useTraitAnswers';
-export { useTraitResult, type TraitScores } from './useTraitResult';
-
+export { useTraitSurvey } from './useTraitSurvey';
+export type { AnswerType } from './useTraitAnswers';
