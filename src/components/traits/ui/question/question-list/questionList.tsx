@@ -1,17 +1,20 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import type { TraitKey } from '@/commons/constants/animal/trait.enum';
 import styles from './styles.module.css';
 
-interface Answer {
-  id: number;
-  text: string;
+interface QuestionChoice {
+  value: 1 | 2 | 3 | 4 | 5;
+  label: string;
 }
 
 interface Question {
-  id: number;
-  question: string;
-  answers: Answer[];
+  id: string;
+  axis: TraitKey;
+  weight: number;
+  text: string;
+  choices: QuestionChoice[];
 }
 
 interface QuestionListProps {
@@ -20,28 +23,15 @@ interface QuestionListProps {
   selectedAnswer?: number;
 }
 
-// 임시 질문 데이터 (실제로는 props나 API에서 받아올 것)
-const QUESTIONS: Question[] = [
-  {
-    id: 1,
-    question: '게임할 때 더 편한 방식은?',
-    answers: [
-      { id: 1, text: '완전 혼자서 플레이하는 걸 선호함' },
-      { id: 2, text: '혼자 플레이가 편하지만 파티도 가끔 함' },
-      { id: 3, text: '둘 다 상관없음' },
-      { id: 4, text: '팀 플레이가 더 즐거움' },
-      { id: 5, text: '팀원과 협력하는 플레이가 핵심이라고 생각함' },
-    ],
-  },
-  // 추가 질문들은 나중에 채워넣을 것
-];
+// TODO: hooks를 통해 questions를 import할 예정
+const QUESTIONS: Question[] = [];
 
 export default function QuestionList({
   onAnswerSelect,
   selectedAnswer,
   currentStep,
 }: QuestionListProps) {
-  const [currentQuestion] = QUESTIONS; // 현재는 첫 질문만
+  const [currentQuestion] = QUESTIONS; // TODO: hooks에서 가져온 questions 사용
   const [clickedAnswer, setClickedAnswer] = useState<number | null>(null);
 
   // 질문이 바뀌면 클릭 상태 초기화
@@ -63,35 +53,35 @@ export default function QuestionList({
 
   return (
     <div className={styles.questionBody}>
-      <h2 className={styles.questionText}>{currentQuestion.question}</h2>
+      <h2 className={styles.questionText}>{currentQuestion?.text}</h2>
 
       {/* 답변 옵션들 */}
       <div className={styles.answersWrapper}>
-        {currentQuestion.answers.map((answer) => {
+        {currentQuestion?.choices.map((choice) => {
           // 클릭한 답변이거나 이전에 선택된 답변이면 선택 상태로 표시
           const isSelected =
-            clickedAnswer === answer.id || selectedAnswer === answer.id;
+            clickedAnswer === choice.value || selectedAnswer === choice.value;
           return (
             <button
-              key={answer.id}
+              key={choice.value}
               className={`${styles.answerButton} ${
                 isSelected ? styles.answerButtonSelected : ''
               }`}
-              onClick={() => handleAnswerSelect(answer.id)}
+              onClick={() => handleAnswerSelect(choice.value)}
             >
               <div
                 className={`${styles.answerNumber} ${
                   isSelected ? styles.answerNumberSelected : ''
                 }`}
               >
-                {answer.id}
+                {choice.value}
               </div>
               <span
                 className={`${styles.answerText} ${
                   isSelected ? styles.answerTextSelected : ''
                 }`}
               >
-                {answer.text}
+                {choice.label}
               </span>
             </button>
           );
