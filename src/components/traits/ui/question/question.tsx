@@ -1,32 +1,33 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './styles.module.css';
 import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
 import Image from 'next/image';
 import QuestionList from './question-list/questionList';
 import QuestionSchedule from './question-schedule/questionSchedule';
-
-type AnswerType = number | { dayTypes: string[]; timeSlots: string[] };
+import { useTraitTest, useTraitAnswers, type AnswerType } from '../../hooks';
 
 interface QuestionProps {
   onComplete?: () => void;
 }
 
 export default function Question({ onComplete }: QuestionProps) {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedAnswers, setSelectedAnswers] = useState<
-    Record<number, AnswerType>
-  >({});
+  // 테스트 흐름 관리
+  const {
+    currentStep,
+    totalSteps,
+    isLastStep,
+    progressPercentage,
+    progressWidth,
+    pacmanPosition,
+    goToPrevious,
+    goToNext,
+  } = useTraitTest();
 
-  const totalSteps = 11;
-
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
+  // 답변 상태 관리
+  const { saveAnswer, getAnswer } = useTraitAnswers();
 
   const handleBack = () => {
     // 뒤로가기 로직 (실제 구현 시 router.back() 등 사용)
@@ -34,27 +35,18 @@ export default function Question({ onComplete }: QuestionProps) {
 
   const handleAnswerSelect = (answer: AnswerType) => {
     // 선택된 답변 저장
-    setSelectedAnswers({
-      ...selectedAnswers,
-      [currentStep]: answer,
-    });
+    saveAnswer(currentStep, answer);
 
     // 다음 단계로 이동
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    } else {
+    if (isLastStep) {
       // 마지막 질문 완료 - 분석 로딩 화면 표시
       if (onComplete) {
         onComplete();
       }
+    } else {
+      goToNext();
     }
   };
-
-  const progressPercentage = Math.round(((currentStep - 1) / totalSteps) * 100);
-  const progressWidth = ((currentStep - 1) / totalSteps) * 100;
-
-  // 팩맨 위치 계산 (0-10 사이)
-  const pacmanPosition = currentStep - 1;
 
   return (
     <div className={styles.container}>
@@ -110,7 +102,7 @@ export default function Question({ onComplete }: QuestionProps) {
             onAnswerSelect={handleAnswerSelect}
             currentStep={currentStep}
             selectedAnswer={
-              selectedAnswers[currentStep] as
+              getAnswer(currentStep) as
                 | { dayTypes: string[]; timeSlots: string[] }
                 | undefined
             }
@@ -119,7 +111,7 @@ export default function Question({ onComplete }: QuestionProps) {
           <QuestionList
             onAnswerSelect={handleAnswerSelect}
             currentStep={currentStep}
-            selectedAnswer={selectedAnswers[currentStep] as number | undefined}
+            selectedAnswer={getAnswer(currentStep) as number | undefined}
           />
         )}
 
@@ -159,7 +151,7 @@ export default function Question({ onComplete }: QuestionProps) {
           variant="outline"
           size="m"
           shape="rectangle"
-          onClick={handlePrevious}
+          onClick={goToPrevious}
           disabled={currentStep === 1}
         >
           <Icon name="chevron-left" size={20} />

@@ -1,21 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import type { TraitKey } from '@/commons/constants/animal/trait.enum';
+import { QUESTIONS } from '../../../data/questions';
 import styles from './styles.module.css';
-
-interface QuestionChoice {
-  value: 1 | 2 | 3 | 4 | 5;
-  label: string;
-}
-
-interface Question {
-  id: string;
-  axis: TraitKey;
-  weight: number;
-  text: string;
-  choices: QuestionChoice[];
-}
 
 interface QuestionListProps {
   onAnswerSelect?: (answer: number) => void;
@@ -23,15 +10,13 @@ interface QuestionListProps {
   selectedAnswer?: number;
 }
 
-// TODO: hooks를 통해 questions를 import할 예정
-const QUESTIONS: Question[] = [];
-
 export default function QuestionList({
   onAnswerSelect,
   selectedAnswer,
-  currentStep,
+  currentStep = 1,
 }: QuestionListProps) {
-  const [currentQuestion] = QUESTIONS; // TODO: hooks에서 가져온 questions 사용
+  // 현재 단계에 해당하는 질문 가져오기 (currentStep은 1부터 시작)
+  const currentQuestion = QUESTIONS[currentStep - 1];
   const [clickedAnswer, setClickedAnswer] = useState<number | null>(null);
 
   // 질문이 바뀌면 클릭 상태 초기화
