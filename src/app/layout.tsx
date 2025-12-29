@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import { AuthProvider } from '../commons/providers/auth/auth.provider';
+import { PresenceProvider } from '../commons/providers/presence/presence.provider';
+import { UserStatusProvider } from '../commons/providers/user-status/user-status.provider';
 import { NextThemesProvider } from '../commons/providers/next-themes/next-themes.provider';
 import { ModalProvider } from '../commons/providers/modal/modal.provider';
 import { AuthGuard } from '../commons/providers/auth/auth.guard';
@@ -31,13 +33,17 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AuthProvider>
-          <NextThemesProvider>
-            <ModalProvider>
-              <AuthGuard>
-                <Layout>{children}</Layout>
-              </AuthGuard>
-            </ModalProvider>
-          </NextThemesProvider>
+          <PresenceProvider>
+            <UserStatusProvider>
+              <NextThemesProvider>
+                <ModalProvider>
+                  <AuthGuard>
+                    <Layout>{children}</Layout>
+                  </AuthGuard>
+                </ModalProvider>
+              </NextThemesProvider>
+            </UserStatusProvider>
+          </PresenceProvider>
         </AuthProvider>
       </body>
     </html>

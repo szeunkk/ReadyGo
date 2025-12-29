@@ -1,8 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Icon from '@/commons/components/icon';
 import { useAuth } from '@/commons/providers/auth/auth.provider';
+import {
+  useUserStatusStore,
+  type ManualStatus,
+} from '@/stores/user-status.store';
 import { useProfileBinding } from '../hooks/index.binding.hook';
 import styles from './styles.module.css';
 
@@ -35,8 +39,18 @@ const STATUS_CONFIG = {
 export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
   const { logout, user: authUser } = useAuth();
   const { profileData } = useProfileBinding();
+  const { myStatus, setMyManualStatus } = useUserStatusStore();
   const [isStatusOpen, setIsStatusOpen] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState<UserStatus>('online');
+  const [currentStatus, setCurrentStatus] = useState<UserStatus>(
+    (myStatus || 'online') as UserStatus
+  );
+
+  // myStatus가 변경되면 currentStatus도 업데이트
+  useEffect(() => {
+    if (myStatus) {
+      setCurrentStatus(myStatus as UserStatus);
+    }
+  }, [myStatus]);
 
   // 2-1) username 부분에는 Supabase Auth를 통해 사용자 세션 정보에서 user.email을 가져와서 username 부분에 바인딩
   // user가 null이거나 user.email이 없는 경우 fallback 처리
@@ -57,7 +71,9 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
   const handleStatusSelect = (status: UserStatus) => {
     setCurrentStatus(status);
     setIsStatusOpen(false);
-    // TODO: 실제 상태 변경 API 호출
+    // UserStatusProvider에서 오버라이드한 setMyManualStatus 호출
+    // 이 함수는 optimistic update 후 서버 API를 통해 DB에 반영합니다
+    setMyManualStatus(status as ManualStatus);
   };
 
   const handleViewProfile = () => {
