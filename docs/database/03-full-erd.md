@@ -38,6 +38,7 @@ erDiagram
   %% User / Profile Domain
   %% =========================
   user_profiles ||--|| user_settings : has
+  user_profiles ||--|| user_status : has
   user_profiles ||--|| user_traits : has
   user_profiles ||--o{ user_social_links : has
   user_profiles ||--o{ user_tags : has
@@ -112,6 +113,7 @@ erDiagram
 erDiagram
   %% Core User
   user_profiles ||--|| user_settings : has
+  user_profiles ||--|| user_status : has
   user_profiles ||--|| user_traits : has
 
   %% Social
@@ -175,7 +177,7 @@ erDiagram
 
 - **Author**: ReadyGo / Eunkyoung Kim(김은경)
 - **Created At**: 2025-12-24
-- **Last Updated At**: 2025-12-26
+- **Last Updated At**: 2025-12-29
 - **Document Version**: v1.0.0
 - **Status**: Active
 - **Source of Truth**:
@@ -188,3 +190,4 @@ erDiagram
 | ------: | ---------- | ------------------------------------------------ |
 |  v1.0.0 | 2025-12-24 | Full integrated ERD                              |
 |  v1.0.1 | 2025-12-26 | steam_game_sync_logs 테이블 추가에 따른 ERD 수정 |
+|  v1.0.2 | 2025-12-29 | User/Profile Domain에 user_status 추가           |

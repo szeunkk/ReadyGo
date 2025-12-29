@@ -20,6 +20,7 @@
 ```mermaid
 erDiagram
   user_profiles ||--|| user_settings : has
+  user_profiles ||--|| user_status : has
   user_profiles ||--o{ user_social_links : has
   user_profiles ||--|| user_traits : has
   user_profiles ||--o{ user_tags : has
@@ -140,7 +141,7 @@ erDiagram
 
 - **Author**: ReadyGo / Eunkyoung Kim(김은경)
 - **Created At**: 2025-12-24
-- **Last Updated At**: 2025-12-26
+- **Last Updated At**: 2025-12-29
 - **Document Version**: v1.0.0
 - **Status**: Active
 - **Source of Truth**:
@@ -149,7 +150,8 @@ erDiagram
 
 ## Version History
 
-| Version | Date       | Description               |
-| ------: | ---------- | ------------------------- |
-|  v1.0.0 | 2025-12-24 | Domain-level ERD diagrams |
-|  v1.0.1 | 2025-12-26 | Steam 도메인 ERD 수정     |
+| Version | Date       | Description                            |
+| ------: | ---------- | -------------------------------------- |
+|  v1.0.0 | 2025-12-24 | Domain-level ERD diagrams              |
+|  v1.0.1 | 2025-12-26 | Steam 도메인 ERD 수정                  |
+|  v1.0.2 | 2025-12-29 | User/Profile Domain에 user_status 추가 |
