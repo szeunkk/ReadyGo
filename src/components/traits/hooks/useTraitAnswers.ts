@@ -22,7 +22,7 @@ export type TraitAnswers = Record<string, AnswerType>;
  * - 질문 ID 기준으로 답변 저장
  * - UI(step)와 완전히 분리
  */
-export function useTraitAnswers() {
+export const useTraitAnswers = () => {
   const [answers, setAnswers] = useState<TraitAnswers>({});
 
   /**
@@ -67,4 +67,4 @@ export function useTraitAnswers() {
     removeAnswer, // optional
     resetAnswers,
   };
-}
+};

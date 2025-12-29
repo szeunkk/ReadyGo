@@ -61,16 +61,18 @@ const EMPTY_SCORES: TraitScores = {
  * 2. 질문의 가중치(weight)를 곱하여 누적
  * 3. 각 성향별 원점수를 0~100 범위로 정규화
  */
-export function calculateTraitScores(
+export const calculateTraitScores = (
   answers: Record<string, AnswerType>
-): TraitScores {
+): TraitScores => {
   // 1단계: 각 질문의 답변을 점수로 변환하여 성향별로 누적
   const rawScores = QUESTIONS.reduce<TraitScores>(
     (acc, q) => {
       const answer = answers[q.id];
 
       // 스케줄 질문 등 숫자가 아닌 답변은 스킵
-      if (typeof answer !== 'number') return acc;
+      if (typeof answer !== 'number') {
+        return acc;
+      }
 
       // 답변 점수 * 가중치를 해당 성향에 누적
       acc[q.axis] += ANSWER_SCORE_MAP[answer] * q.weight;
@@ -81,7 +83,7 @@ export function calculateTraitScores(
 
   // 2단계: 원점수를 0~100 범위로 정규화
   return normalize(rawScores);
-}
+};
 
 /**
  * 원점수를 0~100 범위로 정규화
@@ -95,7 +97,7 @@ export function calculateTraitScores(
  * - 최대값 (+5) → 100
  * - 공식: ((value + MAX) / (MAX * 2)) * 100
  */
-function normalize(scores: TraitScores): TraitScores {
+const normalize = (scores: TraitScores): TraitScores => {
   // 이론적 최대값 (모든 질문에 5점, weight=1 가정 시)
   const MAX = 5;
 
@@ -107,4 +109,4 @@ function normalize(scores: TraitScores): TraitScores {
     },
     {} as TraitScores
   );
-}
+};

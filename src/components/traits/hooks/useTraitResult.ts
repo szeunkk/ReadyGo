@@ -5,7 +5,7 @@ import { calculateTraitScores } from '../domain/calculateTraitScores';
 import { resolveAnimalType } from '../domain/resolveAnimalType';
 import type { TraitScores } from '../domain/calculateTraitScores';
 
-export function useTraitResult(answers: Record<string, AnswerType>) {
+export const useTraitResult = (answers: Record<string, AnswerType>) => {
   /**
    * answers → traitScores
    */
@@ -24,4 +24,4 @@ export function useTraitResult(answers: Record<string, AnswerType>) {
     traitScores,
     animalType,
   };
-}
+};

@@ -12,7 +12,7 @@ import type { AnswerType } from './useTraitAnswers';
  *
  * @param onComplete - 테스트 완료 시 실행될 콜백 함수
  */
-export function useTraitSurvey(onComplete?: () => void) {
+export const useTraitSurvey = (onComplete?: () => void) => {
   // 질문 흐름 관리
   const {
     currentQuestion,
@@ -90,4 +90,4 @@ export function useTraitSurvey(onComplete?: () => void) {
     traitScores,
     animalType,
   };
-}
+};

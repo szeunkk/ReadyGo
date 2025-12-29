@@ -5,9 +5,9 @@ import { SCHEDULE_QUESTION } from '@/components/traits/data/questionSchedule';
 /**
  * 배열을 랜덤하게 섞는 함수
  */
-function shuffle<T>(arr: T[]): T[] {
+const shuffle = <T,>(arr: T[]): T[] => {
   return [...arr].sort(() => Math.random() - 0.5);
-}
+};
 
 /**
  * 전체 테스트 흐름 관리 Hook
@@ -16,7 +16,7 @@ function shuffle<T>(arr: T[]): T[] {
  * - 페이지 이동 (다음/이전)
  * - 완료 판단
  */
-export function useTraitTest() {
+export const useTraitTest = () => {
   // 일반 질문들을 섞고, 스케줄 질문을 마지막에 고정
   const [questions] = useState(() => {
     return [...shuffle(QUESTIONS), SCHEDULE_QUESTION];
@@ -67,4 +67,4 @@ export function useTraitTest() {
     prev,
     reset,
   };
-}
+};

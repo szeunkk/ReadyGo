@@ -62,7 +62,7 @@ const WEIGHT = {
  * - 불변성 보장
  * - reduce/map 기반 선언적 구현
  */
-export function resolveAnimalType(traitScores: TraitScores): AnimalType {
+export const resolveAnimalType = (traitScores: TraitScores): AnimalType => {
   return (
     (
       Object.entries(animalProfiles) as [
@@ -106,4 +106,4 @@ export function resolveAnimalType(traitScores: TraitScores): AnimalType {
         return current.score > best.score ? current : best;
       }).animalType
   );
-}
+};
