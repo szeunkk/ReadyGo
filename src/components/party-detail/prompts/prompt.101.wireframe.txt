@@ -15,7 +15,7 @@
 ==============================================
 
 핵심요구사항) 완성된 컴포넌트를 페이지에서 import하여 연결시킬 것.
-                - 연결될 경로: src/app/(main)/party/[postId]/page.tsx
+                - 연결될 경로: src/app/(main)/party/[Id]/page.tsx
 
 핵심요구사항) HTML과 flexbox를 활용한 와이어프레임 구조만 만들어낼 것.
 

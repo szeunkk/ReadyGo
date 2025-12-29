@@ -127,7 +127,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
   };
 
   const handlePartyCountIncrease = () => {
-    if (maxMembers < 10) {
+    if (maxMembers < 8) {
       setValue('max_members', maxMembers + 1, { shouldValidate: true });
     }
   };
@@ -448,7 +448,20 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
           </div>
 
           <div className={styles.formGroup}>
-            <Input label="태그" size="l" placeholder="#태그 입력" />
+            <Controller
+              name="tags"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Input
+                  {...field}
+                  label="태그"
+                  size="l"
+                  placeholder="#태그 입력"
+                  state={fieldState.error ? 'error' : 'Default'}
+                  additionalInfo={fieldState.error?.message}
+                />
+              )}
+            />
           </div>
         </div>
       </div>

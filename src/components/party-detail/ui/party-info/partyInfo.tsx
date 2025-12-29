@@ -143,18 +143,6 @@ export default function PartyInfo({
                   {data.voice_chat}
                 </span>
               </div>
-              <div className={styles.infoItem}>
-                <div className={styles.iconLabelWrapper}>
-                  <Icon name="group" size={20} className={styles.infoIcon} />
-                  <span className={styles.infoLabel}>최대 인원</span>
-                </div>
-                <span
-                  className={styles.infoValue}
-                  data-testid="party-detail-max-members"
-                >
-                  {data.max_members}명
-                </span>
-              </div>
             </div>
           </div>
         </div>

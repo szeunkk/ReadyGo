@@ -156,4 +156,3 @@ test.describe('등록취소모달 기능', () => {
     expect(isModalVisible).toBe(false);
   });
 });
-
