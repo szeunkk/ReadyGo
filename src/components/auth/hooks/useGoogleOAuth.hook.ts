@@ -32,14 +32,54 @@ export const useGoogleOAuth = () => {
           return;
         }
 
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        // OAuth 콜백 후 URL에서 세션을 읽어오는 데 시간이 걸릴 수 있으므로 재시도
+        let retryCount = 0;
+        const maxRetries = 5;
+        const retryDelay = 500; // 500ms
 
-        if (session?.user && !hasProcessedSessionRef.current) {
-          hasProcessedSessionRef.current = true;
-          await processOAuthCallback(session.user.id);
-        }
+        const checkSession = async (): Promise<void> => {
+          try {
+            const {
+              data: { session },
+            } = await supabase.auth.getSession();
+
+            if (
+              session?.user &&
+              session?.access_token &&
+              session?.refresh_token &&
+              !hasProcessedSessionRef.current
+            ) {
+              hasProcessedSessionRef.current = true;
+              await processOAuthCallbackWithSession(session, session.user.id);
+            } else if (
+              retryCount < maxRetries &&
+              !hasProcessedSessionRef.current
+            ) {
+              // 세션이 아직 없으면 재시도
+              retryCount++;
+              setTimeout(checkSession, retryDelay);
+            } else if (retryCount >= maxRetries) {
+              // 최대 재시도 횟수 초과 시 플래그 제거
+              console.warn('OAuth session not found after retries');
+              if (typeof window !== 'undefined') {
+                localStorage.removeItem(OAUTH_PROCESSING_KEY);
+              }
+            }
+          } catch (error) {
+            console.error('Session check error:', error);
+            if (retryCount < maxRetries) {
+              retryCount++;
+              setTimeout(checkSession, retryDelay);
+            } else {
+              if (typeof window !== 'undefined') {
+                localStorage.removeItem(OAUTH_PROCESSING_KEY);
+              }
+            }
+          }
+        };
+
+        // 초기 세션 확인 시작
+        await checkSession();
       } catch (error) {
         console.error('Initial session check error:', error);
         // 에러 발생 시 플래그 제거
@@ -49,27 +89,40 @@ export const useGoogleOAuth = () => {
       }
     };
 
-    // OAuth 콜백 처리 로직
-    const processOAuthCallback = async (userId: string) => {
+    // OAuth 콜백 처리 로직 (세션을 파라미터로 받는 버전)
+    const processOAuthCallbackWithSession = async (
+      session: {
+        access_token: string;
+        refresh_token: string;
+        user: { id: string };
+      },
+      userId: string
+    ) => {
       try {
-        // 현재 세션 정보 확인
-        // Supabase가 자동으로 세션을 localStorage에 저장하므로 별도 저장 불필요
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        // OAuth 콜백 후 세션을 HttpOnly 쿠키에 저장하기 위해 API 호출
+        const sessionResponse = await fetch('/api/auth/session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include', // 쿠키 포함
+          body: JSON.stringify({
+            accessToken: session.access_token,
+            refreshToken: session.refresh_token,
+          }),
+        });
 
-        if (!session?.access_token) {
-          throw new Error('세션을 받지 못했습니다.');
+        if (!sessionResponse.ok) {
+          throw new Error('세션 저장에 실패했습니다.');
         }
 
-        // user 정보 가져오기
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+        const sessionData = await sessionResponse.json();
 
-        if (!user) {
+        if (!sessionData.user) {
           throw new Error('사용자 정보를 가져오지 못했습니다.');
         }
+
+        const user = sessionData.user;
 
         // user_profiles 테이블에서 레코드 존재 여부 확인
         const { data: existingProfile, error: profileCheckError } =
@@ -131,21 +184,23 @@ export const useGoogleOAuth = () => {
             );
           }
 
-          // Supabase 세션이 자동으로 관리되므로 별도 localStorage 저장 불필요
+          // HttpOnly 쿠키에 세션이 저장되었으므로 페이지 새로고침으로 세션 상태 동기화
           // 초기 데이터 생성 성공 → signup-success로 이동
           // OAuth 처리 플래그 제거
           if (typeof window !== 'undefined') {
             localStorage.removeItem(OAUTH_PROCESSING_KEY);
           }
-          router.push(URL_PATHS.SIGNUP_SUCCESS);
+          // 페이지 새로고침으로 세션 상태 동기화
+          window.location.href = URL_PATHS.SIGNUP_SUCCESS;
         } else {
-          // 기존 유저: Supabase 세션이 자동으로 관리되므로 별도 localStorage 저장 불필요
+          // 기존 유저: HttpOnly 쿠키에 세션이 저장되었으므로 페이지 새로고침으로 세션 상태 동기화
           // 기존 유저: user_profiles 레코드가 이미 존재 → home으로 이동
           // OAuth 처리 플래그 제거
           if (typeof window !== 'undefined') {
             localStorage.removeItem(OAUTH_PROCESSING_KEY);
           }
-          router.push(URL_PATHS.HOME);
+          // 페이지 새로고침으로 세션 상태 동기화
+          window.location.href = URL_PATHS.HOME;
         }
       } catch (error) {
         // 에러 모달 표시 (한 번만)
@@ -187,11 +242,14 @@ export const useGoogleOAuth = () => {
       if (
         event === 'SIGNED_IN' &&
         session?.user &&
+        session?.access_token &&
+        session?.refresh_token &&
         isProcessingOAuth &&
         !hasProcessedSessionRef.current
       ) {
         hasProcessedSessionRef.current = true;
-        await processOAuthCallback(session.user.id);
+        // onAuthStateChange에서 받은 세션을 바로 사용
+        await processOAuthCallbackWithSession(session, session.user.id);
       }
     });
 
