@@ -19,7 +19,7 @@
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);
   font-weight: var(--typo-body-md-font-weight);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   color: var(--color-text-primary);
 }
 
@@ -34,8 +34,6 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: 48px;
-  padding: 12px 16px;
   border-radius: var(--border-radius-12, 12px);
   box-sizing: border-box;
   cursor: pointer;
@@ -54,6 +52,17 @@
   font-size: var(--typo-body-lg-font-size);
   line-height: var(--typo-body-lg-line-height);
   font-weight: var(--typo-body-lg-font-weight);
+}
+
+/* Size Styles */
+.size-m {
+  height: 48px;
+  padding: 12px 16px;
+}
+
+.size-l {
+  height: 56px;
+  padding: 14px 16px;
 }
 
 .selectbox.disabled {

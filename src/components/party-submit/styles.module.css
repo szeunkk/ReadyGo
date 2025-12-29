@@ -417,3 +417,99 @@
   flex: 1;
   height: 48px;
 }
+
+/* DatePicker Styles */
+.datePicker {
+  width: 100%;
+  height: 56px;
+  background-color: var(--color-bg-secondary) !important;
+  border: 1px solid var(--color-border-secondary) !important;
+  border-radius: var(--border-radius-12, 12px) !important;
+  color: var(--color-text-primary);
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif !important;
+  padding: 0 16px !important;
+  box-sizing: border-box;
+}
+
+.datePicker:hover:not(.ant-picker-focused):not(
+    :has(.ant-picker-input > input:not(:placeholder-shown))
+  ) {
+  border-color: var(--color-border-interactive-secondary) !important;
+}
+
+/* Active state - 영역 클릭 시 달력이 나올 때 (selectbox의 active 상태와 동일) */
+.datePicker.ant-picker-focused {
+  border-color: var(--color-border-interactive-primary) !important;
+  box-shadow: 0 0 0 2px var(--color-transparent-12) !important;
+}
+
+/* Filled state - value가 있을 때 (placeholder가 보이지 않을 때) */
+.datePicker:has(.ant-picker-input > input:not(:placeholder-shown)):not(
+    .ant-picker-focused
+  ):not(:hover) {
+  border-color: var(--color-border-interactive-primary) !important;
+}
+
+.datePicker:has(.ant-picker-input > input:not(:placeholder-shown)):hover:not(
+    .ant-picker-focused
+  ) {
+  border-color: var(--color-border-interactive-secondary) !important;
+}
+
+.datePicker .ant-picker-input > input {
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif !important;
+  font-size: var(--typo-body-lg-font-size) !important;
+  line-height: var(--typo-body-lg-line-height) !important;
+  font-weight: var(--typo-body-lg-font-weight) !important;
+  color: var(--color-text-primary) !important;
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  height: auto !important;
+}
+
+.datePicker .ant-picker-input > input::placeholder {
+  color: var(--color-text-interactive-secondary) !important;
+}
+
+.datePicker .ant-picker-suffix {
+  color: var(--color-text-interactive-secondary) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: 4px !important;
+}
+
+.datePicker .ant-picker-suffix svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.datePickerPopup {
+  z-index: 10000 !important;
+}
+
+/* Error Message */
+.errorMessage {
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-size: var(--typo-body-sm-medium-font-size);
+  line-height: var(--typo-body-sm-medium-line-height);
+  font-weight: var(--typo-body-sm-medium-font-weight);
+  color: var(--color-text-danger);
+  margin-top: 4px;
+}

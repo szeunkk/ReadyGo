@@ -48,3 +48,30 @@
             - body 영역은 flex: 1로 설정하여 남은 공간을 모두 차지하도록 함
             - body 영역에 overflow-y: auto를 적용하여 내용이 넘칠 경우 스크롤이 생기도록 함
             - container에 적절한 max-height 또는 height 제한을 설정하여 화면 크기를 초과하지 않도록 함
+
+==============================================
+
+3차추가요구사항) 날짜 선택 인풋 영역을 antd DatePicker로 대체할 것.
+               
+                •	기존 Input 컴포넌트(시작일 필드)를 완전히 제거하고 antd DatePicker로 대체할 것.
+                •	피그마 디자인을 참고하여 구현할 것: https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2590-74408&m=dev
+                •	MCP Figma Desktop을 활용하여 피그마의 디자인 속성(레이아웃/간격/높이/패딩/폰트/색상/보더/라운드/아이콘 위치 등)을 모두 확인하고 적용할 것.
+                •	DatePicker의 스타일은 피그마 디자인에 맞춰 커스터마이징할 것.
+                •	antd DatePicker 패널(팝업)은 모달 위에 중첩되어 표시되어야 하며, 모달 아래로 깔리면 안 됨.
+                •	getPopupContainer로 팝업이 모달 컨텐츠 DOM에 렌더링되도록 지정할 것.
+                •	필요 시 popupClassName을 통해 z-index 보장할 것.
+                •	DatePicker 사용 예시:
+               
+                import React from 'react';
+                import type { DatePickerProps } from 'antd';
+                import { DatePicker } from 'antd';
+                import type { Dayjs } from 'dayjs';
+
+                const onChange: DatePickerProps<Dayjs, false>['onChange'] = (date, dateString) => {
+                console.log(date, dateString);
+                };
+
+                const App: React.FC = () => <DatePicker onChange={onChange}/>;
+
+                export default App;
+3차추가요구사항) 시작시간, 컨트롤 수준, 난이도 Selectbox의 옵션그룹에 있는 아이템 클릭시 인풋에 반영할 것.

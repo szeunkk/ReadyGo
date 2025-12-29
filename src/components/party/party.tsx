@@ -146,6 +146,7 @@ export default function Party() {
               shape="rectangle"
               className={styles.buttonWidth}
               onClick={openPartySubmitModal}
+              data-testid="party-create-button"
             >
               새 파티 만들기
             </Button>
