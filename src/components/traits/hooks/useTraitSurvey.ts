@@ -35,7 +35,9 @@ export const useTraitSurvey = (onComplete?: () => void) => {
    * 답변 선택 및 다음 단계 이동
    */
   const selectAnswer = (answer: AnswerType) => {
-    if (!currentQuestion) return;
+    if (!currentQuestion) {
+      return;
+    }
 
     saveAnswer(currentQuestion.id, answer);
 
