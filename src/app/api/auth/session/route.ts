@@ -22,7 +22,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
  * - 일반 로그인: { email, password }
  * - OAuth 콜백: { accessToken, refreshToken } (OAuth 콜백 후 세션 설정용)
  */
-export async function POST(request: NextRequest) {
+export const POST = async function (request: NextRequest) {
   try {
     const body = await request.json();
     const { email, password, accessToken, refreshToken } = body;
@@ -31,7 +31,10 @@ export async function POST(request: NextRequest) {
     let sessionData: {
       access_token: string;
       refresh_token: string;
-      user: any;
+      user: {
+        id: string;
+        email?: string;
+      };
     } | null = null;
 
     // OAuth 콜백 처리: accessToken과 refreshToken이 제공된 경우
@@ -181,7 +184,7 @@ export async function POST(request: NextRequest) {
  * - access token이 만료되었을 때 refresh token으로 자동 갱신
  * - 갱신된 토큰을 HttpOnly 쿠키에 저장
  */
-export async function GET() {
+export const GET = async function () {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('sb-access-token')?.value;
@@ -352,7 +355,7 @@ export async function GET() {
  * 로그아웃 API
  * DELETE /api/auth/session
  */
-export async function DELETE() {
+export const DELETE = async function () {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('sb-access-token')?.value;

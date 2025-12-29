@@ -122,8 +122,6 @@ export const useKakaoOAuth = () => {
           throw new Error('사용자 정보를 가져오지 못했습니다.');
         }
 
-        const user = sessionData.user;
-
         // user_profiles 테이블에서 레코드 존재 여부 확인
         const { data: existingProfile, error: profileCheckError } =
           await supabase
