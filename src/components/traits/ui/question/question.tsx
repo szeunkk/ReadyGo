@@ -53,7 +53,7 @@ export default function Question({ onComplete }: QuestionProps) {
         <div className={styles.titleSection}>
           <div className={styles.titleWrapper}>
             <h1 className={styles.title}>게임 성향 분석 테스트</h1>
-            <p className={styles.stepCounter}>
+            <p className={styles.stepCounter} data-testid="survey-step-counter">
               {currentStep} / {totalSteps}
             </p>
           </div>
@@ -61,7 +61,7 @@ export default function Question({ onComplete }: QuestionProps) {
           <div className={styles.progressSection}>
             <div className={styles.progressHeader}>
               <span className={styles.progressLabel}>진행률</span>
-              <span className={styles.progressPercentage}>
+              <span className={styles.progressPercentage} data-testid="survey-progress">
                 {Math.round(progressPercentage)}%
               </span>
             </div>
@@ -84,30 +84,32 @@ export default function Question({ onComplete }: QuestionProps) {
             <div className={styles.dotMedium} />
             <div className={styles.dotLight} />
           </div>
-          <span className={styles.questionNumber}>
+          <span className={styles.questionNumber} data-testid="survey-question-number">
             Q{String(currentStep).padStart(2, '0')}
           </span>
         </div>
 
         {/* 질문 본문 */}
-        {isScheduleQuestion ? (
-          <QuestionSchedule
-            onAnswerSelect={handleAnswerSelect}
-            selectedAnswer={
-              selectedAnswer as
-                | { dayTypes: string[]; timeSlots: string[] }
-                | undefined
-            }
-          />
-        ) : currentQuestion && 'choices' in currentQuestion ? (
-          <QuestionList
-            questionId={currentQuestion.id}
-            questionText={currentQuestion.text}
-            choices={currentQuestion.choices}
-            onAnswerSelect={handleAnswerSelect}
-            selectedAnswer={selectedAnswer as number | undefined}
-          />
-        ) : null}
+        <div data-testid={`survey-question-${currentQuestion?.id || 'unknown'}`}>
+          {isScheduleQuestion ? (
+            <QuestionSchedule
+              onAnswerSelect={handleAnswerSelect}
+              selectedAnswer={
+                selectedAnswer as
+                  | { dayTypes: string[]; timeSlots: string[] }
+                  | undefined
+              }
+            />
+          ) : currentQuestion && 'choices' in currentQuestion ? (
+            <QuestionList
+              questionId={currentQuestion.id}
+              questionText={currentQuestion.text}
+              choices={currentQuestion.choices}
+              onAnswerSelect={handleAnswerSelect}
+              selectedAnswer={selectedAnswer as number | undefined}
+            />
+          ) : null}
+        </div>
 
         {/* 질문 카드 푸터 (팩맨 진행률) */}
         <div className={styles.questionCardFooter}>
@@ -147,6 +149,7 @@ export default function Question({ onComplete }: QuestionProps) {
           shape="rectangle"
           onClick={prev}
           disabled={currentIndex === 0}
+          data-testid="survey-prev-button"
         >
           <Icon name="chevron-left" size={20} />
           이전
