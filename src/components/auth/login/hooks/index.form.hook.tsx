@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -32,7 +31,6 @@ type LoginFormData = z.infer<typeof loginSchema>;
 const REMEMBERED_EMAIL_KEY = 'rememberedEmail';
 
 export const useLoginForm = () => {
-  const router = useRouter();
   const { openModal, closeAllModals } = useModal();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const hasShownSuccessModalRef = useRef(false);
