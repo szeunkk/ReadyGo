@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useModal } from '@/commons/providers/modal';
-import PartySubmit from '@/components/party-submit/partySubmit';
+import PartySubmit from '@/components/party-submit/PartySubmit';
 
 export const useLinkModal = () => {
   const { openModal, closeModal } = useModal();

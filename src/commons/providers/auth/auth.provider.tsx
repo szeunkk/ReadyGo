@@ -3,6 +3,7 @@
 import {
   useEffect,
   useRef,
+  useState,
   createContext,
   useContext,
   useCallback,
@@ -10,7 +11,6 @@ import {
 import { useRouter, usePathname } from 'next/navigation';
 import type { User } from '@supabase/supabase-js';
 
-import { supabase } from '@/lib/supabase/client';
 import { useAuthStore } from '@/stores/auth.store';
 import { URL_PATHS } from '@/commons/constants/url';
 
@@ -25,6 +25,7 @@ const PUBLIC_PATHS = [
 interface AuthContextValue {
   isLoggedIn: boolean;
   user: User | null;
+  isSessionSynced: boolean; // 세션 동기화 완료 여부
   loginRedirect: () => void;
   logout: () => Promise<void>;
 }
@@ -50,6 +51,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const isInitializedRef = useRef(false);
   const isRedirectingRef = useRef(false);
   const isSessionSyncedRef = useRef(false);
+  const [isSessionSynced, setIsSessionSynced] = useState(false); // 세션 동기화 완료 상태
   const storeRef = useRef({ accessToken, user });
 
   // store 상태를 ref에 동기화 (무한 루프 방지)
@@ -57,23 +59,38 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     storeRef.current = { accessToken, user };
   }, [accessToken, user]);
 
-  // Supabase 세션을 Zustand store에 동기화하는 함수
+  /**
+   * API를 통해 세션을 Zustand store에 동기화
+   *
+   * Supabase 세션 관리를 API로 일원화:
+   * - Supabase 클라이언트의 localStorage 저장 비활성화
+   * - 모든 세션 조회는 /api/auth/session API를 통해서만 수행
+   * - 실제 토큰은 서버의 HttpOnly 쿠키에서 관리
+   * - 클라이언트 store에는 인증 상태만 저장
+   * - 토큰 갱신: API에서 Supabase의 autoRefreshToken을 활용하여 자동 갱신
+   * - 클라이언트는 직접 토큰을 읽지 않고 API를 통해서만 조회
+   */
   const syncSessionToStore = useCallback(async () => {
     try {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
+      // API를 통해 세션 조회 (HttpOnly 쿠키 자동 포함, 토큰 갱신 자동 처리)
+      const response = await fetch('/api/auth/session', {
+        method: 'GET',
+        credentials: 'include', // 쿠키 포함
+      });
 
-      if (error) {
-        console.error('Failed to get session:', error);
+      if (!response.ok) {
+        console.error('Failed to get session:', response.statusText);
         clearAuth();
         return;
       }
 
-      // 세션 존재 여부만 확인 (복호화/검증 금지)
-      const newAccessToken = session?.access_token ?? null;
-      const newUser = session?.user ?? null;
+      const data = await response.json();
+
+      // 세션 존재 여부 확인
+      const newUser = data.user ?? null;
+      // 실제 토큰은 서버에서 HttpOnly 쿠키로 관리되므로,
+      // 클라이언트에는 인증 여부만 표시용으로 저장
+      const newAccessToken = newUser ? 'authenticated' : null;
 
       // 무한 루프 방지: 값이 변경된 경우에만 업데이트
       const { accessToken: currentAccessToken, user: currentUser } =
@@ -91,6 +108,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } finally {
       // 세션 동기화 완료 표시
       isSessionSyncedRef.current = true;
+      setIsSessionSynced(true);
     }
   }, [clearAuth, setAuth]);
 
@@ -98,42 +116,36 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     if (!isInitializedRef.current) {
       isInitializedRef.current = true;
+      setIsSessionSynced(false); // 초기화 시작 시 false로 설정
       syncSessionToStore().then(() => {
         isSessionSyncedRef.current = true;
+        setIsSessionSynced(true); // 동기화 완료 시 true로 설정
       });
     }
   }, [syncSessionToStore]);
 
-  // Supabase auth 상태 변화 구독
+  /**
+   * 주기적으로 세션 상태 확인
+   *
+   * Supabase의 onAuthStateChange 구독 대신 API 기반으로 전환:
+   * - Supabase 클라이언트의 자동 세션 관리 비활성화
+   * - API를 통한 명시적 세션 조회로 일원화
+   * - API에서 토큰 만료 시 자동 갱신 처리 (autoRefreshToken 활용)
+   * - 클라이언트는 토큰을 직접 읽지 않고 API를 통해서만 조회
+   */
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // 세션 동기화
-      const newAccessToken = session?.access_token ?? null;
-      const newUser = session?.user ?? null;
-
-      // 무한 루프 방지: ref의 현재 값과 비교
-      const { accessToken: currentAccessToken, user: currentUser } =
-        storeRef.current;
-      if (
-        currentAccessToken !== newAccessToken ||
-        currentUser?.id !== newUser?.id ||
-        JSON.stringify(currentUser) !== JSON.stringify(newUser)
-      ) {
-        setAuth(newAccessToken, newUser);
+    // 초기 동기화 후 주기적으로 세션 상태 확인
+    // API 호출 시 토큰 만료 여부를 확인하고 필요시 자동 갱신
+    const intervalId = setInterval(() => {
+      if (isSessionSyncedRef.current) {
+        syncSessionToStore();
       }
-
-      // SIGNED_OUT 이벤트 시 명시적으로 초기화
-      if (event === 'SIGNED_OUT') {
-        clearAuth();
-      }
-    });
+    }, 60000); // 1분마다 확인
 
     return () => {
-      subscription.unsubscribe();
+      clearInterval(intervalId);
     };
-  }, [setAuth, clearAuth]);
+  }, [syncSessionToStore]);
 
   // 로그인 상태 해제 시 자동 리다이렉트 (공개 페이지 제외)
   useEffect(() => {
@@ -171,10 +183,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     router.push(URL_PATHS.LOGIN);
   };
 
+  /**
+   * 로그아웃 처리
+   *
+   * Supabase 세션 관리 일원화:
+   * - API를 통해 서버 쿠키 삭제 및 Supabase 세션 제거
+   * - 클라이언트 store 초기화
+   */
   const logout = async () => {
     try {
-      // Supabase 세션 제거
-      await supabase.auth.signOut();
+      // API를 통해 로그아웃 처리 (서버 쿠키 삭제 및 Supabase 세션 제거)
+      await fetch('/api/auth/session', {
+        method: 'DELETE',
+        credentials: 'include', // 쿠키 포함
+      });
       // Zustand store 초기화
       clearAuth();
       // 로그인 페이지로 이동
@@ -190,6 +212,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const value: AuthContextValue = {
     isLoggedIn: Boolean(accessToken),
     user,
+    isSessionSynced,
     loginRedirect,
     logout,
   };
