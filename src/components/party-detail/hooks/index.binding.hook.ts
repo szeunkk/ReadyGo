@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
 
 export interface PartyDetailData {
   id: number;
@@ -52,7 +51,7 @@ const formatTime = (timeString: string): string => {
   return `${period} ${displayHour.toString().padStart(2, '0')}:${minute}`;
 };
 
-// 컨트롤 수준 한국어 변환
+// 컨트롤 수준 한국어 변환: 영어 id를 한국어 label로 변환
 const getControlLevelLabel = (controlLevel: string): string => {
   const controlLevelMap: Record<string, string> = {
     beginner: '미숙',
@@ -64,7 +63,7 @@ const getControlLevelLabel = (controlLevel: string): string => {
   return controlLevelMap[controlLevel] || controlLevel;
 };
 
-// 난이도 한국어 변환
+// 난이도 한국어 변환: 영어 id를 한국어 label로 변환
 const getDifficultyLabel = (difficulty: string): string => {
   const difficultyMap: Record<string, string> = {
     undefined: '미정',
@@ -77,7 +76,7 @@ const getDifficultyLabel = (difficulty: string): string => {
   return difficultyMap[difficulty] || difficulty;
 };
 
-// voice_chat 표시 텍스트 변환
+// voice_chat 표시 텍스트 변환: null이면 "사용 안함", 'required'는 "필수 사용", 'optional'은 "선택적 사용"으로 변환
 const getVoiceChatLabel = (voiceChat: string | null): string => {
   if (voiceChat === null) {
     return '사용 안함';
@@ -92,10 +91,17 @@ const getVoiceChatLabel = (voiceChat: string | null): string => {
 };
 
 // tags 배열 변환
+// - 저장 형식: tags는 jsonb 컬럼에 string[] 형태로 저장되어 있음
+// - 조회 시: Supabase에서 조회한 tags는 이미 string[] 배열 형태로 반환됨
+// - 배열 처리:
+//   - tags가 null이면 빈 배열([])로 처리할 것.
+//   - tags가 배열이면 그대로 사용할 것.
 const parseTags = (tags: unknown): string[] => {
+  // tags가 null이면 빈 배열([])로 처리
   if (tags === null || tags === undefined) {
     return [];
   }
+  // tags가 배열이면 그대로 사용 (Supabase에서 이미 string[] 형태로 반환됨)
   if (Array.isArray(tags)) {
     return tags.filter((tag) => typeof tag === 'string');
   }
@@ -126,16 +132,28 @@ export const usePartyBinding = (): UsePartyBindingReturn => {
           throw new Error('유효하지 않은 파티 ID입니다.');
         }
 
-        // Supabase에서 데이터 조회
-        const { data: partyData, error: fetchError } = await supabase
-          .from('party_posts')
-          .select('*')
-          .eq('id', id)
-          .single();
+        // API Route를 통해 데이터 조회
+        const response = await fetch(`/api/party/${id}`, {
+          method: 'GET',
+          credentials: 'include', // HttpOnly 쿠키 포함 (중요!)
+        });
 
-        if (fetchError) {
-          throw fetchError;
+        // 응답 상태 확인
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('인증이 필요합니다.');
+          }
+          if (response.status === 404) {
+            throw new Error('파티 데이터를 찾을 수 없습니다.');
+          }
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error || '데이터를 불러오는 중 오류가 발생했습니다.'
+          );
         }
+
+        // JSON 파싱
+        const { data: partyData } = await response.json();
 
         if (!partyData) {
           throw new Error('파티 데이터를 찾을 수 없습니다.');

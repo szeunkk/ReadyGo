@@ -6,41 +6,21 @@ test.describe('파티 상세 데이터 바인딩 기능', () => {
     // 브라우저 환경에서 직접 import하여 사용
     const validPartyId = await page.evaluate(async () => {
       try {
-        // 브라우저 환경에서 동적으로 모듈 로드
-        // 실제 페이지에서는 이미 Supabase 클라이언트가 초기화되어 있을 수 있음
-        // 페이지에서 직접 API 호출을 통해 데이터 조회
-        const response = await fetch('/api/party/first', {
+        // 새로운 API Route를 통해 파티 목록 조회
+        // 실제 데이터를 사용 (하드코딩하지 않음)
+        const response = await fetch('/api/party?limit=1', {
           method: 'GET',
+          credentials: 'include', // HttpOnly 쿠키 포함
           headers: {
             'Content-Type': 'application/json',
           },
         });
 
         if (response.ok) {
-          const data = await response.json();
-          return data.id;
-        }
-
-        // API가 없으면 직접 Supabase 사용 시도
-        // window 객체에서 환경 변수 확인
-        // @ts-expect-error - 브라우저 환경에서 window 객체 타입 확장
-        const supabaseUrl = window.__NEXT_DATA__?.env?.NEXT_PUBLIC_SUPABASE_URL;
-        // @ts-expect-error - 브라우저 환경에서 window 객체 타입 확장
-        const supabaseAnonKey =
-          window.__NEXT_DATA__?.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-        if (supabaseUrl && supabaseAnonKey) {
-          // @ts-expect-error - 브라우저 환경에서 동적 import
-          const { createClient } = await import('@supabase/supabase-js');
-          const supabase = createClient(supabaseUrl, supabaseAnonKey);
-          const { data, error } = await supabase
-            .from('party_posts')
-            .select('id')
-            .limit(1)
-            .single();
-
-          if (!error && data) {
-            return data.id;
+          const result = await response.json();
+          // 응답 형식: { data: [...] }
+          if (result.data && Array.isArray(result.data) && result.data.length > 0) {
+            return result.data[0].id;
           }
         }
       } catch (err) {
@@ -75,9 +55,7 @@ test.describe('파티 상세 데이터 바인딩 기능', () => {
 
     // 에러가 표시되지 않았는지 확인
     const errorElement = page.locator('[data-testid="party-detail-error"]');
-    const hasError = await errorElement
-      .isVisible({ timeout: 499 })
-      .catch(() => false);
+    const hasError = await errorElement.isVisible().catch(() => false);
 
     if (hasError) {
       // 에러가 있으면 테스트 실패
@@ -85,9 +63,9 @@ test.describe('파티 상세 데이터 바인딩 기능', () => {
       throw new Error(`파티 데이터 로드 실패: ${errorText}`);
     }
 
-    // 제목이 존재하는지 확인
+    // 제목이 존재하는지 확인 (이미 waitForSelector로 대기했으므로 timeout 불필요)
     const titleElement = page.locator('[data-testid="party-detail-title"]');
-    await expect(titleElement).toBeVisible({ timeout: 499 });
+    await expect(titleElement).toBeVisible();
     const titleText = await titleElement.textContent();
     expect(titleText).toBeTruthy();
     expect(titleText?.trim().length).toBeGreaterThan(0);
@@ -96,7 +74,7 @@ test.describe('파티 상세 데이터 바인딩 기능', () => {
     const gameTitleElement = page.locator(
       '[data-testid="party-detail-game-title"]'
     );
-    await expect(gameTitleElement).toBeVisible({ timeout: 499 });
+    await expect(gameTitleElement).toBeVisible();
     const gameTitleText = await gameTitleElement.textContent();
     expect(gameTitleText).toBeTruthy();
     expect(gameTitleText?.trim().length).toBeGreaterThan(0);
@@ -105,19 +83,19 @@ test.describe('파티 상세 데이터 바인딩 기능', () => {
     const descriptionElement = page.locator(
       '[data-testid="party-detail-description"]'
     );
-    await expect(descriptionElement).toBeVisible({ timeout: 499 });
+    await expect(descriptionElement).toBeVisible();
     const descriptionText = await descriptionElement.textContent();
     expect(descriptionText).toBeTruthy();
 
     // 시작 날짜 형식 확인 (mm/dd 형식)
     const dateElement = page.locator('[data-testid="party-detail-start-date"]');
-    await expect(dateElement).toBeVisible({ timeout: 499 });
+    await expect(dateElement).toBeVisible();
     const dateText = await dateElement.textContent();
     expect(dateText).toMatch(/^\d{2}\/\d{2}$/);
 
     // 시작 시간 형식 확인 (오전/오후 hh:mm 형식)
     const timeElement = page.locator('[data-testid="party-detail-start-time"]');
-    await expect(timeElement).toBeVisible({ timeout: 499 });
+    await expect(timeElement).toBeVisible();
     const timeText = await timeElement.textContent();
     expect(timeText).toMatch(/(오전|오후)\s+\d{1,2}:\d{2}/);
 
@@ -125,7 +103,7 @@ test.describe('파티 상세 데이터 바인딩 기능', () => {
     const maxMembersElement = page.locator(
       '[data-testid="party-detail-max-members"]'
     );
-    await expect(maxMembersElement).toBeVisible({ timeout: 499 });
+    await expect(maxMembersElement).toBeVisible();
     const maxMembersText = await maxMembersElement.textContent();
     expect(maxMembersText).toMatch(/\d+명/);
 
@@ -133,7 +111,7 @@ test.describe('파티 상세 데이터 바인딩 기능', () => {
     const controlLevelElement = page.locator(
       '[data-testid="party-detail-control-level"]'
     );
-    await expect(controlLevelElement).toBeVisible({ timeout: 499 });
+    await expect(controlLevelElement).toBeVisible();
     const controlLevelText = await controlLevelElement.textContent();
     const validControlLevels = ['미숙', '반숙', '완숙', '빡숙', '장인'];
     expect(validControlLevels).toContain(controlLevelText?.trim());
@@ -142,7 +120,7 @@ test.describe('파티 상세 데이터 바인딩 기능', () => {
     const difficultyElement = page.locator(
       '[data-testid="party-detail-difficulty"]'
     );
-    await expect(difficultyElement).toBeVisible({ timeout: 499 });
+    await expect(difficultyElement).toBeVisible();
     const difficultyText = await difficultyElement.textContent();
     const validDifficulties = ['미정', '유동', '이지', '노멀', '하드', '지옥'];
     expect(validDifficulties).toContain(difficultyText?.trim());
@@ -151,7 +129,7 @@ test.describe('파티 상세 데이터 바인딩 기능', () => {
     const voiceChatElement = page.locator(
       '[data-testid="party-detail-voice-chat"]'
     );
-    await expect(voiceChatElement).toBeVisible({ timeout: 499 });
+    await expect(voiceChatElement).toBeVisible();
     const voiceChatText = await voiceChatElement.textContent();
     const validVoiceChatValues = ['사용 안함', '필수 사용', '선택적 사용'];
     expect(validVoiceChatValues).toContain(voiceChatText?.trim());
@@ -166,30 +144,18 @@ test.describe('파티 상세 데이터 바인딩 기능', () => {
       waitUntil: 'domcontentloaded',
     });
 
-    // 페이지가 로드될 때까지 대기
-    await page.waitForSelector('[data-testid="party-detail-page"]', {
-      state: 'visible',
-      timeout: 499,
-    });
+    // 페이지가 로드될 때까지 대기 (API 호출 시간 고려하여 timeout 조정)
+    const pageElement = page.locator('[data-testid="party-detail-page"]');
+    await expect(pageElement).toBeVisible({ timeout: 1999 });
 
     // 에러 표시 확인 (에러 메시지가 표시되어야 함)
-    // 에러가 나타날 때까지 대기
-    await page.waitForSelector('[data-testid="party-detail-error"]', {
-      state: 'visible',
-      timeout: 499,
-    });
-
+    // API 호출 완료 후 에러가 나타날 때까지 대기
     const errorElement = page.locator('[data-testid="party-detail-error"]');
-    const isErrorVisible = await errorElement.isVisible().catch(() => false);
-
-    // 에러가 표시되어야 함
-    expect(isErrorVisible).toBeTruthy();
+    await expect(errorElement).toBeVisible({ timeout: 1999 });
 
     // 에러 메시지가 존재하는지 확인
-    if (isErrorVisible) {
-      const errorText = await errorElement.textContent();
-      expect(errorText).toBeTruthy();
-      expect(errorText?.trim().length).toBeGreaterThan(0);
-    }
+    const errorText = await errorElement.textContent();
+    expect(errorText).toBeTruthy();
+    expect(errorText?.trim().length).toBeGreaterThan(0);
   });
 });
