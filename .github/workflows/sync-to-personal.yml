@@ -23,6 +23,10 @@ jobs:
         run: |
           git remote add personal https://x-access-token:${{ secrets.PERSONAL_REPO_TOKEN }}@github.com/szeunkk/ReadyGo.git
 
+      - name: Remove workflows before push
+        run: |
+          rm -rf .github/workflows
+
       - name: Sync main branch
         run: |
           git checkout main
