@@ -46,7 +46,7 @@ interface UserStatusStore {
  * 유저가 직접 설정하는 상태(user_status)를 관리하며,
  * Presence 정보와 결합하여 최종 표시 상태를 계산합니다.
  */
-export const useUserStatusStore = create<UserStatusStore>((set, get) => ({
+export const useUserStatusStore = create<UserStatusStore>((set) => ({
   myStatus: null,
   statusByUserId: {},
 
