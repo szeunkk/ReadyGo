@@ -16,22 +16,31 @@ export const useSignupSuccess = () => {
   useEffect(() => {
     const fetchNickname = async () => {
       try {
-        // 1. 현재 로그인한 유저의 ID 확보
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser();
+        // 1. API를 통해 현재 로그인한 유저 정보 조회
+        const sessionResponse = await fetch('/api/auth/session', {
+          method: 'GET',
+          credentials: 'include', // 쿠키 포함
+        });
 
-        // 로그인 세션이 없는 경우 로그인 페이지로 리다이렉트
-        if (userError || !user || !user.id) {
-          console.error('Failed to get user:', userError);
+        if (!sessionResponse.ok) {
+          console.error('Failed to get session');
           router.replace(URL_PATHS.LOGIN);
           return;
         }
 
-        const userId = user.id;
+        const sessionData = await sessionResponse.json();
+
+        // 로그인 세션이 없는 경우 로그인 페이지로 리다이렉트
+        if (!sessionData.user || !sessionData.user.id) {
+          console.error('No user session found');
+          router.replace(URL_PATHS.LOGIN);
+          return;
+        }
+
+        const userId = sessionData.user.id;
 
         // 2. user_profiles 테이블에서 닉네임 조회
+        // Supabase 클라이언트는 데이터베이스 쿼리용으로 계속 사용
         const { data: profile, error: profileError } = await supabase
           .from('user_profiles')
           .select('nickname')

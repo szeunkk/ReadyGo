@@ -164,7 +164,27 @@ export const useSignupForm = () => {
         );
       }
 
-      // 3. 성공 페이지로 이동
+      // 3. 회원가입 후 자동 로그인 (세션 설정)
+      if (authData.session?.access_token) {
+        // API를 통해 세션 설정 (HttpOnly 쿠키에 저장)
+        const loginResponse = await fetch('/api/auth/session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include', // 쿠키 포함
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }),
+        });
+
+        if (!loginResponse.ok) {
+          console.warn('Auto-login after signup failed, but signup was successful');
+        }
+      }
+
+      // 4. 성공 페이지로 이동
       router.push(URL_PATHS.SIGNUP_SUCCESS);
     } catch (error) {
       // 에러 모달 표시 (한 번만)

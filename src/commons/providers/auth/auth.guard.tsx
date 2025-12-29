@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth.store';
+import { useAuth } from './auth.provider';
 import { useModal } from '../modal/modal.provider';
 import { isMemberOnlyPath, URL_PATHS } from '@/commons/constants/url';
 import { UnauthorizedPage } from './ui/UnauthorizedPage';
@@ -16,11 +17,16 @@ interface AuthGuardProps {
  * - 초기 인가 완료 전까지는 빈 화면 유지
  * - 비회원의 회원 전용 경로 접근 시, 1회 모달 노출 후 로그인 페이지로 안내
  * - 테스트 환경(NEXT_PUBLIC_TEST_ENV=test)에서는 항상 통과
+ *
+ * HttpOnly 쿠키 방식 전환에 따른 변경:
+ * - AuthProvider의 세션 동기화 완료 상태를 확인하여 실제 API 호출 완료 후 인가 진행
+ * - 고정 지연 대신 세션 동기화 완료를 명시적으로 확인
  */
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const router = useRouter();
   const pathname = usePathname();
   const accessToken = useAuthStore((s) => s.accessToken);
+  const { isSessionSynced } = useAuth(); // 세션 동기화 완료 상태 확인
   const { openModal, closeAllModals } = useModal();
 
   const [isMounted, setIsMounted] = useState(false);
@@ -47,26 +53,18 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     setIsMounted(true);
   }, []);
 
-  // AuthProvider 초기화 시점 이후에 인가 진행을 보장하기 위해 다음 틱으로 미룸
+  // AuthProvider의 세션 동기화 완료를 확인하여 인가 진행
   useEffect(() => {
     if (!isMounted) {
       return;
     }
 
-    // AuthProvider의 세션 동기화를 기다리기 위해 약간의 지연 추가
-    let raf = 0;
-    raf = window.requestAnimationFrame(() => {
-      // 추가 지연으로 AuthProvider의 초기 세션 동기화 완료 대기
-      setTimeout(() => {
-        setDidAuthorize(true);
-      }, 100);
-    });
-    return () => {
-      if (raf) {
-        window.cancelAnimationFrame(raf);
-      }
-    };
-  }, [isMounted]);
+    // 세션 동기화가 완료되면 인가 진행
+    // HttpOnly 쿠키 방식: API 호출 완료 후 세션 상태가 store에 반영됨
+    if (isSessionSynced) {
+      setDidAuthorize(true);
+    }
+  }, [isMounted, isSessionSynced]);
 
   // 경로 변경 시 모달 플래그 리셋
   useEffect(() => {
