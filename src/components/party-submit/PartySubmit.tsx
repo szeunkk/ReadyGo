@@ -10,6 +10,7 @@ import Selectbox, { SelectboxItem } from '@/commons/components/selectbox';
 import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
 import { usePartySubmit } from './hooks/index.submit.hook';
+import { useLinkModalClose } from './hooks/index.link.modal.close.hook';
 
 interface PartySubmitProps {
   onClose?: () => void;
@@ -18,6 +19,7 @@ interface PartySubmitProps {
 export default function PartySubmit({ onClose }: PartySubmitProps) {
   const { form, onSubmit, isSubmitting, isValid, errors } = usePartySubmit();
   const { control, setValue } = form;
+  const { openCancelModal } = useLinkModalClose();
   const [gameSearchQuery, setGameSearchQuery] = useState('');
   const [isGameOptionsOpen, setIsGameOptionsOpen] = useState(false);
   const gameSearchRef = useRef<HTMLDivElement>(null);
@@ -457,7 +459,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
           variant="secondary"
           shape="rectangle"
           className={styles.cancelButton}
-          onClick={onClose}
+          onClick={openCancelModal}
         >
           취소
         </Button>
