@@ -57,3 +57,17 @@
 
 - ADD TABLE
 - 이유: 게임 단위 steam 메타 동기화 상세 로그 기록을 위한 테이블 추가
+
+---
+
+## v1.0.3
+
+**Date**: 2025-12-29  
+**Author**: ReadyGo / Jiyoun Han(한지연)
+
+### user_status
+
+- ADD TABLE
+- 이유: 유저의 온라인 상태(online, away, dnd, offline)를 관리하기 위한 테이블 추가
+- 영향: User / Profile Domain 확장, 실시간 상태 표시 기능 지원
+- 관련 기능: 채팅, 파티 참여 등에서 유저의 현재 상태를 확인하는데 활용
