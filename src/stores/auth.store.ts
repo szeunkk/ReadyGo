@@ -10,7 +10,7 @@ interface AuthStore {
 
 /**
  * 인증 상태 관리 Store
- * 
+ *
  * HttpOnly 쿠키 방식으로 전환하여:
  * - localStorage 저장 로직 완전 제거 (중복 저장 방지)
  * - 실제 토큰은 서버의 HttpOnly 쿠키에서 관리
