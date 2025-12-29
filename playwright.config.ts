@@ -33,9 +33,21 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    // Setup project: 모든 테스트 전에 로그인 상태 생성
+    {
+      name: 'setup',
+      testDir: './tests',
+      testMatch: /.*\.setup\.ts/,
+    },
+    // 메인 테스트: setup 완료 후 실행, 저장된 인증 상태 사용
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        // setup에서 저장한 인증 상태 사용
+        storageState: '.auth/user.json',
+      },
+      dependencies: ['setup'], // setup이 먼저 실행되도록 설정
     },
   ],
 

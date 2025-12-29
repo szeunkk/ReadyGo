@@ -1,22 +1,34 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import styles from './styles.module.css';
 import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
 import Image from 'next/image';
 import QuestionList from './question-list/questionList';
 import QuestionSchedule from './question-schedule/questionSchedule';
-import { useTraitSurvey, type AnswerType } from '../../hooks';
+import { useTraitSurvey, type AnswerType, type TraitSubmitPayload } from '../../hooks';
 
 interface QuestionProps {
-  onComplete?: () => void;
+  onComplete?: (payload: TraitSubmitPayload) => void;
 }
 
 // 팩맨 애니메이션 상수
 const PACMAN_STEP_WIDTH = 21; // px per step
 
 export default function Question({ onComplete }: QuestionProps) {
+  // 중복 호출 방지 플래그
+  const isCompletedRef = useRef(false);
+
+  // 완료 콜백 래퍼 (중복 호출 방지)
+  const handleComplete = (payload: TraitSubmitPayload) => {
+    if (isCompletedRef.current) {
+      return; // 이미 호출되었으면 무시
+    }
+    isCompletedRef.current = true;
+    onComplete?.(payload);
+  };
+
   // 통합 훅 사용
   const {
     currentQuestion,
@@ -27,7 +39,7 @@ export default function Question({ onComplete }: QuestionProps) {
     selectedAnswer,
     selectAnswer,
     prev,
-  } = useTraitSurvey(onComplete);
+  } = useTraitSurvey(handleComplete);
 
   // 현재 단계 (1부터 시작)
   const currentStep = currentIndex + 1;

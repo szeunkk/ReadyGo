@@ -41,8 +41,6 @@
 
 조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
             - 기존 traits 도메인 구현 패턴을 참고할 것.
-	            - traits/domain/calculateTraitScores.ts
-	            - traits/domain/resolveAnimalType.ts
 	            - 있으면 payload shape 참고만, Route는 body를 신뢰하지 말고 검증
 	        - Supabase 쿼리 패턴 (Repository 레이어 기준)
                 - 실제 supabase 쿼리는 route handler에서 직접 작성하지 않는다.
@@ -50,7 +48,6 @@
 
             - 인증 패턴:
                 - route handler에서 supabase.auth.getUser()로 인증할 것.
-                - Route Handler에서 쿠키 기반 auth를 읽을 수 있는 “server client” 패턴을 반드시 따를 것.
                 - user.id를 service 레이어로 전달한다.
 
             - Repository 구현 패턴
@@ -81,8 +78,7 @@
 
 핵심요구사항) 1. 인증
             - Route Handler에서 Supabase Auth로 현재 유저를 조회한다.
-            - 본 서비스는 로그인 필수 서비스이며, 정상적인 UI 경로에서는 비로그인 요청이 발생하지 않도록 이미 가드되어있다.
-                - 그럼에도 불구하고, 세션 만료·비정상 요청에 대비하여 인증 정보가 없는 경우 API 레벨에서는 401로 종료한다.
+            - 인증 정보가 없는 경우 API 레벨에서는 401로 종료한다.
             - 모든 저장 로직은 auth로부터 얻은 user.id만 사용한다.
             - 요청 body에 user_id가 포함된 경우 400으로 거부한다. ("user_id is not allowed")
 
@@ -96,11 +92,9 @@
             - 검증 규칙
                 - traits: Trait 5개 모두 포함 + 각 값은 0~100 number
                 - AnimalType: AnimalType enum/union에 정의된 값 중 하나
-                - DayTypes, TimeSlots: 각각 DayTypes, TimeSlots 상수에 정의된 id 값 중 하나도
+                - DayTypes, TimeSlots: DayTypes / TimeSlots 상수에 포함된 id인지 검증
             - schedule 조합 생성 및 중복 제거 규칙
                 - DayTypes와 TimeSlots는 각각 중복 제거(set) 후 사용한다.
-                - 조합은 다음 형태로 생성한다: { day_type: DayTypeId; time_slot: TimeSlotId }
-                - 조합 생성 후에도 { day_type, time_slot } 기준으로 중복 제거를 한 번 더 수행한다
                 - 최종 조합 결과가 0건인 경우: user_play_schedules에 대한 insert는 수행하지 않는다.
 
 핵심요구사항) 3. 저장 흐름 (Service 레이어 책임)
@@ -130,7 +124,6 @@
 핵심요구사항) 6. 원자성 한계 명시
             - 다중 테이블 트랜잭션은 보장되지 않는다.
             - 일부 단계 성공 후 실패가 발생할 수 있음을 코드 주석으로 명시한다.
-            - 필요 시 RPC로 묶을 수 있으나, 이번 구현 범위에서는 제외한다.
 
 ==============================================
 

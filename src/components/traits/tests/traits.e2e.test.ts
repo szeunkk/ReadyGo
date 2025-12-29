@@ -10,6 +10,10 @@ import { test, expect } from '@playwright/test';
  * - 스케줄 질문 처리
  * - 진행률 표시
  * - 전체 설문 완료
+ *
+ * 인증:
+ * - auth.setup.ts에서 로그인 상태를 미리 생성
+ * - 모든 테스트는 로그인된 상태로 실행됨 (storageState 자동 적용)
  */
 
 test.describe('Traits Survey E2E: 설문 기본 흐름', () => {
@@ -195,25 +199,25 @@ test.describe('Traits Survey E2E: 전체 설문 완료', () => {
     await page.waitForSelector('[data-testid="survey-step-counter"]');
 
     // 3개 질문만 답변
-    await page.click('[data-testid="answer-button-5"]');
+    await page.click('[data-testid="answer-button-5"]'); // Q1: 5점
     await page.waitForTimeout(400);
 
-    await page.click('[data-testid="answer-button-3"]');
+    await page.click('[data-testid="answer-button-3"]'); // Q2: 3점
     await page.waitForTimeout(400);
 
-    await page.click('[data-testid="answer-button-4"]');
+    await page.click('[data-testid="answer-button-4"]'); // Q3: 4점 → 자동으로 Q4로 이동
     await page.waitForTimeout(400);
 
     // 이전으로 2번 이동
-    await page.click('[data-testid="survey-prev-button"]');
+    await page.click('[data-testid="survey-prev-button"]'); // Q4 → Q3
     await page.waitForTimeout(200);
 
-    await page.click('[data-testid="survey-prev-button"]');
+    await page.click('[data-testid="survey-prev-button"]'); // Q3 → Q2
     await page.waitForTimeout(200);
 
-    // 첫 번째 답변이 유지되는지 확인
-    const firstAnswer = page.locator('[data-testid="answer-button-5"]');
-    await expect(firstAnswer).toHaveClass(/answerButtonSelected/);
+    // 두 번째 답변이 유지되는지 확인 (현재 Q2이므로 3점이 선택되어 있어야 함)
+    const secondAnswer = page.locator('[data-testid="answer-button-3"]');
+    await expect(secondAnswer).toHaveClass(/answerButtonSelected/);
   });
 });
 

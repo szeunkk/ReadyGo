@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { cookies } from 'next/headers';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { AnimalType } from '@/commons/constants/animal/animal.enum';
 import { TraitKey } from '@/commons/constants/animal/trait.enum';
-import { DAY_TYPES, TIME_SLOTS } from '@/components/traits/data/questionSchedule';
+import {
+  DAY_TYPES,
+  TIME_SLOTS,
+} from '@/components/traits/data/questionSchedule';
 import { submitTraits } from '@/services/traits/submitTraits.service';
 
 /**
  * POST /api/traits/submit
- * 
+ *
  * 책임:
  * - 인증 확인
  * - 요청 검증
@@ -42,18 +46,21 @@ const TraitsSchema = z.object({
 const SubmitTraitsSchema = z
   .object({
     traits: TraitsSchema,
-    animalType: z.string().refine(
-      (val) => validAnimalTypes.has(val as AnimalType),
-      { message: 'Invalid animalType' }
-    ),
-    dayTypes: z.array(z.string()).refine(
-      (arr) => arr.every((id) => validDayTypeIds.has(id)),
-      { message: 'Invalid dayTypes' }
-    ),
-    timeSlots: z.array(z.string()).refine(
-      (arr) => arr.every((id) => validTimeSlotIds.has(id)),
-      { message: 'Invalid timeSlots' }
-    ),
+    animalType: z
+      .string()
+      .refine((val) => validAnimalTypes.has(val as AnimalType), {
+        message: 'Invalid animalType',
+      }),
+    dayTypes: z
+      .array(z.string())
+      .refine((arr) => arr.every((id) => validDayTypeIds.has(id)), {
+        message: 'Invalid dayTypes',
+      }),
+    timeSlots: z
+      .array(z.string())
+      .refine((arr) => arr.every((id) => validTimeSlotIds.has(id)), {
+        message: 'Invalid timeSlots',
+      }),
     user_id: z.undefined().optional(),
   })
   .strict()
@@ -68,13 +75,17 @@ const SubmitTraitsSchema = z
 
 export const POST = async (request: NextRequest) => {
   try {
-    // 1. 인증 확인
+    // 1. 인증 확인 (쿠키 우선, Authorization 헤더 대체)
+    const cookieStore = await cookies();
+    const accessToken =
+      cookieStore.get('sb-access-token')?.value ||
+      request.headers.get('Authorization')?.replace('Bearer ', '') ||
+      '';
+
     const {
       data: { user },
       error: authError,
-    } = await supabaseAdmin.auth.getUser(
-      request.headers.get('Authorization')?.replace('Bearer ', '') || ''
-    );
+    } = await supabaseAdmin.auth.getUser(accessToken);
 
     if (authError || !user) {
       return NextResponse.json(
@@ -162,5 +173,4 @@ export const POST = async (request: NextRequest) => {
       { status: 500 }
     );
   }
-}
-
+};
