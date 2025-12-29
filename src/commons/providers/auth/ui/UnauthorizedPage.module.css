@@ -1,0 +1,9 @@
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--color-bg-primary);
+  z-index: 9998; /* 모달(z-index: 9999)보다 낮지만 Layout보다 높게 */
+}

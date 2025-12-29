@@ -1,0 +1,76 @@
+.container {
+  width: 464px;
+  height: 754px;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background-color: var(--color-bg-primary);
+  border-radius: 36px;
+  border: 1px solid var(--color-border-secondary);
+}
+
+.mainArea {
+  width: 400px;
+  height: 690px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  background: var(--color-bg-secondary);
+}
+
+.partyTitle {
+  width: 352px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  color: var(--color-text-primary);
+  font-size: var(--typo-heading-md-font-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--typo-heading-md-line-height);
+}
+.memberCount {
+  display: flex;
+  gap: 4px;
+  height: 30px;
+  align-self: stretch;
+  align-items: center;
+  font-size: var(--typo-body-lg-font-size);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--typo-body-lg-line-height);
+}
+.currentCount {
+  color: var(--color-text-interactive-primary);
+}
+
+.maxCount {
+  color: var(--color-text-interactive-secondary);
+}
+
+.partyItemGroup {
+  width: 352px;
+  height: 596px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+.partyItem {
+  width: 352px;
+  height: 64px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background-color: var(--color-gray-200);
+  color: var(--color-gray-800);
+  font-size: 14px;
+}

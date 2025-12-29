@@ -1,0 +1,18 @@
+.overlayBackdrop {
+  position: fixed;
+  top: var(--header-height);
+  left: var(--side-bar-width);
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-overlay);
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+.overlayContent {
+  display: flex;
+  border-radius: 16px;
+  z-index: 51;
+}

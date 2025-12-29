@@ -1,0 +1,185 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 참고할 TSX  파일경로: src/components/auth/signup/index.tsx
+조건-파일경로) 참고할 CSS  파일경로: src/components/auth/signup/styles.module.css
+조건-파일경로) 구현될 HOOK 파일경로: src/components/auth/signup/hooks/index.form.hook.tsx
+조건-파일경로) 구현될 TEST 파일경로: src/components/auth/signup/tests/index.form.hook.spec.ts
+
+==============================================
+
+핵심요구사항) 다음의 기능을 playwright 테스트를 활용하여 TDD기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+            1) 테스트 제외 라이브러리
+                - jest
+                - @testing-library/react
+
+            2) 테스트 조건
+                - timeout은 network 통신인 경우 2000ms 미만으로 설정할 것.
+                - timeout은 network 통신이 아닌 경우 설정하지 않거나, 500ms 미만으로 설정할 것.
+                - /auth/signup 페이지가 완전히 로드된 후 테스트할 것.
+                    - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+                    - 페이지 로드 식별 금지사항: networkidle 대기 방법
+                - /auth/signup 페이지에 고정 식별자 data-testid="auth-signup-page" 를 반드시 배치하고, Playwright는 이를 기준으로 “로드 완료”를 판별할 것.
+
+            3) 테스트 Auth/API 조건 (Supabase)
+
+                3-1) 데이터
+                    - 성공 시나리오는 실제 Supabase Auth를 사용할 것.
+                    - Mock데이터 사용하지 말 것.
+
+                3-2) 성공 시나리오 (실제 Supabase, 모킹 금지)
+                    - Supabase Auth 요청을 모킹하지 말 것.
+                    - 이메일 중복을 피하기 위해 이메일은 timestamp를 포함하여 항상 등록할 것.
+                    - 성공 시 다음을 검증할 것:
+                        1. data.user.id 존재 (필수)
+                        2. insert user_profiles가 error 없이 성공 (응답으로 확인)
+                        3. insert user_settings가 error 없이 성공 (응답으로 확인)
+                        4. /(auth)/signup-success 이동 + data-testid="auth-signup-success-page" 대기
+
+                    - 성공 검증 방식:
+                        - UI 기반(페이지 이동/성공 페이지 고정 data-testid 대기) + (가능하면) DB select를 통한 존재 확인을 수행할 것.
+                        - 단, DB select는 RLS 정책을 만족해야 하며, 불가할 경우 “insert 응답으로 생성 사실을 확인”하는 방식으로 대체할 것.
+
+                3-3) 실패 시나리오 (모킹 필수)
+                    - 실패 시나리오에서는 Supabase 관련 네트워크 호출을 Playwright page.route()로 모킹할 것.
+                    - 모킹 대상은 “함수 호출(supabase.auth.signUp)”이 아니라, 실제 HTTP 요청 경로를 기준으로 가로챌 것.
+                    - 실패 시나리오는 최소 2종류를 포함할 것.
+                        1. auth.signUp 실패 (signup API 자체 에러)
+                            - Supabase Auth signup 요청을 가로채서 실패 응답을 반환할 것.
+                            - 우선적으로 아래 패턴을 모킹 대상으로 사용할 것:
+                                - **/auth/v1/signup**
+                            - 환경에 따라 실제 호출 경로가 다를 수 있으므로, 테스트 실행 로그에서 호출 URL을 확인하고 route 패턴을 조정할 것.
+                            - 실패 응답은 HTTP 4xx 또는 5xx로 반환하고, 응답 바디는 Supabase 에러 형태({ error: "...", error_description: "..." } 또는 유사)로 구성할 것.
+                        2. auth.signUp 성공 후 초기 데이터 생성 실패 (profiles/settings insert 단계 에러)
+                            - Auth signup 요청은 정상 응답으로 통과시키되(모킹 또는 실제 호출), 초기 데이터 생성 단계의 DB insert 요청을 가로채서 실패 응답을 반환할 것.
+                            - 모킹 대상:
+                                - user_profiles insert 요청 또는 user_settings insert 요청
+                            - 우선적으로 아래 PostgREST 패턴을 모킹 대상으로 사용할 것:
+                                - **/rest/v1/user_profiles**
+                                - **/rest/v1/user_settings**
+                            - 둘 중 하나만 실패시키는 케이스를 만들고(예: profiles 성공, settings 실패), 최종 결과가 “가입실패모달 노출”로 귀결되는지 검증할 것.
+                    - 실패 시 공통 검증:
+                        - 가입실패모달이 노출되는지
+                        - '확인' 클릭 시 열려있는 모든 모달이 닫히는지
+                        - 닫힌 뒤 동일한 실패 상태에서 재렌더링되어도 모달이 같은 상황에서 다시 자동으로 나타나지 않도록 할 것(중복 오픈 방지)
+
+
+==============================================
+
+핵심요구사항) 다음의 조건에 맞게 회원가입 폼 등록 기능을 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+            1) 라이브러리조건
+                - 폼: 이미 설치되어있는 react-hook-form, @hookform/resolvers를 사용할 것.
+                - 검증: 이미 설치되어있는 zod를 사용할 것.   
+
+            2) zod 검증 조건
+                - email: '@' 포함
+                - password: 영문 + 숫자 포함 8자리 이상
+                - passwordConfirm: password와 동일
+
+            3) 유저시나리오(회원가입) - Supabase Email Auth + 초기 데이터 생성
+                1. 모든 인풋이 입력되고 zod 검증을 통과하면 회원가입 버튼을 활성화 할 것.
+
+                2. 회원가입 버튼을 누르면, 아래 순서로 처리할 것.
+
+                    2-1) Supabase Auth 회원가입
+                        - API: supabase.auth.signUp
+                        - 요청 데이터: { email, password }
+                        - passwordConfirm은 서버로 보내지 않음(프론트 검증 전용)
+
+                    2-2) 회원가입 성공 판단
+                        - signUp 결과에서 data.user.id가 존재하면 회원가입 성공으로 간주하고, 즉시 다음 단계(초기 데이터 생성)로 진행할 것.
+                        - error가 존재하거나 예외 발생 시 실패 처리로 진행할 것.
+
+                    2-3) 초기 데이터 생성(필수)
+                        - 회원가입 성공(userId 확보) 직후, 아래 테이블에 기본 레코드를 생성할 것.
+                            1. user_profiles
+                            2. user_settings
+                        - user_profiles 기본 생성 데이터(필수 컬럼만 최소 구성하되 ERD와 충돌 없이 동작하도록 설계):
+                            - id: userId
+                            - nickname: 기본 닉네임 자동 생성 => lib/nickname/generateNickname.ts 
+                            - avatar_url: null
+                            - bio: 빈 문자열 또는 null
+                            - animal_type: bear
+                            - tier: silver
+                            - temperature_score: 30
+                            - status_message: 빈 문자열 또는 null
+                            - created_at/updated_at은 DB default(now())를 우선 사용하되, 스키마에 따라 필요한 경우에만 전달
+                            user_profiles insert payload는 실제 Supabase 테이블 컬럼/타입과 일치하도록 최소 필드로 구성하고(필수/존재 컬럼만), 존재하지 않는 컬럼은 제거할 것. tier 타입이 text가 아니면 DB 타입에 맞춰 값 변환할 것.
+
+                        - user_settings 기본 생성 데이터:
+                            - id: userId
+                            - theme_mode : dark
+                            - notification_push: true
+                            - notification_chat: true
+                            - notification_party : true
+                            - language: ko
+                            - created_at/updated_at은 DB default(now()) 우선
+
+                        - 초기 데이터 생성은 가능한 한 “원자적으로” 보이도록 처리할 것:
+                            - profiles insert 성공 후 settings insert 실패 시, 최종 실패로 처리하고 가입실패모달을 띄울 것.
+                            - (가능하면) 실패 시 생성된 일부 데이터 롤백 전략을 고려하되, 프론트 단에서 완전 롤백이 어렵다면 최소한 사용자에게 실패를 명확히 안내하고 재시도 가능하게 할 것.
+
+                3. 회원가입 전체 플로우가 성공하면:
+                    - 성공 페이지로 즉시 이동: /(auth)/signup-success
+                    - 페이지 이동 경로는 commons/constants/url.ts에 정의된 URL을 사용해서 이동할 것.
+
+                4. 회원가입 전체 플로우가 실패하면:
+                    - 가입실패모달을 노출할 것.
+                
+                5. 모달 조건(실패 모달에만 적용)
+                    5-1) 모달조건
+                        - 모달 프로바이더 경로: src/commons/providers/modal/modal.provider.tsx
+                        - 이미 셋팅되어있는 modal.provider를 사용할 것.
+                        - 이미 셋팅되어있는 modal.provider를 수정하지 말 것.
+                        - 모달은 한 번만 보여야 하며, 닫힌 뒤에는 같은 상황에서 다시 나타나지 않도록 할 것.
+                            - 실패 모달은 hasShownErrorModal 같은 ref/state 플래그로 제어하여 동일 실패 상태 재렌더에서도 자동 재오픈 금지
+
+                    5-2) 공통컴포넌트조건                        
+                        - 가입실패모달: <Modal />, variant: 'single'
+
+                    5-3) 실패 모달 확인 클릭 동작        
+                        - 가입실패모달:
+                            1. '확인' 클릭
+                            2. 열려있는 모든 모달을 닫기
+                            3. 페이지 이동 없음(현재 페이지 유지)
+
+==============================================
+
+핵심요구사항) Hook(src/components/auth/signup/hooks/index.form.hook.tsx)은 다음 책임을 가진다.
+            - zod 스키마/리졸버 연결
+            - 버튼 활성화/비활성화 로직
+            - submit 로직(회원가입 → 초기 데이터 생성 → 성공 페이지 이동)
+            - 실패 모달 오픈/중복 방지
+            - 라우팅 처리(성공 시 signup-success 이동)
+
+핵심요구사항) UI(src/components/auth/signup/index.tsx)는 hook을 사용하여:
+            - data-testid="auth-signup-page"를 최상단(또는 명확한 root)에 부여
+            - 필드 입력 및 에러 메시지 표시
+            - 버튼 disabled 상태가 hook의 formState를 반영하도록 연결
+
+핵심요구사항) 성공 페이지(/(auth)/signup-success)는 존재한다고 가정하며, 테스트에서는 해당 페이지의 고정 data-testid(예: data-testid="auth-signup-success-page")를 기준으로 이동 성공을 확인할 것.
+            - 만약 페이지가 아직 없다면, 최소한의 페이지(또는 라우팅)도 함께 추가하여 테스트가 가능하게 할 것.
+            
+
+핵심요구사항) 마지막으로, 구현 결과를 다음 2개 체크리스트로 반환할 것.
+            - 커서룰(@01-common.mdc, @04-func.mdc) 적용 결과 체크리스트
+            - 기능 요구사항 및 테스트 통과 체크리스트
+                - 성공 시나리오(실데이터/무모킹) 통과 여부
+                - 실패 시나리오 2종(모킹) 통과 여부
+                - data-testid 기반 로드 대기 준수 여부
+                - timeout 규칙 준수 여부
+
+==============================================
+
+핵심요구사항) 로그인 페이지 라우팅 기능 구현
+            로그인하기 버튼을 클릭하면 로그인 페이지로 이동할 것.
+            - 이동할 페이지: /(auth)/login
+            - commons/constants/url.ts의 페이지URL에 정의된 경로를 사용할 것.

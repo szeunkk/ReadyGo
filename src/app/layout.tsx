@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
-import { NextThemesProvider } from './commons/providers/next-themes/next-themes.provider';
+import { AuthProvider } from '../commons/providers/auth/auth.provider';
+import { NextThemesProvider } from '../commons/providers/next-themes/next-themes.provider';
+import { ModalProvider } from '../commons/providers/modal/modal.provider';
+import { AuthGuard } from '../commons/providers/auth/auth.guard';
+import { Layout } from '../commons/layout';
 
 const pretendard = localFont({
   src: '../fonts/PretendardVariable.woff2',
@@ -21,9 +25,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${pretendard.variable}  antialiased`}>
-        <NextThemesProvider>{children}</NextThemesProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${pretendard.variable}  antialiased`}
+        suppressHydrationWarning
+      >
+        <AuthProvider>
+          <NextThemesProvider>
+            <ModalProvider>
+              <AuthGuard>
+                <Layout>{children}</Layout>
+              </AuthGuard>
+            </ModalProvider>
+          </NextThemesProvider>
+        </AuthProvider>
       </body>
     </html>
   );

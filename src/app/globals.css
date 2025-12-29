@@ -6,6 +6,15 @@
   --background: #ffffff;
   --foreground: #171717;
 
+  /* Layout */
+  --side-bar-width: 80px;
+  --header-height: 80px;
+
+  /* Z-Index */
+  --z-header: 100;
+  --z-sidemenu: 100;
+  --z-overlay: 1000;
+
   /* Font Family */
   --font-code: 'Source Code Pro', 'Courier New', monospace;
 
@@ -757,7 +766,7 @@
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background: var(--color-bg-secondary);
   font-family:
     var(--font-pretendard, 'Pretendard'),
     -apple-system,

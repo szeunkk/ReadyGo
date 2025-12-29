@@ -1,0 +1,121 @@
+.questionBody {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 32px;
+  width: 100%;
+}
+
+.questionText {
+  font-family: var(--typo-heading-lg-font-family);
+  font-size: var(--typo-heading-lg-font-size);
+  line-height: var(--typo-heading-lg-line-height);
+  font-weight: var(--typo-heading-lg-font-weight);
+  color: var(--color-text-primary);
+  text-align: center;
+  margin: 0;
+  padding: 0 74px;
+}
+
+.sectionsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.sectionLabel {
+  font-family: var(--typo-body-lg-font-family);
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  font-weight: var(--typo-body-lg-font-weight);
+  color: var(--color-text-interactive-secondary);
+  padding: 0 4px;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.buttonGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+.scheduleButton {
+  flex: 1;
+  min-height: 56px;
+  padding: 16px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scheduleButton:hover {
+  background: var(--color-bg-interactive-teritiary-hover);
+  border-color: var(--color-border-interactive-secondary);
+}
+
+.scheduleButton:active {
+  background: var(--color-bg-interactive-teritiary-pressed);
+  box-shadow:
+    0px 15px 20px -4px rgba(95, 252, 226, 0.15),
+    0px 6px 8px -5px rgba(95, 252, 226, 0.15);
+}
+
+.scheduleButtonSelected {
+  background: rgba(127, 253, 232, 0.12);
+  border-color: #5ffce2;
+  box-shadow:
+    0px 20px 25px -5px rgba(95, 252, 226, 0.2),
+    0px 8px 10px -6px rgba(95, 252, 226, 0.2);
+}
+
+.scheduleButtonSelected:hover {
+  background: rgba(127, 253, 232, 0.12);
+  border-color: #5ffce2;
+  box-shadow:
+    0px 20px 25px -5px rgba(95, 252, 226, 0.2),
+    0px 8px 10px -6px rgba(95, 252, 226, 0.2);
+}
+
+.scheduleButtonSelected:active {
+  background: rgba(127, 253, 232, 0.12);
+  border-color: #5ffce2;
+  box-shadow:
+    0px 10px 15px -3px rgba(95, 252, 226, 0.2),
+    0px 4px 6px -4px rgba(95, 252, 226, 0.2);
+}
+
+.scheduleButtonText {
+  font-family: var(--typo-body-lg-font-family);
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  font-weight: var(--typo-body-lg-font-weight);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+.scheduleButtonTextSelected {
+  font-family: var(--typo-body-lg-medium-font-family);
+  font-size: var(--typo-body-lg-medium-font-size);
+  line-height: var(--typo-body-lg-medium-line-height);
+  font-weight: var(--typo-body-lg-medium-font-weight);
+  color: var(--color-text-interactive-primary);
+}

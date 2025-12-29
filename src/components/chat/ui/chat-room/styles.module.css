@@ -1,0 +1,308 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-bg-primary);
+}
+
+/* 헤더 영역 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 16px;
+  background-color: var(--color-bg-primary);
+  flex-shrink: 0;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerAvatar {
+  flex-shrink: 0;
+}
+
+.headerUserInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.headerNickname {
+  font-family: var(--typo-body-lg-semibold-font-family);
+  font-size: var(--typo-body-lg-semibold-font-size);
+  line-height: var(--typo-body-lg-semibold-line-height);
+  font-weight: var(--typo-body-lg-semibold-font-weight);
+  color: var(--color-text-primary);
+}
+
+.headerStatus {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  font-weight: var(--typo-body-sm-font-weight);
+  color: var(--color-text-interactive-secondary);
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.searchBar {
+  width: 360px;
+  flex-shrink: 0;
+}
+
+.menuButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-bg-secondary);
+  border: none;
+  border-radius: 16.4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: var(--color-icon-primary);
+  transition: background-color 0.2s;
+}
+
+.menuButton:hover {
+  background-color: var(--color-bg-interactive-teritiary-hover);
+}
+
+.menuButton:active,
+.menuButton.active {
+  background-color: var(--color-bg-interactive-teritiary-pressed);
+  color: var(--color-icon-interactive-primary, #5ffce2);
+}
+
+.menuButton:active svg,
+.menuButton.active svg {
+  color: var(--color-icon-interactive-primary, #5ffce2);
+}
+
+.menuButton:active svg path,
+.menuButton.active svg path {
+  fill: var(--color-icon-interactive-primary, #5ffce2);
+}
+
+.menuButton:focus-visible {
+  outline: 1px solid var(--color-border-focus-ring);
+  outline-offset: 2px;
+}
+
+/* 차단 안내 배너 */
+.blockBanner {
+  padding: 12px 16px;
+  background-color: var(--color-bg-danger-subtle);
+  color: var(--color-text-danger);
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-font-weight);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* 메시지 리스트 영역 */
+.messageList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 32px 16px;
+  background-color: var(--color-bg-secondary);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.dateDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  font-family: var(--typo-body-sm-medium-font-family);
+  font-size: var(--typo-body-sm-medium-font-size);
+  line-height: var(--typo-body-sm-medium-line-height);
+  font-weight: var(--typo-body-sm-medium-font-weight);
+  color: var(--color-text-interactive-secondary);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.messageRow {
+  display: flex;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.ownMessageContainer {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-left: auto;
+  align-self: flex-end;
+}
+
+.otherMessageContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.messageAvatar {
+  flex-shrink: 0;
+}
+
+.avatarSpacer {
+  width: 40px;
+  flex-shrink: 0;
+}
+
+.otherMessageContent {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.otherMessageBubble {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: var(--color-bg-tertiary);
+  border-radius: 24px;
+  max-width: 100%;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.ownMessageBubble {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: var(--color-bg-interactive-primary-hover);
+  border-radius: 24px;
+  max-width: 100%;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.messageContent {
+  font-family: var(--typo-body-lg-font-family);
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  font-weight: var(--typo-body-lg-font-weight);
+  color: var(--color-text-primary);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.ownMessageBubble .messageContent {
+  color: var(--color-text-interactive-inverse);
+}
+
+.messageTime {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  font-weight: var(--typo-body-sm-font-weight);
+  color: var(--color-text-interactive-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-bottom: 14px;
+}
+
+.unreadIndicator {
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-icon-primary);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.systemMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 8px 16px;
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  font-weight: var(--typo-body-sm-font-weight);
+  color: var(--color-text-interactive-secondary);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* 입력 영역 */
+.inputArea {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 16px;
+  background-color: var(--color-bg-primary);
+  flex-shrink: 0;
+}
+
+.inputWrapper {
+  flex: 1;
+  height: 48px;
+  min-width: 0;
+}
+
+.messageInput {
+  width: 100%;
+  height: 100%;
+}
+
+.sendButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  background-color: var(--color-bg-secondary);
+  border: none;
+  border-radius: 16.4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: var(--color-icon-primary);
+  transition: background-color 0.2s;
+}
+
+/* Button 컴포넌트의 기본 padding과 size 스타일 오버라이드 */
+/* CSS Module에서 Button 컴포넌트의 클래스를 오버라이드하기 위해 더 구체적인 선택자 사용 */
+.sendButton[class*='button'][class*='size-m'] {
+  padding: 0;
+  height: 48px;
+}
+
+.sendButton:hover:not(:disabled) {
+  background-color: var(--color-bg-interactive-teritiary-hover);
+}
+
+.sendButton:active:not(:disabled) {
+  background-color: var(--color-bg-interactive-teritiary-pressed);
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sendButton:focus-visible {
+  outline: 2px solid var(--color-border-focus-ring);
+  outline-offset: 2px;
+}

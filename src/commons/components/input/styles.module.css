@@ -1,0 +1,364 @@
+/* 
+ * 핵심요구사항: global.css에 정의된 CSS 변수(상수 토큰)를 사용할 것.
+ * - 모든 색상 값은 var(--color-*) 형태의 CSS 변수를 사용
+ * - 모든 폰트 값은 var(--typo-*) 또는 var(--font-weight-*) 형태의 CSS 변수를 사용
+ * - 하드코딩된 색상 및 폰트 값을 절대 사용하지 않음
+ */
+
+/* Base Container Styles */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Base Input Styles */
+.input {
+  display: flex;
+  align-items: center;
+  border: none;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+/* Size Styles */
+.size-m {
+  height: 48px;
+}
+
+.size-l {
+  height: 56px;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.inputContent {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.inputTextContainer {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 0;
+}
+
+.inputField {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  color: var(--color-text-interactive-secondary);
+  width: 100%;
+}
+
+.inputField[readonly] {
+  cursor: default;
+}
+
+.inputField::placeholder {
+  color: var(--color-text-interactive-secondary);
+}
+
+.inputIcon {
+  flex-shrink: 0;
+  color: var(--color-icon-primary);
+}
+
+.cursor {
+  color: inherit;
+  opacity: 0.6;
+}
+
+/* Label Styles */
+.label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 18px;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-primary);
+}
+
+.labelIcon {
+  flex-shrink: 0;
+  color: var(--color-icon-primary);
+}
+
+.labelText {
+  display: flex;
+  align-items: center;
+}
+
+.required {
+  color: var(--color-text-danger);
+  margin-left: 0;
+}
+
+/* Additional Info Styles */
+.additionalInfo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 16px;
+  font-family:
+    var(--font-pretendard, 'Pretendard'),
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif;
+  font-style: normal;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  color: var(--color-text-interactive-secondary);
+}
+
+.additionalInfo.error {
+  color: var(--color-text-danger);
+}
+
+.additionalInfoIcon {
+  flex-shrink: 0;
+  color: var(--color-icon-primary);
+}
+
+.additionalInfoText {
+  display: flex;
+  align-items: center;
+}
+
+/* Primary Variant */
+.variant-primary {
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--border-radius-12, 12px);
+  color: var(--color-text-interactive-secondary);
+  border: 1px solid transparent;
+}
+
+/* Hover state - CSS pseudo-class */
+.variant-primary.state-Default:hover:not(.state-disabled):not(.disabled):not(
+    :has(.inputField:focus)
+  ):not(.state-error),
+.variant-primary.state-filled:hover:not(.state-disabled):not(.disabled):not(
+    :has(.inputField:focus)
+  ):not(.state-error) {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-interactive-secondary);
+  border-radius: var(--border-radius-12, 12px);
+}
+
+/* Active state (focus) - CSS pseudo-class */
+.variant-primary.state-Default:has(.inputField:focus):not(.state-disabled):not(
+    .disabled
+  ):not(.state-error),
+.variant-primary.state-filled:has(.inputField:focus):not(.state-disabled):not(
+    .disabled
+  ):not(.state-error) {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-interactive-primary);
+  border-radius: var(--border-radius-12, 12px);
+}
+
+/* Filled state - CSS pseudo-class (placeholder 기반) */
+.variant-primary.state-Default:has(.inputField:not(:placeholder-shown)):not(
+    .state-disabled
+  ):not(.disabled):not(:has(.inputField:focus)):not(:hover):not(.state-error) {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-12, 12px);
+  color: var(--color-text-primary);
+}
+
+.variant-primary.state-Default:has(.inputField:not(:placeholder-shown)):not(
+    .state-disabled
+  ):not(.disabled):not(:has(.inputField:focus)):not(:hover):not(.state-error)
+  .inputField {
+  color: var(--color-text-primary);
+}
+
+/* Legacy state classes (하위 호환성 유지) */
+.variant-primary.state-hover {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-interactive-secondary);
+  border-radius: var(--border-radius-12, 12px);
+}
+
+.variant-primary.state-active {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-interactive-primary);
+  border-radius: var(--border-radius-12, 12px);
+}
+
+.variant-primary.state-filled {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-12, 12px);
+  color: var(--color-text-primary);
+}
+
+.variant-primary.state-filled .inputField {
+  color: var(--color-text-primary);
+}
+
+.variant-primary.state-error {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-danger);
+  border-radius: var(--border-radius-12, 12px);
+  color: var(--color-text-primary);
+}
+
+.variant-primary.state-error .inputField {
+  color: var(--color-text-primary);
+}
+
+.variant-primary.state-disabled,
+.disabled {
+  background-color: var(--color-bg-disabled);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-12, 12px);
+  color: var(--color-text-disabled);
+}
+
+.variant-primary.state-disabled .inputField,
+.disabled .inputField {
+  color: var(--color-text-disabled);
+}
+
+.variant-primary.state-disabled .inputIcon,
+.disabled .inputIcon {
+  color: var(--color-icon-disabled);
+}
+
+/* Secondary Variant */
+.variant-secondary {
+  background-color: transparent;
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-8, 8px);
+  color: var(--color-text-interactive-secondary);
+}
+
+.variant-secondary.state-Default {
+  border-color: var(--color-border-secondary);
+}
+
+/* Hover state - CSS pseudo-class */
+.variant-secondary.state-Default:hover:not(.state-disabled):not(.disabled):not(
+    :has(.inputField:focus)
+  ):not(.state-error),
+.variant-secondary.state-filled:hover:not(.state-disabled):not(.disabled):not(
+    :has(.inputField:focus)
+  ):not(.state-error) {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border-interactive-secondary);
+}
+
+/* Active state (focus) - CSS pseudo-class */
+.variant-secondary.state-Default:has(.inputField:focus):not(
+    .state-disabled
+  ):not(.disabled):not(.state-error),
+.variant-secondary.state-filled:has(.inputField:focus):not(.state-disabled):not(
+    .disabled
+  ):not(.state-error) {
+  border-color: var(--color-border-interactive-primary);
+}
+
+/* Filled state - CSS pseudo-class (placeholder 기반) */
+.variant-secondary.state-Default:has(.inputField:not(:placeholder-shown)):not(
+    .state-disabled
+  ):not(.disabled):not(:has(.inputField:focus)):not(:hover):not(.state-error) {
+  border-color: var(--color-border-primary);
+  color: var(--color-text-primary);
+}
+
+.variant-secondary.state-Default:has(.inputField:not(:placeholder-shown)):not(
+    .state-disabled
+  ):not(.disabled):not(:has(.inputField:focus)):not(:hover):not(.state-error)
+  .inputField {
+  color: var(--color-text-primary);
+}
+
+/* Legacy state classes (하위 호환성 유지) */
+.variant-secondary.state-hover {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border-interactive-secondary);
+}
+
+.variant-secondary.state-active {
+  border-color: var(--color-border-interactive-primary);
+}
+
+.variant-secondary.state-filled {
+  border-color: var(--color-border-primary);
+  color: var(--color-text-primary);
+}
+
+.variant-secondary.state-filled .inputField {
+  color: var(--color-text-primary);
+}
+
+.variant-secondary.state-error {
+  border-color: var(--color-border-danger);
+  color: var(--color-text-primary);
+}
+
+.variant-secondary.state-error .inputField {
+  color: var(--color-text-primary);
+}
+
+.variant-secondary.state-disabled {
+  background-color: var(--color-bg-disabled);
+  border-color: var(--color-border-disabled);
+  color: var(--color-text-disabled);
+}
+
+.variant-secondary.state-disabled .inputField {
+  color: var(--color-text-disabled);
+}
+
+.variant-secondary.state-disabled .inputIcon {
+  color: var(--color-icon-disabled);
+}
+
+/* Disabled State - Placeholder */
+.variant-primary.state-disabled .inputField::placeholder,
+.variant-secondary.state-disabled .inputField::placeholder,
+.disabled .inputField::placeholder {
+  color: var(--color-text-disabled);
+}

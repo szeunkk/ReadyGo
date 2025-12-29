@@ -1,0 +1,209 @@
+/* 매치 카드 컨테이너 */
+.container {
+  background-color: var(--color-bg-secondary);
+  border-radius: 24px;
+  padding: 32px;
+  width: 408px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* 컨텐츠 래퍼 */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+  width: 100%;
+}
+
+/* 사용자 정보 섹션 */
+.userSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+}
+
+/* 아바타 래퍼 */
+.avatarWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 아바타 스타일 */
+.avatar {
+  background-color: var(--color-bg-primary);
+  border: 3px solid var(--color-border-secondary);
+  padding: 3px;
+  border-radius: 99999px;
+}
+
+/* 사용자 정보 (닉네임, 매칭률) */
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* 닉네임 스타일 */
+.nickname {
+  font-family: var(--typo-heading-md-font-family);
+  font-size: var(--typo-heading-md-font-size);
+  font-weight: var(--typo-heading-md-font-weight);
+  line-height: var(--typo-heading-md-line-height);
+  color: var(--color-text-primary);
+  text-align: center;
+  white-space: nowrap;
+  margin: 0;
+}
+
+/* 매칭률 컨테이너 */
+.matchRate {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 매칭률 라벨 */
+.matchRateLabel {
+  font-family: var(--typo-body-lg-font-family);
+  font-size: var(--typo-body-lg-font-size);
+  font-weight: var(--typo-body-lg-font-weight);
+  line-height: var(--typo-body-lg-line-height);
+  color: var(--color-text-secondary);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* 매칭률 값 */
+.matchRateValue {
+  font-family: var(--typo-body-lg-font-family);
+  font-size: var(--typo-body-lg-medium-font-size);
+  font-weight: var(--typo-body-lg-medium-font-weight);
+  line-height: var(--typo-body-lg-medium-line-height);
+  color: var(--color-text-interactive-primary);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* 질문 섹션 */
+.questionSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+/* 질문 텍스트 */
+.questionText {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: var(--typo-body-md-font-weight);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-secondary);
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* 선호도 섹션 */
+.preferencesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+/* 개별 선호도 항목 */
+.preferenceItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background-color: var(--color-bg-primary);
+  border-radius: 8px;
+}
+
+/* 선호도 아이콘 및 라벨 */
+.preferenceIcon {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 아이콘 래퍼 */
+.iconWrapper {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-text-interactive-primary);
+}
+
+/* 선호도 라벨 */
+.preferenceLabel {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: var(--typo-body-md-medium-font-weight);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  width: 80px;
+}
+
+/* 선호도 값 */
+.preferenceValue {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: var(--typo-body-md-font-weight);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-interactive-secondary);
+  white-space: nowrap;
+}
+
+/* 프로필 보기 버튼 */
+.button {
+  width: 100%;
+  height: 48px;
+  padding: 14px 20px;
+}
+
+/* 반응형 - 중형 데스크탑 (1440px ~ 1920px) */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .container {
+    width: 408px;
+  }
+}
+
+/* 반응형 - 모바일 */
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    max-width: 396px;
+    padding: 24px;
+  }
+
+  .content {
+    gap: 24px;
+  }
+
+  .questionSection {
+    gap: 12px;
+  }
+
+  .preferencesSection {
+    gap: 6px;
+  }
+
+  .preferenceItem {
+    padding: 6px 10px;
+  }
+}

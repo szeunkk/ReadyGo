@@ -1,0 +1,87 @@
+/* 매치 섹션 컨테이너 */
+.container {
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 36px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+/* 섹션 제목 */
+.heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.headingText {
+  font-family: var(--typo-heading-lg-font-family);
+  font-size: var(--typo-heading-lg-font-size);
+  font-weight: var(--typo-heading-lg-font-weight);
+  line-height: var(--typo-heading-lg-line-height);
+  color: var(--color-text-primary);
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* 그리드 컨테이너 */
+.gridContainer {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* 반응형 디자인 - 중형 데스크탑 (1440px ~ 1920px) */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .gridContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 408px);
+    grid-template-rows: repeat(2, auto);
+    gap: 24px;
+    overflow-x: visible;
+  }
+}
+
+/* 반응형 디자인 - 대형 데스크탑 (1920px 이상) */
+@media (min-width: 1920px) {
+  .gridContainer {
+    display: flex;
+    gap: 24px;
+    overflow-x: visible;
+  }
+}
+
+/* 반응형 디자인 - 태블릿 */
+@media (max-width: 1024px) {
+  .container {
+    padding: 24px;
+  }
+
+  .gridContainer {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* 반응형 디자인 - 모바일 */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .headingText {
+    font-size: var(--typo-heading-md-font-size);
+    line-height: var(--typo-heading-md-line-height);
+  }
+
+  .gridContainer {
+    gap: 12px;
+  }
+}

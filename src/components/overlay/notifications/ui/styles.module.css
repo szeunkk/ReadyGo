@@ -1,0 +1,228 @@
+/* 알림 컨테이너 */
+.notificationsContainer {
+  display: flex;
+  flex-direction: column;
+  width: 408px;
+  height: 100%;
+  background-color: var(--color-bg-primary);
+  border-right: 1px solid var(--color-border-primary);
+}
+
+/* 헤더 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26px 24px;
+  border-bottom: 1px solid var(--color-border-secondary);
+  gap: 10px;
+}
+
+.title {
+  font-family: var(--typo-heading-lg-font-family);
+  font-size: var(--typo-heading-lg-font-size);
+  font-weight: var(--typo-heading-lg-font-weight);
+  line-height: var(--typo-heading-lg-line-height);
+  color: var(--color-text-primary);
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.markAllReadButton {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: var(--typo-body-md-font-weight);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-interactive-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.markAllReadButton:hover {
+  color: var(--color-text-interactive-primary);
+}
+
+/* 알림 리스트 */
+.notificationsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* 알림 아이템 */
+.notificationItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.notificationItem:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-border-primary);
+}
+
+/* 읽음/안읽음 상태 */
+.notificationItem.unread {
+  background-color: var(--color-bg-secondary);
+}
+
+.notificationItem.read {
+  background-color: var(--color-bg-secondary);
+  opacity: 0.7;
+}
+
+/* 알림 내용 */
+.notificationContent {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+/* 아이콘 컨테이너 */
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-bg-primary);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.icon {
+  color: var(--color-icon-primary);
+}
+
+/* 알림 타입별 색상 */
+.reviewReceived {
+  background-color: var(--color-bg-primary);
+}
+
+.reviewReceived .icon {
+  color: var(--color-text-danger);
+}
+
+.reviewRequested {
+  background-color: var(--color-bg-primary);
+}
+
+.reviewRequested .icon {
+  color: var(--color-text-warning);
+}
+
+.friendRequested {
+  background-color: var(--color-bg-primary);
+}
+
+.friendRequested .icon {
+  color: var(--color-icon-interactive-primary);
+}
+
+.partyInvited {
+  background-color: var(--color-bg-primary);
+}
+
+.partyInvited .icon {
+  color: #c27aff;
+}
+
+.chatReceived {
+  background-color: var(--color-bg-primary);
+}
+
+.chatReceived .icon {
+  color: var(--color-text-info);
+}
+
+/* 텍스트 컨테이너 */
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* 메시지 */
+.message {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: var(--typo-body-md-medium-font-weight);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 타임스탬프 */
+.timestamp {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: var(--typo-body-sm-font-weight);
+  line-height: var(--typo-body-sm-line-height);
+  color: var(--color-text-interactive-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 안읽음 표시 점 */
+.unreadDot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-brand-600);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* 빈 상태 */
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: var(--typo-body-md-font-weight);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--color-text-interactive-secondary);
+  text-align: center;
+}
+
+/* 스크롤바 스타일링 */
+.notificationsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notificationsList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.notificationsList::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-secondary);
+  border-radius: 3px;
+}
+
+.notificationsList::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-border-primary);
+}

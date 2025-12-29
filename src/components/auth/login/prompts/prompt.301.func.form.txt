@@ -1,0 +1,190 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 참고할 TSX 파일경로: src/components/auth/login/index.tsx
+조건-파일경로) 참고할 CSS 파일경로: src/components/auth/login/styles.module.css
+조건-파일경로) 구현될 HOOK 파일경로: src/components/auth/login/hooks/index.form.hook.tsx
+조건-파일경로) 구현될 TEST 파일경로: src/components/auth/login/tests/index.form.hook.spec.ts
+
+==============================================
+
+핵심요구사항) 다음의 기능을 playwright 테스트를 활용하여 TDD기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+            1) 테스트 제외 라이브러리
+                - jest
+                - @testing-library/react
+
+            2) 테스트 조건
+                - timeout은 network 통신인 경우 2000ms 미만으로 설정할 것.
+                - timeout은 network 통신이 아닌 경우 설정하지 않거나, 500ms 미만으로 설정할 것.
+                - /auth/login 페이지가 완전히 로드된 후 테스트할 것.
+                    - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+                    - 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+            3) 테스트 API 조건 (Supabase)
+                3-1) 데이터
+                    - 성공 시나리오는 실제 Supabase Auth를 사용할 것.
+                    - Mock데이터 사용하지 말 것.
+
+                3-2) 성공 시나리오 (실제 Supabase, 모킹 금지)
+                    - Supabase Auth 요청을 모킹하지 말 것.
+                    - 아래 계정을 사용하여 로그인 테스트를 수행할 것.
+                        - 사용할 email: "a@c.com"
+                        - 사용할 password: "1234qwer"
+
+                    - 로그인 성공 시 다음을 검증할 것.
+                        1) supabase.auth.signInWithPassword 결과에서 session.access_token이 존재하는지
+                        2) supabase.auth.getUser() 결과에서 user.id, user.email이 정상적으로 반환되는지
+                    - fetchUserLoggedIn API: _id, name이 정상적으로 반환되는지 확인할 것.
+
+                3-3) 실패 시나리오 (모킹 필수)
+                    - 실패 시나리오에서는 Supabase Auth 관련 네트워크 호출을 Playwright page.route()로 모킹할 것.
+                    - 모킹 대상은 함수 호출이 아니라 실제 HTTP 요청 경로 기준으로 가로챌 것.
+                    - 최소 1개 이상의 로그인 실패 시나리오를 포함할 것.
+
+                    예: /auth/v1/token?grant_type=password 요청을 가로채 HTTP 401 또는 400 에러 응답 반환
+                    
+                    - 실패 시 공통 검증
+                        - 로그인실패모달이 노출되는지
+                        - '확인' 클릭 시 열려있는 모든 모달이 닫히는지
+                        - 동일 실패 상태에서 재렌더링되어도 모달이 다시 자동으로 열리지 않도록 할 것(중복 오픈 방지)
+
+핵심요구사항) 다음의 조건에 맞게 회원가입 폼 등록 기능을 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+            1) 라이브러리조건
+                - 폼: 이미 설치되어있는 react-hook-form, @hookform/resolvers를 사용할 것.
+                - 검증: 이미 설치되어있는 zod를 사용할 것.
+
+                - zod 검증 조건
+                    - email: '@' 포함
+                    - password: 최소 8글자 이상
+
+            2) 유저시나리오(로그인)
+                1. 모든 인풋이 입력되고 zod 검증을 통과하면 로그인 버튼을 활성화할 것.                
+
+                2. 로그인 버튼 클릭 시 아래 순서로 처리할 것.
+                    2-1) Supabase Auth 로그인
+                        - API: supabase.auth.signInWithPassword
+                        - 요청 데이터: { email, password }
+                    2-2) 로그인 성공 판단
+                    - signIn 결과에서 session.access_token이 존재하면 로그인 성공으로 간주할 것.
+                    - error가 존재하거나 예외 발생 시 실패 처리로 진행할 것.
+                    2-3) 로그인 성공 후 처리
+                    - Supabase Auth가 자동으로 세션을 localStorage에 저장하므로 별도 저장 불필요
+                    - 세션 정보는 supabase.auth.getSession()으로 조회 가능
+                    - 이후 로그인완료모달을 노출할 것.
+                    2-4) 로그인 실패 처리
+                        - 로그인에 실패하면 로그인실패모달을 노출할 것.
+
+               
+                3. 각 상황별 모달의 확인을 누르면, 아래의 지시에 따를 것.
+                    3-1) 모달조건
+                        - 모달 프로바이더 경로: src/commons/providers/modal/modal.provider.tsx
+                        - 이미 셋팅되어있는 modal.provider를 사용할 것.
+                        - 이미 셋팅되어있는 modal.provider를 수정하지 말 것.
+                        - 모달은 한 번만 보여야 하며, 닫힌 뒤에는 같은 상황에서 다시 나타나지 않도록 할 것.
+
+                    3-2) 공통컴포넌트조건
+                        - 로그인완료모달: <Modal />, variant: 'single'
+                        - 로그인실패모달: <Modal />, variant: 'single'
+
+                    3-3) 페이지이동조건
+                        - commons/constants/url.ts의 페이지URL에 정의된 경로로 이동할 것.
+
+                        - 로그인완료모달:
+                            1. '확인' 클릭
+                            2. 열려있는 모든 모달을 닫기
+                            3. 홈페이지로 이동 => /(main)/home
+
+                        - 로그인실패모달:
+                            1. '확인' 클릭
+                            2. 열려있는 모든 모달을 닫기
+
+==============================================
+
+핵심요구사항) Hook 책임 분리
+            Hook(src/components/auth/login/hooks/index.form.hook.tsx)은 다음 책임을 가진다.                
+            - zod 스키마 및 resolver 연결
+            - 버튼 활성화/비활성화 상태 관리
+            - 로그인 submit 로직(Supabase Auth)
+            - localStorage 저장 처리
+            - 성공/실패 모달 오픈 및 중복 방지
+            - 성공 시 라우팅 처리
+
+핵심요구사항) UI 컴포넌트 책임
+            UI(src/components/auth/login/index.tsx)는 Hook을 사용하여:
+            - data-testid="auth-login-page"를 root에 부여할 것.
+            - 인풋 필드 및 에러 메시지를 렌더링할 것.
+            - 버튼 disabled 상태를 hook의 formState와 연결할 것.
+
+==============================================
+구현 완료 후 아래 2가지 체크리스트를 반환할 것.
+
+1) 커서룰(@01-common.mdc, @04-func.mdc) 적용 결과 체크리스트
+2) 기능 요구사항 및 테스트 통과 체크리스트
+   - 성공 시나리오(실제 Supabase, 무모킹) 통과 여부
+   - 실패 시나리오(Playwright route mocking) 통과 여부
+   - data-testid 기반 페이지 로드 판별 준수 여부
+   - timeout 규칙 준수 여부
+
+==============================================
+
+추가사항) 아이디 저장 기능 구현
+
+핵심요구사항) 아이디 저장 기능을 구현하고, 적용 결과를 체크리스트로 반환할 것.
+            1) 로컬스토리지 조건
+                - localStorage 키 이름: "rememberedEmail"
+                - 저장할 값: 이메일 인풋에 입력된 문자열 값 (email 필드 값)
+                - 저장 형식: 문자열(string)로 저장할 것.
+
+            2) 체크박스 상태 관리
+                2-1) 초기 상태
+                    - 페이지 로드 시 localStorage에 "rememberedEmail" 키가 존재하고 값이 있으면:
+                        1) 체크박스 상태를 'selected'로 설정할 것.
+                        2) 이메일 인풋의 기본값(defaultValue)을 저장된 이메일로 설정할 것.
+                    - localStorage에 "rememberedEmail" 키가 없거나 값이 없으면:
+                        1) 체크박스 상태를 'unselected'로 설정할 것.
+                        2) 이메일 인풋의 기본값을 빈 문자열로 설정할 것.
+
+                2-2) 체크박스 클릭 시 동작
+                    - 체크박스가 'unselected' → 'selected'로 변경될 때:
+                        1) 현재 이메일 인풋에 입력된 값을 localStorage에 "rememberedEmail" 키로 저장할 것.
+                        2) 이메일 인풋에 값이 없으면 저장하지 않을 것.
+                    - 체크박스가 'selected' → 'unselected'로 변경될 때:
+                        1) localStorage에서 "rememberedEmail" 키를 삭제할 것.
+
+            3) 이메일 입력 시 동작
+                - 체크박스가 'selected' 상태일 때:
+                    1) 사용자가 이메일 인풋에 값을 입력하거나 수정하면, 실시간으로 localStorage의 "rememberedEmail" 값을 업데이트할 것.
+                    2) 이메일 인풋이 비워지면 localStorage에서 "rememberedEmail" 키를 삭제할 것.
+
+            4) 구현 위치
+                4-1) Hook 책임 (src/components/auth/login/hooks/index.form.hook.tsx)
+                    - localStorage에서 저장된 이메일 불러오기 (초기화 시)
+                    - 체크박스 상태 변경 핸들러 제공
+                    - 이메일 값 변경 시 localStorage 업데이트 로직
+                    - react-hook-form의 watch를 활용하여 이메일 값 변경 감지
+
+                4-2) UI 컴포넌트 책임 (src/components/auth/login/index.tsx)
+                    - Hook에서 제공하는 체크박스 상태 및 핸들러를 사용할 것.
+                    - 체크박스 컴포넌트에 상태와 핸들러를 연결할 것.
+
+            5) 테스트 조건 (선택사항)
+                - Playwright 테스트에서 다음 시나리오를 검증할 수 있음:
+                    1) 체크박스 선택 후 이메일 입력 → localStorage에 저장되는지
+                    2) 페이지 새로고침 → 저장된 이메일이 인풋에 표시되고 체크박스가 선택 상태인지
+                    3) 체크박스 해제 → localStorage에서 삭제되는지
+                    4) 체크박스 선택 상태에서 이메일 수정 → localStorage 값이 업데이트되는지
+
+==============================================
+
+핵심요구사항) 회원가입 페이지 라우팅 기능 구현
+            회원가입하기 버튼을 클릭하면 회원가입 페이지로 이동할 것.
+            - 이동할 페이지: /(auth)/signup
+            - commons/constants/url.ts의 페이지URL에 정의된 경로를 사용할 것.

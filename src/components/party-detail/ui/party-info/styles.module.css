@@ -1,0 +1,95 @@
+.container {
+  width: 464px;
+  height: 452px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+  border-radius: 36px;
+  border: 1px solid var(--color-border-secondary);
+  background: var(--color-bg-primary);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  flex: 1;
+}
+
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 24px;
+  border-radius: 20px;
+  background: var(--color-bg-secondary);
+}
+
+.infoInner {
+  display: flex;
+  flex-direction: column;
+  width: 231px;
+  height: 228px;
+  gap: 24px;
+}
+
+.title {
+  font-family: var(--typo-heading-lg-font-family);
+  font-size: var(--typo-heading-md-font-size);
+  line-height: var(--typo-heading-lg-line-height);
+  font-weight: var(--typo-heading-lg-font-weight);
+  color: var(--color-text-primary);
+}
+
+.infoList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.iconLabelWrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 104px;
+  height: 20px;
+}
+
+.infoIcon {
+  color: var(--color-icon-interactive-primary);
+  flex-shrink: 0;
+}
+
+.infoLabel {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-font-weight);
+  color: var(--color-text-interactive-secondary);
+}
+
+.infoValue {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-font-weight);
+  color: var(--color-text-primary);
+}
+
+.tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.button {
+  width: 100%;
+}

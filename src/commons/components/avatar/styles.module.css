@@ -1,0 +1,123 @@
+/* Base Wrapper */
+.wrapper {
+  position: relative;
+  display: inline-block;
+  border-radius: 99999px;
+  overflow: visible;
+  background-color: var(--color-bg-primary);
+}
+
+/* Image Container */
+.imageContainer {
+  width: 100%;
+  height: 100%;
+  border-radius: 99999px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 99999px;
+}
+
+/* Color Filter - SVG 색상 변경 (mask 방식) */
+.colorFilter .image {
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* Size Styles */
+.size-s {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--color-border-secondary);
+}
+
+.size-m {
+  width: 64px;
+  height: 64px;
+  border: 2px solid var(--color-border-secondary);
+}
+
+.size-L {
+  width: 100px;
+  height: 100px;
+  border: 3px solid var(--color-border-secondary);
+}
+
+/* Status Dot Base */
+.statusDot {
+  position: absolute;
+  border-radius: 99999px;
+}
+
+/* Status Dot Sizes - 아바타 크기에 비례 (약 18~22%) */
+.size-s .statusDot {
+  width: 10px;
+  height: 10px;
+  min-width: 10px;
+  min-height: 10px;
+  right: calc(50% - 19.14px);
+  bottom: calc(50% - 19.14px);
+}
+
+.size-m .statusDot {
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  min-height: 14px;
+  right: calc(50% - 29.62px);
+  bottom: calc(50% - 29.62px);
+}
+
+.size-L .statusDot {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  right: calc(50% - 45.35px);
+  bottom: calc(50% - 45.35px);
+}
+
+/* Status Colors */
+.status-online {
+  background-color: var(--color-icon-success);
+  border: 2px solid var(--color-icon-interactive-inverse);
+}
+
+.status-away {
+  background-color: var(--color-icon-warning);
+  border: 2px solid var(--color-icon-interactive-inverse);
+}
+
+.status-ban {
+  background-color: var(--color-icon-danger);
+  border: 2px solid var(--color-icon-interactive-inverse);
+}
+
+/* status 'offline'인 경우: size별로 border 두께 다름 */
+.status-offline {
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-icon-interactive-secondary);
+}
+
+.status-offline.size-s {
+  border: 2.5px solid var(--color-icon-interactive-secondary);
+}
+
+.status-offline.size-m {
+  border: 3.5px solid var(--color-icon-interactive-secondary);
+}
+
+.status-offline.size-L {
+  border: 5px solid var(--color-icon-interactive-secondary);
+}

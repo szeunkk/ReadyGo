@@ -1,0 +1,155 @@
+/* Base Radio Styles */
+.label {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  clip-path: inset(50%);
+}
+
+.radioWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 99999px;
+  border: 1.5px solid transparent;
+  box-sizing: border-box;
+}
+
+.radioWrapper.hasFocusRing {
+  box-shadow: 0 0 0 4px var(--color-transparent-32);
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 99999px;
+  box-sizing: border-box;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.radio.disabled {
+  cursor: not-allowed;
+}
+
+.label:has(.input:disabled) {
+  cursor: not-allowed;
+}
+
+.indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 99999px;
+  background-color: var(--color-bg-primary);
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Status: Unselected */
+.status-unselected.state-default {
+  background-color: var(--color-bg-primary);
+  border: 1.5px solid var(--color-border-interactive-secondary);
+}
+
+.status-unselected.state-hover,
+.label:hover
+  .status-unselected.state-default:not(.state-disabled):not(.disabled) {
+  background-color: var(--color-bg-primary);
+  border: 1.5px solid var(--color-border-interactive-secondary-hover);
+}
+
+.status-unselected.state-press {
+  background-color: var(--color-bg-primary);
+  border: 1.5px solid var(--color-border-interactive-secondary-pressed);
+}
+
+.status-unselected.state-focus {
+  background-color: var(--color-bg-primary);
+  border: 1.5px solid var(--color-border-interactive-primary);
+}
+
+.status-unselected.state-disabled {
+  background-color: var(--color-bg-disabled);
+  border: 1.5px solid var(--color-border-disabled);
+}
+
+.status-unselected.state-error {
+  background-color: var(--color-bg-primary);
+  border: 1.5px solid var(--color-border-danger);
+}
+
+/* Status: Selected */
+.status-selected.state-default {
+  background-color: var(--color-bg-interactive-primary);
+  border: none;
+}
+
+.status-selected.state-hover,
+.label:hover
+  .status-selected.state-default:not(.state-disabled):not(.disabled) {
+  background-color: var(--color-bg-interactive-primary-hover);
+  border: none;
+}
+
+.status-selected.state-press {
+  background-color: var(--color-bg-interactive-primary-pressed);
+  border: none;
+}
+
+.status-selected.state-focus {
+  background-color: var(--color-bg-interactive-primary);
+  border: none;
+}
+
+.status-selected.state-disabled {
+  background-color: var(--color-bg-disabled);
+  border: none;
+}
+
+.status-selected.state-disabled .indicator {
+  background-color: var(--color-bg-primary);
+}
+
+.status-selected.state-error {
+  background-color: var(--color-bg-danger);
+  border: none;
+}
+
+/* Focus state */
+.input:focus-visible ~ .radioWrapper .radio {
+  outline: none;
+}
+
+.input:focus-visible ~ .radioWrapper .status-unselected.state-default {
+  border-color: var(--color-border-interactive-primary);
+}
+
+.input:focus-visible ~ .radioWrapper .status-selected.state-default {
+  background-color: var(--color-bg-interactive-primary);
+}
+
+/* Focus ring is controlled by state prop, not focus-visible */
+
+.label:active .status-unselected.state-default {
+  border-color: var(--color-border-interactive-secondary-pressed);
+}
+
+.label:active .status-selected.state-default {
+  background-color: var(--color-bg-interactive-primary-pressed);
+}

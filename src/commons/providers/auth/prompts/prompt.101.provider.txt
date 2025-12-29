@@ -1,0 +1,145 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+
+==============================================
+
+조건-파일경로) 구현될 TSX 파일경로: src/commons/providers/auth/auth.provider.tsx
+
+==============================================
+
+핵심요구사항) 완성된 컴포넌트를 layout에서 import하여 연결시킬 것. (children을 감싸도록 만들 것)
+            - 연결될 경로: src/app/layout.tsx
+            - 연결될 순서: <NextThemesProvider /> 보다 위에 위치할 것.
+            - 다른 Provider의 코드를 수정하지 말 것.
+            - 단, layout.tsx에서 Provider 감싸는 “순서 조정/추가”는 허용
+
+==============================================
+
+
+핵심요구사항) AuthProvider가 제공해야 하는 기능(모든 페이지에서 실시간 감지/동기화)
+
+1) 공통 전제
+- 현재 프로젝트의 로그인 구현은 Supabase Auth를 사용한다:
+  - 폼 로그인: supabase.auth.signInWithPassword 성공 시 Supabase가 자동으로 세션 저장
+  - 구글/카카오 로그인: OAuth 콜백 처리 완료 후 Supabase가 자동으로 세션 저장
+- AuthProvider는 “인증의 단일 진실 소스”로서 Supabase 세션을 사용한다:
+  - Supabase 세션: supabase.auth.getSession()으로 조회 (자동으로 localStorage에 저장됨)
+  - Zustand store: Supabase 세션에서 읽어온 accessToken, user를 UI 상태로 관리
+  - 로그인 상태 판별은 Supabase 세션 존재 여부로 한다 (복호화/검증 금지, 존재 유무만 확인)
+
+2) 로그인 상태 판별 규칙(필수)
+- “로그인 상태” 판단 기준은 Supabase 세션 존재 여부로 한다:
+  - supabase.auth.getSession()으로 세션 조회
+  - session?.access_token이 존재하면 로그인 상태로 판별
+  - 최종 판별은 Zustand store의 accessToken 유무로 하되, 이는 Supabase 세션에서 동기화된 값이다.
+- AuthProvider는 마운트 시 Supabase 세션을 조회하여 Zustand에 동기화해야 한다.
+- accessToken은 복호화/유효성 검사를 하지 말고 “존재 유무”만 확인할 것.
+
+3) 로그인 유저 정보 조회 규칙(필수)
+- Zustand store의 user 데이터를 provider에서 최신으로 유지할 것.
+- 마운트 시 Supabase 세션에서 user 정보를 조회하여 Zustand에 동기화할 것.
+  - supabase.auth.getSession() 또는 supabase.auth.getUser() 사용
+  - session.user 또는 user 객체를 그대로 사용
+- user의 구조는 Supabase Auth의 user 객체 구조를 따른다:
+  - 기본: { id, email, ... } (Supabase Auth user 객체)
+  - 추가 정보가 필요한 경우 user_profiles 테이블에서 조회하여 확장 가능
+  - AuthProvider는 Supabase user 객체를 그대로 store에 반영한다.
+
+4) 실시간 감지/동기화(필수)
+- “모든 페이지에서 실시간으로 최신 로그인 상태/유저정보 유지” 요구사항을 충족하기 위해 아래를 구현할 것:
+  - (필수) supabase.auth.onAuthStateChange를 구독하여 세션 변화를 실시간 감지
+  - (필수) 동일 탭 내에서의 store 변경에도 반응하도록 useAuthStore 상태를 구독(useEffect 의존성 또는 subscribe 패턴)
+  - (선택) window 'storage' 이벤트를 구독하여 탭 간 세션 변화를 반영 (Supabase가 자동으로 처리하지만 추가 동기화 가능)
+- 동기화 규칙:
+  - Supabase 세션이 변경되면(SIGNED_IN, SIGNED_OUT, TOKEN_REFRESHED 등) Zustand store에 동기화
+  - store의 accessToken/user는 Supabase 세션에서 읽어온 값으로만 업데이트 (단방향 동기화)
+  - 단, 중복 set으로 무한 루프가 발생하지 않도록 비교 후 업데이트(guard)할 것
+
+5) 자동 리다이렉트 규칙(필수)
+- 아래 조건을 모두 반영하여 “자동 리다이렉트”를 구현할 것.
+  - 로그인 상태가 해제(Supabase 세션 없음)되면 자동으로 로그인 페이지로 이동:
+    - URL_PATHS.LOGIN (예: '/login') 사용
+  - 단, 로그인 관련 공개 페이지에서는 강제 리다이렉트를 하면 안 된다.
+    - 예: /login, /signup, /signup-success, /steam/callback 등
+    - 공개 페이지 목록은 URL_PATHS 기준으로 관리할 것(상수 추가 허용)
+- 위 예외 처리 없이는 OAuth 콜백/회원가입 성공 페이지에서 튕길 수 있으므로 반드시 적용할 것.
+
+6) Provider API(하위 컴포넌트에서 사용 가능하도록 제공)
+- AuthProvider는 “Context”를 제공할 것(하위 컴포넌트에서 호출 가능해야 함)
+- Context로 아래 기능을 노출할 것:
+  - isLoggedIn: boolean (Supabase 세션 기반, Zustand store에서 조회)
+  - user: User | null (Supabase Auth user 객체, Zustand store에서 조회)
+  - loginRedirect(): void
+    - URL_PATHS.LOGIN으로 router.push
+  - logout(): void
+    - supabase.auth.signOut() 호출 (Supabase 세션 제거)
+    - Zustand store clearAuth() 호출(상태 초기화)
+    - URL_PATHS.LOGIN으로 router.push
+- 주의: Provider 내부에서 modal.provider를 사용하지 않는다(인증 모달은 각 로그인 훅에서 이미 처리).  
+  - AuthProvider의 책임은 “상태 동기화/리다이렉트/로그아웃”에 한정한다.
+
+7) Supabase auth 이벤트(필수)
+- supabase.auth.onAuthStateChange를 구독하여 세션 변화를 실시간 감지한다:
+  - SIGNED_IN: 세션 생성 시 Zustand store에 동기화
+  - SIGNED_OUT: 세션 제거 시 Zustand store 초기화
+  - TOKEN_REFRESHED: 토큰 갱신 시 Zustand store 업데이트
+  - USER_UPDATED: 유저 정보 변경 시 Zustand store 업데이트
+- onAuthStateChange는 AuthProvider의 핵심 동기화 메커니즘이다.
+
+==============================================
+
+구현방식)
+
+- 라우팅: next/navigation의 useRouter 사용, router.push 기반 이동
+- Zustand: useAuthStore(accessToken, user, setAuth, clearAuth) 사용
+- Supabase 세션 조회:
+  - supabase.auth.getSession()으로 현재 세션 조회
+  - supabase.auth.getUser()로 유저 정보 조회
+- 상태 복원:
+  - provider 마운트 시 Supabase 세션을 조회하여 Zustand store에 동기화
+  - session?.access_token과 session?.user를 store에 setAuth
+  - 세션이 없으면 store를 초기화
+- 실시간 감지:
+  - supabase.auth.onAuthStateChange 구독 (핵심)
+  - store 상태 변화 구독(의존성 또는 subscribe)
+  - (선택) window 'storage' 이벤트 구독 (탭 간 동기화)
+- 무한 루프 방지:
+  - Supabase 세션 값과 store 값이 동일하면 set을 생략하는 guard 로직 포함
+
+==============================================
+
+주의사항)
+
+- Provider 파일은 반드시 'use client'로 선언할 것.
+- 다른 Provider(Apollo, Theme 등) 내부 코드는 수정하지 말 것.
+- layout.tsx에서는 Provider 감싸는 “순서”만 요구사항에 맞게 조정할 것.
+- accessToken 유효성 검사는 하지 말 것(복호화/서명검증/만료검사 금지).
+- 공개 페이지 예외 처리 없이 무조건 로그인 리다이렉트하면 OAuth/가입 성공 플로우가 깨질 수 있으니 반드시 예외를 둔다.
+
+==============================================
+
+구현 완료 후 아래 2가지 체크리스트를 반환할 것.
+
+1) 커서룰(@01-common.mdc, @04-func.mdc) 적용 결과 체크리스트
+
+2) 기능 요구사항 체크리스트
+- [ ] AuthProvider 파일이 지정 경로에 생성되었는지(src/commons/providers/auth/auth.provider.tsx)
+- [ ] layout.tsx에서 AuthProvider가 NextThemesProvider보다 위에 위치하는지
+- [ ] 마운트 시 Supabase 세션 조회 → Zustand 동기화 로직이 동작하는지
+- [ ] 로그인 상태 판별이 “Supabase 세션 존재 여부”로 동작하는지
+- [ ] accessToken 복호화/유효성검사 없이 존재 유무만 확인하는지
+- [ ] user(Supabase Auth user 객체)를 안전하게 store에 저장하는지
+- [ ] supabase.auth.onAuthStateChange로 세션 변화를 실시간 감지하는지
+- [ ] store 동기화 시 무한 루프 방지(guard)가 있는지
+- [ ] 로그아웃 시 supabase.auth.signOut()으로 세션 제거되는지
+- [ ] 로그아웃 시 Zustand clearAuth로 상태 초기화되는지
+- [ ] 로그아웃 후 URL_PATHS.LOGIN으로 이동하는지
+- [ ] 로그인 해제(세션 없음) 시 자동으로 URL_PATHS.LOGIN으로 리다이렉트되는지
+- [ ] /login, /signup, /signup-success, /steam/callback 등 공개 페이지에서 자동 리다이렉트가 발생하지 않도록 예외 처리되어 있는지
+- [ ] Context로 isLoggedIn/user/loginRedirect/logout API가 하위에서 사용 가능한지
+- [ ] supabase.auth.onAuthStateChange를 구독하고 cleanup 시 해제하는지

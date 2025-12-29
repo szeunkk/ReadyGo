@@ -1,0 +1,148 @@
+/* 홈페이지 전체 컨테이너 */
+.container {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px;
+  width: 100%;
+  height: fit-content;
+}
+
+/* 왼쪽 섹션 (매치 + 파티) */
+.leftSection {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  flex: 1;
+  max-width: 1336px;
+  width: 100%;
+  transition: margin-right 0.25s ease;
+}
+
+/* 반응형 디자인 - 중형 데스크탑 (1440px ~ 1920px) */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .leftSection {
+    max-width: 900px;
+  }
+}
+
+/* 반응형 디자인 - 대형 데스크탑 (1920px 이상) */
+@media (min-width: 1920px) {
+  .leftSection {
+    max-width: 1760px;
+  }
+}
+
+.leftSection.sidePanelOpen {
+  margin-right: -456px; /* ProfileSection width(408px) + gap(32px) */
+}
+
+/* 매치 섹션 */
+.matchSection {
+  width: 100%;
+}
+
+/* 파티 섹션 */
+.partySection {
+  width: 100%;
+}
+
+/* 오른쪽 사이드바 섹션 */
+.rightSection {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 408px;
+  flex-shrink: 0;
+}
+
+/* 프로필 섹션 나타날 때 사이드패널 애니메이션 후 표시 */
+.rightSection > * {
+  animation: profileAppear 0s ease 0.25s;
+  animation-fill-mode: backwards;
+}
+
+@keyframes profileAppear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 반응형 디자인 - 중형 데스크탑 이상에서 항상 표시 */
+@media (min-width: 1440px) {
+  .rightSection {
+    display: flex;
+  }
+}
+
+/* 플레이스홀더 스타일 (임시) */
+.placeholder {
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 42px;
+  padding: 32px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.placeholder p {
+  font-family: var(--typo-body-lg-regular-font-family);
+  font-size: var(--typo-body-lg-regular-font-size);
+  font-weight: var(--typo-body-lg-regular-font-weight);
+  line-height: var(--typo-body-lg-regular-line-height);
+  color: var(--color-text-secondary);
+}
+
+/* 반응형 디자인 - 태블릿 (1024px 이하) */
+@media (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+    padding: 24px;
+    gap: 24px;
+  }
+
+  .leftSection {
+    max-width: 100%;
+    gap: 24px;
+  }
+
+  .rightSection {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* 반응형 디자인 - 모바일 (768px 이하) */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .leftSection {
+    gap: 16px;
+  }
+
+  .rightSection {
+    gap: 16px;
+  }
+
+  .placeholder {
+    padding: 24px;
+    min-height: 300px;
+    border-radius: 24px;
+  }
+}
+
+/* 반응형 디자인 - 작은 모바일 (480px 이하) */
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+}

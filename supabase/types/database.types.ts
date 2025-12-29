@@ -493,40 +493,49 @@ export type Database = {
       }
       party_posts: {
         Row: {
-          created_at: string | null
-          creator_id: string | null
-          description: string | null
-          game_title: string | null
+          control_level: string
+          created_at: string
+          creator_id: string
+          description: string
+          difficulty: string
+          game_title: string
           id: number
-          max_members: number | null
-          platform: string | null
-          required_tier: string | null
-          status: string | null
-          title: string | null
+          max_members: number
+          party_title: string
+          start_date: string
+          start_time: string
+          tags: Json | null
+          voice_chat: string | null
         }
         Insert: {
-          created_at?: string | null
-          creator_id?: string | null
-          description?: string | null
-          game_title?: string | null
+          control_level: string
+          created_at?: string
+          creator_id?: string
+          description: string
+          difficulty: string
+          game_title: string
           id?: number
-          max_members?: number | null
-          platform?: string | null
-          required_tier?: string | null
-          status?: string | null
-          title?: string | null
+          max_members: number
+          party_title: string
+          start_date: string
+          start_time: string
+          tags?: Json | null
+          voice_chat?: string | null
         }
         Update: {
-          created_at?: string | null
-          creator_id?: string | null
-          description?: string | null
-          game_title?: string | null
+          control_level?: string
+          created_at?: string
+          creator_id?: string
+          description?: string
+          difficulty?: string
+          game_title?: string
           id?: number
-          max_members?: number | null
-          platform?: string | null
-          required_tier?: string | null
-          status?: string | null
-          title?: string | null
+          max_members?: number
+          party_title?: string
+          start_date?: string
+          start_time?: string
+          tags?: Json | null
+          voice_chat?: string | null
         }
         Relationships: []
       }
@@ -590,27 +599,57 @@ export type Database = {
       steam_game_info: {
         Row: {
           app_id: number
+          categories: Json[] | null
           created_at: string | null
-          description: string | null
-          genre: string | null
+          genres: string[] | null
           header_image: string | null
           name: string | null
+          short_description: string | null
         }
         Insert: {
           app_id: number
+          categories?: Json[] | null
           created_at?: string | null
-          description?: string | null
-          genre?: string | null
+          genres?: string[] | null
           header_image?: string | null
           name?: string | null
+          short_description?: string | null
         }
         Update: {
           app_id?: number
+          categories?: Json[] | null
           created_at?: string | null
-          description?: string | null
-          genre?: string | null
+          genres?: string[] | null
           header_image?: string | null
           name?: string | null
+          short_description?: string | null
+        }
+        Relationships: []
+      }
+      steam_game_sync_logs: {
+        Row: {
+          app_id: number | null
+          created_at: string | null
+          id: number
+          reason: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          app_id?: number | null
+          created_at?: string | null
+          id?: never
+          reason?: string | null
+          status: string
+          user_id?: string | null
+        }
+        Update: {
+          app_id?: number | null
+          created_at?: string | null
+          id?: never
+          reason?: string | null
+          status?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -739,7 +778,7 @@ export type Database = {
       }
       user_profiles: {
         Row: {
-          animal_type: string | null
+          animal_type: string
           avatar_url: string | null
           bio: string | null
           created_at: string | null
@@ -747,12 +786,12 @@ export type Database = {
           nickname: string | null
           status_message: string | null
           steam_id: string | null
-          temperature_score: number | null
-          tier: string | null
+          temperature_score: number
+          tier: string
           updated_at: string | null
         }
         Insert: {
-          animal_type?: string | null
+          animal_type?: string
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
@@ -760,12 +799,12 @@ export type Database = {
           nickname?: string | null
           status_message?: string | null
           steam_id?: string | null
-          temperature_score?: number | null
-          tier?: string | null
+          temperature_score?: number
+          tier?: string
           updated_at?: string | null
         }
         Update: {
-          animal_type?: string | null
+          animal_type?: string
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
@@ -773,8 +812,8 @@ export type Database = {
           nickname?: string | null
           status_message?: string | null
           steam_id?: string | null
-          temperature_score?: number | null
-          tier?: string | null
+          temperature_score?: number
+          tier?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -894,35 +933,32 @@ export type Database = {
       }
       user_traits: {
         Row: {
+          cooperation: number
+          exploration: number
           id: number
-          trait_action: number | null
-          trait_casual: number | null
-          trait_competitive: number | null
-          trait_flex: number | null
-          trait_strategy: number | null
-          trait_teamwork: number | null
+          leadership: number
+          social: number
+          strategy: number
           updated_at: string | null
           user_id: string | null
         }
         Insert: {
+          cooperation?: number
+          exploration?: number
           id?: number
-          trait_action?: number | null
-          trait_casual?: number | null
-          trait_competitive?: number | null
-          trait_flex?: number | null
-          trait_strategy?: number | null
-          trait_teamwork?: number | null
+          leadership?: number
+          social?: number
+          strategy?: number
           updated_at?: string | null
           user_id?: string | null
         }
         Update: {
+          cooperation?: number
+          exploration?: number
           id?: number
-          trait_action?: number | null
-          trait_casual?: number | null
-          trait_competitive?: number | null
-          trait_flex?: number | null
-          trait_strategy?: number | null
-          trait_teamwork?: number | null
+          leadership?: number
+          social?: number
+          strategy?: number
           updated_at?: string | null
           user_id?: string | null
         }
