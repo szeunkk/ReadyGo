@@ -142,14 +142,15 @@ export const useLoginForm = () => {
 
       if (!response.ok) {
         // API 에러 메시지 사용
-        const errorMessage =
-          responseData.error || '로그인에 실패했습니다.';
+        const errorMessage = responseData.error || '로그인에 실패했습니다.';
         throw new Error(errorMessage);
       }
 
       // 2. 로그인 성공 판단
       if (!responseData.user) {
-        throw new Error('로그인에 실패했습니다. 사용자 정보를 받지 못했습니다.');
+        throw new Error(
+          '로그인에 실패했습니다. 사용자 정보를 받지 못했습니다.'
+        );
       }
 
       // 3. 로그인 성공 후 처리

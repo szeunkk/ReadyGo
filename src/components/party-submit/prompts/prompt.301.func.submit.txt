@@ -66,6 +66,9 @@
                     - difficulty: text (필수) - 난이도
                     - voice_chat: text (선택: 'required' | 'optional' | null) - 보이스챗 사용 여부
                     - tags: jsonb (선택: string[] 형태 권장) - 태그
+                        - 입력 형식: "#금요일#가보자#빡겜" 같은 형식으로 값이 들어옴
+                        - 변환 필요: "#" 기호로 분리하여 string[] 형태로 변환하여 저장할 것
+                            - "#금요일#가보자#빡겜" → ["금요일", "가보자", "빡겜"]
                     - created_at: timestamptz (권장: default now())
 
             3) 인증/권한 조건 (RLS 전제)
@@ -85,6 +88,7 @@
                    - insert 전 데이터 변환:
                      - start_date: antd DatePicker의 "yy-mm-dd" 형식을 Supabase date 형식으로 변환
                      - start_time: "오후 11:00", "오전 09:30" 같은 텍스트 형식을 Supabase time 형식(HH:mm:ss 또는 HH:mm)으로 변환
+                     - tags: "#금요일#가보자#빡겜" 같은 형식을 "#" 기호로 분리하여 string[] 형태로 변환
                    - 성공 시: insert 결과로 생성된 id를 확보할 것.
                    - 실패 시: 에러 메시지를 사용자에게 노출할 것.
                      2-1) 에러 메시지 노출 방법
