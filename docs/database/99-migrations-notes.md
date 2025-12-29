@@ -71,3 +71,17 @@
 - 이유: 유저의 온라인 상태(online, away, dnd, offline)를 관리하기 위한 테이블 추가
 - 영향: User / Profile Domain 확장, 실시간 상태 표시 기능 지원
 - 관련 기능: 채팅, 파티 참여 등에서 유저의 현재 상태를 확인하는데 활용
+
+---
+
+## v1.0.4
+
+**Date**: 2025-12-29  
+**Author**: ReadyGo / Eunkyoung Kim(김은경)
+
+### user_play_schedules
+
+- ADD TABLE
+- 이유: 유저의 플레이 시간대 성향 관리를 위한 테이블 추가
+- 영향: Traits의 성향축 5개 외 주 플레이 시간대 저장 지원
+- 관련 기능: 성향 분석 결과 저장 외 프로필 조회, 매칭 로직 간 활용
