@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Icon from '@/commons/components/icon';
 import { useAuth } from '@/commons/providers/auth/auth.provider';
+import { useProfileBinding } from '../hooks/index.binding.hook';
 import styles from './styles.module.css';
 
 type UserStatus = 'online' | 'away' | 'dnd' | 'offline';
@@ -33,15 +34,16 @@ const STATUS_CONFIG = {
 
 export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
   const { logout } = useAuth();
+  const { profileData } = useProfileBinding();
   const [isStatusOpen, setIsStatusOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<UserStatus>('online');
 
-  // TODO: 실제 사용자 데이터로 교체
+  // 실제 사용자 데이터 (user_profiles에서 조회한 데이터)
   const user = {
-    nickname: '게이머베어',
-    username: '@gamer_bear',
-    avatar: 'bear', // 아바타 타입
-    isSteamConnected: true,
+    nickname: profileData.nickname || '',
+    username: '@gamer_bear', // TODO: 향후 username 필드 추가 시 실제 데이터로 교체
+    avatar: 'bear', // TODO: 향후 avatar_url 또는 animal_type 사용
+    isSteamConnected: profileData.isSteamConnected,
   };
 
   const handleStatusToggle = () => {
