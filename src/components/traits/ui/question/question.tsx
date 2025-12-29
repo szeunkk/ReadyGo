@@ -7,7 +7,11 @@ import Icon from '@/commons/components/icon';
 import Image from 'next/image';
 import QuestionList from './question-list/questionList';
 import QuestionSchedule from './question-schedule/questionSchedule';
-import { useTraitSurvey, type AnswerType, type TraitSubmitPayload } from '../../hooks';
+import {
+  useTraitSurvey,
+  type AnswerType,
+  type TraitSubmitPayload,
+} from '../../hooks';
 
 interface QuestionProps {
   onComplete?: (payload: TraitSubmitPayload) => void;

@@ -23,4 +23,3 @@ export const updateAnimalType = async (
     throw new Error(`Failed to update animal_type: ${error.message}`);
   }
 };
-

@@ -43,4 +43,3 @@ export const upsertUserTraits = async (
     throw new Error(`Failed to upsert user_traits: ${error.message}`);
   }
 };
-

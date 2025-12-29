@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 /**
  * POST /api/traits/submit API 테스트
- * 
+ *
  * 테스트 전제:
  * - 실제 Supabase Auth 사용 (mock 금지)
  * - 실제 데이터로 테스트
@@ -33,13 +33,16 @@ test.describe('POST /api/traits/submit', () => {
     expect(body).toHaveProperty('message');
   });
 
-  test('400: user_id가 body에 포함된 경우 거부된다', async ({ request, page }) => {
+  test('400: user_id가 body에 포함된 경우 거부된다', async ({
+    request,
+    page,
+  }) => {
     // 테스트용으로 실제 인증이 필요하므로 skip
     test.skip(true, 'Requires actual authentication setup');
-    
+
     await page.goto('/login');
     // 실제 로그인 후 세션 쿠키 획득 필요
-    
+
     const payloadWithUserId = {
       ...validPayload,
       user_id: 'some-user-id',
@@ -136,13 +139,16 @@ test.describe('POST /api/traits/submit', () => {
     expect(body).toHaveProperty('message');
   });
 
-  test.skip('200: 유효한 요청은 성공한다 (인증 필요)', async ({ request, page }) => {
+  test.skip('200: 유효한 요청은 성공한다 (인증 필요)', async ({
+    request,
+    page,
+  }) => {
     // 실제 인증 후 테스트해야 하므로 skip
     // 실제 환경에서는 beforeEach에서 로그인 처리 필요
-    
+
     await page.goto('/login');
     // 실제 로그인 후 세션 쿠키 획득
-    
+
     const response = await request.post('/api/traits/submit', {
       data: validPayload,
     });
@@ -152,9 +158,12 @@ test.describe('POST /api/traits/submit', () => {
     expect(body).toEqual({ ok: true });
   });
 
-  test.skip('200: 빈 schedule(dayTypes/timeSlots)도 허용된다', async ({ request, page }) => {
+  test.skip('200: 빈 schedule(dayTypes/timeSlots)도 허용된다', async ({
+    request,
+    page,
+  }) => {
     await page.goto('/login');
-    
+
     const payloadWithEmptySchedule = {
       ...validPayload,
       dayTypes: [],
@@ -170,32 +179,34 @@ test.describe('POST /api/traits/submit', () => {
     expect(body).toEqual({ ok: true });
   });
 
-  test.skip('200: 동일 유저 재요청 시 데이터가 갱신된다', async ({ request, page }) => {
+  test.skip('200: 동일 유저 재요청 시 데이터가 갱신된다', async ({
+    request,
+    page,
+  }) => {
     await page.goto('/login');
-    
+
     // 첫 번째 요청
     const firstPayload = {
       ...validPayload,
       animalType: 'wolf',
     };
-    
+
     const firstResponse = await request.post('/api/traits/submit', {
       data: firstPayload,
     });
     expect(firstResponse.status()).toBe(200);
-    
+
     // 두 번째 요청 (다른 animal_type)
     const secondPayload = {
       ...validPayload,
       animalType: 'fox',
     };
-    
+
     const secondResponse = await request.post('/api/traits/submit', {
       data: secondPayload,
     });
     expect(secondResponse.status()).toBe(200);
-    
+
     // DB에서 최종 값 확인 필요 (실제 구현 시)
   });
 });
-

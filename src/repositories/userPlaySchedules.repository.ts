@@ -42,4 +42,3 @@ export const insertMany = async (rows: PlayScheduleRow[]): Promise<void> => {
     throw new Error(`Failed to insert user_play_schedules: ${error.message}`);
   }
 };
-

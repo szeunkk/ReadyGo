@@ -24,16 +24,16 @@ export type SubmitTraitsPayload = {
 
 /**
  * Traits 제출 결과를 저장한다
- * 
+ *
  * 저장 흐름:
  * 1. user_traits upsert
  * 2. user_profiles.animal_type 업데이트
  * 3. user_play_schedules 교체 저장 (delete → insert)
- * 
+ *
  * ⚠️ 주의: 다중 테이블 트랜잭션은 보장되지 않음
  * - 일부 단계 성공 후 실패가 발생할 수 있음
  * - 실패 시 즉시 중단하고 에러를 throw
- * 
+ *
  * @param userId - 인증된 유저 ID
  * @param payload - 검증된 traits 제출 데이터
  * @throws Error - 저장 중 에러 발생 시
@@ -75,4 +75,3 @@ export const submitTraits = async (
     await insertMany(scheduleRows);
   }
 };
-
