@@ -33,15 +33,19 @@ const STATUS_CONFIG = {
 } as const;
 
 export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
-  const { logout } = useAuth();
+  const { logout, user: authUser } = useAuth();
   const { profileData } = useProfileBinding();
   const [isStatusOpen, setIsStatusOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<UserStatus>('online');
 
+  // 2-1) username 부분에는 Supabase Auth를 통해 사용자 세션 정보에서 user.email을 가져와서 username 부분에 바인딩
+  // user가 null이거나 user.email이 없는 경우 fallback 처리
+  const username = authUser?.email || '';
+
   // 실제 사용자 데이터 (user_profiles에서 조회한 데이터)
   const user = {
     nickname: profileData.nickname || '',
-    username: '@gamer_bear', // TODO: 향후 username 필드 추가 시 실제 데이터로 교체
+    username,
     avatar: 'bear', // TODO: 향후 avatar_url 또는 animal_type 사용
     isSteamConnected: profileData.isSteamConnected,
   };
