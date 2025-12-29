@@ -5,7 +5,7 @@ import { SCHEDULE_QUESTION } from '@/components/traits/data/questionSchedule';
 /**
  * 배열을 랜덤하게 섞는 함수
  */
-const shuffle = <T,>(arr: T[]): T[] => {
+const shuffle = <T>(arr: T[]): T[] => {
   return [...arr].sort(() => Math.random() - 0.5);
 };
 
