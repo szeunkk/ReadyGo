@@ -61,7 +61,10 @@ export default function Question({ onComplete }: QuestionProps) {
           <div className={styles.progressSection}>
             <div className={styles.progressHeader}>
               <span className={styles.progressLabel}>진행률</span>
-              <span className={styles.progressPercentage} data-testid="survey-progress">
+              <span
+                className={styles.progressPercentage}
+                data-testid="survey-progress"
+              >
                 {Math.round(progressPercentage)}%
               </span>
             </div>
@@ -84,13 +87,18 @@ export default function Question({ onComplete }: QuestionProps) {
             <div className={styles.dotMedium} />
             <div className={styles.dotLight} />
           </div>
-          <span className={styles.questionNumber} data-testid="survey-question-number">
+          <span
+            className={styles.questionNumber}
+            data-testid="survey-question-number"
+          >
             Q{String(currentStep).padStart(2, '0')}
           </span>
         </div>
 
         {/* 질문 본문 */}
-        <div data-testid={`survey-question-${currentQuestion?.id || 'unknown'}`}>
+        <div
+          data-testid={`survey-question-${currentQuestion?.id || 'unknown'}`}
+        >
           {isScheduleQuestion ? (
             <QuestionSchedule
               onAnswerSelect={handleAnswerSelect}
