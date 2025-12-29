@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-import { supabase } from '@/lib/supabase/client';
 import { URL_PATHS } from '@/commons/constants/url';
 import { useModal } from '@/commons/providers/modal';
 import { CheckboxStatus } from '@/commons/components/checkbox';
@@ -128,42 +127,36 @@ export const useLoginForm = () => {
     hasShownErrorModalRef.current = false;
 
     try {
-      // 1. Supabase Auth 로그인
-      const { data: authData, error: authError } =
-        await supabase.auth.signInWithPassword({
+      // 1. API를 통해 로그인
+      const response = await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // 쿠키 포함
+        body: JSON.stringify({
           email: data.email,
           password: data.password,
-        });
+        }),
+      });
 
-      if (authError) {
-        // Supabase Auth 에러 메시지를 한글로 변환
-        let errorMessage = '로그인에 실패했습니다.';
-        if (authError.message) {
-          if (
-            authError.message.includes('Invalid login credentials') ||
-            authError.message.includes('invalid_grant')
-          ) {
-            errorMessage = '이메일 또는 비밀번호가 올바르지 않습니다.';
-          } else if (authError.message.includes('Email not confirmed')) {
-            errorMessage = '이메일 인증이 완료되지 않았습니다.';
-          } else if (authError.message.includes('Too many requests')) {
-            errorMessage = '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
-          } else {
-            errorMessage = authError.message;
-          }
-        }
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        // API 에러 메시지 사용
+        const errorMessage =
+          responseData.error || '로그인에 실패했습니다.';
         throw new Error(errorMessage);
       }
 
       // 2. 로그인 성공 판단
-      // Supabase가 자동으로 세션을 localStorage에 저장하므로 별도 저장 불필요
-      if (!authData.session?.access_token) {
-        throw new Error('로그인에 실패했습니다. 세션을 받지 못했습니다.');
+      if (!responseData.user) {
+        throw new Error('로그인에 실패했습니다. 사용자 정보를 받지 못했습니다.');
       }
 
       // 3. 로그인 성공 후 처리
-      // Supabase Auth가 자동으로 세션을 관리하므로 별도 localStorage 저장 불필요
-      // 세션 정보는 supabase.auth.getSession()으로 조회 가능
+      // HttpOnly 쿠키에 토큰이 저장되므로 별도 처리 불필요
+      // 페이지 새로고침으로 세션 상태 동기화
 
       // 로그인완료모달 노출 (한 번만)
       if (!hasShownSuccessModalRef.current) {
@@ -175,7 +168,8 @@ export const useLoginForm = () => {
           confirmText: '확인',
           onConfirm: () => {
             closeAllModals();
-            router.push(URL_PATHS.HOME);
+            // 페이지 새로고침으로 세션 상태 동기화
+            window.location.href = URL_PATHS.HOME;
           },
         });
       }
