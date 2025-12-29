@@ -1,4 +1,13 @@
 /**
+ * ❗ Domain Contract (DO NOT DIVERGE)
+ *
+ * - DB / API / Front 공용 Animal / Trait 계약
+ * - DB 저장값과 1:1 매핑
+ * - string / 임의 값 사용 금지
+ * - 변경 시 반드시 전 영역 영향 검토
+ */
+
+/**
  * Animal Type & Group Enums
  * 동물 타입 및 그룹 정의
  */
