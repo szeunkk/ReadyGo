@@ -56,8 +56,7 @@ interface UserStatusProviderProps {
  */
 export const UserStatusProvider = ({ children }: UserStatusProviderProps) => {
   const { user } = useAuth();
-  const { setMyStatus, setUserStatus, setMyManualStatus } =
-    useUserStatusStore();
+  const { setMyStatus, setUserStatus } = useUserStatusStore();
   const channelRef = useRef<RealtimeChannel | null>(null);
   const subscribedUserIdRef = useRef<string | null>(null);
   const seededUserIdRef = useRef<string | null>(null);
@@ -187,8 +186,10 @@ export const UserStatusProvider = ({ children }: UserStatusProviderProps) => {
             {
               event: '*',
               schema: 'public',
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               table: 'user_status' as any,
             },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (payload: any) => {
               // 이벤트 수신 시 payload.new를 기준으로 처리
               if (payload.new) {

@@ -13,44 +13,42 @@ if (!supabaseUrl || !supabaseAnonKey) {
 /**
  * 파티 목록 조회
  * GET /api/party
+ * 인증되지 않은 유저도 조회 가능
  */
 export const GET = async (request: NextRequest) => {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('sb-access-token')?.value;
 
-    if (!accessToken) {
-      return NextResponse.json(
-        { error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    // session/route.ts와 동일한 패턴
+    // 인증 토큰이 있으면 사용하고, 없으면 anon key만 사용
     const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: false,
       },
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
+      global: accessToken
+        ? {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        : {},
     });
 
     // 쿼리 파라미터 처리 (선택사항)
     const { searchParams } = new URL(request.url);
     const limit = searchParams.get('limit');
-    const status = searchParams.get('status');
+    // 주의: party_posts 테이블에 status 컬럼이 없으므로 status 필터링 제거
+    // const status = searchParams.get('status');
 
     let query = supabase
       .from('party_posts')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (status) {
-      query = query.eq('status', status);
-    }
+    // status 컬럼이 없으므로 필터링 제거
+    // if (status) {
+    //   query = query.eq('status', status);
+    // }
 
     if (limit) {
       query = query.limit(parseInt(limit, 10));
@@ -59,10 +57,7 @@ export const GET = async (request: NextRequest) => {
     const { data: partyList, error } = await query;
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ data: partyList || [] });
@@ -149,6 +144,7 @@ export const POST = async (request: NextRequest) => {
     }
 
     // 파티 생성
+    // 주의: party_posts 테이블에 status 컬럼이 없으므로 status 필드 제거
     const { data: insertData, error: insertError } = await supabase
       .from('party_posts')
       .insert({
@@ -163,16 +159,14 @@ export const POST = async (request: NextRequest) => {
         difficulty,
         voice_chat: voiceChat || null,
         tags: tags || null,
-        status: 'recruiting',
+        // status 컬럼이 없으므로 제거
+        // status: 'recruiting',
       })
       .select('id')
       .single();
 
     if (insertError) {
-      return NextResponse.json(
-        { error: insertError.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: insertError.message }, { status: 500 });
     }
 
     if (!insertData || !insertData.id) {
@@ -182,10 +176,7 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    return NextResponse.json(
-      { data: { id: insertData.id } },
-      { status: 201 }
-    );
+    return NextResponse.json({ data: { id: insertData.id } }, { status: 201 });
   } catch (error) {
     console.error('Party create API error:', error);
     return NextResponse.json(
@@ -194,4 +185,3 @@ export const POST = async (request: NextRequest) => {
     );
   }
 };
-
