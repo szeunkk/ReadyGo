@@ -381,6 +381,7 @@ export const DELETE = async function () {
       // 로그아웃 전에 user_status를 offline으로 업데이트
       if (user?.id) {
         try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await (supabase as any).from('user_status').upsert(
             {
               user_id: user.id,

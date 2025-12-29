@@ -17,7 +17,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
  * 로그인 직후 user_status 테이블에 해당 user의 row가 없을 수 있으므로,
  * 1회 upsert를 수행합니다.
  */
-export const POST = async function (request: NextRequest) {
+export const POST = async function (_request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('sb-access-token')?.value;
@@ -110,6 +110,7 @@ export const POST = async function (request: NextRequest) {
       // 이미 row가 존재하는 경우 status를 덮어쓰지 않도록
       // onConflict: user_id로 설정
       // 타입 정의에 user_status가 없을 수 있으므로 any로 캐스팅
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: upsertError } = await (refreshedSupabase as any)
         .from('user_status')
         .upsert(
@@ -193,6 +194,7 @@ export const POST = async function (request: NextRequest) {
 
           if (!refreshedError && refreshedUser) {
             // user_status 테이블에 upsert 수행
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { error: upsertError } = await (refreshedSupabase as any)
               .from('user_status')
               .upsert(
@@ -225,6 +227,7 @@ export const POST = async function (request: NextRequest) {
     }
 
     // user_status 테이블에 upsert 수행
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: upsertError } = await (supabase as any)
       .from('user_status')
       .upsert(

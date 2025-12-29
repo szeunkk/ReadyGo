@@ -55,6 +55,10 @@ export interface PartyCardProps {
    * 추가 클래스명
    */
   className?: string;
+  /**
+   * 파티 ID (data-testid 생성용)
+   */
+  partyId?: number | string;
 }
 
 export default function Card({
@@ -68,6 +72,7 @@ export default function Card({
   avatarColor = 'var(--color-text-secondary)',
   onJoinClick,
   className = '',
+  partyId,
 }: PartyCardProps) {
   const containerClasses = [styles.card, className].filter(Boolean).join(' ');
 
@@ -75,18 +80,45 @@ export default function Card({
   const displayAvatars = memberAvatars.slice(0, 4);
   const remainingCount = Math.max(0, memberAvatars.length - 4);
 
+  // data-testid 생성
+  const cardTestId = partyId ? `party-card-${partyId}` : undefined;
+  const titleTestId = partyId ? `party-card-title-${partyId}` : undefined;
+  const descriptionTestId = partyId
+    ? `party-card-description-${partyId}`
+    : undefined;
+  const gameTagTestId = partyId ? `party-card-game-tag-${partyId}` : undefined;
+  const memberCountTestId = partyId
+    ? `party-card-member-count-${partyId}`
+    : undefined;
+  const startTimeTestId = partyId
+    ? `party-card-start-time-${partyId}`
+    : undefined;
+  const voiceChatTestId = partyId
+    ? `party-card-voice-chat-${partyId}`
+    : undefined;
+  const difficultyTestId = partyId
+    ? `party-card-difficulty-${partyId}`
+    : undefined;
+  const controlLevelTestId = partyId
+    ? `party-card-control-level-${partyId}`
+    : undefined;
+
   return (
-    <div className={containerClasses}>
+    <div className={containerClasses} data-testid={cardTestId}>
       {/* Title 영역 */}
       <div className={styles.cardTitleMemberWrapper}>
         <div className={styles.titleSection}>
           <div className={styles.titleTagWrapper}>
-            <h2 className={styles.cardTitle}>{title}</h2>
-            <Tag style="duotone" className={styles.gameTag}>
+            <h2 className={styles.cardTitle} data-testid={titleTestId}>
+              {title}
+            </h2>
+            <Tag style="duotone" className={styles.gameTag} data-testid={gameTagTestId}>
               {gameTag}
             </Tag>
           </div>
-          <p className={styles.cardDescription}>{description}</p>
+          <p className={styles.cardDescription} data-testid={descriptionTestId}>
+            {description}
+          </p>
         </div>
 
         {/* Party Member 영역 */}
@@ -115,7 +147,7 @@ export default function Card({
               </div>
             )}
           </div>
-          <div className={styles.memberCount}>
+          <div className={styles.memberCount} data-testid={memberCountTestId}>
             <span className={styles.currentCount}>{currentMembers}</span>
             <span className={styles.maxCount}> / {maxMembers}명</span>
           </div>
@@ -135,7 +167,7 @@ export default function Card({
               />
               <span className={styles.categoryLabel}>시작 시간</span>
             </div>
-            <span className={styles.categoryValue}>
+            <span className={styles.categoryValue} data-testid={startTimeTestId}>
               {_categories.startTime}
             </span>
           </div>
@@ -149,7 +181,7 @@ export default function Card({
               />
               <span className={styles.categoryLabel}>보이스챗</span>
             </div>
-            <span className={styles.categoryValue}>
+            <span className={styles.categoryValue} data-testid={voiceChatTestId}>
               {_categories.voiceChat}
             </span>
           </div>
@@ -163,7 +195,7 @@ export default function Card({
               />
               <span className={styles.categoryLabel}>난이도</span>
             </div>
-            <span className={styles.categoryValue}>
+            <span className={styles.categoryValue} data-testid={difficultyTestId}>
               {_categories.difficulty}
             </span>
           </div>
@@ -177,7 +209,7 @@ export default function Card({
               />
               <span className={styles.categoryLabel}>컨트롤 수준</span>
             </div>
-            <span className={styles.categoryValue}>
+            <span className={styles.categoryValue} data-testid={controlLevelTestId}>
               {_categories.controlLevel}
             </span>
           </div>

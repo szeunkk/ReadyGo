@@ -116,6 +116,7 @@ export const POST = async function (request: NextRequest) {
       }
 
       // user_status 테이블에 upsert 수행
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: upsertError } = await (refreshedSupabase as any)
         .from('user_status')
         .upsert(
@@ -199,6 +200,7 @@ export const POST = async function (request: NextRequest) {
 
           if (!refreshedError && refreshedUser) {
             // user_status 테이블에 upsert 수행
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { error: upsertError } = await (refreshedSupabase as any)
               .from('user_status')
               .upsert(
@@ -231,6 +233,7 @@ export const POST = async function (request: NextRequest) {
     }
 
     // user_status 테이블에 upsert 수행
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: upsertError } = await (supabase as any)
       .from('user_status')
       .upsert(
