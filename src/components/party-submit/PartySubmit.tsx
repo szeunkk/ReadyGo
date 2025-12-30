@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Controller } from 'react-hook-form';
 import { DatePicker } from 'antd';
+import type { DatePickerProps } from 'antd';
+import dayjs from 'dayjs';
 import styles from './styles.module.css';
 import Searchbar from '@/commons/components/searchbar';
 import Input from '@/commons/components/input';
@@ -135,6 +137,11 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
   const handleVoiceChatToggle = (value: 'required' | 'optional') => {
     const newValue = voiceChat === value ? null : value;
     setValue('voice_chat', newValue, { shouldValidate: true });
+  };
+
+  // 날짜 제한: 과거 날짜 선택 차단
+  const disabledDate: DatePickerProps['disabledDate'] = (current) => {
+    return current && current.isBefore(dayjs().startOf('day'));
   };
 
   return (
@@ -271,6 +278,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
                           field.onChange(date);
                         }}
                         format="YYYY-MM-DD"
+                        disabledDate={disabledDate}
                         suffixIcon={<Icon name="calendar" size={20} />}
                         getPopupContainer={(trigger) => {
                           return (
