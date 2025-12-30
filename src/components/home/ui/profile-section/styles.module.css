@@ -5,7 +5,10 @@
   flex-direction: column;
   gap: 30px;
   width: 408px;
+  min-width: 408px;
+  max-width: 408px;
   height: fit-content;
+  flex-shrink: 0;
 }
 
 /* Animal Card */
@@ -80,10 +83,7 @@
 
 /* Responsive Design */
 @media (max-width: 1440px) {
-  .profileSection {
-    width: 360px;
-  }
-
+  /* profileSection 너비는 rightSection(408px)에 맞춰 유지 */
   .radarChartWrapper {
     height: 220px;
   }
@@ -95,10 +95,7 @@
 }
 
 @media (max-width: 768px) {
-  .profileSection {
-    width: 100%;
-    max-width: 408px;
-  }
+  /* profileSection은 항상 408px 유지 */
 
   .chartsContainer {
     padding: 24px 16px;
