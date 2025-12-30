@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import styles from './styles.module.css';
 import Avatar from '@/commons/components/avatar';
-import Searchbar from '@/commons/components/searchbar';
 import Icon from '@/commons/components/icon';
 
 interface FriendRequest {
@@ -13,7 +12,6 @@ interface FriendRequest {
 }
 
 export default function FriendRequests() {
-  const [activeTab, setActiveTab] = useState<'list' | 'request'>('request');
   const [friendRequests] = useState<FriendRequest[]>([
     { id: '1', nickname: '게이머호랑이', status: 'online' },
     { id: '2', nickname: '게이머호랑이', status: 'offline' },

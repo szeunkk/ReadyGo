@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import styles from './styles.module.css';
 import Searchbar from '@/commons/components/searchbar';
-import Icon from '@/commons/components/icon';
 import FriendLists from '../friend-lists/friendLists';
 import FriendRequests from '../friend-requests/friendRequests';
 

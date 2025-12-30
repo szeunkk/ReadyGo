@@ -1,0 +1,437 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 참고할 useRealtimeChat Hook 파일경로: src/components/chat/hooks/useRealtimeChat.hook.tsx
+조건-파일경로) 참고할 Repository 파일경로: src/repositories/chat.repository.ts
+조건-파일경로) 구현될 Hook 파일경로: src/components/chat/hooks/useChatRoom.hook.tsx
+조건-파일경로) 참고할 Supabase 클라이언트: src/lib/supabase/client.ts
+조건-파일경로) 참고할 API 라우트: src/app/api/chat/message/route.ts
+
+==============================================
+
+핵심요구사항) useRealtimeChat을 통합하고, 초기 메시지 로드, postgres_changes 구독, 메시지 전송, 읽음 처리를 포함한 통합 채팅방 Hook을 구현하고, 적용 결과를 체크리스트로 반환할 것.
+
+            1) Hook 기본 구조
+                1-1) 파일 위치 및 네이밍
+                    - 파일 경로: src/components/chat/hooks/useChatRoom.hook.tsx
+                    - Hook 이름: useChatRoom
+                    - 'use client' 디렉티브 필수
+                
+                1-2) Import
+                    - React hooks: useEffect, useRef, useState, useCallback, useMemo
+                    - useRealtimeChat: src/components/chat/hooks/useRealtimeChat.hook.tsx에서 import
+                    - Repository: getChatMessages, markRoomAsRead, markMessagesAsRead 함수 import
+                    - Supabase: RealtimeChannel 타입
+                    - Supabase 클라이언트: src/lib/supabase/client.ts에서 'supabase as baseSupabase' import
+                    - 인증: useAuth() hook import
+                    - 타입: Database 타입 import
+
+            2) useRealtimeChat 통합
+                2-1) useRealtimeChat 사용
+                    - useRealtimeChat hook을 내부에서 호출
+                    - onMessage 콜백을 통해 수신된 메시지를 내부 상태에 추가
+                    - Broadcast 수신 메시지와 postgres_changes 수신 메시지의 중복 제거 처리
+                    - useRealtimeChat의 sendMessage 재사용 또는 동일 로직 구현 (API 호출 + Broadcast 전송)
+                    - onMessage 콜백 호출 시 try/catch로 에러 처리하여 채널 보호
+
+                2-2) 메시지 중복 제거
+                    - Broadcast와 postgres_changes가 동시에 수신될 수 있음
+                    - 메시지 ID 기반으로 중복 체크 (Set<number> 패턴 사용)
+                    - useState로 관리되는 messages 배열에 추가 시 중복 체크
+                    - useMemo로 중복 제거된 메시지 목록 관리
+                    - 구현 패턴:
+                        const seenIds = new Set<number>();
+                        messages.filter(msg => {
+                          if (seenIds.has(msg.id)) return false;
+                          seenIds.add(msg.id);
+                          return true;
+                        })
+
+            3) 초기 메시지 로드 (API)
+                3-1) 초기 메시지 조회
+                    - roomId가 변경되거나 초기 마운트 시 API를 통해 메시지 조회
+                    - API 엔드포인트: GET /api/chat/message?roomId={roomId}&limit={limit}&offset={offset}
+                    - Query 파라미터:
+                        - roomId: number (필수)
+                        - limit: number (선택, 기본값 50)
+                        - offset: number (선택, 기본값 0)
+                    - API 응답 형식: { data: ChatMessage[] }
+                    - API 라우트가 없으면 생성 필요 (src/app/api/chat/message/route.ts에 GET 핸들러 추가)
+                    - Repository 함수는 서버 사이드 전용이므로 클라이언트 Hook에서는 API 사용 필수
+
+                3-2) 메시지 정렬
+                    - Repository의 getChatMessages는 created_at 기준 내림차순(ascending: false)으로 반환 (최신→과거)
+                    - UI 표시 순서는 과거→최신이므로 반드시 reverse 처리 필요
+                    - 구현: 초기 로드 후 messages.reverse() 또는 [...messages].reverse()
+                    - 실시간 수신 메시지는 created_at 기준으로 정렬된 위치에 삽입
+
+                3-3) 로딩 상태 관리
+                    - isLoading: boolean 상태로 초기 로딩 상태 관리
+                    - roomId 변경 시 isLoading을 true로 리셋 (새 방 로딩 시작)
+                    - 초기 로드 완료 후 isLoading을 false로 설정
+                    - 에러 발생 시 error 상태에 에러 메시지 저장 및 isLoading을 false로 설정
+
+            4) postgres_changes로 INSERT 구독
+                4-1) postgres_changes 채널 구독
+                    - useRealtimeChat의 Broadcast 채널과 별도로 postgres_changes 구독
+                    - 채널 이름: `chat:${roomId}:changes` 형식 사용 (Broadcast 채널과 구분)
+                    - baseSupabase.channel()로 채널 생성
+                    - .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_id=eq.${roomId}` })
+                    - postgres_changes는 DB 변경사항을 실시간으로 수신 (더 안정적)
+
+                4-2) INSERT 이벤트 처리
+                    - postgres_changes의 INSERT 이벤트 수신 시:
+                        1) payload.new에서 새 메시지 정보 추출
+                        2) Set<number>를 사용한 메시지 ID 기반 중복 체크 (Broadcast와 중복 방지)
+                        3) 중복이 아니면 messages 배열에 추가
+                        4) onMessage 콜백 호출 시 try/catch로 에러 처리 (useRealtimeChat의 onMessage와 동일한 형식)
+                        5) payload.new의 타입은 Database['public']['Tables']['chat_messages']['Row']와 동일
+
+                4-3) 채널 관리
+                    - channelRef: useRef<RealtimeChannel | null>(null) 사용
+                    - subscribedRoomIdRef: useRef<number | null>(null) 사용
+                    - roomId 변경 시 이전 채널 정리 후 새 채널 구독
+                    - useRealtimeChat의 채널과 별도로 관리
+
+                4-4) 중복 구독 방지
+                    - subscribedRoomIdRef.current === roomId && channelRef.current 존재 시 no-op
+                    - useRealtimeChat의 패턴과 동일하게 구현
+
+            5) 메시지 전송 플로우 (DB 저장 + Broadcast)
+                5-1) sendMessage 함수 구현
+                    - 함수 시그니처: sendMessage(content: string, contentType?: string): Promise<void>
+                    - 입력 파라미터: content(필수), contentType(선택, 기본값 'text')
+                    - 구현 방식 선택:
+                        옵션 A: useRealtimeChat의 sendMessage 재사용 (권장)
+                            - useRealtimeChat의 sendMessage는 이미 DB 저장 + Broadcast 전송을 포함
+                            - 중복 구현 방지를 위해 재사용 권장
+                            - 단, useRealtimeChat의 subscribeToRoom이 호출되어 있어야 함
+                        옵션 B: 동일 로직 직접 구현
+                            - 내부 처리:
+                                1) roomId 확인 (subscribedRoomIdRef.current 또는 props.roomId)
+                                2) user?.id 확인 (useAuth().user?.id)
+                                3) roomId 또는 user?.id가 없으면 에러 throw
+                                4) POST /api/chat/message API 호출
+                                    - body: { roomId: number, content: string, contentType?: string }
+                                    - 응답: { data: ChatMessage }
+                                5) API 응답에서 저장된 메시지 정보 획득
+                                6) 저장 성공 시 Broadcast 전송 (useRealtimeChat의 채널 활용)
+                    - 권장: 옵션 A (useRealtimeChat.sendMessage 재사용)
+
+                5-2) Broadcast 전송 (옵션 B 선택 시)
+                    - DB 저장 성공 후 Broadcast로 실시간 전송
+                    - useRealtimeChat의 채널을 직접 사용
+                    - payload 형식:
+                        {
+                          id: number; // DB에 저장된 메시지 ID
+                          content: string;
+                          contentType: string;
+                          senderId: string;
+                          roomId: number;
+                          createdAt: string;
+                        }
+                    - Broadcast는 영구 저장되지 않으므로, DB 저장은 필수
+
+                5-3) 전송 후 상태 업데이트
+                    - 전송 성공 시:
+                        - postgres_changes로 자동 수신되므로 로컬 상태 업데이트 불필요
+                        - 또는 optimistic update 구현 (선택사항)
+                    - 전송 실패 시:
+                        - error 상태에 에러 메시지 저장
+                        - optimistic update가 있었다면 롤백
+
+            6) 읽음 처리 (API)
+                6-1) 자동 읽음 처리
+                    - 채팅방 진입 시 (roomId 변경 시):
+                        - API 라우트를 통해 호출: POST /api/chat/message/read
+                        - Request body: { roomId: number }
+                        - API 응답: { success: boolean }
+                        - 해당 채팅방의 모든 읽지 않은 메시지를 읽음 처리
+                        - API 엔드포인트: src/app/api/chat/message/read/route.ts (이미 존재)
+                        - Repository 함수는 서버 사이드 전용이므로 클라이언트 Hook에서는 API 사용 필수
+
+                6-2) 수동 읽음 처리
+                    - 특정 메시지들을 읽음 처리하는 함수 제공
+                    - 함수 시그니처: markAsRead(messageIds: number[]): Promise<void>
+                    - API 라우트를 통해 호출: POST /api/chat/message/read
+                        - Request body: { roomId: number, messageIds: number[] }
+                        - API 응답: { success: boolean }
+                    - API 엔드포인트 확장 필요: 현재는 roomId만 받음, messageIds 배열 지원 추가 필요
+                        - 또는 별도 엔드포인트 생성: POST /api/chat/message/read/messages
+                        - body: { roomId: number, messageIds: number[] }
+
+                6-3) 읽음 상태 업데이트
+                    - 읽음 처리 후 로컬 messages 배열의 해당 메시지들의 is_read 상태 업데이트
+                    - 또는 postgres_changes로 chat_message_reads 테이블 변경사항 구독하여 자동 업데이트 (선택사항)
+
+            7) Hook 반환 값
+                7-1) 반환 객체
+                    interface UseChatRoomReturn {
+                      messages: ChatMessage[];
+                      sendMessage: (content: string, contentType?: string) => Promise<void>;
+                      markAsRead: (messageIds: number[]) => Promise<void>;
+                      isLoading: boolean;
+                      error: string | null;
+                      isConnected: boolean; // useRealtimeChat의 isConnected
+                    }
+
+                7-2) messages: ChatMessage[]
+                    - 현재 채팅방의 메시지 목록
+                    - 초기 로드된 메시지 + 실시간 수신된 메시지
+                    - created_at 기준 정렬 (UI 표시 순서에 맞게)
+                    - 중복 제거된 메시지 목록
+
+                7-3) sendMessage(content: string, contentType?: string): Promise<void>
+                    - 메시지 전송 함수
+                    - DB 저장 + Broadcast 전송
+
+                7-4) markAsRead(messageIds: number[]): Promise<void>
+                    - 특정 메시지들을 읽음 처리하는 함수
+                    - 입력: messageIds 배열
+
+                7-5) isLoading: boolean
+                    - 초기 메시지 로딩 상태
+                    - true: 로딩 중
+                    - false: 로딩 완료
+
+                7-6) error: string | null
+                    - 에러 발생 시 에러 메시지
+                    - 정상 작동 시 null
+
+                7-7) isConnected: boolean
+                    - useRealtimeChat의 isConnected 상태
+                    - 실시간 연결 상태
+
+            8) Hook 파라미터
+                8-1) 파라미터 타입
+                    interface UseChatRoomProps {
+                      roomId: number; // 필수: 채팅방 ID
+                      onMessage?: (message: ChatMessage) => void; // 선택: 메시지 수신 콜백
+                    }
+
+                8-2) roomId: number (필수)
+                    - 채팅방 ID
+                    - roomId 변경 시 자동으로:
+                        1) 이전 채널 정리
+                        2) 초기 메시지 로드
+                        3) postgres_changes 구독
+                        4) useRealtimeChat의 subscribeToRoom 호출
+                        5) 읽음 처리
+
+                8-3) onMessage?: (message: ChatMessage) => void (선택)
+                    - 메시지 수신 시 호출되는 콜백
+                    - Broadcast 또는 postgres_changes로 수신된 메시지에 대해 호출
+
+            9) 타입 정의
+                9-1) ChatMessage 타입
+                    - 반드시 Database['public']['Tables']['chat_messages']['Row'] 타입 사용
+                    - 별도 interface 정의 금지 (Database 타입과 일치하도록)
+                    - 타입 별칭 사용:
+                        type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
+                    - RealtimeMessage (useRealtimeChat)와 ChatMessage 매핑 규칙:
+                        - Broadcast 수신 시: RealtimeMessage → ChatMessage 변환
+                        - postgres_changes 수신 시: payload.new는 이미 ChatMessage 타입
+                        - 변환 로직:
+                            const chatMessage: ChatMessage = {
+                              id: realtimeMessage.id!,
+                              content: realtimeMessage.content,
+                              content_type: realtimeMessage.contentType || 'text',
+                              created_at: realtimeMessage.createdAt,
+                              sender_id: realtimeMessage.senderId,
+                              room_id: realtimeMessage.roomId,
+                              is_read: false, // 기본값
+                            };
+
+                9-2) Hook 파라미터 타입
+                    interface UseChatRoomProps {
+                      roomId: number;
+                      onMessage?: (message: ChatMessage) => void;
+                    }
+
+                9-3) Hook 반환 타입
+                    interface UseChatRoomReturn {
+                      messages: ChatMessage[];
+                      sendMessage: (content: string, contentType?: string) => Promise<void>;
+                      markAsRead: (messageIds: number[]) => Promise<void>;
+                      isLoading: boolean;
+                      error: string | null;
+                      isConnected: boolean;
+                    }
+
+            10) 에러 처리
+                10-1) 초기 메시지 로드 실패
+                    - getChatMessages 실패 시 error 상태에 에러 메시지 저장
+                    - console.error 로깅
+                    - isLoading을 false로 설정
+
+                10-2) postgres_changes 구독 실패
+                    - 채널 구독 실패 시:
+                        1) error 상태에 에러 메시지 저장
+                        2) console.error 로깅
+                        3) 상태 초기화:
+                            - isConnected를 false로 설정 (useRealtimeChat의 isConnected와 별도 관리 필요 시)
+                            - channelRef.current를 null로 설정
+                            - subscribedRoomIdRef.current를 null로 설정
+                        4) cleanupChannel() 함수 호출하여 채널 정리
+
+                10-3) 메시지 전송 실패
+                    - API 호출 실패 시 에러 throw
+                    - error 상태에 에러 메시지 저장
+                    - console.error 로깅
+
+                10-4) 읽음 처리 실패
+                    - markRoomAsRead 또는 markMessagesAsRead 실패 시 에러 로그
+                    - 사용자에게는 에러를 표시하지 않음 (백그라운드 처리)
+
+            11) Cleanup 처리
+                11-1) roomId 변경 시
+                    - 이전 채널 정리 (postgres_changes 채널)
+                    - useRealtimeChat의 unsubscribe 호출
+                    - messages 배열 초기화 (새 방 데이터 로드 전 초기화 필수)
+                    - isLoading을 true로 리셋 (새 방 로딩 시작)
+                    - error 상태 초기화 (null로 설정)
+
+                11-2) 컴포넌트 언마운트 시
+                    - postgres_changes 채널 정리
+                    - useRealtimeChat의 unsubscribe 호출
+                    - 모든 ref 초기화 (channelRef, subscribedRoomIdRef 등)
+
+                11-3) user?.id 변경 시
+                    - 채널 정리 (postgres_changes 채널)
+                    - useRealtimeChat의 cleanup 처리
+                    - messages 배열 초기화
+                    - isLoading을 true로 리셋
+                    - user?.id가 다시 설정되면 자동으로 재로딩 및 재구독
+
+            12) 구현 주의사항
+                12-1) useRealtimeChat 통합
+                    - useRealtimeChat의 subscribeToRoom을 roomId 변경 시 자동 호출
+                    - useRealtimeChat의 sendMessage 재사용 권장 (옵션 A) 또는 동일 로직 구현 (옵션 B)
+                    - useRealtimeChat의 onMessage 콜백을 통해 Broadcast 수신 메시지 처리
+                    - Broadcast와 postgres_changes의 중복 제거 필수 (Set<number> 패턴 사용)
+                    - RealtimeMessage → ChatMessage 변환 로직 구현
+
+                12-2) 메시지 상태 관리
+                    - useState로 messages 배열 관리
+                    - useMemo로 정렬 및 중복 제거된 메시지 목록 반환
+                    - 메시지 추가 시 중복 체크 (id 기반)
+
+                12-3) 채널 관리
+                    - postgres_changes 채널과 useRealtimeChat의 Broadcast 채널을 별도로 관리
+                    - roomId 변경 시 두 채널 모두 정리 후 재구독
+
+                12-4) API 라우트 스펙
+                    - 초기 메시지 로드: GET /api/chat/message?roomId={roomId}&limit={limit}&offset={offset}
+                        - Query: roomId (number, 필수), limit (number, 선택, 기본값 50), offset (number, 선택, 기본값 0)
+                        - 응답: { data: ChatMessage[] }
+                        - 현재 없음: src/app/api/chat/message/route.ts에 GET 핸들러 추가 필요
+                    - 메시지 전송: POST /api/chat/message
+                        - Body: { roomId: number, content: string, contentType?: string }
+                        - 응답: { data: ChatMessage }
+                        - 현재 존재: src/app/api/chat/message/route.ts
+                    - 읽음 처리 (전체): POST /api/chat/message/read
+                        - Body: { roomId: number }
+                        - 응답: { success: boolean }
+                        - 현재 존재: src/app/api/chat/message/read/route.ts
+                    - 읽음 처리 (특정 메시지): POST /api/chat/message/read/messages (또는 기존 엔드포인트 확장)
+                        - Body: { roomId: number, messageIds: number[] }
+                        - 응답: { success: boolean }
+                        - 현재 없음: 엔드포인트 생성 또는 기존 엔드포인트 확장 필요
+                    - 모든 API 호출은 credentials: 'include' 설정 필수
+
+                12-5) 성능 최적화
+                    - 메시지 목록이 많을 경우 가상화(virtualization) 고려
+                    - 초기 로드 시 limit을 적절히 설정 (기본 50)
+                    - 필요시 페이지네이션 구현 (더보기 버튼)
+
+            13) 사용 예시
+                13-1) Hook 사용 패턴
+                    const { messages, sendMessage, markAsRead, isLoading, error, isConnected } = useChatRoom({
+                      roomId: 123,
+                      onMessage: (message) => {
+                        console.log('New message:', message);
+                      },
+                    });
+
+                13-2) 메시지 전송
+                    const handleSend = async () => {
+                      try {
+                        await sendMessage('Hello!', 'text');
+                        // 또는
+                        await sendMessage('Hello!'); // contentType 기본값 'text'
+                      } catch (error) {
+                        console.error('Failed to send message:', error);
+                      }
+                    };
+
+                13-3) 읽음 처리
+                    const handleMarkAsRead = async (messageIds: number[]) => {
+                      try {
+                        await markAsRead(messageIds);
+                      } catch (error) {
+                        console.error('Failed to mark as read:', error);
+                      }
+                    };
+
+                13-4) 메시지 목록 표시
+                    {isLoading ? (
+                      <div>로딩 중...</div>
+                    ) : (
+                      <div>
+                        {messages.map((message) => (
+                          <div key={message.id}>
+                            {message.content}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+==============================================
+
+구현 완료 후 아래 2가지 체크리스트를 반환할 것.
+
+1) 커서룰(@01-common.mdc, @04-func.mdc) 적용 결과 체크리스트
+   - 파일 경로 준수 여부
+   - 라이브러리 사용 규칙 준수 여부
+   - 코드 구조 및 네이밍 규칙 준수 여부
+
+2) 기능 요구사항 구현 체크리스트
+   - useRealtimeChat 통합 구현 여부
+   - useRealtimeChat의 subscribeToRoom 자동 호출 구현 여부
+   - useRealtimeChat의 onMessage 콜백을 통한 Broadcast 수신 처리 구현 여부
+   - onMessage 콜백 try/catch 에러 처리 구현 여부
+   - RealtimeMessage → ChatMessage 변환 로직 구현 여부
+   - 초기 메시지 로드 (API) 구현 여부
+   - GET /api/chat/message API 호출 구현 여부
+   - 메시지 reverse 처리 구현 여부 (과거→최신 순서)
+   - 로딩 상태 관리 (isLoading) 구현 여부
+   - roomId 변경 시 isLoading 리셋 구현 여부
+   - postgres_changes로 INSERT 구독 구현 여부
+   - postgres_changes 채널 관리 (channelRef, subscribedRoomIdRef) 구현 여부
+   - postgres_changes INSERT 이벤트 처리 구현 여부
+   - postgres_changes 이벤트 try/catch 에러 처리 구현 여부
+   - Broadcast와 postgres_changes 중복 제거 구현 여부 (Set<number> 패턴)
+   - 메시지 전송 플로우 (DB 저장 + Broadcast) 구현 여부
+   - sendMessage 함수 구현 여부 (useRealtimeChat.sendMessage 재사용 또는 동일 로직)
+   - 읽음 처리 (자동/수동) 구현 여부 (API 사용)
+   - POST /api/chat/message/read 자동 호출 구현 여부 (roomId 변경 시)
+   - markAsRead 함수 구현 여부 (API 호출)
+   - messages 상태 관리 구현 여부
+   - 메시지 정렬 구현 여부 (reverse 처리 포함)
+   - roomId 변경 시 자동 처리 구현 여부 (채널 정리, messages 초기화, 초기 로드, 구독, 읽음 처리)
+   - Cleanup 처리 구현 여부 (언마운트, roomId 변경, user?.id 변경)
+   - user?.id 변경 시 재로딩 구현 여부
+   - postgres_changes 구독 실패 시 상태 초기화 구현 여부
+   - 에러 처리 구현 여부
+   - 타입 정의 구현 여부 (Database Row 타입 사용)
+   - RealtimeMessage vs ChatMessage 매핑 규칙 준수 여부
+   - Hook 반환 값 구현 여부 (messages, sendMessage, markAsRead, isLoading, error, isConnected)
+
