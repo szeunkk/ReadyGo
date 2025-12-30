@@ -107,10 +107,10 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
     { id: 'hell', value: '지옥' },
   ];
 
-  // 시간 옵션 (10분 간격)
+  // 시간 옵션 (30분 간격)
   const timeOptions: SelectboxItem[] = Array.from({ length: 24 }, (_, hour) =>
-    Array.from({ length: 6 }, (_, minuteIndex) => {
-      const minute = minuteIndex * 10;
+    Array.from({ length: 2 }, (_, minuteIndex) => {
+      const minute = minuteIndex * 30;
       const period = hour < 12 ? '오전' : '오후';
       const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
       const displayMinute = minute.toString().padStart(2, '0');
