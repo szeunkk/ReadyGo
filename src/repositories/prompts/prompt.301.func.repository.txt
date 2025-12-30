@@ -1,0 +1,221 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 참고할 Repository 파일경로: src/repositories/steamGame.repository.ts
+조건-파일경로) 구현될 Repository 파일경로: src/repositories/chat.repository.ts
+조건-파일경로) 참고할 타입 파일경로: supabase/types/database.types.ts
+조건-파일경로) 참고할 DB 문서경로: docs/database/04-table-details.md
+
+==============================================
+
+핵심요구사항) 채팅 기능을 위한 Repository를 구현하고, 적용 결과를 체크리스트로 반환할 것.
+
+            1) Repository 기본 구조
+                1-1) Supabase 클라이언트 사용
+                    - src/lib/supabase/server.ts의 supabaseAdmin을 사용할 것.
+                    - import 경로: import { supabaseAdmin } from '@/lib/supabase/server';
+                
+                1-2) 타입 정의
+                    - database.types.ts의 Database 타입을 활용할 것.
+                    - 각 테이블의 Row, Insert, Update 타입을 활용할 것.
+                    - 커스텀 타입이 필요한 경우 파일 내부에 정의할 것.
+
+                1-3) 에러 처리
+                    - 모든 함수는 error가 발생하면 throw error할 것.
+                    - steamGame.repository.ts의 패턴을 따를 것.
+                
+                1-4) 권한/RLS 전제 조건
+                    - Repository는 supabaseAdmin(service role)을 사용하므로 RLS를 우회한다.
+                    - 권한 검증/세션 확인은 호출부(API Route 또는 Hook)에서 선행되어야 한다.
+                    - Repository 함수는 순수한 데이터 액세스 로직만 담당한다.
+
+            2) 채팅방 관련 함수
+                2-1) getChatRoomByMembers(userId1: string, userId2: string): Promise<ChatRoom | null>
+                    - 두 사용자 간의 1:1 채팅방이 존재하는지 조회할 것.
+                    - chat_rooms 테이블과 chat_room_members 테이블을 조인하여 조회할 것.
+                    - type='direct'인 채팅방만 조회할 것.
+                    - 두 사용자가 모두 참여한 채팅방이 존재하면 해당 채팅방 정보를 반환할 것.
+                    - 존재하지 않으면 null을 반환할 것.
+                    - 반환 타입: database.types.ts의 chat_rooms.Row 타입 활용.
+
+                2-2) createChatRoom(memberIds: string[]): Promise<ChatRoom>
+                    - 새로운 1:1 채팅방을 생성할 것.
+                    - 중복 방지: 생성 전에 getChatRoomByMembers(userId1, userId2)를 먼저 호출하여 기존 채팅방이 있는지 확인할 것.
+                    - 기존 채팅방이 존재하면: 해당 채팅방을 반환할 것 
+                    - 기존 채팅방이 없으면: 새로 생성할 것.
+                    - chat_rooms 테이블에 type='direct'로 레코드 생성할 것.
+                    - 생성된 채팅방의 id를 사용하여 chat_room_members 테이블에 각 멤버 추가할 것.
+                    - joined_at은 현재 시간으로 설정할 것.
+                    - 생성된 채팅방 정보를 반환할 것.
+                    - 반환 타입: database.types.ts의 chat_rooms.Row 타입 활용.
+                    - 트랜잭션 처리: chat_rooms 생성과 chat_room_members 추가를 순차적으로 처리할 것.
+
+                2-3) getUserChatRooms(userId: string): Promise<ChatRoomListItem[]>
+                    - 특정 사용자가 참여한 모든 채팅방 목록을 조회할 것.
+                    - 성능 최적화를 위해 단계적 조회 전략을 사용할 것:
+                            1차: chat_room_members를 기준으로 chat_rooms 목록 조회 (room_ids 수집)
+                            2차: 수집한 room_ids를 기반으로 마지막 메시지(lastMessage) 매핑
+                                - chat_messages 테이블에서 각 room_id별 최신 1개 메시지 조회
+                                - 단일 쿼리로 room_ids를 IN 조건으로 처리하여 N+1 문제 방지
+                            3차: unreadCount 집계
+                                - chat_message_reads 또는 chat_messages.is_read를 활용하여 읽지 않은 메시지 수 계산
+                                - 가능하면 DB RPC Function 또는 View를 활용하는 것을 권장
+                            4차: 상대방 사용자 정보 조회 (1:1 채팅의 경우)
+                                - user_profiles 테이블과 조인하여 닉네임, animal_type 등 조회
+                        - 최신 메시지 기준으로 정렬할 것 (내림차순).
+                    - chat_room_members를 기준으로 조회할 것.
+                    - 각 채팅방에 대해 다음 정보를 포함할 것:
+                        - chat_rooms 정보 (id, type, created_at)
+                        - 상대방 사용자 정보 (1:1 채팅의 경우)
+                            - user_profiles 테이블과 조인하여 닉네임, animal_type 등 조회
+                        - 마지막 메시지 정보 (chat_messages에서 최신 1개)
+                        - 읽지 않은 메시지 수 (chat_message_reads 기준으로 계산)
+                    - 최신 메시지 기준으로 정렬할 것 (내림차순).
+                    - 반환 타입: 커스텀 타입 ChatRoomListItem 정의
+                        interface ChatRoomListItem {
+                          room: ChatRoom;
+                          otherMember?: UserProfile;
+                          lastMessage?: ChatMessage;
+                          unreadCount: number;
+                        }
+
+            3) 메시지 관련 함수
+                3-1) getChatMessages(roomId: number, limit: number = 50, offset: number = 0): Promise<ChatMessage[]>
+                    - 특정 채팅방의 메시지 목록을 조회할 것.
+                    - chat_messages 테이블에서 room_id로 필터링할 것.
+                    - created_at 기준 내림차순 정렬 (최신 메시지가 먼저).
+                    - limit과 offset을 사용하여 페이지네이션 지원할 것.
+                    - 반환 타입: database.types.ts의 chat_messages.Row[] 타입 활용.
+
+                3-2) sendMessage(roomId: number, senderId: string, content: string, contentType: string = 'text'): Promise<ChatMessage>
+                    - 새로운 메시지를 저장할 것.
+                    - chat_messages 테이블에 레코드 생성할 것.
+                    - 필수 필드:
+                        - room_id: 전달받은 roomId
+                        - sender_id: 전달받은 senderId
+                        - content: 전달받은 content
+                        - content_type: 전달받은 contentType (기본값: 'text')
+                        - is_read: false (기본값)
+                        - created_at: 현재 시간 (Supabase 자동 설정)
+                    - 생성된 메시지 정보를 반환할 것.
+                    - 반환 타입: database.types.ts의 chat_messages.Row 타입 활용.
+
+                3-3) deleteMessage(messageId: number): Promise<void>
+                    - 메시지를 삭제할 것 (soft delete 또는 hard delete).
+                    - 현재는 hard delete로 구현할 것.
+                    - chat_messages 테이블에서 id로 삭제할 것.
+                    - 삭제 성공 시 아무것도 반환하지 않을 것.
+
+            4) 읽음 처리 관련 함수
+                4-1) markMessagesAsRead(roomId: number, userId: string, messageIds: number[]): Promise<void>
+                    - 특정 메시지들을 읽음 처리할 것.
+                    - chat_message_reads 테이블에 레코드 생성할 것.
+                    - 각 messageId에 대해 다음 정보로 생성:
+                        - message_id: 메시지 ID
+                        - user_id: 사용자 ID
+                        - read_at: 현재 시간
+                    - 중복 생성 방지: upsert(onConflict)를 사용하여 구현할 것.
+                        - (message_id, user_id) 조합의 유니크 제약이 있다는 전제 하에
+                        - .upsert(data, { onConflict: 'message_id,user_id' }) 패턴 사용
+                        - 또는 DB에 유니크 제약이 없다면 별도로 생성 후 upsert 적용
+                        - steamGame.repository.ts의 upsert 패턴 참고
+                        - 동시성 문제(Race Condition) 방지를 위해 SELECT 후 INSERT 방식 대신 upsert 사용
+                    - chat_messages 테이블의 is_read 필드도 업데이트할 것 (선택사항, 필요시 구현).
+
+                4-2) getUnreadCount(roomId: number, userId: string): Promise<number>
+                    - 특정 채팅방에서 읽지 않은 메시지 수를 계산할 것.
+                    - chat_messages 테이블에서 room_id로 필터링하고, sender_id가 userId가 아닌 메시지 조회.
+                    - chat_message_reads 테이블과 조인하여 읽음 처리되지 않은 메시지만 카운트할 것.
+                    - 또는 chat_messages의 is_read 필드를 활용할 수 있음.
+                    - 반환 타입: number (읽지 않은 메시지 개수).
+
+                4-3) markRoomAsRead(roomId: number, userId: string): Promise<void>
+                    - 특정 채팅방의 모든 읽지 않은 메시지를 읽음 처리할 것.
+                    - 해당 채팅방에서 현재 사용자가 읽지 않은 모든 메시지 ID를 조회할 것.
+                    - markMessagesAsRead 함수를 활용하여 일괄 읽음 처리할 것.
+
+            5) 차단 관련 함수 (선택사항, Phase 6에서 구현 예정이므로 기본 구조만)
+                5-1) blockUser(userId: string, blockedUserId: string): Promise<void>
+                    - 사용자를 차단할 것.
+                    - chat_blocks 테이블에 레코드 생성할 것.
+                    - 중복 차단 방지: upsert(onConflict)를 사용하여 구현할 것.
+                        - (user_id, blocked_user_id) 조합의 유니크 제약이 있다는 전제 하에
+                        - .upsert(data, { onConflict: 'user_id,blocked_user_id' }) 패턴 사용
+                        - steamGame.repository.ts의 upsert 패턴 참고
+                    - 반환 타입: void.
+
+                5-2) unblockUser(userId: string, blockedUserId: string): Promise<void>
+                    - 사용자 차단을 해제할 것.
+                    - chat_blocks 테이블에서 레코드를 삭제할 것.
+                    - 반환 타입: void.
+
+                5-3) isUserBlocked(userId: string, otherUserId: string): Promise<boolean>
+                    - 사용자가 다른 사용자를 차단했는지 확인할 것.
+                    - chat_blocks 테이블에서 조회할 것.
+                    - 반환 타입: boolean.
+
+            6) 타입 정의
+                6-1) 커스텀 타입 정의
+                    - ChatRoom: database.types.ts의 chat_rooms.Row 활용.
+                    - ChatMessage: database.types.ts의 chat_messages.Row 활용.
+                    - ChatRoomMember: database.types.ts의 chat_room_members.Row 활용.
+                    - UserProfile: database.types.ts의 user_profiles.Row 활용 (필요시).
+                    - ChatRoomListItem: 채팅방 목록 항목 (위 2-3 참고).
+
+                6-2) 함수 파라미터 타입
+                    - 모든 함수의 파라미터는 명시적 타입을 지정할 것.
+                    - uuid 타입은 string으로 처리할 것.
+                    - bigint 타입은 number로 처리할 것.
+
+            7) 구현 주의사항
+                7-1) Supabase 쿼리 패턴
+                    - .from()으로 테이블 선택.
+                    - .select()로 필요한 컬럼만 선택 (성능 최적화).
+                    - .eq(), .in() 등으로 필터링.
+                    - .order()로 정렬.
+                    - .limit(), .range()로 페이지네이션.
+                    - .insert()로 생성.
+                    - .upsert()로 생성/수정 (중복 방지 필요 시, onConflict 옵션 사용).
+                    - .update()로 수정 (필요시).
+                    - .delete()로 삭제.
+
+                7-2) 조인 쿼리
+                    - Supabase의 .select()에서 관계된 테이블 조인 가능.
+                    - 예: .select('*, user_profiles(*)')
+                    - 또는 별도 쿼리로 분리하여 처리.
+
+                7-3) 트랜잭션 처리
+                    - Supabase는 단일 쿼리만 트랜잭션 지원.
+                    - 여러 쿼리가 필요한 경우 순차 처리 후 에러 핸들링할 것.
+                    - createChatRoom의 경우 순차 처리 필수.
+
+                7-4) 에러 처리
+                    - 모든 Supabase 쿼리 결과에서 error 체크할 것.
+                    - error가 존재하면 throw error할 것.
+                    - try-catch는 호출하는 쪽(Hook 등)에서 처리할 것.
+
+==============================================
+
+구현 완료 후 아래 2가지 체크리스트를 반환할 것.
+
+1) 커서룰(@01-common.mdc, @04-func.mdc) 적용 결과 체크리스트
+   - 파일 경로 준수 여부
+   - 라이브러리 사용 규칙 준수 여부
+   - 코드 구조 및 네이밍 규칙 준수 여부
+
+2) 기능 요구사항 구현 체크리스트
+   - 채팅방 관련 함수 구현 완료 여부
+   - 메시지 관련 함수 구현 완료 여부
+   - 읽음 처리 관련 함수 구현 완료 여부
+   - 차단 관련 함수 구현 완료 여부 (선택사항)
+   - 타입 정의 완료 여부
+   - 에러 처리 구현 여부
+   - Supabase 쿼리 패턴 준수 여부
