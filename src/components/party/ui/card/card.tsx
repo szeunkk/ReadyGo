@@ -102,6 +102,9 @@ export default function Card({
   const controlLevelTestId = partyId
     ? `party-card-control-level-${partyId}`
     : undefined;
+  const joinButtonTestId = partyId
+    ? `party-card-join-button-${partyId}`
+    : undefined;
 
   return (
     <div className={containerClasses} data-testid={cardTestId}>
@@ -238,6 +241,7 @@ export default function Card({
           shape="round"
           className={styles.joinButton}
           onClick={onJoinClick}
+          data-testid={joinButtonTestId}
         >
           참여하기
         </Button>

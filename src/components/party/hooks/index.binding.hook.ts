@@ -76,7 +76,7 @@ const formatDateTime = (dateString: string, timeString: string): string => {
   return `${formattedDate} ${period} ${displayHour.toString().padStart(2, '0')}:${minute}`;
 };
 
-// voice_chat 값을 한글로 변환: 'required' → "필수 사용", 'optional' → "선택 사용", null → "선택 사용" (기본값)
+// voice_chat 값을 한글로 변환: 'required' → "필수 사용", 'optional' → "선택 사용", null → "사용 안함" (기본값)
 const getVoiceChatLabel = (voiceChat: string | null): string => {
   if (voiceChat === 'required') {
     return '필수 사용';
@@ -85,7 +85,7 @@ const getVoiceChatLabel = (voiceChat: string | null): string => {
     return '선택 사용';
   }
   // null인 경우 기본값
-  return '선택 사용';
+  return '사용 안함';
 };
 
 // control_level 값을 한글로 변환: 영어 id를 한국어 label로 변환

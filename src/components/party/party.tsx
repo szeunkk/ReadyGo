@@ -7,6 +7,7 @@ import Button from '@/commons/components/button';
 import Card from './ui/card';
 import { useLinkModal } from './hooks/index.link.modal.hook';
 import { usePartyListBinding } from './hooks/index.binding.hook';
+import { useLinkRouting } from './hooks/index.link.routing.hook';
 import styles from './styles.module.css';
 
 export default function Party() {
@@ -15,6 +16,7 @@ export default function Party() {
   );
   const { openPartySubmitModal } = useLinkModal();
   const { data: partyList, isLoading, error } = usePartyListBinding();
+  const { navigateToPartyDetail } = useLinkRouting();
 
   const genreItems: SelectboxItem[] = [
     { id: 'all', value: '모든 게임 장르' },
@@ -75,7 +77,15 @@ export default function Party() {
             <div>파티가 없습니다</div>
           ) : (
             partyList.map((party) => (
-              <Card key={party.partyId || party.title} {...party} />
+              <Card
+                key={party.partyId || party.title}
+                {...party}
+                onJoinClick={() => {
+                  if (party.partyId) {
+                    navigateToPartyDetail(party.partyId);
+                  }
+                }}
+              />
             ))
           )}
         </div>
