@@ -277,6 +277,7 @@ export const useKakaoOAuth = () => {
           scopes: 'account_email',
           queryParams: {
             scope: 'account_email',
+            prompt: 'login', // 기존 카카오 세션이 있더라도 다시 로그인하게 만듦
           },
         },
       });

@@ -14,7 +14,7 @@ database.types.ts와 본 문서는 항상 동일 커밋에 포함되어야 한�
 # Supabase Schema Analysis
 
 Schema: public  
-Total Tables: 33  
+Total Tables: 34  
 Generated from: database.types.ts
 
 ## Scope - 분석 범위
@@ -67,12 +67,14 @@ Generated from: database.types.ts
 - user_profiles
 - user_reports
 - user_settings
+- user_status
 - user_social_links
 - user_tags
 - user_traits
+- user_play_schedules
 ```
 
-📌 총 34개 (public schema 기준)
+📌 총 36개 (public schema 기준)
 
 ## Column Definition Rules
 
@@ -131,8 +133,8 @@ Generated from: database.types.ts
 
 - **Author**: ReadyGo / Eunkyoung Kim(김은경)
 - **Created At**: 2025-12-24
-- **Last Updated At**: 2025-12-24
-- **Document Version**: v1.0.0
+- **Last Updated At**: 2025-12-29
+- **Document Version**: v1.0.3
 - **Status**: Active
 - **Source of Truth**:
   - Supabase Production Database
@@ -144,3 +146,5 @@ Generated from: database.types.ts
 | ------: | ---------- | ------------------------------------------------- |
 |  v1.0.0 | 2025-12-24 | Public schema analysis based on database.types.ts |
 |  v1.0.1 | 2025-12-26 | 테이블 추가에 따른 테이블 목록 요약 수정          |
+|  v1.0.2 | 2025-12-29 | user_status 테이블 추가                           |
+|  v1.0.3 | 2025-12-29 | user_play_schedules 테이블 추가                   |

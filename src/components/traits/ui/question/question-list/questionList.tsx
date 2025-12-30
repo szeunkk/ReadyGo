@@ -58,6 +58,7 @@ export default function QuestionList({
                 isSelected ? styles.answerButtonSelected : ''
               }`}
               onClick={() => handleAnswerSelect(choice.value)}
+              data-testid={`answer-button-${choice.value}`}
             >
               <div
                 className={`${styles.answerNumber} ${

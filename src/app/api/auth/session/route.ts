@@ -174,7 +174,7 @@ export const POST = async function (request: NextRequest) {
       { status: 500 }
     );
   }
-}
+};
 
 /**
  * 세션 조회 API (토큰 자동 갱신 포함)
@@ -349,7 +349,7 @@ export const GET = async function () {
       { status: 500 }
     );
   }
-}
+};
 
 /**
  * 로그아웃 API
@@ -373,6 +373,33 @@ export const DELETE = async function () {
         },
       });
 
+      // 사용자 정보 조회 (user_status 업데이트를 위해)
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      // 로그아웃 전에 user_status를 offline으로 업데이트
+      if (user?.id) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as any).from('user_status').upsert(
+            {
+              user_id: user.id,
+              status: 'offline',
+            },
+            {
+              onConflict: 'user_id',
+            }
+          );
+        } catch (statusError) {
+          // user_status 업데이트 실패해도 로그아웃은 진행
+          console.error(
+            'Failed to update user_status to offline:',
+            statusError
+          );
+        }
+      }
+
       // Supabase 세션 제거
       await supabase.auth.signOut();
     }
@@ -390,4 +417,4 @@ export const DELETE = async function () {
     cookieStore.delete('sb-refresh-token');
     return NextResponse.json({ success: true });
   }
-}
+};

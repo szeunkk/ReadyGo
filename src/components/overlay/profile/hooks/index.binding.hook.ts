@@ -60,7 +60,8 @@ export const useProfileBinding = () => {
         // nickname: 조회된 user_profiles.nickname 사용 (null이거나 빈 문자열인 경우 빈 문자열)
         // isSteamConnected: user_profiles.steam_id가 null이 아니면 true, null이면 false
         const nickname = profile.nickname?.trim() || '';
-        const isSteamConnected = profile.steam_id !== null && profile.steam_id !== '';
+        const isSteamConnected =
+          profile.steam_id !== null && profile.steam_id !== '';
 
         setProfileData({
           nickname,

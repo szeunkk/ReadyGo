@@ -1,67 +1,58 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React from 'react';
+import { useRouter } from 'next/navigation';
 import Result from './ui/result/result';
-import { AnimalType, getAnimalTypeMeta } from '@/commons/constants/animal';
+import { AnimalType } from '@/commons/constants/animal';
 import { RadarChartData } from '@/commons/components/radar-chart';
+import { URL_PATHS } from '@/commons/constants/url';
 import styles from './styles.module.css';
 
-// Mock 데이터 - 실제로는 API나 상태 관리를 통해 전달받아야 합니다
-const MOCK_ANIMAL_TYPE = AnimalType.fox;
-const MOCK_NICKNAME = '전략적인 여우';
-const MOCK_MATCH_TYPES = ['늑대', '올빼미', '호랑이']; // 궁합 데이터 (추후 animal.compat.ts에서 가져올 예정)
-
-const getMockData = () => {
-  const animalMeta = getAnimalTypeMeta(MOCK_ANIMAL_TYPE);
-
-  // Trait 값을 실제 성향 데이터 기반으로 생성
-  // dominantTraits: 85, secondaryTraits: 65, avoidTraits: 35
-  const radarData: RadarChartData[] = [
-    { trait: 'cooperation', value: 65 }, // secondaryTraits
-    { trait: 'exploration', value: 65 }, // secondaryTraits
-    { trait: 'strategy', value: 85 }, // dominantTraits
-    { trait: 'leadership', value: 35 }, // avoidTraits
-    { trait: 'social', value: 65 }, // secondaryTraits
-  ];
-
-  return {
-    animalType: MOCK_ANIMAL_TYPE,
-    nickname: MOCK_NICKNAME,
-    radarData,
-    mainRole: {
-      label: animalMeta.mainRole.name,
-      description: animalMeta.mainRole.description,
-    },
-    subRole: {
-      label: animalMeta.subRole.name,
-      description: animalMeta.subRole.description,
-    },
-    matchTypes: MOCK_MATCH_TYPES,
-    characteristics: animalMeta.checkSentences,
+export interface TraitsResultPageProps {
+  animalType: AnimalType;
+  nickname: string;
+  radarData: RadarChartData[];
+  mainRole: {
+    label: string;
+    description: string;
   };
-};
+  subRole: {
+    label: string;
+    description: string;
+  };
+  matchTypes: string[];
+  characteristics: string[];
+}
 
-export default function TraitsResultPage() {
-  const mockData = useMemo(() => getMockData(), []);
+export default function TraitsResultPage({
+  animalType,
+  nickname,
+  radarData,
+  mainRole,
+  subRole,
+  matchTypes,
+  characteristics,
+}: TraitsResultPageProps) {
+  const router = useRouter();
 
   const handlePrevious = () => {
-    // TODO: 이전 페이지로 이동
+    router.push(URL_PATHS.TRAITS);
   };
 
   const handleComplete = () => {
-    // TODO: 홈으로 이동
+    router.push(URL_PATHS.HOME);
   };
 
   return (
     <div className={styles.page}>
       <Result
-        animalType={mockData.animalType}
-        nickname={mockData.nickname}
-        radarData={mockData.radarData}
-        mainRole={mockData.mainRole}
-        subRole={mockData.subRole}
-        matchTypes={mockData.matchTypes}
-        characteristics={mockData.characteristics}
+        animalType={animalType}
+        nickname={nickname}
+        radarData={radarData}
+        mainRole={mainRole}
+        subRole={subRole}
+        matchTypes={matchTypes}
+        characteristics={characteristics}
         onPrevious={handlePrevious}
         onComplete={handleComplete}
       />

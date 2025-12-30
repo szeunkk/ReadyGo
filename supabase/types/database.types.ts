@@ -776,6 +776,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_play_schedules: {
+        Row: {
+          created_at: string
+          day_type: string
+          id: number
+          time_slot: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day_type: string
+          id?: never
+          time_slot: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day_type?: string
+          id?: never
+          time_slot?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           animal_type: string
@@ -902,6 +926,24 @@ export type Database = {
         }
         Relationships: []
       }
+      user_status: {
+        Row: {
+          status: Database["public"]["Enums"]["user_presence_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          status?: Database["public"]["Enums"]["user_presence_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          status?: Database["public"]["Enums"]["user_presence_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_tags: {
         Row: {
           created_at: string | null
@@ -972,7 +1014,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_presence_status: "online" | "away" | "dnd" | "offline"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1099,6 +1141,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_presence_status: ["online", "away", "dnd", "offline"],
+    },
   },
 } as const

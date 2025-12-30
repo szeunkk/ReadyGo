@@ -10,6 +10,7 @@ import Selectbox, { SelectboxItem } from '@/commons/components/selectbox';
 import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
 import { usePartySubmit } from './hooks/index.submit.hook';
+import { useLinkModalClose } from './hooks/index.link.modal.close.hook';
 
 interface PartySubmitProps {
   onClose?: () => void;
@@ -18,6 +19,7 @@ interface PartySubmitProps {
 export default function PartySubmit({ onClose }: PartySubmitProps) {
   const { form, onSubmit, isSubmitting, isValid, errors } = usePartySubmit();
   const { control, setValue } = form;
+  const { openCancelModal } = useLinkModalClose();
   const [gameSearchQuery, setGameSearchQuery] = useState('');
   const [isGameOptionsOpen, setIsGameOptionsOpen] = useState(false);
   const gameSearchRef = useRef<HTMLDivElement>(null);
@@ -125,7 +127,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
   };
 
   const handlePartyCountIncrease = () => {
-    if (maxMembers < 10) {
+    if (maxMembers < 8) {
       setValue('max_members', maxMembers + 1, { shouldValidate: true });
     }
   };
@@ -446,7 +448,20 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
           </div>
 
           <div className={styles.formGroup}>
-            <Input label="태그" size="l" placeholder="#태그 입력" />
+            <Controller
+              name="tags"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Input
+                  {...field}
+                  label="태그"
+                  size="l"
+                  placeholder="#태그 입력"
+                  state={fieldState.error ? 'error' : 'Default'}
+                  additionalInfo={fieldState.error?.message}
+                />
+              )}
+            />
           </div>
         </div>
       </div>
@@ -457,7 +472,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
           variant="secondary"
           shape="rectangle"
           className={styles.cancelButton}
-          onClick={onClose}
+          onClick={openCancelModal}
         >
           취소
         </Button>

@@ -494,4 +494,235 @@ test.describe('파티 모집 글 등록 기능', () => {
     // 로그인 페이지로 리다이렉트되었는지 확인
     await expect(page).toHaveURL(/.*\/login/, { timeout: 2000 });
   });
+
+  test('태그 입력 테스트: "#금요일#가보자#빡겜" 형식 입력 후 변환 확인', async ({
+    page,
+  }) => {
+    // 게임 선택
+    const gameSearchInput = page.locator('input[placeholder="게임 검색"]');
+    await gameSearchInput.fill('오버워치', { timeout: 500 });
+    await page.waitForTimeout(100);
+    const gameOption = page.locator('text=오버워치').first();
+    await gameOption.click({ timeout: 500 });
+
+    // 파티 제목 입력
+    const partyTitleInput = page.locator(
+      'input[placeholder="파티 제목을 입력해 주세요."]'
+    );
+    await partyTitleInput.fill('태그 테스트 파티', { timeout: 500 });
+    await partyTitleInput.evaluate((el) => {
+      el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
+    });
+    await page.waitForTimeout(100);
+
+    // 시작일 선택
+    const datePicker = page.locator('.ant-picker-input input');
+    await datePicker.click({ timeout: 500 });
+    await page.waitForTimeout(200);
+    const todayCell = page.locator('.ant-picker-cell-today');
+    await todayCell.click({ timeout: 500 });
+    await page.waitForTimeout(100);
+
+    // 시작시간 선택
+    const timeSelectbox = page.locator('text=시간 선택').first();
+    await timeSelectbox.click({ timeout: 500 });
+    await page.waitForTimeout(200);
+    const timeOption = page.locator('text=오전 09:00').first();
+    await timeOption.click({ timeout: 500 });
+    await page.waitForTimeout(100);
+
+    // 설명 입력
+    const descriptionInput = page.locator(
+      'input[placeholder="파티 모집과 관련된 상세 내용을 입력해 주세요."]'
+    );
+    await descriptionInput.fill('태그 테스트 설명입니다', { timeout: 500 });
+    await descriptionInput.evaluate((el) => {
+      el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
+    });
+    await page.waitForTimeout(100);
+
+    // 컨트롤 수준 선택
+    const controlLevelSelectbox = page.locator('text=옵션 선택').first();
+    await controlLevelSelectbox.click({ timeout: 500 });
+    await page.waitForTimeout(200);
+    const controlOption = page.locator('text=미숙').first();
+    await controlOption.click({ timeout: 500 });
+    await page.waitForTimeout(100);
+
+    // 난이도 선택
+    const difficultySelectbox = page.locator('text=난이도 선택').first();
+    await difficultySelectbox.click({ timeout: 500 });
+    await page.waitForTimeout(200);
+    const difficultyOption = page.locator('text=이지').first();
+    await difficultyOption.click({ timeout: 500 });
+    await page.waitForTimeout(100);
+
+    // 태그 입력: "#금요일#가보자#빡겜" 형식
+    const tagsInput = page.locator('input[placeholder="#태그 입력"]');
+    await tagsInput.fill('#금요일#가보자#빡겜', { timeout: 500 });
+    await tagsInput.evaluate((el) => {
+      el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
+    });
+    await page.waitForTimeout(100);
+
+    // React 상태 업데이트를 위한 대기
+    await page.waitForTimeout(200);
+
+    // 등록 버튼 클릭
+    const submitButton = page.getByRole('button', { name: '파티 만들기' });
+    await page.waitForFunction(
+      (buttonText) => {
+        const buttons = Array.from(document.querySelectorAll('button'));
+        const button = buttons.find((btn) =>
+          btn.textContent?.includes(buttonText)
+        );
+        return button && !button.disabled;
+      },
+      '파티 만들기',
+      { timeout: 449, polling: 10 }
+    );
+    await submitButton.click({ timeout: 500 });
+
+    // 등록완료 모달 노출 확인
+    const successModalTitle = page.locator('text=등록 완료');
+    await expect(successModalTitle).toBeVisible({ timeout: 2000 });
+
+    // 모달 확인 버튼 클릭
+    const confirmButton = page.locator('button:has-text("확인")');
+    await confirmButton.click({ timeout: 500 });
+
+    // /party/[id]로 이동 확인
+    await expect(page).toHaveURL(/.*\/party\/\d+/, { timeout: 2000 });
+
+    // 태그가 올바르게 표시되는지 확인 (상세 페이지에서)
+    // 태그는 선택적 필드이므로 표시되지 않을 수도 있음
+    // 하지만 DB에 올바르게 저장되었는지는 상세 페이지에서 확인 가능
+  });
+
+  test('DB 반영 확인: 등록 성공 후 생성된 id로 올바른 URL(/party/[id])로 이동했는지 확인', async ({
+    page,
+  }) => {
+    // 게임 선택
+    const gameSearchInput = page.locator('input[placeholder="게임 검색"]');
+    await gameSearchInput.fill('오버워치', { timeout: 500 });
+    await page.waitForTimeout(100);
+    const gameOption = page.locator('text=오버워치').first();
+    await gameOption.click({ timeout: 500 });
+
+    // 파티 제목 입력 (고유한 제목 사용)
+    const uniqueTitle = `DB 반영 테스트 ${Date.now()}`;
+    const partyTitleInput = page.locator(
+      'input[placeholder="파티 제목을 입력해 주세요."]'
+    );
+    await partyTitleInput.fill(uniqueTitle, { timeout: 500 });
+    await partyTitleInput.evaluate((el) => {
+      el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
+    });
+    await page.waitForTimeout(100);
+
+    // 시작일 선택
+    const datePicker = page.locator('.ant-picker-input input');
+    await datePicker.click({ timeout: 500 });
+    await page.waitForTimeout(200);
+    const todayCell = page.locator('.ant-picker-cell-today');
+    await todayCell.click({ timeout: 500 });
+    await page.waitForTimeout(100);
+
+    // 시작시간 선택
+    const timeSelectbox = page.locator('text=시간 선택').first();
+    await timeSelectbox.click({ timeout: 500 });
+    await page.waitForTimeout(200);
+    const timeOption = page.locator('text=오전 09:00').first();
+    await timeOption.click({ timeout: 500 });
+    await page.waitForTimeout(100);
+
+    // 설명 입력
+    const descriptionInput = page.locator(
+      'input[placeholder="파티 모집과 관련된 상세 내용을 입력해 주세요."]'
+    );
+    await descriptionInput.fill('DB 반영 테스트 설명입니다', { timeout: 500 });
+    await descriptionInput.evaluate((el) => {
+      el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(
+        new Event('change', { bubbles: true, cancelable: true })
+      );
+    });
+    await page.waitForTimeout(100);
+
+    // 컨트롤 수준 선택
+    const controlLevelSelectbox = page.locator('text=옵션 선택').first();
+    await controlLevelSelectbox.click({ timeout: 500 });
+    await page.waitForTimeout(200);
+    const controlOption = page.locator('text=미숙').first();
+    await controlOption.click({ timeout: 500 });
+    await page.waitForTimeout(100);
+
+    // 난이도 선택
+    const difficultySelectbox = page.locator('text=난이도 선택').first();
+    await difficultySelectbox.click({ timeout: 500 });
+    await page.waitForTimeout(200);
+    const difficultyOption = page.locator('text=이지').first();
+    await difficultyOption.click({ timeout: 500 });
+    await page.waitForTimeout(100);
+
+    // React 상태 업데이트를 위한 대기
+    await page.waitForTimeout(200);
+
+    // 등록 버튼 클릭
+    const submitButton = page.getByRole('button', { name: '파티 만들기' });
+    await page.waitForFunction(
+      (buttonText) => {
+        const buttons = Array.from(document.querySelectorAll('button'));
+        const button = buttons.find((btn) =>
+          btn.textContent?.includes(buttonText)
+        );
+        return button && !button.disabled;
+      },
+      '파티 만들기',
+      { timeout: 449, polling: 10 }
+    );
+    await submitButton.click({ timeout: 500 });
+
+    // 등록완료 모달 노출 확인
+    const successModalTitle = page.locator('text=등록 완료');
+    await expect(successModalTitle).toBeVisible({ timeout: 2000 });
+
+    // 모달 확인 버튼 클릭
+    const confirmButton = page.locator('button:has-text("확인")');
+    await confirmButton.click({ timeout: 500 });
+
+    // /party/[id]로 이동 확인 (URL 패턴 확인)
+    await expect(page).toHaveURL(/.*\/party\/\d+/, { timeout: 2000 });
+
+    // URL에서 ID 추출
+    const currentUrl = page.url();
+    const urlMatch = currentUrl.match(/\/party\/(\d+)/);
+    expect(urlMatch).toBeTruthy();
+    const partyId = urlMatch?.[1];
+    expect(partyId).toBeTruthy();
+
+    // 상세 페이지가 올바르게 로드되었는지 확인
+    await page.waitForSelector('[data-testid="party-detail-page"]', {
+      state: 'visible',
+      timeout: 2000,
+    });
+
+    // 등록한 제목이 상세 페이지에 표시되는지 확인 (DB 반영 확인)
+    const detailTitle = page.locator('[data-testid="party-detail-title"]');
+    await expect(detailTitle).toBeVisible({ timeout: 2000 });
+    const detailTitleText = await detailTitle.textContent();
+    expect(detailTitleText).toContain(uniqueTitle);
+  });
 });

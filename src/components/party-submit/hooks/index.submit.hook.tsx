@@ -7,12 +7,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { Dayjs } from 'dayjs';
 
-import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/commons/providers/auth/auth.provider';
 import { useModal } from '@/commons/providers/modal';
 import { getPartyDetailUrl, URL_PATHS } from '@/commons/constants/url';
 
-// 날짜 변환: antd DatePicker의 "yy-mm-dd" 형식을 Supabase date 형식으로 변환
+// 날짜 형식 변환: antd DatePicker의 Dayjs 객체를 Supabase date 형식(YYYY-MM-DD)으로 변환
 const convertDateToSupabaseFormat = (date: Dayjs | null): string | null => {
   if (!date) {
     return null;
@@ -21,7 +20,7 @@ const convertDateToSupabaseFormat = (date: Dayjs | null): string | null => {
   return date.format('YYYY-MM-DD');
 };
 
-// 시간 변환: "오후 11:00", "오전 09:30" 형식을 Supabase time 형식(HH:mm:ss)으로 변환
+// 시간 형식 변환: "오후 11:00", "오전 09:30" 형식을 Supabase time 형식(HH:mm:ss)으로 변환
 const convertTimeToSupabaseFormat = (
   timeString: string | null
 ): string | null => {
@@ -52,6 +51,23 @@ const convertTimeToSupabaseFormat = (
   return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00`;
 };
 
+// 태그 형식 변환: "#금요일#가보자#빡겜" 형식을 "#" 기호로 분리하여 string[] 형태로 변환
+const convertTagsToArray = (
+  tagsString: string | null | undefined
+): string[] | null => {
+  if (!tagsString || tagsString.trim() === '') {
+    return null;
+  }
+
+  // "#" 기호로 분리하고, 빈 문자열 제거
+  const tags = tagsString
+    .split('#')
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length > 0);
+
+  return tags.length > 0 ? tags : null;
+};
+
 // Zod 스키마 정의
 const partySubmitSchema = z.object({
   game_title: z.string().min(1, '게임을 선택해주세요.'),
@@ -71,7 +87,7 @@ const partySubmitSchema = z.object({
   control_level: z.string().min(1, '컨트롤 수준을 선택해주세요.'),
   difficulty: z.string().min(1, '난이도를 선택해주세요.'),
   voice_chat: z.enum(['required', 'optional']).nullable().optional(),
-  tags: z.array(z.string()).optional(),
+  tags: z.string().optional(), // "#금요일#가보자#빡겜" 형식으로 입력받음
 });
 
 export type PartySubmitFormData = z.infer<typeof partySubmitSchema>;
@@ -99,7 +115,7 @@ export const usePartySubmit = (options?: UsePartySubmitOptions) => {
       control_level: '',
       difficulty: '',
       voice_chat: null,
-      tags: [],
+      tags: '',
     },
     mode: 'onChange',
   });
@@ -124,19 +140,23 @@ export const usePartySubmit = (options?: UsePartySubmitOptions) => {
     setIsSubmitting(true);
 
     try {
-      // 날짜/시간 변환
+      // 날짜/시간/태그 변환
       const supabaseDate = convertDateToSupabaseFormat(data.start_date);
       const supabaseTime = convertTimeToSupabaseFormat(data.start_time);
+      const supabaseTags = convertTagsToArray(data.tags);
 
       if (!supabaseDate || !supabaseTime) {
         throw new Error('날짜 또는 시간 형식이 올바르지 않습니다.');
       }
 
-      // Supabase에 insert
-      const { data: insertData, error } = await supabase
-        .from('party_posts')
-        .insert({
-          creator_id: user.id,
+      // API Route를 통해 파티 생성
+      const response = await fetch('/api/party', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // HttpOnly 쿠키 포함 (중요!)
+        body: JSON.stringify({
           game_title: data.game_title,
           party_title: data.party_title,
           start_date: supabaseDate,
@@ -146,14 +166,21 @@ export const usePartySubmit = (options?: UsePartySubmitOptions) => {
           control_level: data.control_level,
           difficulty: data.difficulty,
           voice_chat: data.voice_chat || null,
-          tags: data.tags && data.tags.length > 0 ? data.tags : null,
-        })
-        .select('id')
-        .single();
+          tags: supabaseTags,
+        }),
+      });
 
-      if (error) {
-        throw error;
+      // 응답 상태 확인
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('인증이 필요합니다.');
+        }
+        const errorData = await response.json();
+        throw new Error(errorData.error || '파티 등록 중 오류가 발생했습니다.');
       }
+
+      // JSON 파싱
+      const { data: insertData } = await response.json();
 
       if (!insertData || !insertData.id) {
         throw new Error('등록된 파티 ID를 가져올 수 없습니다.');
