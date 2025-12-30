@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  width: fit-content;
+  width: 100%;
   height: fit-content;
 }
 
@@ -69,46 +69,46 @@
 /* 매치 카드 그리드 */
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 24px;
   width: 100%;
 }
 
 /* side-panel이 열렸을 때 그리드 (3열 x 4행) */
 .gridWithPanel {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-/* 반응형 레이아웃 - 대형 데스크탑 (1920px 이상) */
+/* 반응형 레이아웃 - 대형 데스크탑 (1920px 이상) - 4열 고정 */
 @media (min-width: 1920px) {
   .grid {
-    grid-template-columns: repeat(4, auto);
+    grid-template-columns: repeat(4, 396px);
   }
 
   .gridWithPanel {
-    grid-template-columns: repeat(3, auto);
+    grid-template-columns: repeat(3, 396px);
   }
 }
 
-/* 반응형 레이아웃 - 중형 데스크탑 (1440px ~ 1920px) */
+/* 반응형 레이아웃 - 중형 데스크탑 (1440px ~ 1919px) - 3열 유연 */
 @media (min-width: 1440px) and (max-width: 1919px) {
   .grid {
-    grid-template-columns: repeat(3, auto);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .gridWithPanel {
-    grid-template-columns: repeat(2, auto);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-/* 반응형 레이아웃 - 소형 데스크탑 (1024px ~ 1440px) */
+/* 반응형 레이아웃 - 소형 데스크탑 (1024px ~ 1439px) - 3열 유연 */
 @media (min-width: 1024px) and (max-width: 1439px) {
   .grid {
-    grid-template-columns: repeat(3, auto);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .gridWithPanel {
-    grid-template-columns: repeat(2, auto);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
