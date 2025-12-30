@@ -15,22 +15,23 @@
   flex-direction: column;
   gap: 32px;
   flex: 1;
+  min-width: 408px;
   max-width: 1336px;
   width: 100%;
   transition: margin-right 0.25s ease;
 }
 
-/* 반응형 디자인 - 중형 데스크탑 (1440px ~ 1920px) */
-@media (min-width: 1440px) and (max-width: 1919px) {
+/* 반응형 디자인 - 중형 데스크탑 (1440px ~ 1799px) - 3열 */
+@media (min-width: 1440px) and (max-width: 1799px) {
   .leftSection {
-    max-width: 900px;
+    max-width: 1200px;
   }
 }
 
-/* 반응형 디자인 - 대형 데스크탑 (1920px 이상) */
-@media (min-width: 1920px) {
+/* 반응형 디자인 - 대형 데스크탑 (1800px 이상) - 4열 */
+@media (min-width: 1800px) {
   .leftSection {
-    max-width: 1760px;
+    max-width: 1600px;
   }
 }
 
@@ -54,6 +55,8 @@
   flex-direction: column;
   gap: 30px;
   width: 408px;
+  min-width: 408px;
+  max-width: 408px;
   flex-shrink: 0;
 }
 
@@ -112,10 +115,7 @@
     gap: 24px;
   }
 
-  .rightSection {
-    width: 100%;
-    max-width: 100%;
-  }
+  /* rightSection은 항상 408px 유지 */
 }
 
 /* 반응형 디자인 - 모바일 (768px 이하) */

@@ -3,7 +3,7 @@
   background-color: var(--color-bg-secondary);
   border-radius: 24px;
   padding: 32px;
-  width: 408px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -109,7 +109,8 @@
   line-height: var(--typo-body-md-line-height);
   color: var(--color-text-secondary);
   margin: 0;
-  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 /* 선호도 섹션 */
@@ -128,6 +129,7 @@
   padding: 6px 12px;
   background-color: var(--color-bg-primary);
   border-radius: 8px;
+  min-width: 0;
 }
 
 /* 선호도 아이콘 및 라벨 */
@@ -156,7 +158,8 @@
   line-height: var(--typo-body-md-line-height);
   color: var(--color-text-primary);
   white-space: nowrap;
-  width: 80px;
+  min-width: 80px;
+  flex-shrink: 0;
 }
 
 /* 선호도 값 */
@@ -167,6 +170,10 @@
   line-height: var(--typo-body-md-line-height);
   color: var(--color-text-interactive-secondary);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
 /* 프로필 보기 버튼 */
@@ -176,23 +183,47 @@
   padding: 14px 20px;
 }
 
-/* 반응형 - 중형 데스크탑 (1440px ~ 1920px) */
-@media (min-width: 1440px) and (max-width: 1919px) {
+/* 반응형 - 태블릿 */
+@media (max-width: 1024px) {
   .container {
-    width: 408px;
+    padding: 24px;
+  }
+
+  .content {
+    gap: 24px;
+  }
+}
+
+/* 반응형 - 중형 데스크탑 (1440px ~ 1799px) - 3열 */
+@media (min-width: 1440px) and (max-width: 1799px) {
+  .container {
+    padding: 24px;
+  }
+
+  .content {
+    gap: 24px;
+  }
+
+  .questionSection {
+    gap: 12px;
+  }
+}
+
+/* 반응형 - 대형 데스크탑 (1800px 이상) - 4열 */
+@media (min-width: 1800px) {
+  .container {
+    padding: 28px;
   }
 }
 
 /* 반응형 - 모바일 */
 @media (max-width: 768px) {
   .container {
-    width: 100%;
-    max-width: 396px;
-    padding: 24px;
+    padding: 20px;
   }
 
   .content {
-    gap: 24px;
+    gap: 20px;
   }
 
   .questionSection {

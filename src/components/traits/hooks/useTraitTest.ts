@@ -40,7 +40,7 @@ export const useTraitTest = () => {
    * 다음 단계로 이동
    */
   const next = () => {
-    setCurrentIndex((i) => Math.min(i + 1, totalSteps));
+    setCurrentIndex((i) => Math.min(i + 1, totalSteps - 1));
   };
 
   /**
