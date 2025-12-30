@@ -1,7 +1,17 @@
 import { useTraitTest } from './useTraitTest';
 import { useTraitAnswers } from './useTraitAnswers';
 import { useTraitResult } from './useTraitResult';
-import type { AnswerType } from './useTraitAnswers';
+import type { AnswerType, ScheduleAnswer } from './useTraitAnswers';
+
+/**
+ * API 제출용 Payload 타입
+ */
+export interface TraitSubmitPayload {
+  traits: Record<string, number>;
+  animalType: string;
+  dayTypes: string[];
+  timeSlots: string[];
+}
 
 /**
  * 성향 테스트 통합 관리 Hook
@@ -10,9 +20,11 @@ import type { AnswerType } from './useTraitAnswers';
  * - 결과 계산
  * - 테스트 완료 시 콜백 실행
  *
- * @param onComplete - 테스트 완료 시 실행될 콜백 함수
+ * @param onComplete - 테스트 완료 시 실행될 콜백 함수 (payload 전달)
  */
-export const useTraitSurvey = (onComplete?: () => void) => {
+export const useTraitSurvey = (
+  onComplete?: (payload: TraitSubmitPayload) => void
+) => {
   // 질문 흐름 관리
   const {
     currentQuestion,
@@ -46,7 +58,15 @@ export const useTraitSurvey = (onComplete?: () => void) => {
       next();
     } else {
       // 마지막 질문인 경우 완료 콜백 실행
-      onComplete?.();
+      // payload 생성 및 전달
+      const scheduleAnswer = answer as ScheduleAnswer;
+      const payload: TraitSubmitPayload = {
+        traits: traitScores,
+        animalType,
+        dayTypes: scheduleAnswer.dayTypes,
+        timeSlots: scheduleAnswer.timeSlots,
+      };
+      onComplete?.(payload);
     }
   };
 

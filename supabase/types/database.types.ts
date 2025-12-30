@@ -776,6 +776,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_play_schedules: {
+        Row: {
+          created_at: string
+          day_type: string
+          id: number
+          time_slot: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day_type: string
+          id?: never
+          time_slot: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day_type?: string
+          id?: never
+          time_slot?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           animal_type: string

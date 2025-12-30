@@ -82,6 +82,7 @@ export default function QuestionSchedule({
                     isSelected ? styles.scheduleButtonSelected : ''
                   }`}
                   onClick={() => handleDayTypeSelect(id)}
+                  data-testid={`schedule-day-${id}`}
                 >
                   <span
                     className={`${styles.scheduleButtonText} ${
@@ -109,6 +110,7 @@ export default function QuestionSchedule({
                     isSelected ? styles.scheduleButtonSelected : ''
                   }`}
                   onClick={() => handleTimeSlotSelect(id)}
+                  data-testid={`schedule-time-${id}`}
                 >
                   <span
                     className={`${styles.scheduleButtonText} ${

@@ -1,6 +1,6 @@
 # Table Details(ReadyGo)
 
-본 문서는 ReadyGo 서비스의 public schema 전체 테이블(34개)에 대한 상세 정의 문서이다.
+본 문서는 ReadyGo 서비스의 public schema 전체 테이블(36개)에 대한 상세 정의 문서이다.
 
 ### Source of Truth (SSOT)
 
@@ -82,7 +82,19 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | social      | int         | ❌       | 교류 성향 점수 |
 | updated_at  | timestamptz | ⭕       | 수정 시각      |
 
-#### 5. user_social_links
+#### 5. user_play_schedules
+
+- 유저 플레이 성향 테이블
+
+| Column     | Type        | Nullable | Description                       |
+| ---------- | ----------- | -------- | --------------------------------- |
+| id         | bigint      | ❌       | PK                                |
+| user_id    | uuid        | ❌       | 유저                              |
+| day_type   | text        | ❌       | weekday, weekend                  |
+| time_slot  | text        | ❌       | dawn, morning, afternoon, evening |
+| created_at | timestamptz | ❌       | 생성 시각                         |
+
+#### 6. user_social_links
 
 - 유저 외부 링크
 
@@ -94,7 +106,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | url        | text        | ⭕       | 링크 URL    |
 | created_at | timestamptz | ⭕       | 생성 시각   |
 
-#### 6. user_tags
+#### 7. user_tags
 
 - 유저-태그 매핑
 
@@ -105,7 +117,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | tag_id     | bigint      | ⭕       | 태그 ID     |
 | created_at | timestamptz | ⭕       | 생성 시각   |
 
-#### 7. tags
+#### 8. tags
 
 - 태그 마스터
 
@@ -115,7 +127,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | name       | text        | ⭕       | 태그 이름   |
 | created_at | timestamptz | ⭕       | 생성 시각   |
 
-#### 8. user_reports
+#### 9. user_reports
 
 - 유저 신고
 
@@ -132,7 +144,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 ### 2️⃣ Chat Domain
 
-#### 9. chat_rooms
+#### 10. chat_rooms
 
 - 채팅방
 
@@ -142,7 +154,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | type       | text        | ⭕       | 채팅방 타입 (direct) |
 | created_at | timestamptz | ⭕       | 생성 시각            |
 
-#### 10. chat_room_members
+#### 11. chat_room_members
 
 - 채팅방 참여자
 
@@ -153,7 +165,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | user_id   | uuid        | ⭕       | 참여 유저   |
 | joined_at | timestamptz | ⭕       | 참여 시각   |
 
-#### 11. chat_messages
+#### 12. chat_messages
 
 - 채팅 메시지
 
@@ -167,7 +179,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | is_read      | boolean     | ⭕       | 읽음 여부   |
 | created_at   | timestamptz | ⭕       | 전송 시각   |
 
-#### 12. chat_message_reads
+#### 13. chat_message_reads
 
 - 메시지 읽음 기록
 
@@ -178,7 +190,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | user_id    | uuid        | ⭕       | 읽은 유저   |
 | read_at    | timestamptz | ⭕       | 읽은 시각   |
 
-#### 13. chat_blocks
+#### 14. chat_blocks
 
 - 채팅 차단
 
@@ -193,7 +205,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 ### 3️⃣ Party Domain
 
-#### 14. party_posts
+#### 15. party_posts
 
 - 파티 모집글
 
@@ -214,7 +226,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | status        | text        | ❌       | 모집 상태(default: recruiting)                   |
 | created_at    | timestamptz | ❌       | 생성 시각(default: now())                        |
 
-#### 15. party_members
+#### 16. party_members
 
 - 파티 참여자
 
@@ -226,7 +238,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | role      | text        | ⭕       | 역할        |
 | joined_at | timestamptz | ⭕       | 참여 시각   |
 
-#### 16. party_messages
+#### 17. party_messages
 
 - 파티 채팅
 
@@ -238,7 +250,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | content    | text        | ⭕       | 메시지      |
 | created_at | timestamptz | ⭕       | 전송 시각   |
 
-#### 17. party_activity_logs
+#### 18. party_activity_logs
 
 - 파티 활동 로그
 
@@ -254,7 +266,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 ### 4️⃣ Match Domain
 
-#### 18. match_scores
+#### 19. match_scores
 
 - 매칭 점수
 
@@ -266,7 +278,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | similarity_score | int         | ⭕       | 매칭 점수   |
 | calculated_at    | timestamptz | ⭕       | 계산 시각   |
 
-#### 19. match_filters
+#### 20. match_filters
 
 - 매칭 필터
 
@@ -279,7 +291,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | mode            | text        | ⭕       | 플레이 모드 |
 | updated_at      | timestamptz | ⭕       | 수정 시각   |
 
-#### 20. match_recent_views
+#### 21. match_recent_views
 
 - 최근 조회
 
@@ -294,7 +306,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 ### 5️⃣ Steam Domain
 
-#### 21. steam_user_games
+#### 22. steam_user_games
 
 - 유저 게임 기록
 
@@ -309,7 +321,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | last_played      | timestamptz | ⭕       | 마지막 실행 시각 |
 | created_at       | timestamptz | ⭕       | 생성 시각        |
 
-#### 22. steam_game_info
+#### 23. steam_game_info
 
 - 게임 메타
 
@@ -323,7 +335,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | header_image      | text        | ⭕       | 헤더 이미지         |
 | created_at        | timestamptz | ⭕       | 생성 시각           |
 
-#### 23. steam_sync_logs
+#### 24. steam_sync_logs
 
 - 유저 단위 Steam 동기화 세션 로그
 
@@ -335,7 +347,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | synced_games_count | int         | ⭕       | 동기화 게임 수 |
 | synced_at          | timestamptz | ⭕       | 동기화 시각    |
 
-#### 24. steam_game_sync_logs
+#### 25. steam_game_sync_logs
 
 - 게임 단위 Steam 메타 동기화 상세 로그
 
@@ -352,7 +364,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 ### 6️⃣ Social / Interaction Domain
 
-#### 25. friend_requests
+#### 26. friend_requests
 
 - 유저 간 친구 요청 상태
 - 요청 생성, 수락, 거절 등 관계 형성 이전 단계 기록
@@ -365,7 +377,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | status      | text        | ⭕       | 요청 상태      |
 | created_at  | timestamptz | ⭕       | 요청 시각      |
 
-#### 26. friendships
+#### 27. friendships
 
 - 친구로 연결된 유저 간의 관계 정보
 - 쌍방 관계를 하나의 레코드로 관리
@@ -378,7 +390,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | status     | text        | ⭕       | 관계 상태   |
 | created_at | timestamptz | ⭕       | 생성 시각   |
 
-#### 27. reviews
+#### 28. reviews
 
 - 파티 또는 플레이 이후 유저가 남긴 평가 기록
 - 매너, 협업, 소통 등 점수 및 코멘트 포함
@@ -399,7 +411,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 ### 7️⃣ System / Logs Domain
 
-#### 28. analytics_user_actions
+#### 29. analytics_user_actions
 
 - 행동 로그
 
@@ -411,7 +423,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | target_id  | text        | ⭕       | 행동 대상 식별자   |
 | created_at | timestamptz | ⭕       | 행동 발생 시각     |
 
-#### 29. event_logs
+#### 30. event_logs
 
 - 서비스 이벤트 기록 테이블
 - 유저 행동 또는 시스템 이벤트를 구조적으로 기록
@@ -424,7 +436,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | metadata   | jsonb       | ⭕       | 이벤트 데이터 |
 | created_at | timestamptz | ⭕       | 발생 시각     |
 
-#### 30. error_logs
+#### 31. error_logs
 
 - 시스템 에러 기록 테이블
 - 서버/클라이언트/배치 작업 등에서 발생한 오류를 기록
@@ -437,7 +449,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | stacktrace | text        | ⭕       | 스택 트레이스  |
 | created_at | timestamptz | ⭕       | 발생 시각      |
 
-#### 31. bans
+#### 32. bans
 
 - 유저 제재 정보 테이블
 - 일시적 또는 영구 제재 상태 관리
@@ -450,7 +462,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | expires_at | timestamptz | ⭕       | 제재 만료 시각 |
 | created_at | timestamptz | ⭕       | 제재 생성 시각 |
 
-#### 32. temperature_logs
+#### 33. temperature_logs
 
 - 유저 온도 점수 변경 로그
 - 후기, 신고, 시스템 판단에 따른 점수 변화 기록
@@ -463,7 +475,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | reason     | text        | ⭕       | 변경 사유   |
 | created_at | timestamptz | ⭕       | 발생 시각   |
 
-#### 33. tier_history
+#### 34. tier_history
 
 - 유저 티어 변경 이력 테이블
 - 티어 상승/하락 이력 보존
@@ -476,7 +488,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | current_tier  | text        | ⭕       | 변경 후 티어 |
 | changed_at    | timestamptz | ⭕       | 변경 시각    |
 
-#### 34. notifications
+#### 35. notifications
 
 - 유저에게 전달되는 시스템 알림 테이블
 
@@ -490,7 +502,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | is_read    | boolean     | ⭕       | 읽음 여부      |
 | created_at | timestamptz | ⭕       | 생성 시각      |
 
-#### 35. push_tokens
+#### 36. push_tokens
 
 - 푸시 알림 전송을 위한 디바이스 토큰 관리 테이블
 
@@ -514,7 +526,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 - **Author**: ReadyGo / Eunkyoung Kim(김은경)
 - **Created At**: 2025-12-24
 - **Last Updated At**: 2025-12-29
-- **Document Version**: v1.0.0
+- **Document Version**: v1.0.7
 - **Status**: Active
 - **Source of Truth**:
   - Supabase Production Database
@@ -522,12 +534,13 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 ## Version History
 
-| Version | Date       | Description                                                                              |
-| ------: | ---------- | ---------------------------------------------------------------------------------------- |
-|  v1.0.0 | 2025-12-24 | Detailed table & column documentation (33 tables)                                        |
-|  v1.0.1 | 2025-12-26 | steam_game_info 테이블 컬럼 추가 및 수정                                                 |
-|  v1.0.2 | 2025-12-26 | steam_game_info categories, genres 컬럼 수정(jsonb[], text[])                            |
-|  v1.0.3 | 2025-12-26 | 게임 단위 Steam 메타 동기화 상세 로그 확인을 위한 steam_game_sync_logs 테이블 추가       |
-|  v1.0.4 | 2025-12-27 | party_posts 컬럼 NOT NULL 정리 및 RLS 정책 적용(생성자만 수정 가능, 인증 유저 조회 허용) |
-|  v1.0.5 | 2025-12-27 | title => game_title 컬럼 명 변경                                                         |
-|  v1.0.6 | 2025-12-29 | User/Profile Domain에 user_status 테이블 추가                                            |
+| Version | Date       | Description                                                                               |
+| ------: | ---------- | ----------------------------------------------------------------------------------------- |
+|  v1.0.0 | 2025-12-24 | Detailed table & column documentation (33 tables)                                         |
+|  v1.0.1 | 2025-12-26 | steam_game_info 테이블 컬럼 추가 및 수정                                                  |
+|  v1.0.2 | 2025-12-26 | steam_game_info categories, genres 컬럼 수정(jsonb[], text[])                             |
+|  v1.0.3 | 2025-12-26 | 게임 단위 Steam 메타 동기화 상세 로그 확인을 위한 steam_game_sync_logs 테이블 추가        |
+|  v1.0.4 | 2025-12-27 | party_posts 컬럼 NOT NULL 정리 및 RLS 정책 적용(생성자만 수정 가능, 인증 유저 조회 허용)  |
+|  v1.0.5 | 2025-12-27 | title => game_title 컬럼 명 변경                                                          |
+|  v1.0.6 | 2025-12-29 | User/Profile Domain에 user_status 테이블 추가                                             |
+|  v1.0.7 | 2025-12-29 | user_play_schedules 테이블 추가, 테이블 번호 순서 정리 (5번 중복 해결, 6~36번으로 재정렬) |

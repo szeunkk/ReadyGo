@@ -1,4 +1,5 @@
 // traits/hooks/useTraitResult.ts
+
 import { useMemo } from 'react';
 import type { AnswerType } from './useTraitAnswers';
 import { calculateTraitScores } from '../domain/calculateTraitScores';

@@ -1,0 +1,104 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+            - Next.js App Router Route Handler 규칙 준수
+            - Router Handler는 인증 + 조회 orchestration만 담당하며, 비즈니스 계산 로직을 포함하지 않는다.
+	        - console.log / console.error 사용 금지
+	        - FE 계산 로직, 임시 데이터, mock 사용 금지
+	        - DB는 Supabase client (RLS 기반)만 사용
+	        - service_role key 사용 금지
+	        - 인증 정보는 supabase.auth.getUser() 결과만 신뢰
+	        - 에러 응답은 { message, detail } 형태로 통일
+	        - Supabase 조회 결과가 null일 수 있는 경우를 고려하여 명시적으로 분기 처리한다 (예: row 없음 → 404)
+
+==============================================
+
+조건-파일경로) 참고 및 기준 파일 경로는 다음과 같음
+            - 구현 대상 파일 경로
+                - Route Handler
+                    - src/app/api/traits/result/route.ts
+                    - 책임: 인증, 조회 요청 검증, service 호출, 응답 반환
+                    - Route Handler에서 Supabase 쿼리를 직접 호출하는 구현을 허용하지 않는다.
+                
+                - Service 레이어
+                    - src/services/traits/getTraitsResult.service.ts
+                    - 책임
+                        - userId를 입력으로 받는다
+                        - traits/profile/schedule 조회 흐름을 orchestration 한다
+                        - repository 함수들을 조합하여 경과 DTO를 구성한다
+                        - 조회 실패 시 에러를 throw 한다
+
+                - Repository 레이어
+                    - src/repositories/userTraits.repository.ts: user_traits 조회
+                    - src/repositories/userProfiles.repository.ts: user_profiles 조회 (animal_type)
+                    - src/repositories/userPlaySchedules.repository.ts: user_play_schedules 조회
+
+            - supabase 서버 클라이언트 생성 유틸: src/lib/supabase/server.ts
+            - 포함되어야 하는 타입 / 상수
+                - TraitKey: src/commons/constants/animal/trait.enum.ts
+                - AnimalType: src/commons/constants/animal/animal.enum.ts
+                - DayTypes, TimeSlots: src/components/traits/data/questionSchedule.ts
+
+==============================================
+
+조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
+            - POST  /api/traits/submit Route Handler 구조
+            - supabase.auth.getUser() -> user.id 기준 처리 패턴
+            - RLS 기반 .eq(‘user_id’, user.id) 쿼리 패턴
+            - user_play_schedules 조회 결과를 FE 바인딩에 적합한 형태로 가공하며, 필요 시 Set으로 중복 제거한다
+
+==============================================
+
+핵심요구사항) 다음 기능을 step-by-step 으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
+	1.	GET /api/traits/result Route Handler 생성
+	2.	요청 진입 시 supabase.auth.getUser() 호출
+	3.	비로그인 상태면 즉시 401 반환
+	4.	user_id는 auth.user.id만 사용 (query/body 무시)
+	5.	아래 테이블을 모두 user_id 기준으로 조회
+	    - user_traits
+	    - user_profiles
+	    - user_play_schedules
+	6.	user_traits row가 없으면 404 + { message: ‘traits not found’ } 반환
+	7.	trait 점수 5개를 traits 객체로 매핑
+	8.	user_profiles.animal_type → animalType으로 매핑
+	9.	user_play_schedules rows를 가공하여
+	    - dayTypes: string[]
+	    - timeSlots: string[]
+	    - Set을 사용해 중복 제거
+	10.	최종 응답을 아래 구조로 반환
+        {
+            traits: {
+                cooperation: number;
+                exploration: number;
+                strategy: number;
+                leadership: number;
+                social: number;
+            };
+            animalType: string;
+            schedule: {
+                dayTypes: string[];
+                timeSlots: string[];
+            };
+        }
+	11.	user_traits 외의 보조 데이터(user_profiles, schedule)가 비어 있더라도 API가 500으로 크래시하지 않도록 처리
+	12.	모든 실패 케이스는 상태 코드 + { message, detail } 반환
+
+==============================================
+
+구현 완료 후 반환 체크리스트) 구현 완료 후 아래 체크리스트를 반환할 것.
+            - GET /api/traits/result Route Handler 구현
+	        - 인증 실패 시 401 반환
+	        - user_id 주입 차단 확인
+	        - user_traits 기준 404 처리
+	        - traits / animalType / schedule 응답 구조 일치
+	        - schedule 중복 제거 적용
+	        - RLS 기반 쿼리만 사용
+	        - console 출력 없음
+	        - 에러 응답 포맷 통일
+	        - FE 추가 가공 없이 사용 가능
+
