@@ -115,12 +115,42 @@ const getDifficultyLabel = (difficulty: string): string => {
 
 // Mock 데이터: party_members
 const mockPartyMembers: MockPartyMember[] = [
-  { post_id: 1, user_id: 'user-1', role: 'member', joined_at: '2024-01-01T00:00:00Z' },
-  { post_id: 1, user_id: 'user-2', role: 'member', joined_at: '2024-01-01T00:00:00Z' },
-  { post_id: 2, user_id: 'user-3', role: 'member', joined_at: '2024-01-01T00:00:00Z' },
-  { post_id: 2, user_id: 'user-4', role: 'member', joined_at: '2024-01-01T00:00:00Z' },
-  { post_id: 2, user_id: 'user-5', role: 'member', joined_at: '2024-01-01T00:00:00Z' },
-  { post_id: 3, user_id: 'user-6', role: 'member', joined_at: '2024-01-01T00:00:00Z' },
+  {
+    post_id: 1,
+    user_id: 'user-1',
+    role: 'member',
+    joined_at: '2024-01-01T00:00:00Z',
+  },
+  {
+    post_id: 1,
+    user_id: 'user-2',
+    role: 'member',
+    joined_at: '2024-01-01T00:00:00Z',
+  },
+  {
+    post_id: 2,
+    user_id: 'user-3',
+    role: 'member',
+    joined_at: '2024-01-01T00:00:00Z',
+  },
+  {
+    post_id: 2,
+    user_id: 'user-4',
+    role: 'member',
+    joined_at: '2024-01-01T00:00:00Z',
+  },
+  {
+    post_id: 2,
+    user_id: 'user-5',
+    role: 'member',
+    joined_at: '2024-01-01T00:00:00Z',
+  },
+  {
+    post_id: 3,
+    user_id: 'user-6',
+    role: 'member',
+    joined_at: '2024-01-01T00:00:00Z',
+  },
 ];
 
 // Mock 데이터: user_profiles
@@ -139,14 +169,12 @@ const mockUserProfiles: MockUserProfile[] = [
 const getMemberAvatars = (postId: number): string[] => {
   // 해당 파티의 참여자 찾기
   const members = mockPartyMembers.filter((m) => m.post_id === postId);
-  
+
   // 참여자 수만큼 동물 아바타 생성 (최대 4개)
-  const avatars = members
-    .slice(0, 4)
-    .map((member) => {
-      const profile = mockUserProfiles.find((p) => p.user_id === member.user_id);
-      return profile?.animal_type || 'default';
-    });
+  const avatars = members.slice(0, 4).map((member) => {
+    const profile = mockUserProfiles.find((p) => p.user_id === member.user_id);
+    return profile?.animal_type || 'default';
+  });
 
   return avatars;
 };
@@ -157,7 +185,10 @@ const getCurrentMembers = (postId: number): number => {
 };
 
 // description이 카드 사이즈를 넘어가는 경우 "..."으로 표현하여 카드 사이즈를 넘어가지 않도록 처리
-const truncateDescription = (description: string, maxLength: number = 100): string => {
+const truncateDescription = (
+  description: string,
+  maxLength: number = 100
+): string => {
   if (description.length <= maxLength) {
     return description;
   }
@@ -189,13 +220,19 @@ export const usePartyListBinding = (): UsePartyListBindingReturn => {
         if (!response.ok) {
           if (response.status >= 400 && response.status < 500) {
             const errorData = await response.json().catch(() => ({}));
-            console.error('파티 목록 조회 실패:', errorData.error || '클라이언트 오류');
+            console.error(
+              '파티 목록 조회 실패:',
+              errorData.error || '클라이언트 오류'
+            );
             setData([]);
             return;
           }
           if (response.status >= 500) {
             const errorData = await response.json().catch(() => ({}));
-            console.error('파티 목록 조회 실패:', errorData.error || '서버 오류');
+            console.error(
+              '파티 목록 조회 실패:',
+              errorData.error || '서버 오류'
+            );
             setData([]);
             return;
           }
@@ -217,7 +254,7 @@ export const usePartyListBinding = (): UsePartyListBindingReturn => {
         const transformedData: PartyCardProps[] = partyList.map((party) => {
           // memberAvatars 생성 (Mock 데이터 사용)
           const memberAvatars = getMemberAvatars(party.id);
-          
+
           // currentMembers 계산 (Mock 데이터 사용)
           const currentMembers = getCurrentMembers(party.id);
 
@@ -257,4 +294,3 @@ export const usePartyListBinding = (): UsePartyListBindingReturn => {
 
   return { data, isLoading, error };
 };
-

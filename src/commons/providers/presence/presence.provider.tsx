@@ -33,20 +33,23 @@ export const PresenceProvider = ({ children }: PresenceProviderProps) => {
       // user.id가 null로 변경된 경우(로그아웃) cleanup 수행
       if (channelRef.current) {
         // Presence를 먼저 untrack하여 다른 클라이언트에 leave 이벤트 전송
-        channelRef.current.untrack().then(() => {
-          // untrack 완료 후 채널 제거
-          baseSupabase.removeChannel(channelRef.current!);
-          channelRef.current = null;
-          subscribedUserIdRef.current = null;
-          setPresenceUserIds([]);
-        }).catch((error) => {
-          // untrack 실패해도 채널은 제거
-          console.error('Failed to untrack presence:', error);
-          baseSupabase.removeChannel(channelRef.current!);
-          channelRef.current = null;
-          subscribedUserIdRef.current = null;
-          setPresenceUserIds([]);
-        });
+        channelRef.current
+          .untrack()
+          .then(() => {
+            // untrack 완료 후 채널 제거
+            baseSupabase.removeChannel(channelRef.current!);
+            channelRef.current = null;
+            subscribedUserIdRef.current = null;
+            setPresenceUserIds([]);
+          })
+          .catch((error) => {
+            // untrack 실패해도 채널은 제거
+            console.error('Failed to untrack presence:', error);
+            baseSupabase.removeChannel(channelRef.current!);
+            channelRef.current = null;
+            subscribedUserIdRef.current = null;
+            setPresenceUserIds([]);
+          });
       }
       return;
     }
@@ -112,8 +115,15 @@ export const PresenceProvider = ({ children }: PresenceProviderProps) => {
             if (Array.isArray(presences)) {
               presences.forEach((presence) => {
                 // presence 객체는 track할 때 전달한 데이터를 포함
-                const presenceData = presence as { user_id?: string; joined_at?: string; [key: string]: unknown };
-                if (presenceData.user_id && typeof presenceData.user_id === 'string') {
+                const presenceData = presence as {
+                  user_id?: string;
+                  joined_at?: string;
+                  [key: string]: unknown;
+                };
+                if (
+                  presenceData.user_id &&
+                  typeof presenceData.user_id === 'string'
+                ) {
                   if (!userIds.includes(presenceData.user_id)) {
                     userIds.push(presenceData.user_id);
                   }
@@ -169,20 +179,23 @@ export const PresenceProvider = ({ children }: PresenceProviderProps) => {
     return () => {
       if (channelRef.current) {
         // Presence를 먼저 untrack하여 다른 클라이언트에 leave 이벤트 전송
-        channelRef.current.untrack().then(() => {
-          // untrack 완료 후 채널 제거
-          baseSupabase.removeChannel(channelRef.current!);
-          channelRef.current = null;
-          subscribedUserIdRef.current = null;
-          setPresenceUserIds([]);
-        }).catch((error) => {
-          // untrack 실패해도 채널은 제거
-          console.error('Failed to untrack presence:', error);
-          baseSupabase.removeChannel(channelRef.current!);
-          channelRef.current = null;
-          subscribedUserIdRef.current = null;
-          setPresenceUserIds([]);
-        });
+        channelRef.current
+          .untrack()
+          .then(() => {
+            // untrack 완료 후 채널 제거
+            baseSupabase.removeChannel(channelRef.current!);
+            channelRef.current = null;
+            subscribedUserIdRef.current = null;
+            setPresenceUserIds([]);
+          })
+          .catch((error) => {
+            // untrack 실패해도 채널은 제거
+            console.error('Failed to untrack presence:', error);
+            baseSupabase.removeChannel(channelRef.current!);
+            channelRef.current = null;
+            subscribedUserIdRef.current = null;
+            setPresenceUserIds([]);
+          });
       }
     };
   }, [user?.id, setPresenceUserIds]);
@@ -190,4 +203,3 @@ export const PresenceProvider = ({ children }: PresenceProviderProps) => {
   // UI를 렌더링하지 않는 bootstrap Provider
   return <>{children}</>;
 };
-

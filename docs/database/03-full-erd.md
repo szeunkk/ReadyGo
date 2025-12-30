@@ -44,6 +44,8 @@ erDiagram
   user_profiles ||--o{ user_tags : has
   tags ||--o{ user_tags : mapped_by
   user_profiles ||--o{ user_reports : reported
+  user_profiles ||--o{ user_play_schedules : plays_at
+
 
   %% =========================
   %% Chat Domain
@@ -178,7 +180,7 @@ erDiagram
 - **Author**: ReadyGo / Eunkyoung Kim(김은경)
 - **Created At**: 2025-12-24
 - **Last Updated At**: 2025-12-29
-- **Document Version**: v1.0.0
+- **Document Version**: v1.0.3
 - **Status**: Active
 - **Source of Truth**:
   - Supabase Production Database
@@ -191,3 +193,4 @@ erDiagram
 |  v1.0.0 | 2025-12-24 | Full integrated ERD                              |
 |  v1.0.1 | 2025-12-26 | steam_game_sync_logs 테이블 추가에 따른 ERD 수정 |
 |  v1.0.2 | 2025-12-29 | User/Profile Domain에 user_status 추가           |
+|  v1.0.3 | 2025-12-29 | user_play_schedules 테이블 추가에 따른 ERD 수정  |

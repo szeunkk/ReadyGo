@@ -180,7 +180,9 @@ export const useSignupForm = () => {
         });
 
         if (!loginResponse.ok) {
-          console.warn('Auto-login after signup failed, but signup was successful');
+          console.warn(
+            'Auto-login after signup failed, but signup was successful'
+          );
         }
       }
 

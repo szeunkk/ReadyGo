@@ -112,7 +112,11 @@ export default function Card({
             <h2 className={styles.cardTitle} data-testid={titleTestId}>
               {title}
             </h2>
-            <Tag style="duotone" className={styles.gameTag} data-testid={gameTagTestId}>
+            <Tag
+              style="duotone"
+              className={styles.gameTag}
+              data-testid={gameTagTestId}
+            >
               {gameTag}
             </Tag>
           </div>
@@ -167,7 +171,10 @@ export default function Card({
               />
               <span className={styles.categoryLabel}>시작 시간</span>
             </div>
-            <span className={styles.categoryValue} data-testid={startTimeTestId}>
+            <span
+              className={styles.categoryValue}
+              data-testid={startTimeTestId}
+            >
               {_categories.startTime}
             </span>
           </div>
@@ -181,7 +188,10 @@ export default function Card({
               />
               <span className={styles.categoryLabel}>보이스챗</span>
             </div>
-            <span className={styles.categoryValue} data-testid={voiceChatTestId}>
+            <span
+              className={styles.categoryValue}
+              data-testid={voiceChatTestId}
+            >
               {_categories.voiceChat}
             </span>
           </div>
@@ -195,7 +205,10 @@ export default function Card({
               />
               <span className={styles.categoryLabel}>난이도</span>
             </div>
-            <span className={styles.categoryValue} data-testid={difficultyTestId}>
+            <span
+              className={styles.categoryValue}
+              data-testid={difficultyTestId}
+            >
               {_categories.difficulty}
             </span>
           </div>
@@ -209,7 +222,10 @@ export default function Card({
               />
               <span className={styles.categoryLabel}>컨트롤 수준</span>
             </div>
-            <span className={styles.categoryValue} data-testid={controlLevelTestId}>
+            <span
+              className={styles.categoryValue}
+              data-testid={controlLevelTestId}
+            >
               {_categories.controlLevel}
             </span>
           </div>

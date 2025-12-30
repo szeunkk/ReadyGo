@@ -19,7 +19,11 @@ test.describe('파티 상세 데이터 바인딩 기능', () => {
         if (response.ok) {
           const result = await response.json();
           // 응답 형식: { data: [...] }
-          if (result.data && Array.isArray(result.data) && result.data.length > 0) {
+          if (
+            result.data &&
+            Array.isArray(result.data) &&
+            result.data.length > 0
+          ) {
             return result.data[0].id;
           }
         }
