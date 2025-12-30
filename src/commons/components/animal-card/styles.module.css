@@ -98,7 +98,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 32px;
+  gap: 16px;
   width: 100%;
 }
 
@@ -107,7 +107,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 24px;
+  gap: 16px;
   padding: 0 8px;
   width: 100%;
 }
@@ -117,7 +117,7 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -274,9 +274,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
   width: 100%;
-  padding: 16px 24px 24px;
+  padding: 16px 24px;
   border-radius: 18px;
   background-color: var(--color-bg-interactive-teritiary);
 }
@@ -326,4 +326,69 @@
   color: var(--color-text-interactive-secondary);
   white-space: nowrap;
   text-align: center;
+}
+
+/* Action Buttons - User Variant */
+.actionButtons {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+}
+
+.primaryButton {
+  display: flex;
+  flex-grow: 1;
+  flex-basis: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 14px 20px;
+  border-radius: 99999px;
+  background-color: var(--color-bg-interactive-primary);
+  border: none;
+  cursor: pointer;
+  min-width: 0;
+  min-height: 1px;
+}
+
+.primaryButton:hover {
+  opacity: 0.9;
+}
+
+.primaryButtonText {
+  font-family: var(--typo-body-lg-font-family);
+  font-size: var(--typo-body-lg-font-size);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--typo-body-lg-line-height);
+  color: var(--color-text-interactive-inverse);
+  white-space: nowrap;
+  margin: 0;
+  text-align: center;
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 14px;
+  border-radius: 99999px;
+  background-color: var(--color-bg-interactive-secondary);
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.iconButton:hover {
+  opacity: 0.9;
+}
+
+.primaryButtonIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--color-icon-interactive-inverse);
 }

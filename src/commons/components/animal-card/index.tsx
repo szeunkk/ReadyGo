@@ -26,6 +26,9 @@ export interface AnimalCardProps extends Omit<
   perfectMatchTypes?: AnimalType[];
   matchPercentage?: number;
   matchReasons?: string[];
+  onMessageClick?: () => void;
+  onProfileClick?: () => void;
+  onMoreClick?: () => void;
   className?: string;
 }
 
@@ -41,6 +44,9 @@ export default function AnimalCard({
   perfectMatchTypes,
   matchPercentage,
   matchReasons,
+  onMessageClick,
+  onProfileClick,
+  onMoreClick,
   className = '',
   ...props
 }: AnimalCardProps) {
@@ -179,6 +185,26 @@ export default function AnimalCard({
           </div>
         )}
       </div>
+
+      {/* Action Buttons - User Variant */}
+      {property === 'user' && (
+        <div className={styles.actionButtons}>
+          <button className={styles.primaryButton} onClick={onMessageClick}>
+            <Icon
+              name="message-circle-dots"
+              size={20}
+              className={styles.primaryButtonIcon}
+            />
+            <p className={styles.primaryButtonText}>메시지 보내기</p>
+          </button>
+          <button className={styles.iconButton} onClick={onProfileClick}>
+            <Icon name="add-user" size={20} className={styles.icon} />
+          </button>
+          <button className={styles.iconButton} onClick={onMoreClick}>
+            <Icon name="more-horizontal" size={20} className={styles.icon} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
