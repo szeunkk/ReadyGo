@@ -41,8 +41,9 @@ export default function TraitsPage() {
       const result = await response.json();
 
       if (result.ok) {
-        // 성공 시 결과 페이지로 이동
+        // 성공 시 결과 페이지로 이동 (로딩 상태 유지)
         router.push(URL_PATHS.TRAITS_RESULT);
+        // 성공 시에는 isLoading을 false로 설정하지 않음 (페이지 전환까지 로딩 유지)
       } else {
         throw new Error(result.message || 'Unexpected response format');
       }
@@ -52,7 +53,7 @@ export default function TraitsPage() {
         err instanceof Error ? err.message : 'An unknown error occurred';
       setError(errorMessage);
       console.error('Traits submission error:', err);
-    } finally {
+      // 에러 시에만 로딩 해제
       setIsLoading(false);
       isSubmittingRef.current = false;
     }
