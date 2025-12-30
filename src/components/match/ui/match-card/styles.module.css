@@ -4,19 +4,9 @@
   border-radius: 24px;
   padding: 32px;
   width: 100%;
-  min-width: 300px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-}
-
-/* 4열 이상에서는 카드 크기 고정 */
-@media (min-width: 1920px) {
-  .container {
-    width: 396px;
-    min-width: 396px;
-    max-width: 396px;
-  }
 }
 
 /* 컨텐츠 래퍼 */
