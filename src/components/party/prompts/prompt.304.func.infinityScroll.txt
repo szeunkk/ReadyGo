@@ -9,10 +9,9 @@
 
 ==============================================
 
-조건-파일경로) 수정할 API 파일경로: src/app/api/party/route.ts
-조건-파일경로) 수정할 HOOK 파일경로: src/components/party/hooks/index.binding.hook.ts
-조건-파일경로) 수정할 TSX 파일경로: src/components/party/party.tsx
-조건-파일경로) 수정할 CSS 파일경로: src/components/party/styles.module.css
+조건-파일경로) 참고할 API  문서경로: 
+조건-파일경로) 참고할 TSX  파일경로: src/components/party/party.tsx
+조건-파일경로) 참고할 CSS  파일경로: src/components/party/styles.module.css
 조건-파일경로) 구현될 HOOK 파일경로: src/components/party/hooks/index.infinityScroll.hook.ts
 조건-파일경로) 구현될 TEST 파일경로: src/components/party/tests/index.infinityScroll.hook.spec.ts
 
@@ -27,7 +26,7 @@
                 - timeout은 network 통신인 경우 2000ms 미만으로 설정할 것.
                 - timeout은 network 통신이 아닌 경우 설정하지 않거나, 500ms 미만으로 설정할 것.
                 - /party 페이지가 완전히 로드된 후 테스트할 것.
-                    - 페이지 로드 식별 요구사항: 고정식별자 data-testid="party-page" 대기 방법
+                    - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
                     - 페이지 로드 식별 금지사항: networkidle 대기 방법
 
             3) 테스트 API 조건
@@ -37,162 +36,30 @@
 
                 3-2) 성공시나리오
                     - API 모킹하지 말 것.
-                    - 파티 목록이 올바르게 표시되는지 확인할 것.
+                    - "dog.ceo"가 포함된 이미지주소가 반환되는지 확인할 것.
 
                 3-3) 실패시나리오
                     - API 모킹할 것.
 
-핵심요구사항) 파티 목록 무한스크롤 기능을 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+핵심요구사항) 제공된 API-Docs를 참고하여 사진목록조회 기능을 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
             1) 라이브러리조건
-                - 무한스크롤: 이미 설치되어있는 react-infinite-scroller를 사용할 것.
+                - API: 이미 설치되어있는 @tanstack/react-query를 사용할 것.
 
-            2) API 수정사항 (src/app/api/party/route.ts)
-                2-1) 쿼리 파라미터 추가
-                    - offset 파라미터를 추가할 것.
-                    - limit과 offset을 사용하여 Supabase의 range() 메서드로 페이지네이션을 구현할 것.
-                    - range(start, end) 형식: offset부터 (offset + limit - 1)까지
-
-                2-2) 기본값 설정
-                    - limit이 없을 경우 기본값은 설정하지 않을 것 (기존 동작 유지).
-                    - offset이 없을 경우 기본값은 0으로 설정할 것.
-
-            3) Hook 수정사항 (src/components/party/hooks/index.binding.hook.ts)
-                3-1) 데이터 페칭 함수 분리
-                    - fetchPartyList 함수를 외부에서도 사용 가능하도록 export할 것.
-                    - fetchPartyList 함수는 pageNum, limit 파라미터를 받도록 수정할 것.
-                    - pageNum은 1부터 시작하며, offset = (pageNum - 1) * limit으로 계산할 것.
-                    - API 호출 시 limit과 offset을 쿼리 파라미터로 전달할 것.
-                    - 반환값: { data: PartyCardProps[], hasMore: boolean }
-                    - hasMore는 응답 데이터 개수가 limit과 같으면 true, 적으면 false로 설정할 것.
-
-                3-2) 기존 usePartyListBinding 훅 유지
-                    - 기존 usePartyListBinding 훅은 그대로 유지하되, 내부에서 fetchPartyList를 사용하도록 리팩토링할 것.
-                    - 또는 새로운 무한스크롤 훅에서만 fetchPartyList를 사용하도록 할 것.
-
-            4) 무한스크롤 Hook 생성 (src/components/party/hooks/index.infinityScroll.hook.ts)
-                4-1) Hook 인터페이스 정의
-                    - usePartyInfiniteScroll로 파티 전용으로 구현할 것.
-
-                4-2) 상태 관리
-                    - data: PartyCardProps[] - 누적된 데이터 목록
-                    - isLoading: boolean - 초기 로딩 상태
-                    - isLoadingMore: boolean - 추가 데이터 로딩 중 상태
-                    - error: Error | null - 에러 상태
-                    - hasMore: boolean - 더 불러올 데이터가 있는지 여부
-                    - page: number - 현재 페이지 번호 (초기값: 1)
-
-                4-3) 상수 정의
-                    - ITEMS_PER_PAGE = 12 (한 번에 불러올 아이템 수)
-
-                4-4) 초기 데이터 로드
-                    - useEffect에서 첫 페이지 데이터를 로드할 것.
-                    - index.binding.hook.ts의 fetchPartyList 함수를 사용할 것.
-
-                4-5) loadMore 함수 구현
-                    - loadMore 함수를 구현할 것.
-                    - hasMore가 false이거나 isLoadingMore가 true일 경우 early return할 것.
-                    - page를 1 증가시키고 fetchPartyList를 호출할 것.
-                    - 응답 데이터를 기존 data 배열에 추가할 것.
-                    - 응답 데이터의 hasMore 값을 확인하여 hasMore 상태를 업데이트할 것.
-
-                4-6) 반환값
-                    - { data, isLoading, isLoadingMore, error, loadMore, hasMore }
-
-            5) CSS 수정사항 (src/components/party/styles.module.css)
-                5-1) .mainArea 스타일 수정
-                    - display: flex 유지할 것.
-                    - flex-wrap: wrap 유지할 것.
-                    - gap: 24px 유지할 것.
-                    - height 관련 속성 제거할 것 (자동 높이).
-
-                5-2) .cardListContainer 스타일 추가 (새로운 클래스)
-                    - .mainArea 내부에 카드 목록을 감싸는 컨테이너를 위한 스타일.
-                    - display: flex 추가할 것.
-                    - flex-wrap: wrap 추가할 것.
-                    - gap: 24px 추가할 것.
-                    - width: 100% 설정할 것.
-                    - max-height: calc(100vh - 400px) 추가할 것.
-                    - overflow-y: auto 추가할 것 (스크롤은 이 컨테이너에만 적용).
-                    - min-height: 500px 추가할 것.
-
-            6) 컴포넌트 수정사항 (src/components/party/party.tsx)
-                6-1) 라이브러리 import
-                    - react-infinite-scroller에서 InfiniteScroll을 import할 것.
-
-                6-2) Hook 사용 수정
-                    - usePartyListBinding 대신 usePartyInfiniteScroll을 사용할 것.
-                    - loadMore와 hasMore를 받을 것.
-
-                6-3) InfiniteScroll 적용
-                    - .mainArea 내부에 .cardListContainer 클래스를 가진 div를 생성할 것.
-                    - 카드 목록을 .cardListContainer 내부에 배치하고, InfiniteScroll로 감쌀 것.
-                    - 스크롤은 .cardListContainer에만 적용되도록 구현할 것.
-                    - InfiniteScroll props 설정:
-                        - pageStart: 0
-                        - loadMore: loadMore 함수
-                        - hasMore: hasMore 상태
-                        - loader: 로딩 중 표시할 컴포넌트 (<div>로딩 중...</div>)
-                        - useWindow: false (컨테이너 스크롤 사용)
-                        - getScrollParent: () => document.querySelector('.cardListContainer') 또는 ref 사용
-
-                6-4) 카드 레이아웃
-                    - 카드는 flex-wrap으로 자동 배치할 것.
-                    - 각 카드의 width는 기존 스타일 유지할 것.
-
-                6-5) 로딩 상태 처리
-                    - 초기 로딩(isLoading)과 추가 로딩(isLoadingMore)을 구분하여 표시할 것.
-                    - 초기 로딩: "로딩 중..." 메시지
-                    - 추가 로딩: InfiniteScroll의 loader prop 사용
-
-                6-6) 에러 상태 처리
-                    - error가 있을 경우 에러 메시지를 표시할 것.
-
-            7) 테스트 작성 (src/components/party/tests/index.infinityScroll.hook.spec.ts)
-                7-1) 테스트 시나리오
-                    - 무한스크롤 기능이 정상 동작하는지 확인할 것.
-
-                7-2) 테스트 케이스
-                    1) 초기 로드 - 첫 페이지 데이터가 올바르게 로드되는지 확인
-                        - /party 페이지 접속
-                        - data-testid="party-page" 대기
-                        - 파티 카드가 최대 12개까지 표시되는지 확인
-                        - API 호출: GET /api/party?limit=12&offset=0 확인
-                        - timeout: 1999ms 이하
-
-                    2) 스크롤 시 추가 데이터 로드 - 스크롤 시 다음 페이지 데이터가 로드되는지 확인
-                        - /party 페이지 접속
-                        - data-testid="party-page" 대기
-                        - .cardListContainer 영역을 스크롤하여 하단에 도달
-                        - 추가 파티 카드가 로드되는지 확인
-                        - API 호출: GET /api/party?limit=12&offset=12 확인
-                        - timeout: 1999ms 이하
-
-                    3) 더 이상 데이터가 없을 때 - hasMore가 false일 때 추가 요청이 발생하지 않는지 확인
-                        - 모든 데이터를 로드한 후
-                        - 스크롤해도 추가 API 호출이 발생하지 않는지 확인
-                        - (실제 데이터가 많지 않을 경우 스킵 가능)
-
-                    4) 로딩 상태 확인 - 초기 로딩과 추가 로딩이 올바르게 표시되는지 확인
-                        - 초기 로딩: "로딩 중..." 메시지 확인
-                        - 추가 로딩: InfiniteScroll loader 확인
-
-                    5) 에러 처리 - API 호출 실패 시 적절한 에러 처리가 되는지 확인
-                        - API 모킹하여 500 에러 반환
-                        - 에러 상태가 올바르게 표시되는지 확인
-
-            8) 유저시나리오(파티목록 무한스크롤)
-                1. 페이지에 접속하면, 파티 목록조회 API를 요청할 것.
-                    1-1) API엔드포인트: GET /api/party?limit=12&offset=0
-                    1-2) 요청데이터: 없음
-                    1-3) 응답데이터: 파티 목록 배열 (최대 12개)
+            2) 유저시나리오(사진목록조회)
+                1. 페이지에 접속하면, 강아지 목록조회 API를 요청할 것.
+                    1-1) API엔드포인트: https://dog.ceo/api/breeds/image/random/6
+                    2-2) 요청데이터: 없음
+                    2-3) 응답데이터: { message: 강아지 6마리의 사진주소가 들어있는 배열, status }
                 
-                2. 조회 로딩중에는 "로딩 중..." 메시지를 보여줄 것.
+                2. 조회 로딩중에는 스플래시 스크린을 보여줄 것.
+                    - 로딩 방식: 스플래시 스크린
+                    - 스플래시 스크린 개수: 강아지 개수와 일치하도록 6개의 스플래시 스크린
+                    - 스플래시 스크린 디자인
+                        - 회색 배경에 두꺼운 흰 세로줄을 우측 30도 기울일 것.
+                        - 흰 세로줄은 blur를 줘서 부드럽게 퍼져보이도록 구현할 것.
+                        - 이동속도는 빠르게 반복되도록 구현할 것.
+
+                3. 조회에 성공하여 받은 6마리의 강아지 배열을 무한스크롤 형태로 노출할 것.
                 
-                3. 조회에 성공하여 받은 파티 목록을 카드 형태로 노출할 것.
-                
-                4. 유저가 .cardListContainer 영역을 스크롤하면, 추가적인 파티 목록을 요청하여 바인딩 할 것.
-                    4-1) 스크롤조건: react-infinite-scroller의 기본 동작 (스크롤이 하단에 가까워질 때)
-                    4-2) 스크롤은 .cardListContainer에만 적용되고, .mainArea는 스크롤하지 않을 것.
-                    4-3) 추가 요청: GET /api/party?limit=12&offset=12 (다음 페이지)
-                    4-4) 로딩 중에는 InfiniteScroll의 loader가 표시될 것.
-                    4-5) 더 이상 불러올 데이터가 없으면 hasMore가 false가 되어 추가 요청이 중단될 것.
+                4. 유저가 무한스크롤을 스크롤하면, 추가적인 강아지를 요청하여 바인딩 할 것.
+                    - 스크롤조건: 스크롤이 마지막 2마리의 강아지만 남겨놓은 상태
