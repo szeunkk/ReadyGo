@@ -23,20 +23,22 @@
 }
 
 /* 필터 그룹 (Selectbox들) */
-.filterGroup {
-  width: fit-content;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  flex: 1;
-}
+/* 3열 이상 (1025px ~): 320px 고정 */
+@media (min-width: 1025px) {
+  .filterGroup {
+    width: fit-content;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+  }
 
-/* Selectbox 스타일 */
-.selectbox {
-  width: 320px;
-  min-width: 320px;
-  max-width: 320px;
-  flex-shrink: 0;
+  .selectbox {
+    width: 320px;
+    min-width: 320px;
+    max-width: 320px;
+    flex-shrink: 0;
+  }
 }
 
 /* 목록갱신 버튼 */
@@ -145,12 +147,6 @@
   .grid,
   .gridWithPanel {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .selectbox {
-    width: 250px;
-    min-width: 250px;
-    max-width: 250px;
   }
 }
 
