@@ -243,7 +243,7 @@ export default function Card({
           onClick={onJoinClick}
           data-testid={joinButtonTestId}
         >
-          참여하기
+          상세보기
         </Button>
       </div>
     </div>
