@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { SelectboxItem } from '@/commons/components/selectbox';
 
 export const useMatchFilters = () => {
-  const [selectedMatchRate, setSelectedMatchRate] = useState<string>('75');
-  const [selectedStatus, setSelectedStatus] = useState<string>('online');
+  const [selectedMatchRate, setSelectedMatchRate] = useState<string>('');
+  const [selectedStatus, setSelectedStatus] = useState<string>('');
 
   const handleMatchRateChange = (item: SelectboxItem) => {
     setSelectedMatchRate(item.id);
