@@ -4,7 +4,6 @@ import type { Database } from '@/types/supabase';
 // 타입 정의
 type ChatRoom = Database['public']['Tables']['chat_rooms']['Row'];
 type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
-type ChatRoomMember = Database['public']['Tables']['chat_room_members']['Row'];
 type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
 
 export interface ChatRoomListItem {
@@ -423,31 +422,89 @@ export const markMessagesAsRead = async (
     return;
   }
 
+  // 유효한 messageIds만 필터링
+  const validMessageIds = messageIds.filter(
+    (id) => typeof id === 'number' && !isNaN(id) && id > 0
+  );
+
+  if (validMessageIds.length === 0) {
+    console.warn('markMessagesAsRead: 유효한 messageIds가 없습니다.');
+    return;
+  }
+
   const now = new Date().toISOString();
-  const readsData = messageIds.map((messageId) => ({
+  const readsData = validMessageIds.map((messageId) => ({
     message_id: messageId,
     user_id: userId,
     read_at: now,
   }));
 
-  // upsert를 사용하여 중복 생성 방지
-  // (message_id, user_id) 조합의 유니크 제약이 있다는 전제
-  const { error } = await supabaseAdmin
-    .from('chat_message_reads')
-    .upsert(readsData, { onConflict: 'message_id,user_id' });
+  try {
+    // upsert를 사용하여 중복 생성 방지
+    // (message_id, user_id) 조합의 유니크 제약이 있다는 전제
+    // Supabase에서는 onConflict에 컬럼 이름을 문자열로 지정
+    const { error: upsertError } = await supabaseAdmin
+      .from('chat_message_reads')
+      .upsert(readsData, {
+        onConflict: 'message_id,user_id',
+        ignoreDuplicates: false,
+      });
 
-  if (error) {
+    if (upsertError) {
+      console.error(
+        'markMessagesAsRead - chat_message_reads upsert error:',
+        upsertError
+      );
+      console.error('upsert data:', readsData);
+      console.error(
+        'roomId:',
+        roomId,
+        'userId:',
+        userId,
+        'messageIds:',
+        validMessageIds
+      );
+
+      // upsert가 실패하면 개별 insert 시도 (중복은 무시)
+      for (const readData of readsData) {
+        const { error: insertError } = await supabaseAdmin
+          .from('chat_message_reads')
+          .insert(readData)
+          .select()
+          .maybeSingle();
+
+        // 중복 에러는 무시 (이미 읽음 처리된 경우)
+        if (
+          insertError &&
+          !insertError.message?.includes('duplicate') &&
+          !insertError.code?.includes('23505')
+        ) {
+          console.error(
+            'markMessagesAsRead - individual insert error:',
+            insertError,
+            'for:',
+            readData
+          );
+        }
+      }
+    }
+
+    // chat_messages 테이블의 is_read 필드도 업데이트
+    const { error: updateError } = await supabaseAdmin
+      .from('chat_messages')
+      .update({ is_read: true })
+      .in('id', validMessageIds);
+
+    if (updateError) {
+      console.error(
+        'markMessagesAsRead - chat_messages update error:',
+        updateError
+      );
+      throw updateError;
+    }
+  } catch (error) {
+    console.error('markMessagesAsRead - 전체 에러:', error);
     throw error;
-  }
-
-  // chat_messages 테이블의 is_read 필드도 업데이트
-  const { error: updateError } = await supabaseAdmin
-    .from('chat_messages')
-    .update({ is_read: true })
-    .in('id', messageIds);
-
-  if (updateError) {
-    throw updateError;
   }
 };
 
@@ -510,9 +567,11 @@ export const markRoomAsRead = async (
     .from('chat_messages')
     .select('id')
     .eq('room_id', roomId)
-    .neq('sender_id', userId);
+    .neq('sender_id', userId)
+    .not('id', 'is', null);
 
   if (messagesError) {
+    console.error('markRoomAsRead - messagesError:', messagesError);
     throw messagesError;
   }
 
@@ -520,7 +579,14 @@ export const markRoomAsRead = async (
     return;
   }
 
-  const messageIds = unreadMessages.map((m) => m.id);
+  // null이 아닌 id만 필터링
+  const messageIds = unreadMessages
+    .map((m) => m.id)
+    .filter((id): id is number => id !== null && typeof id === 'number');
+
+  if (messageIds.length === 0) {
+    return;
+  }
 
   // markMessagesAsRead 함수를 활용하여 일괄 읽음 처리
   await markMessagesAsRead(roomId, userId, messageIds);

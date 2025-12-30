@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import styles from './styles.module.css';
 import Avatar from '@/commons/components/avatar';
-import Searchbar from '@/commons/components/searchbar';
 import Icon from '@/commons/components/icon';
 
 interface Friend {
@@ -13,7 +12,6 @@ interface Friend {
 }
 
 export default function FriendLists() {
-  const [activeTab, setActiveTab] = useState<'list' | 'request'>('list');
   const [friends] = useState<Friend[]>([
     { id: '1', nickname: '게이머호랑이', status: 'online' },
     { id: '2', nickname: '게이머호랑이', status: 'offline' },
@@ -21,8 +19,6 @@ export default function FriendLists() {
     { id: '4', nickname: '게이머호랑이', status: 'ban' },
     { id: '5', nickname: '까칠한까마귀', status: 'online' },
   ]);
-
-  const [friendRequestCount] = useState(3);
 
   const handleMessage = (id: string) => {
     // TODO: Implement message functionality
