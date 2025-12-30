@@ -62,10 +62,7 @@ export const GET = async (
           { status: 404 }
         );
       }
-      return NextResponse.json(
-        { error: fetchError.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: fetchError.message }, { status: 500 });
     }
 
     return NextResponse.json({ data: partyData });
@@ -144,10 +141,7 @@ export const DELETE = async (
           { status: 404 }
         );
       }
-      return NextResponse.json(
-        { error: fetchError.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: fetchError.message }, { status: 500 });
     }
 
     // 생성자만 삭제 가능
@@ -165,10 +159,7 @@ export const DELETE = async (
       .eq('id', id);
 
     if (deleteError) {
-      return NextResponse.json(
-        { error: deleteError.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: deleteError.message }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
@@ -247,10 +238,7 @@ export const PATCH = async (
           { status: 404 }
         );
       }
-      return NextResponse.json(
-        { error: fetchError.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: fetchError.message }, { status: 500 });
     }
 
     // 생성자만 수정 가능
@@ -302,10 +290,7 @@ export const PATCH = async (
       .single();
 
     if (updateError) {
-      return NextResponse.json(
-        { error: updateError.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
     return NextResponse.json({ data: updatedData });
@@ -317,4 +302,3 @@ export const PATCH = async (
     );
   }
 };
-

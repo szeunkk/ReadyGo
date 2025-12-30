@@ -27,37 +27,32 @@
                     - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
                     - 페이지 로드 식별 금지사항: networkidle 대기 방법
             
-            3) 테스트 로컬스토리지 조건
+            3) 테스트 데이터 조건
                 3-1) 데이터
                     - 실제데이터를 사용할 것.
                     - Mock데이터 사용하지 말 것.
 
                 3-2) 성공시나리오
-                    - 로컬스토리지 모킹하지 말 것.
+                    - API 모킹하지 말 것.
 
                 3-3) 실패시나리오
-                    - 로컬스토리지 모킹하지 말 것.
+                    - API 모킹하지 말 것.
 
             4) 테스트 데이터타입
-                - 저장소: 로컬스토리지
-                - key: diaries
-                - value: [{ 
-                    id: number,
-                    title: string, 
-                    content: string, 
-                    emotion: enum.ts 경로에 정의된 emotion enum 타입을 import하여 사용할 것.
-                    createdAt: string
-                }]
+                - 데이터 소스: API (usePartyListBinding hook을 통해 가져온 파티 목록)
+                - 파티 카드 데이터 구조: party.tsx의 Card 컴포넌트에 전달되는 props 참고
+                - partyId: 파티 카드에 바인딩된 고유 ID
 
 ==============================================
 
-핵심요구사항) 각 일기카드를 클릭시, url.ts의 페이지URL에 정의된 경로로 이동할 것.
+핵심요구사항) 각 파티카드의 "참여하기" 버튼을 클릭시, url.ts의 페이지URL에 정의된 경로로 이동할 것.
             1) 경로: commons/constants/url.ts
             2) 조건
-                - CSS는 cursor: pointer만 추가할 것.
-                - 경로를 하드코딩하지 말고, url.ts를 import 하여 적용할 것.
-                - 해당 카드에 바인딩된 id를 사용할 것.
+                - 경로를 하드코딩하지 말고, url.ts의 getPartyDetailUrl 함수를 import 하여 적용할 것.
+                - 해당 카드에 바인딩된 partyId를 사용할 것.
+                - Next.js의 useRouter 또는 Link 컴포넌트를 사용하여 라우팅할 것.
 
-            3) 일기카드 영역
-                - 전체: url.ts에 정의된 일기상세페이지 => /diaries/[id]
-                - 삭제아이콘: 페이지 이동하지 말 것.
+            3) 파티카드 영역
+                - 참여하기 버튼: url.ts에 정의된 파티상세페이지 => /party/[id]
+                - 참여하기 버튼 외의 다른 영역: 페이지 이동하지 말 것.
+                - 참여하기 버튼 data-testid: `party-card-join-button-${partyId}` 형식으로 추가할 것.

@@ -176,9 +176,7 @@ export const usePartySubmit = (options?: UsePartySubmitOptions) => {
           throw new Error('인증이 필요합니다.');
         }
         const errorData = await response.json();
-        throw new Error(
-          errorData.error || '파티 등록 중 오류가 발생했습니다.'
-        );
+        throw new Error(errorData.error || '파티 등록 중 오류가 발생했습니다.');
       }
 
       // JSON 파싱
