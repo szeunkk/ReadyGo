@@ -12,6 +12,26 @@ export type PlayScheduleRow = {
 };
 
 /**
+ * 특정 유저의 모든 play_schedules를 조회한다
+ * - RLS 기반 쿼리
+ * - 존재하지 않으면 빈 배열 반환
+ */
+export const findByUserId = async (
+  userId: string
+): Promise<PlayScheduleRow[]> => {
+  const { data, error } = await supabaseAdmin
+    .from('user_play_schedules')
+    .select('*')
+    .eq('user_id', userId);
+
+  if (error) {
+    throw new Error(`Failed to find user_play_schedules: ${error.message}`);
+  }
+
+  return data || [];
+};
+
+/**
  * 특정 유저의 모든 play_schedules를 삭제한다
  */
 export const deleteByUserId = async (userId: string): Promise<void> => {
