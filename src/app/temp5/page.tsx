@@ -1,0 +1,1248 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useChatRoom } from '@/components/chat/hooks/useChatRoom.hook';
+import { useAuth } from '@/commons/providers/auth/auth.provider';
+import { supabase } from '@/lib/supabase/client';
+import Button from '@/commons/components/button';
+import Input from '@/commons/components/input';
+import AnimalCard from '@/commons/components/animal-card';
+import { AnimalType } from '@/commons/constants/animal';
+import { TierType } from '@/commons/constants/tierType.enum';
+import type { Database } from '@/types/supabase';
+
+// 타입 정의
+type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
+
+// 테스트할 유저 UUID
+const TEST_USER_ID = 'da532b5d-60ac-46b8-a725-3c38845b15ac';
+const TEST_USER_ID_2 = '0783d53d-a804-4e33-83d9-ba97b301d4b2';
+
+export default function RealtimeChatTestPage() {
+  const { user } = useAuth();
+  const [roomId, setRoomId] = useState<number | undefined>(undefined);
+  const [inputRoomId, setInputRoomId] = useState('');
+  const [messageContent, setMessageContent] = useState('');
+  const [otherUserId, setOtherUserId] = useState('');
+
+  // 프로필 데이터
+  const [profileNickname, setProfileNickname] = useState<string>('');
+  const [profileNickname2, setProfileNickname2] = useState<string>('');
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [isLoadingProfile2, setIsLoadingProfile2] = useState(true);
+
+  // 채팅방 목록 데이터
+  interface ChatRoomListItem {
+    roomId: number;
+    otherUserId: string;
+    otherUserNickname: string;
+    lastMessage?: string;
+    lastMessageTime?: string;
+    unreadCount: number;
+  }
+  const [chatRooms, setChatRooms] = useState<ChatRoomListItem[]>([]);
+  const [isLoadingChatRooms, setIsLoadingChatRooms] = useState(true);
+
+  // useChatRoom Hook 사용 (roomId가 없으면 0으로 전달, hook 내부에서 처리)
+  const chatRoomHook = useChatRoom({
+    roomId: roomId || 0, // roomId가 없으면 0으로 전달
+    onMessage: (message: ChatMessage) => {
+      // eslint-disable-next-line no-console
+      console.log('Received message from useChatRoom:', message);
+
+      // 채팅 목록의 마지막 메시지 업데이트
+      setChatRooms((prev) => {
+        const roomIndex = prev.findIndex(
+          (room) => room.roomId === message.room_id
+        );
+        if (roomIndex >= 0) {
+          const updated = [...prev];
+          const messageDate = message.created_at
+            ? new Date(message.created_at)
+            : new Date();
+          const now = new Date();
+          const isToday =
+            messageDate.getDate() === now.getDate() &&
+            messageDate.getMonth() === now.getMonth() &&
+            messageDate.getFullYear() === now.getFullYear();
+
+          let timeString = '';
+          if (isToday) {
+            const diffMs = now.getTime() - messageDate.getTime();
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+
+            if (diffMins < 1) {
+              timeString = '방금 전';
+            } else if (diffMins < 60) {
+              timeString = `${diffMins}분 전`;
+            } else if (diffHours < 24) {
+              timeString = `${diffHours}시간 전`;
+            }
+          } else {
+            const month = messageDate.getMonth() + 1;
+            const day = messageDate.getDate();
+            timeString = `${month}월 ${day}일`;
+          }
+
+          updated[roomIndex] = {
+            ...updated[roomIndex],
+            lastMessage: message.content || undefined,
+            lastMessageTime: timeString,
+            unreadCount:
+              message.sender_id !== user?.id
+                ? updated[roomIndex].unreadCount + 1
+                : updated[roomIndex].unreadCount,
+          };
+          return updated;
+        }
+        return prev;
+      });
+    },
+  });
+
+  // roomId가 없으면 hook의 기본값 사용 (에러 방지)
+  const {
+    messages,
+    sendMessage,
+    isLoading: isLoadingMessages,
+    error,
+    isConnected,
+  } = roomId
+    ? chatRoomHook
+    : {
+        messages: [],
+        sendMessage: async () => {},
+        isLoading: false,
+        error: null,
+        isConnected: false,
+      };
+
+  // roomId 변경 및 연결 상태 디버깅
+  useEffect(() => {
+    if (roomId) {
+      // eslint-disable-next-line no-console
+      console.log('Room ID changed, auto-subscribe should trigger:', roomId);
+    }
+  }, [roomId]);
+
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('ChatRoom status changed:', {
+      isConnected,
+      error,
+      roomId,
+      isLoading: isLoadingMessages,
+      messageCount: messages.length,
+    });
+  }, [isConnected, error, roomId, isLoadingMessages, messages.length]);
+
+  // 채팅 목록의 unreadCount 업데이트 (읽음 처리 후)
+  // useChatRoom hook이 자동으로 읽음 처리를 하므로, unreadCount만 업데이트
+  useEffect(() => {
+    if (roomId && isConnected && !isLoadingMessages) {
+      setChatRooms((prev) => {
+        const roomIndex = prev.findIndex((room) => room.roomId === roomId);
+        if (roomIndex >= 0) {
+          const updated = [...prev];
+          updated[roomIndex] = {
+            ...updated[roomIndex],
+            unreadCount: 0,
+          };
+          return updated;
+        }
+        return prev;
+      });
+    }
+  }, [roomId, isConnected, isLoadingMessages]);
+
+  const handleSubscribe = () => {
+    const id = parseInt(inputRoomId);
+    if (isNaN(id)) {
+      alert('올바른 roomId를 입력하세요 (숫자)');
+      return;
+    }
+    setRoomId(id); // roomId 변경 시 자동으로 구독됨
+  };
+
+  const handleUnsubscribe = () => {
+    setRoomId(undefined); // roomId를 undefined로 설정하면 hook이 자동으로 cleanup
+  };
+
+  // 테스트용 채팅방 생성
+  const handleCreateTestRoom = async () => {
+    if (!user?.id) {
+      alert('로그인이 필요합니다');
+      return;
+    }
+
+    try {
+      let targetUserId = otherUserId.trim();
+
+      // 상대방 ID가 없으면 DB에서 다른 유저 하나 가져오기
+      if (!targetUserId) {
+        const { data: profiles, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('id')
+          .neq('id', user.id) // 자기 자신 제외
+          .limit(1)
+          .single();
+
+        if (profileError || !profiles) {
+          alert(
+            '다른 유저를 찾을 수 없습니다. 상대방 사용자 ID를 직접 입력하세요.'
+          );
+          return;
+        }
+
+        targetUserId = profiles.id;
+      }
+
+      // 자기 자신과는 채팅방 생성 불가
+      if (targetUserId === user.id) {
+        alert('자기 자신과는 채팅방을 생성할 수 없습니다.');
+        return;
+      }
+
+      // API를 통해 채팅방 생성
+      const response = await fetch('/api/chat/room', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          memberIds: [user.id, targetUserId],
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || '채팅방 생성에 실패했습니다.');
+      }
+
+      const newRoom = result.data;
+      setRoomId(newRoom.id);
+      setInputRoomId(newRoom.id.toString());
+      alert(
+        `테스트 채팅방 생성 완료! Room ID: ${newRoom.id}\n상대방: ${targetUserId}`
+      );
+    } catch (error) {
+      console.error('Failed to create test room:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : '채팅방 생성에 실패했습니다.';
+      alert(`채팅방 생성 실패: ${errorMessage}`);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!messageContent.trim()) {
+      alert('메시지를 입력하세요');
+      return;
+    }
+
+    // roomId가 없으면 에러
+    if (!roomId) {
+      alert('채팅방이 생성되지 않았습니다. 먼저 채팅방을 생성해주세요.');
+      return;
+    }
+
+    // 연결이 안 되어 있으면 에러
+    if (!isConnected) {
+      alert(
+        `채팅방에 연결되지 않았습니다.\n\n현재 Room ID: ${roomId}\n연결 상태: 연결 안됨\n\n잠시 후 다시 시도하거나, 구독 버튼을 클릭하여 다시 구독해주세요.`
+      );
+      return;
+    }
+
+    // eslint-disable-next-line no-console
+    console.log('Sending message:', {
+      roomId,
+      isConnected,
+      messageContent: messageContent.trim(),
+    });
+
+    try {
+      await sendMessage(messageContent.trim());
+      setMessageContent('');
+      // eslint-disable-next-line no-console
+      console.log('Message sent successfully');
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+
+      // Room ID 관련 에러인 경우 더 자세한 정보 제공
+      if (errorMessage.includes('Room ID')) {
+        alert(
+          `메시지 전송 실패: ${errorMessage}\n\n현재 Room ID: ${roomId}\n연결 상태: ${isConnected ? '연결됨' : '연결 안됨'}\n\n문제 해결 방법:\n1. 구독 버튼을 클릭하여 다시 구독\n2. 채팅방을 다시 생성\n3. 브라우저 콘솔에서 자세한 에러 확인`
+        );
+      } else {
+        alert(`메시지 전송 실패: ${errorMessage}`);
+      }
+    }
+  };
+
+  // 프로필 닉네임 조회
+  useEffect(() => {
+    const fetchProfileNickname = async () => {
+      setIsLoadingProfile(true);
+      try {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('nickname')
+          .eq('id', TEST_USER_ID)
+          .single();
+
+        if (error) {
+          console.error('Failed to fetch profile:', error);
+          setProfileNickname('알 수 없는 사용자');
+        } else {
+          setProfileNickname(data?.nickname || '알 수 없는 사용자');
+        }
+      } catch (error) {
+        console.error('Unexpected error:', error);
+        setProfileNickname('알 수 없는 사용자');
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    };
+
+    fetchProfileNickname();
+  }, []);
+
+  // 두 번째 프로필 닉네임 조회
+  useEffect(() => {
+    const fetchProfileNickname2 = async () => {
+      setIsLoadingProfile2(true);
+      try {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('nickname')
+          .eq('id', TEST_USER_ID_2)
+          .single();
+
+        if (error) {
+          console.error('Failed to fetch profile 2:', error);
+          setProfileNickname2('알 수 없는 사용자');
+        } else {
+          setProfileNickname2(data?.nickname || '알 수 없는 사용자');
+        }
+      } catch (error) {
+        console.error('Unexpected error 2:', error);
+        setProfileNickname2('알 수 없는 사용자');
+      } finally {
+        setIsLoadingProfile2(false);
+      }
+    };
+
+    fetchProfileNickname2();
+  }, []);
+
+  // 채팅방 목록 조회 함수 (재사용 가능)
+  const fetchChatRooms = useCallback(async () => {
+    if (!user?.id) {
+      setIsLoadingChatRooms(false);
+      return;
+    }
+
+    setIsLoadingChatRooms(true);
+    try {
+      const response = await fetch('/api/chat/rooms', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        console.error('Failed to fetch chat rooms:', result.error);
+        return;
+      }
+
+      const result = await response.json();
+      const rooms = result.data || [];
+
+      // ChatRoomListItem 형식으로 변환
+      const formattedRooms: ChatRoomListItem[] = rooms.map(
+        (room: {
+          room: { id: number };
+          otherMember?: { id: string; nickname: string };
+          lastMessage?: { content?: string; created_at?: string };
+          unreadCount?: number;
+        }) => {
+          const { lastMessage } = room;
+          let lastMessageTime = '';
+
+          if (lastMessage?.created_at) {
+            const messageDate = new Date(lastMessage.created_at);
+            const now = new Date();
+            const isToday =
+              messageDate.getDate() === now.getDate() &&
+              messageDate.getMonth() === now.getMonth() &&
+              messageDate.getFullYear() === now.getFullYear();
+
+            if (isToday) {
+              const diffMs = now.getTime() - messageDate.getTime();
+              const diffMins = Math.floor(diffMs / 60000);
+              const diffHours = Math.floor(diffMins / 60);
+
+              if (diffMins < 1) {
+                lastMessageTime = '방금 전';
+              } else if (diffMins < 60) {
+                lastMessageTime = `${diffMins}분 전`;
+              } else if (diffHours < 24) {
+                lastMessageTime = `${diffHours}시간 전`;
+              }
+            } else {
+              const month = messageDate.getMonth() + 1;
+              const day = messageDate.getDate();
+              lastMessageTime = `${month}월 ${day}일`;
+            }
+          }
+
+          return {
+            roomId: room.room.id,
+            otherUserId: room.otherMember?.id || '',
+            otherUserNickname: room.otherMember?.nickname || '알 수 없음',
+            lastMessage: lastMessage?.content || undefined,
+            lastMessageTime: lastMessageTime || undefined,
+            unreadCount: room.unreadCount || 0,
+          };
+        }
+      );
+
+      setChatRooms(formattedRooms);
+    } catch (error) {
+      console.error('Error fetching chat rooms:', error);
+    } finally {
+      setIsLoadingChatRooms(false);
+    }
+  }, [user?.id]);
+
+  // 페이지 로드 시 기존 채팅방 목록 조회
+  useEffect(() => {
+    fetchChatRooms();
+  }, [user?.id, fetchChatRooms]);
+
+  // 프로필 카드의 채팅하기 버튼 클릭 핸들러 (채팅방 생성만)
+  const handleProfileChatClick = async (targetUserId: string) => {
+    if (!user?.id) {
+      alert('로그인이 필요합니다');
+      return;
+    }
+
+    try {
+      // API를 통해 채팅방 생성
+      const response = await fetch('/api/chat/room', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          memberIds: [user.id, targetUserId],
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || '채팅방 생성에 실패했습니다.');
+      }
+
+      const newRoom = result.data;
+
+      // 채팅방 목록 다시 불러오기 (DB에서 최신 데이터 가져오기)
+      await fetchChatRooms();
+
+      // 현재 선택된 채팅방으로 설정
+      setRoomId(newRoom.id);
+      setInputRoomId(newRoom.id.toString());
+
+      const otherUserNickname =
+        targetUserId === TEST_USER_ID ? profileNickname : profileNickname2;
+
+      alert(
+        `채팅방 생성 완료!\nRoom ID: ${newRoom.id}\n상대방: ${otherUserNickname}\n\n이제 아래 메시지 전송에서 메시지를 보낼 수 있습니다.`
+      );
+    } catch (error) {
+      console.error('Failed to create room:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : '채팅방 생성에 실패했습니다.';
+      alert(`채팅방 생성 실패: ${errorMessage}`);
+    }
+  };
+
+  // 목업 데이터 (profilePanel.tsx의 user-1 데이터 사용)
+  const mockProfileData = {
+    nickname: profileNickname || '로딩 중...',
+    tier: TierType.diamond,
+    animal: AnimalType.tiger,
+    favoriteGenre: 'FPS',
+    activeTime: '18 - 22시',
+    gameStyle: '공격적',
+    weeklyAverage: '12.3 시간',
+    matchPercentage: 94,
+    matchReasons: ['동일 게임 선호', '유사한 플레이 시간대', '비슷한 실력대'],
+  };
+
+  return (
+    <div
+      style={{
+        padding: '20px',
+        maxWidth: '960px',
+        margin: '0 auto',
+        fontFamily: 'system-ui, sans-serif',
+      }}
+      data-testid="realtime-chat-test-page"
+    >
+      <h1 style={{ marginBottom: '20px' }}>Realtime Chat Hook 테스트</h1>
+
+      {/* 프로필 카드 섹션 */}
+      <div
+        style={{
+          marginBottom: '30px',
+          padding: '20px',
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          background: '#000000',
+        }}
+      >
+        <h2 style={{ marginTop: 0, marginBottom: '20px' }}>
+          프로필 카드 테스트
+        </h2>
+
+        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+          {/* 첫 번째 프로필 카드 */}
+          {isLoadingProfile ? (
+            <div style={{ textAlign: 'center', padding: '20px', flex: 1 }}>
+              프로필 로딩 중...
+            </div>
+          ) : (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '24px',
+                flex: 1,
+                minWidth: '300px',
+              }}
+            >
+              {/* Animal Card */}
+              <AnimalCard
+                property="user"
+                nickname={mockProfileData.nickname}
+                tier={mockProfileData.tier}
+                animal={mockProfileData.animal}
+                favoriteGenre={mockProfileData.favoriteGenre}
+                activeTime={mockProfileData.activeTime}
+                gameStyle={mockProfileData.gameStyle}
+                weeklyAverage={mockProfileData.weeklyAverage}
+                matchPercentage={mockProfileData.matchPercentage}
+                matchReasons={mockProfileData.matchReasons}
+              />
+
+              {/* 채팅하기 버튼 */}
+              <Button
+                variant="primary"
+                size="m"
+                shape="round"
+                onClick={() => handleProfileChatClick(TEST_USER_ID)}
+                disabled={!user?.id || isLoadingProfile}
+                style={{ width: '408px' }}
+              >
+                채팅 하기 (채팅방 생성)
+              </Button>
+
+              <div
+                style={{ fontSize: '12px', color: '#666', marginTop: '-10px' }}
+              >
+                * 채팅하기 버튼 클릭 시: 채팅방 생성 및 자동 구독
+              </div>
+            </div>
+          )}
+
+          {/* 두 번째 프로필 카드 */}
+          {isLoadingProfile2 ? (
+            <div style={{ textAlign: 'center', padding: '20px', flex: 1 }}>
+              프로필 로딩 중...
+            </div>
+          ) : (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '24px',
+                flex: 1,
+                minWidth: '300px',
+              }}
+            >
+              {/* Animal Card */}
+              <AnimalCard
+                property="user"
+                nickname={profileNickname2 || '로딩 중...'}
+                tier={TierType.diamond}
+                animal={AnimalType.fox}
+                favoriteGenre="RPG"
+                activeTime="20 - 24시"
+                gameStyle="방어적"
+                weeklyAverage="15.5 시간"
+                matchPercentage={88}
+                matchReasons={['유사한 플레이 시간대', '비슷한 실력대']}
+              />
+
+              {/* 채팅하기 버튼 */}
+              <Button
+                variant="primary"
+                size="m"
+                shape="round"
+                onClick={() => handleProfileChatClick(TEST_USER_ID_2)}
+                disabled={!user?.id || isLoadingProfile2}
+                style={{ width: '408px' }}
+              >
+                채팅 하기 (채팅방 생성)
+              </Button>
+
+              <div
+                style={{ fontSize: '12px', color: '#666', marginTop: '-10px' }}
+              >
+                * 채팅하기 버튼 클릭 시: 채팅방 생성 및 자동 구독
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 채팅 목록 (chatList UI 스타일) */}
+      {isLoadingChatRooms ? (
+        <div
+          style={{
+            marginBottom: '30px',
+            padding: '20px',
+            border: '1px solid #ddd',
+            borderRadius: '8px',
+            background: '#000000',
+            textAlign: 'center',
+          }}
+        >
+          <p style={{ color: '#999' }}>채팅방 목록 로딩 중...</p>
+        </div>
+      ) : chatRooms.length > 0 ? (
+        <div
+          style={{
+            marginBottom: '30px',
+            padding: '20px',
+            border: '1px solid #ddd',
+            borderRadius: '8px',
+            background: '#000000',
+          }}
+        >
+          <h2 style={{ marginTop: 0, marginBottom: '20px' }}>채팅 목록</h2>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+            }}
+          >
+            {chatRooms.map((chatRoom) => (
+              <div
+                key={chatRoom.roomId}
+                onClick={() => {
+                  setRoomId(chatRoom.roomId);
+                  setInputRoomId(chatRoom.roomId.toString());
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border:
+                    roomId === chatRoom.roomId
+                      ? '1px solid var(--color-border-primary, #007bff)'
+                      : '1px solid transparent',
+                  background:
+                    roomId === chatRoom.roomId
+                      ? 'var(--color-bg-secondary, rgba(0, 123, 255, 0.1))'
+                      : 'transparent',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  if (roomId !== chatRoom.roomId) {
+                    e.currentTarget.style.background =
+                      'var(--color-bg-interactive-teritiary-hover, rgba(0, 0, 0, 0.05))';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (roomId !== chatRoom.roomId) {
+                    e.currentTarget.style.background = 'transparent';
+                  }
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '12px',
+                    alignItems: 'center',
+                    flex: 1,
+                    minWidth: 0,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      background: '#ddd',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                      flex: 1,
+                      minWidth: 0,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '16px',
+                        fontWeight: chatRoom.unreadCount > 0 ? '600' : '400',
+                        color: '#fff',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {chatRoom.otherUserNickname}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '14px',
+                        color: '#999',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {chatRoom.lastMessage || '메시지가 없습니다'}
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  {chatRoom.lastMessageTime && (
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        color: '#999',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {chatRoom.lastMessageTime}
+                    </div>
+                  )}
+                  {chatRoom.unreadCount > 0 && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minWidth: '20px',
+                        height: '20px',
+                        padding: '0 6px',
+                        background: '#007bff',
+                        borderRadius: '9999px',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          color: '#fff',
+                          textAlign: 'center',
+                        }}
+                      >
+                        {chatRoom.unreadCount}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div
+          style={{
+            marginBottom: '30px',
+            padding: '20px',
+            border: '1px solid #ddd',
+            borderRadius: '8px',
+            background: '#000000',
+            textAlign: 'center',
+          }}
+        >
+          <p style={{ color: '#999' }}>채팅방이 없습니다.</p>
+        </div>
+      )}
+
+      {/* 수신된 메시지 목록 (메시지 전송 위에 위치) */}
+      <div
+        style={{
+          marginBottom: '20px',
+          padding: '15px',
+          border: '1px solid #ddd',
+          borderRadius: '4px',
+        }}
+      >
+        <h2 style={{ marginTop: 0, marginBottom: '10px' }}>
+          채팅 메시지 ({messages.length}개)
+          {isLoadingMessages && (
+            <span
+              style={{ fontSize: '14px', color: '#999', marginLeft: '10px' }}
+            >
+              (로딩 중...)
+            </span>
+          )}
+        </h2>
+        {error && (
+          <div
+            style={{
+              padding: '10px',
+              background: '#ffebee',
+              borderRadius: '4px',
+              marginBottom: '10px',
+            }}
+          >
+            <p style={{ margin: 0, color: 'red', fontSize: '14px' }}>
+              에러: {error}
+            </p>
+          </div>
+        )}
+        <div
+          data-testid="messages-list"
+          style={{
+            maxHeight: '500px',
+            overflowY: 'auto',
+            background: '#1a1a1a',
+            padding: '20px',
+            borderRadius: '8px',
+            marginBottom: '10px',
+            minHeight: '300px',
+          }}
+        >
+          {messages.length === 0 ? (
+            <p
+              style={{
+                color: '#999',
+                fontStyle: 'italic',
+                textAlign: 'center',
+                padding: '20px',
+              }}
+            >
+              수신된 메시지가 없습니다.
+            </p>
+          ) : (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                padding: '10px',
+              }}
+            >
+              {messages.map((message, index) => {
+                const isOwnMessage = message.sender_id === user?.id;
+                const messageDate = message.created_at
+                  ? new Date(message.created_at)
+                  : null;
+                const timeString = messageDate
+                  ? messageDate.toLocaleTimeString('ko-KR', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true,
+                    })
+                  : '';
+
+                return (
+                  <div
+                    key={message.id || index}
+                    style={{
+                      display: 'flex',
+                      justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
+                      alignItems: 'flex-end',
+                      gap: '8px',
+                    }}
+                  >
+                    {!isOwnMessage && (
+                      <div
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          background: '#ddd',
+                          flexShrink: 0,
+                        }}
+                      />
+                    )}
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: isOwnMessage ? 'flex-end' : 'flex-start',
+                        maxWidth: '70%',
+                      }}
+                    >
+                      <div
+                        style={{
+                          padding: '10px 14px',
+                          borderRadius: '12px',
+                          background: isOwnMessage ? '#4CAF50' : '#3a3a3a',
+                          color: '#fff',
+                          wordBreak: 'break-word',
+                          fontSize: '14px',
+                          lineHeight: '1.4',
+                        }}
+                      >
+                        {message.content}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '11px',
+                          color: '#999',
+                          marginTop: '4px',
+                          padding: '0 4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        {timeString}
+                        {isOwnMessage && (
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              color: message.is_read ? '#4CAF50' : '#999',
+                            }}
+                          >
+                            {message.is_read ? '✓✓' : '✓'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {isOwnMessage && (
+                      <div
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          background: '#ddd',
+                          flexShrink: 0,
+                        }}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        <div>
+          <Button
+            onClick={() => {
+              // useChatRoom hook은 자동으로 메시지를 관리하므로
+              // roomId를 변경하여 메시지를 다시 로드
+              if (roomId) {
+                const currentRoomId = roomId;
+                setRoomId(undefined);
+                setTimeout(() => setRoomId(currentRoomId), 100);
+              }
+            }}
+            style={{ fontSize: '12px', padding: '5px 10px' }}
+            disabled={!roomId}
+          >
+            메시지 새로고침
+          </Button>
+        </div>
+      </div>
+
+      {/* 메시지 전송 (프로필 카드 바로 아래) */}
+      <div
+        style={{
+          marginBottom: '20px',
+          padding: '15px',
+          border: '1px solid #ddd',
+          borderRadius: '4px',
+        }}
+      >
+        <h2 style={{ marginTop: 0, marginBottom: '10px' }}>메시지 전송</h2>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <Input
+            placeholder="메시지 입력"
+            value={messageContent}
+            onChange={(e) => setMessageContent(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+            style={{ flex: 1 }}
+          />
+          <Button
+            data-testid="send-message-btn"
+            onClick={handleSendMessage}
+            disabled={
+              !isConnected ||
+              !messageContent.trim() ||
+              !roomId ||
+              isLoadingMessages
+            }
+          >
+            전송
+          </Button>
+        </div>
+        {roomId && (
+          <div style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
+            현재 채팅방: Room ID {roomId}{' '}
+            {isConnected ? '(연결됨)' : '(연결 대기 중...)'}
+            {isLoadingMessages && ' | 메시지 로딩 중...'}
+            {error && ` | 에러: ${error}`}
+          </div>
+        )}
+        {!roomId && (
+          <div style={{ fontSize: '12px', color: '#999', marginTop: '8px' }}>
+            채팅방이 생성되지 않았습니다. 위에서 채팅방을 생성해주세요.
+          </div>
+        )}
+      </div>
+
+      {/* 사용자 정보 */}
+      <div
+        style={{
+          marginBottom: '20px',
+          padding: '10px',
+          background: '#000000',
+          borderRadius: '4px',
+        }}
+      >
+        <p>
+          <strong>현재 사용자:</strong>{' '}
+          {user?.id ? (
+            <span style={{ color: 'green' }}>{user.id}</span>
+          ) : (
+            <span style={{ color: 'red' }}>로그인 필요</span>
+          )}
+        </p>
+        <p>
+          <strong>이메일:</strong> {user?.email || 'N/A'}
+        </p>
+      </div>
+
+      {/* 연결 상태 */}
+      <div
+        style={{
+          marginBottom: '20px',
+          padding: '10px',
+          background: '#000000',
+          borderRadius: '4px',
+        }}
+      >
+        <p>
+          <strong>Realtime 채널 연결 상태:</strong>{' '}
+          <span
+            data-testid="is-connected"
+            style={{ color: isConnected ? 'green' : 'red', fontWeight: 'bold' }}
+          >
+            {isConnected
+              ? '연결됨 (메시지 전송/수신 가능)'
+              : '연결 안됨 (구독 실패 또는 대기 중)'}
+          </span>
+        </p>
+        {error && (
+          <div
+            style={{
+              marginTop: '10px',
+              padding: '8px',
+              background: '#ffebee',
+              borderRadius: '4px',
+            }}
+          >
+            <p style={{ margin: 0, marginBottom: '5px' }}>
+              <strong style={{ color: 'red' }}>에러:</strong>{' '}
+              <span data-testid="error" style={{ color: 'red' }}>
+                {error}
+              </span>
+            </p>
+            <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>
+              * 연결 실패 원인: 세션 확인 실패, 네트워크 문제, 또는 Realtime
+              서버 문제일 수 있습니다.
+              <br />* 브라우저 콘솔(F12)에서 자세한 에러 로그를 확인하세요.
+            </p>
+          </div>
+        )}
+        {roomId && (
+          <p style={{ marginTop: '10px' }}>
+            <strong>구독 중인 Room ID:</strong> {roomId}
+            {!isConnected && !error && (
+              <span
+                style={{ fontSize: '12px', color: '#999', marginLeft: '10px' }}
+              >
+                (구독 대기 중...)
+              </span>
+            )}
+          </p>
+        )}
+        {roomId && !isConnected && (
+          <div
+            style={{
+              marginTop: '10px',
+              padding: '8px',
+              background: '#fff3cd',
+              borderRadius: '4px',
+            }}
+          >
+            <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>
+              <strong>연결 안됨 상태입니다.</strong>
+              <br />
+              가능한 원인:
+              <br />
+              1. 세션 확인 실패 (로그인 상태 확인 필요)
+              <br />
+              2. Realtime 서버 연결 문제
+              <br />
+              3. 네트워크 문제
+              <br />
+              <br />
+              해결 방법: 브라우저 콘솔(F12)에서 에러 로그를 확인하거나, 페이지를
+              새로고침 후 다시 시도하세요.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* 테스트용 채팅방 생성 */}
+      <div
+        style={{
+          marginBottom: '20px',
+          padding: '15px',
+          border: '1px solid #ddd',
+          borderRadius: '4px',
+          background: '#000000',
+        }}
+      >
+        <h2 style={{ marginTop: 0, marginBottom: '10px' }}>
+          테스트용 채팅방 생성
+        </h2>
+        <p style={{ fontSize: '12px', color: '#666', marginBottom: '10px' }}>
+          채팅방이 없으면 여기서 생성하세요. 상대방 ID를 입력하지 않으면 DB에서
+          다른 유저를 자동으로 찾아서 채팅방을 생성합니다.
+        </p>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <Input
+            placeholder="상대방 사용자 ID (선택사항, 비우면 자기 자신과 생성)"
+            value={otherUserId}
+            onChange={(e) => setOtherUserId(e.target.value)}
+            style={{ flex: 1 }}
+          />
+          <Button onClick={handleCreateTestRoom} disabled={!user?.id}>
+            채팅방 생성
+          </Button>
+        </div>
+      </div>
+
+      {/* 구독 컨트롤 */}
+      <div
+        style={{
+          marginBottom: '20px',
+          padding: '15px',
+          border: '1px solid #ddd',
+          borderRadius: '4px',
+        }}
+      >
+        <h2 style={{ marginTop: 0, marginBottom: '10px' }}>채널 구독</h2>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <Input
+            type="number"
+            placeholder="Room ID 입력 (숫자) 또는 위에서 생성"
+            value={inputRoomId}
+            onChange={(e) => setInputRoomId(e.target.value)}
+            style={{ flex: 1 }}
+          />
+          <Button
+            data-testid="subscribe-btn"
+            onClick={handleSubscribe}
+            disabled={!user?.id || !!roomId}
+          >
+            구독
+          </Button>
+          <Button
+            data-testid="unsubscribe-btn"
+            onClick={handleUnsubscribe}
+            disabled={!isConnected}
+          >
+            구독 해제
+          </Button>
+        </div>
+      </div>
+
+      {/* 사용 방법 안내 */}
+      <div
+        style={{
+          marginTop: '20px',
+          padding: '15px',
+          background: '#000000',
+          borderRadius: '4px',
+          fontSize: '14px',
+        }}
+      >
+        <h3 style={{ marginTop: 0 }}>사용 방법</h3>
+        <ol style={{ margin: 0, paddingLeft: '20px' }}>
+          <li>로그인 상태인지 확인하세요 (위에 사용자 정보 표시됨)</li>
+          <li>
+            <strong>채팅방 생성:</strong> &quot;테스트용 채팅방 생성&quot;에서
+            상대방 사용자 ID를 입력하고 &quot;채팅방 생성&quot; 버튼을
+            클릭하세요. (상대방 ID를 비우면 자기 자신과 채팅방이 생성됩니다)
+          </li>
+          <li>
+            생성된 Room ID가 자동으로 입력되면 &quot;구독&quot; 버튼을
+            클릭하세요 (자동 구독 방식)
+          </li>
+          <li>또는 기존 Room ID를 직접 입력할 수도 있습니다</li>
+          <li>
+            연결 상태가 &quot;연결됨&quot;으로 변경되면 메시지를 전송할 수
+            있습니다
+          </li>
+          <li>
+            메시지를 입력하고 &quot;전송&quot; 버튼을 클릭하거나 Enter 키를
+            누르세요
+          </li>
+          <li>수신된 메시지는 아래 목록에 표시됩니다</li>
+          <li>
+            다른 브라우저/탭에서 같은 Room ID로 구독하면 실시간으로 메시지를
+            주고받을 수 있습니다
+          </li>
+          <li>
+            <strong>주의:</strong> Room ID는 실제 DB의 chat_rooms 테이블에
+            존재하는 id여야 합니다. 존재하지 않는 Room ID로는 메시지 전송이
+            실패합니다.
+          </li>
+        </ol>
+      </div>
+    </div>
+  );
+}

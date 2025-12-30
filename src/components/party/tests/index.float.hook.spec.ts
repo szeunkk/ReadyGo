@@ -179,4 +179,3 @@ test.describe('플로팅 버튼 스크롤 기능', () => {
     expect(finalScrollY).toBe(0);
   });
 });
-
