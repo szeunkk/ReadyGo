@@ -179,6 +179,8 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
             </label>
             <div className={styles.gameSearchWrapper} ref={gameSearchRef}>
               <Searchbar
+                size="l"
+                icon="right"
                 placeholder="게임 검색"
                 value={gameSearchQuery}
                 onChange={handleGameSearchChange}
@@ -187,24 +189,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
                     setIsGameOptionsOpen(true);
                   }
                 }}
-              >
-                <input
-                  type="text"
-                  className={styles.searchInput}
-                  placeholder="게임 검색"
-                  value={gameSearchQuery}
-                  onChange={handleGameSearchChange}
-                  onFocus={() => {
-                    if (
-                      gameSearchQuery.length > 0 &&
-                      filteredGames.length > 0
-                    ) {
-                      setIsGameOptionsOpen(true);
-                    }
-                  }}
-                />
-                <Icon name="search" size={20} />
-              </Searchbar>
+              />
               {isGameOptionsOpen && filteredGames.length > 0 && (
                 <div className={styles.gameOptionsGroup}>
                   {filteredGames.map((game) => {
@@ -397,6 +382,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Selectbox
+                    size="l"
                     label="컨트롤 수준"
                     required
                     placeholder="옵션 선택"
@@ -416,6 +402,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Selectbox
+                    size="l"
                     label="난이도"
                     required
                     placeholder="난이도 선택"
