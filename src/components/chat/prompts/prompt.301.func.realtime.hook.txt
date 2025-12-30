@@ -1,0 +1,338 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 참고할 Provider 파일경로: src/commons/providers/user-status/user-status.provider.tsx
+조건-파일경로) 참고할 Repository 파일경로: src/repositories/chat.repository.ts
+조건-파일경로) 구현될 Hook 파일경로: src/components/chat/hooks/useRealtimeChat.hook.tsx
+조건-파일경로) 참고할 Supabase 클라이언트: src/lib/supabase/client.ts
+
+==============================================
+
+핵심요구사항) Supabase Realtime Broadcast를 사용한 실시간 채팅 Hook을 구현하고, 적용 결과를 체크리스트로 반환할 것.
+
+            1) Hook 기본 구조
+                1-1) 파일 위치 및 네이밍
+                    - 파일 경로: src/components/chat/hooks/useRealtimeChat.hook.tsx
+                    - Hook 이름: useRealtimeChat
+                    - 'use client' 디렉티브 필수
+                
+                1-2) Import
+                    - React hooks: useEffect, useRef, useState, useCallback
+                    - Supabase: RealtimeChannel 타입
+                    - Supabase 클라이언트: src/lib/supabase/client.ts에서 'supabase as baseSupabase' import
+                        - 반드시 baseSupabase 사용 (supabaseAdmin 금지 - 클라이언트 Hook이므로)
+                    - Repository: sendMessage 함수 import
+                    - 인증: useAuth() hook import
+
+            2) Supabase Realtime Broadcast 구현
+                2-1) Broadcast 채널 관리
+                    - user-status.provider.tsx의 채널 관리 패턴을 참고할 것.
+                    - channelRef: useRef<RealtimeChannel | null>(null) 사용
+                    - subscribedRoomIdRef: useRef<number | null>(null) 사용 (현재 구독 중인 채팅방 추적)
+                        - user-status.provider.tsx의 subscribedUserIdRef 패턴과 동일하게 구현
+                    - 채널 이름: `chat:${roomId}` 형식 사용
+                    - config: { broadcast: { self: true } } 설정
+                    - baseSupabase 클라이언트 사용 (Multiple GoTrueClient 인스턴스 방지)
+
+                2-2) 채널 구독 (subscribeToRoom)
+                    - 특정 채팅방(roomId)에 대한 Broadcast 채널 구독
+                    - 중복 구독 방지: 
+                        - 현재 roomId와 subscribedRoomIdRef.current가 동일하고 channelRef.current가 존재하면 no-op (early return)
+                        - user-status.provider.tsx의 패턴 참고 (154-156줄)
+                    - 다른 roomId로 전환 시:
+                        - 기존 채널이 있으면 baseSupabase.removeChannel(channelRef.current) 호출
+                        - channelRef.current = null
+                        - subscribedRoomIdRef.current = null
+                        - 이후 새 채널 생성
+                    - Broadcast 이벤트 리스너 등록:
+                        - event: 'message'
+                        - payload에서 메시지 정보 수신
+
+                2-3) 메시지 전송 (sendMessage)
+                    - 함수 시그니처: sendMessage(content: string, contentType?: string): Promise<void>
+                    - 입력 파라미터: content(필수), contentType(선택, 기본값 'text')만 받음
+                    - 내부에서 roomId와 senderId 처리:
+                        - roomId: subscribedRoomIdRef.current 사용
+                        - senderId: useAuth().user?.id 사용
+                    - roomId 또는 user?.id가 없으면 에러 throw
+                    - chat.repository.ts의 sendMessage(roomId, senderId, content, contentType) 호출
+                    - Broadcast payload 형식 (저장 성공 후 전송):
+                        {
+                          id: number; // DB에 저장된 메시지 ID (중복 방지용)
+                          content: string;
+                          contentType: string; // 중복 방지용
+                          senderId: string;
+                          roomId: number;
+                          createdAt: string;
+                        }
+                    - channel.send({ type: 'broadcast', event: 'message', payload })
+                    - 주의: Broadcast는 영구 저장되지 않으므로, Repository의 sendMessage도 함께 호출할 것.
+                    - 전송 플로우:
+                        1) Repository.sendMessage()로 DB 저장 (반환값에서 id 획득)
+                        2) 저장 성공 후 Broadcast로 실시간 전송 (id 포함하여 중복 방지 가능하도록)
+
+                2-4) 채널 정리 (cleanup)
+                    - useEffect cleanup 함수에서 채널 정리
+                    - roomId 변경 시 이전 채널 정리
+                    - 컴포넌트 언마운트 시 채널 정리
+                    - cleanup 처리:
+                        - baseSupabase.removeChannel(channelRef.current) 호출
+                        - channelRef.current = null
+                        - subscribedRoomIdRef.current = null
+                    - user-status.provider.tsx의 cleanup 패턴 참고 (235-241줄)
+
+            3) 인증 처리
+                3-1) 세션 확인
+                    - user-status.provider.tsx의 checkSession 패턴을 그대로 복사하여 사용 (20-38줄)
+                    - checkSession 함수 구현:
+                        - /api/auth/session API를 GET으로 호출 (credentials: 'include')
+                        - 응답이 ok이고 user가 있으면 sessionData 반환
+                        - 그 외에는 null 반환
+                    - baseSupabase 클라이언트 재사용 (Multiple GoTrueClient 인스턴스 방지)
+                    - subscribeToRoom, sendMessage 실행 전에 checkSession() 호출
+                    - 세션이 없으면 구독/전송 모두 중단하고 refs 초기화
+
+                3-2) 인증된 사용자만 사용 가능
+                    - useAuth()를 통해 user 정보 확인
+                    - user?.id가 없으면:
+                        - 구독하지 않음
+                        - 메시지 전송하지 않음
+                        - channelRef, subscribedRoomIdRef 모두 null로 초기화
+                        - user-status.provider.tsx의 패턴 참고 (117-148줄)
+
+            4) Hook 반환 값
+                4-1) 반환 객체
+                    interface UseRealtimeChatReturn {
+                      subscribeToRoom: (roomId: number) => void;
+                      sendMessage: (content: string, contentType?: string) => Promise<void>;
+                      unsubscribe: () => void;
+                      isConnected: boolean;
+                      error: string | null;
+                    }
+                    - 반환 타입은 9-3)과 일치하도록 통일할 것
+
+                4-2) subscribeToRoom(roomId: number): void
+                    - 특정 채팅방에 대한 실시간 구독 시작
+                    - roomId 변경 시 자동으로 이전 채널 정리 후 새로 구독
+                    - 중복 구독 방지 로직 포함
+
+                4-3) unsubscribe(): void
+                    - 현재 구독 중인 채널을 수동으로 해제
+                    - baseSupabase.removeChannel(channelRef.current) 호출
+                    - channelRef.current = null
+                    - subscribedRoomIdRef.current = null
+                    - isConnected를 false로 설정
+                    - 에러 상태 초기화 (error = null)
+
+                4-4) sendMessage(content: string, contentType?: string): Promise<void>
+                    - 메시지 전송 함수
+                    - 입력: content(필수), contentType(선택, 기본값 'text')
+                    - 내부 처리:
+                        1) subscribedRoomIdRef.current에서 roomId 가져오기
+                        2) useAuth().user?.id에서 senderId 가져오기
+                        3) roomId 또는 senderId가 없으면 에러 throw
+                        4) chat.repository.ts의 sendMessage(roomId, senderId, content, contentType) 호출
+                        5) 저장 성공 시 반환된 메시지 정보에서 id 획득
+                        6) Broadcast로 실시간 전송 (id, contentType 포함)
+                    - 에러 처리: Repository 저장 실패 시 throw
+
+                4-5) isConnected: boolean
+                    - 현재 채널 연결 상태
+                    - Realtime 상태 콜백(.subscribe())에서 상태 갱신:
+                        - SUBSCRIBED → true
+                        - CHANNEL_ERROR → false
+                        - CLOSED → false
+                    - useState로 상태 관리
+
+                4-6) error: string | null
+                    - 에러 발생 시 에러 메시지
+                    - 정상 작동 시 null
+                    - Realtime 상태 콜백에서 CHANNEL_ERROR 발생 시 에러 메시지 세팅
+                    - console.error 로깅 유지
+
+            5) 이벤트 수신 처리
+                5-1) 메시지 수신 콜백
+                    - Broadcast 이벤트 수신 시 콜백 함수 호출
+                    - onMessage 콜백을 파라미터로 받을 것
+                    - 콜백 함수 시그니처:
+                        (message: RealtimeMessage) => void
+                    - RealtimeMessage 타입은 9-1) 참고 (id, contentType 포함)
+
+                5-2) 중복 수신 방지
+                    - Broadcast와 postgres_changes가 동시에 수신될 수 있음
+                    - Broadcast payload에 id와 contentType이 포함되어 있으므로
+                      onMessage 콜백에서 메시지 ID 기반으로 중복 체크 가능
+                    - postgres_changes와 중복 제거를 위해 id 활용 권장
+
+            6) 에러 처리
+                6-1) 채널 구독 실패
+                    - Realtime 상태 콜백(.subscribe())에서 처리
+                    - CHANNEL_ERROR 상태 처리:
+                        - isConnected를 false로 설정
+                        - error 상태에 에러 메시지 세팅
+                        - console.error('Channel error:', ...) 출력
+                    - CLOSED 상태 처리:
+                        - isConnected를 false로 설정
+                        - error 상태에 에러 메시지 세팅 (필요시)
+
+                6-2) 메시지 전송 실패
+                    - Repository 저장 실패 시 에러 throw
+                    - Broadcast 전송 실패 시 에러 로그 (저장은 성공했으므로 계속 진행)
+
+                6-3) 세션 확인 실패
+                    - 세션 확인 실패 시 구독하지 않음
+                    - 에러 로그 출력
+
+            7) 구현 주의사항
+                7-1) 채널 관리 패턴 (user-status.provider.tsx 참고)
+                    - channelRef.current로 채널 인스턴스 관리
+                    - subscribedRoomIdRef로 현재 구독 중인 roomId 추적 (subscribedUserIdRef 패턴과 동일)
+                    - 중복 구독 방지: 
+                        - subscribedRoomIdRef.current === roomId && channelRef.current 존재 시 no-op (early return)
+                        - user-status.provider.tsx의 154-156줄 패턴 참고
+                    - 채널 전환: 다른 roomId로 변경 시:
+                        1) baseSupabase.removeChannel(channelRef.current)
+                        2) channelRef.current = null
+                        3) subscribedRoomIdRef.current = null
+                        4) 새 채널 생성
+                    - user-status.provider.tsx의 158-163줄 패턴 참고
+
+                7-2) Cleanup 처리
+                    - useEffect cleanup 함수에서 반드시 채널 정리
+                    - roomId 변경 시 이전 채널 정리
+                    - 컴포넌트 언마운트 시 채널 정리
+                    - 메모리 누수 방지
+
+                7-3) Broadcast vs Postgres Changes
+                    - Broadcast: 실시간 전송용 (빠른 전달)
+                    - DB 저장: Repository.sendMessage()로 영구 저장
+                    - 최종적으로는 postgres_changes로 수신하는 것이 더 안정적
+                    - Broadcast는 전송 속도 향상을 위한 보조 수단
+
+                7-4) Supabase 클라이언트 사용
+                    - src/lib/supabase/client.ts에서 'supabase as baseSupabase' import
+                    - 반드시 baseSupabase 사용 (클라이언트 Hook이므로)
+                    - supabaseAdmin 사용 금지 (서버 사이드 전용)
+                    - Multiple GoTrueClient 인스턴스 방지를 위해 동일 클라이언트 재사용
+                    - user-status.provider.tsx의 11줄 패턴 참고
+
+                7-5) Prop 기반 자동 구독 (선택사항)
+                    - roomId prop이 전달되면 useEffect로 자동 subscribeToRoom(roomId) 호출
+                    - useEffect deps에 roomId 포함
+                    - roomId 변경 시 자동으로 이전 채널 정리 후 새로 구독
+                    - cleanup 함수에서 unsubscribe() 호출
+                    - 사용자가 수동으로 subscribeToRoom을 호출하지 않아도 되는 편의 기능
+
+            8) 사용 예시
+                8-1) Hook 사용 패턴
+                    // 방법 1: roomId prop으로 자동 구독
+                    const { sendMessage, unsubscribe, isConnected, error } = useRealtimeChat({
+                      onMessage: (message) => {
+                        // 메시지 수신 시 처리
+                        console.log('Received:', message);
+                        // message.id로 중복 제거 가능
+                      },
+                      roomId: 123, // prop으로 전달 시 자동 구독
+                    });
+
+                    // 방법 2: 수동 구독
+                    const { subscribeToRoom, sendMessage, unsubscribe, isConnected, error } = useRealtimeChat({
+                      onMessage: (message) => {
+                        console.log('Received:', message);
+                      },
+                    });
+
+                    // 채팅방 구독 (roomId prop이 없을 때)
+                    useEffect(() => {
+                      if (roomId) {
+                        subscribeToRoom(roomId);
+                      }
+                      // cleanup
+                      return () => {
+                        unsubscribe();
+                      };
+                    }, [roomId, subscribeToRoom, unsubscribe]);
+
+                8-2) 메시지 전송
+                    const handleSend = async () => {
+                      try {
+                        await sendMessage('Hello!', 'text');
+                        // 또는
+                        await sendMessage('Hello!'); // contentType 기본값 'text'
+                      } catch (error) {
+                        console.error('Failed to send message:', error);
+                      }
+                    };
+
+                8-3) 구독 해제
+                    const handleUnsubscribe = () => {
+                      unsubscribe();
+                    };
+
+            9) 타입 정의
+                9-1) 메시지 타입
+                    interface RealtimeMessage {
+                      id?: number; // DB에 저장된 메시지 ID (중복 방지용, Broadcast 수신 시 포함)
+                      content: string;
+                      contentType?: string; // 메시지 타입 (중복 방지용, Broadcast 수신 시 포함)
+                      senderId: string;
+                      roomId: number;
+                      createdAt: string;
+                    }
+                    - Broadcast payload와 일치하도록 정의
+                    - postgres_changes와 중복 제거를 위해 id와 contentType 활용 가능
+
+                9-2) Hook 파라미터 타입
+                    interface UseRealtimeChatProps {
+                      onMessage?: (message: RealtimeMessage) => void;
+                      roomId?: number; // 초기 roomId (선택사항, prop으로 전달 시 자동 구독)
+                    }
+                    - roomId prop이 있으면 useEffect로 자동 subscribeToRoom(roomId) 호출
+                    - deps에 roomId 포함하여 roomId 변경 시 자동 재구독
+
+                9-3) Hook 반환 타입
+                    interface UseRealtimeChatReturn {
+                      subscribeToRoom: (roomId: number) => void;
+                      sendMessage: (content: string, contentType?: string) => Promise<void>;
+                      unsubscribe: () => void;
+                      isConnected: boolean;
+                      error: string | null;
+                    }
+                    - 4-1)과 일치하도록 통일
+                    - unsubscribe: 채널 수동 해제 함수
+
+==============================================
+
+구현 완료 후 아래 2가지 체크리스트를 반환할 것.
+
+1) 커서룰(@01-common.mdc, @04-func.mdc) 적용 결과 체크리스트
+   - 파일 경로 준수 여부
+   - 라이브러리 사용 규칙 준수 여부
+   - 코드 구조 및 네이밍 규칙 준수 여부
+
+2) 기능 요구사항 구현 체크리스트
+   - baseSupabase 클라이언트 사용 여부 (supabaseAdmin 사용 금지 확인)
+   - checkSession 패턴 구현 여부 (user-status.provider.tsx 패턴 복사)
+   - 세션/user?.id 없을 때 subscribe/send 중단 및 refs 초기화 구현 여부
+   - channelRef, subscribedRoomIdRef로 현재 방 추적 구현 여부
+   - 다른 room 전환 시 이전 채널 cleanup 및 null 처리 구현 여부
+   - Broadcast 채널 구독 구현 완료 여부
+   - 중복 구독 방지 (no-op 패턴) 구현 여부
+   - 메시지 전송 기능 구현 완료 여부 (roomIdRef, user?.id 사용)
+   - Broadcast payload 확장 (id, contentType 포함) 구현 여부
+   - Realtime 상태 콜백으로 isConnected 갱신 구현 여부
+   - 채널 정리 로직 구현 완료 여부 (null 처리 포함)
+   - 에러 처리 구현 여부 (CHANNEL_ERROR, CLOSED 상태 처리)
+   - Cleanup 처리 구현 완료 여부 (언마운트, room 변경 시)
+   - unsubscribe 함수 구현 여부
+   - roomId prop 기반 자동 구독 구현 여부 (선택사항)
+   - user-status.provider.tsx 패턴 준수 여부
+
