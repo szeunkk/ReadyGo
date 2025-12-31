@@ -200,8 +200,8 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | Column     | Type        | Nullable | Description |
 | ---------- | ----------- | -------- | ----------- |
 | id         | bigint      | ❌       | PK          |
-| message_id | bigint      | ⭕       | 메시지 ID   |
-| user_id    | uuid        | ⭕       | 읽은 유저   |
+| message_id | bigint      | ❌       | 메시지 ID   |
+| user_id    | uuid        | ❌       | 읽은 유저   |
 | read_at    | timestamptz | ⭕       | 읽은 시각   |
 
 ---
@@ -529,7 +529,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 - **Author**: ReadyGo / Eunkyoung Kim(김은경)
 - **Created At**: 2025-12-24
 - **Last Updated At**: 2025-12-31
-- **Document Version**: v1.0.8
+- **Document Version**: v1.0.9
 - **Status**: Active
 - **Source of Truth**:
   - Supabase Production Database
@@ -537,14 +537,15 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 ## Version History
 
-| Version | Date       | Description                                                                               |
-| ------: | ---------- | ----------------------------------------------------------------------------------------- |
-|  v1.0.0 | 2025-12-24 | Detailed table & column documentation (33 tables)                                         |
-|  v1.0.1 | 2025-12-26 | steam_game_info 테이블 컬럼 추가 및 수정                                                  |
-|  v1.0.2 | 2025-12-26 | steam_game_info categories, genres 컬럼 수정(jsonb[], text[])                             |
-|  v1.0.3 | 2025-12-26 | 게임 단위 Steam 메타 동기화 상세 로그 확인을 위한 steam_game_sync_logs 테이블 추가        |
-|  v1.0.4 | 2025-12-27 | party_posts 컬럼 NOT NULL 정리 및 RLS 정책 적용(생성자만 수정 가능, 인증 유저 조회 허용)  |
-|  v1.0.5 | 2025-12-27 | title => game_title 컬럼 명 변경                                                          |
-|  v1.0.6 | 2025-12-29 | User/Profile Domain에 user_status 테이블 추가                                             |
-|  v1.0.7 | 2025-12-29 | user_play_schedules 테이블 추가, 테이블 번호 순서 정리 (5번 중복 해결, 6~36번으로 재정렬) |
-|  v1.0.8 | 2025-01-13 | chat_blocks 테이블명을 user_blocks로 변경, User/Profile Domain으로 이동                   |
+| Version | Date       | Description                                                                                                  |
+| ------: | ---------- | ------------------------------------------------------------------------------------------------------------ |
+|  v1.0.0 | 2025-12-24 | Detailed table & column documentation (33 tables)                                                            |
+|  v1.0.1 | 2025-12-26 | steam_game_info 테이블 컬럼 추가 및 수정                                                                     |
+|  v1.0.2 | 2025-12-26 | steam_game_info categories, genres 컬럼 수정(jsonb[], text[])                                                |
+|  v1.0.3 | 2025-12-26 | 게임 단위 Steam 메타 동기화 상세 로그 확인을 위한 steam_game_sync_logs 테이블 추가                           |
+|  v1.0.4 | 2025-12-27 | party_posts 컬럼 NOT NULL 정리 및 RLS 정책 적용(생성자만 수정 가능, 인증 유저 조회 허용)                     |
+|  v1.0.5 | 2025-12-27 | title => game_title 컬럼 명 변경                                                                             |
+|  v1.0.6 | 2025-12-29 | User/Profile Domain에 user_status 테이블 추가                                                                |
+|  v1.0.7 | 2025-12-29 | user_play_schedules 테이블 추가, 테이블 번호 순서 정리 (5번 중복 해결, 6~36번으로 재정렬)                    |
+|  v1.0.8 | 2025-01-13 | chat_blocks 테이블명을 user_blocks로 변경, User/Profile Domain으로 이동                                      |
+|  v1.0.9 | 2025-01-15 | chat_message_reads 테이블: message_id, user_id를 NOT NULL로 변경, (message_id, user_id) UNIQUE 제약조건 추가 |
