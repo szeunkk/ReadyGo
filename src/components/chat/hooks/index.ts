@@ -13,3 +13,9 @@ export {
   type UseChatRoomProps,
   type UseChatRoomReturn,
 } from './useChatRoom.hook';
+
+export {
+  useChatList,
+  type UseChatListProps,
+  type UseChatListReturn,
+} from './useChatList.hook';
