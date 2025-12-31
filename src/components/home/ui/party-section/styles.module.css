@@ -32,32 +32,22 @@
 .gridContainer {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(2, fit-content);
   gap: 24px;
   width: 100%;
 }
 
-/* 반응형 디자인 - 중형 데스크탑 (1440px ~ 1920px) */
-@media (min-width: 1440px) and (max-width: 1919px) {
+/* 반응형 디자인 - 중형 데스크탑 (1440px ~ 1799px) - 3열 */
+@media (min-width: 1440px) and (max-width: 1799px) {
   .gridContainer {
-    display: grid;
-    grid-template-columns: repeat(2, auto);
-    grid-template-rows: repeat(2, auto);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 24px;
-  }
-
-  /* 4개까지만 표시 */
-  .gridContainer > *:nth-child(n + 5) {
-    display: none;
   }
 }
 
-/* 반응형 디자인 - 대형 데스크탑 (1920px 이상) */
-@media (min-width: 1920px) {
+/* 반응형 디자인 - 대형 데스크탑 (1800px 이상) - 3열 유지 */
+@media (min-width: 1800px) {
   .gridContainer {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
-    grid-template-rows: repeat(2, auto);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 24px;
   }
 }

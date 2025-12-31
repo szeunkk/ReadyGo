@@ -5,7 +5,10 @@
   flex-direction: column;
   gap: 30px;
   width: 408px;
+  min-width: 408px;
+  max-width: 408px;
   height: fit-content;
+  flex-shrink: 0;
 }
 
 /* Animal Card */
@@ -80,38 +83,15 @@
 
 /* Responsive Design */
 @media (max-width: 1440px) {
-  .profileSection {
-    width: 360px;
-  }
-
-  .radarChartWrapper {
-    height: 220px;
-  }
-
-  .radarChart {
-    width: 200px;
-    height: 172px;
-  }
+  /* profileSection과 차트 크기는 모두 기본값 유지 (408px) */
 }
 
 @media (max-width: 768px) {
-  .profileSection {
-    width: 100%;
-    max-width: 408px;
-  }
+  /* profileSection과 차트 크기는 모두 기본값 유지 (408px) */
 
   .chartsContainer {
     padding: 24px 16px;
     border-radius: 32px;
-  }
-
-  .radarChartWrapper {
-    height: 200px;
-  }
-
-  .radarChart {
-    width: 180px;
-    height: 156px;
   }
 }
 
@@ -133,15 +113,6 @@
   .chartTitle {
     font-size: 14px;
     line-height: 18px;
-  }
-
-  .radarChartWrapper {
-    height: 180px;
-  }
-
-  .radarChart {
-    width: 150px;
-    height: 130px;
   }
 
   .barChartWrapper {

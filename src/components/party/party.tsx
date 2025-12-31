@@ -4,10 +4,12 @@ import React, { useState } from 'react';
 import Selectbox, { type SelectboxItem } from '@/commons/components/selectbox';
 import Searchbar from '@/commons/components/searchbar';
 import Button from '@/commons/components/button';
+import Icon from '@/commons/components/icon';
 import Card from './ui/card';
 import { useLinkModal } from './hooks/index.link.modal.hook';
 import { usePartyListBinding } from './hooks/index.binding.hook';
 import { useLinkRouting } from './hooks/index.link.routing.hook';
+import { useFloatButton } from './hooks/index.float.hook';
 import styles from './styles.module.css';
 
 export default function Party() {
@@ -17,7 +19,7 @@ export default function Party() {
   const { openPartySubmitModal } = useLinkModal();
   const { data: partyList, isLoading, error } = usePartyListBinding();
   const { navigateToPartyDetail } = useLinkRouting();
-
+  const { scrollToTop } = useFloatButton();
   const genreItems: SelectboxItem[] = [
     { id: 'all', value: '모든 게임 장르' },
     { id: 'action', value: '액션' },
@@ -90,6 +92,14 @@ export default function Party() {
           )}
         </div>
       </div>
+      <button
+        className={styles.floatButton}
+        aria-label="맨 위로 이동"
+        onClick={scrollToTop}
+        data-testid="party-float-button"
+      >
+        <Icon name="chevron-up" size={24} />
+      </button>
     </div>
   );
 }

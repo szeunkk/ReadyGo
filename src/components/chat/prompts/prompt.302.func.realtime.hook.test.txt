@@ -1,0 +1,288 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 테스트 대상 Hook 파일경로: src/components/chat/hooks/useRealtimeChat.hook.tsx
+조건-파일경로) 구현될 테스트 파일경로: src/components/chat/tests/useRealtimeChat.hook.spec.ts
+조건-파일경로) 참고할 Repository 파일경로: src/repositories/chat.repository.ts
+조건-파일경로) 참고할 Supabase 클라이언트: src/lib/supabase/client.ts
+조건-파일경로) 참고할 Provider 파일경로: src/commons/providers/user-status/user-status.provider.tsx
+
+==============================================
+
+핵심요구사항) useRealtimeChat hook의 기능을 playwright 테스트를 활용하여 TDD기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+            1) 테스트 제외 라이브러리
+                - jest
+                - @testing-library/react
+                - vitest
+
+            2) 테스트 조건
+                2-1) Timeout 설정
+                    - timeout은 network 통신인 경우 2000ms 미만으로 설정할 것
+                    - timeout은 network 통신이 아닌 경우 설정하지 않거나, 500ms 미만으로 설정할 것
+                    - Realtime 구독/해제는 비동기이므로 적절한 timeout 설정
+
+                2-2) 페이지 로드 대기
+                    - hook을 사용하는 테스트 컴포넌트가 완전히 로드된 후 테스트할 것
+                    - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+                    - 페이지 로드 식별 금지사항: networkidle 대기 방법
+                    - 테스트 컴포넌트에 data-testid="realtime-chat-test-page"를 배치하고, Playwright는 이를 기준으로 "로드 완료"를 판별할 것
+
+                2-3) 테스트 격리
+                    - 각 테스트는 독립적으로 실행 가능하도록 구성
+                    - beforeEach에서 페이지 초기 상태 설정
+                    - 테스트 간 상태 공유 최소화
+
+            3) 테스트 Auth/API 조건 (Supabase)
+                3-1) 데이터
+                    - 성공 시나리오는 실제 Supabase Realtime을 사용할 것
+                    - Mock데이터 사용하지 말 것
+                    - 실패 시나리오는 page.route()로 모킹할 것
+
+                3-2) 성공 시나리오 (실제 Supabase, 모킹 금지)
+                    - Supabase Realtime 요청을 모킹하지 말 것
+                    - 실제 Supabase 클라이언트 사용
+                    - 실제 채팅방(roomId) 사용
+                    - 실제 사용자 인증 사용 (로그인 상태 필요)
+
+                3-3) 실패 시나리오 (모킹 필수)
+                    - 실패 시나리오에서는 Supabase 관련 네트워크 호출을 Playwright page.route()로 모킹할 것
+                    - 모킹 대상은 실제 HTTP 요청 경로를 기준으로 가로챌 것
+                    - 실패 시나리오는 최소 2종류를 포함할 것:
+                        1. checkSession 실패 (/api/auth/session 실패)
+                        2. Repository.sendMessage 실패 (DB insert 실패)
+
+            4) 테스트 컴포넌트
+                4-1) 테스트용 컴포넌트 생성
+                    - 파일 경로: src/components/chat/hooks/tests/RealtimeChatTestComponent.tsx
+                    - useRealtimeChat hook을 사용하는 테스트 컴포넌트
+                    - data-testid="realtime-chat-test-page" 배치
+                    - Hook의 반환값을 UI로 표시:
+                        - isConnected 상태 표시 (data-testid="is-connected")
+                        - error 상태 표시 (data-testid="error")
+                        - subscribeToRoom 버튼 (data-testid="subscribe-btn")
+                        - sendMessage 버튼 (data-testid="send-message-btn")
+                        - unsubscribe 버튼 (data-testid="unsubscribe-btn")
+                        - 수신된 메시지 목록 표시 (data-testid="messages-list")
+
+            5) 테스트 시나리오
+                5-1) Hook 초기화 테스트
+                    - 테스트 컴포넌트 로드 후:
+                        1) data-testid="realtime-chat-test-page" 대기
+                        2) 초기 상태 확인:
+                            - data-testid="is-connected"가 "false"인지 확인
+                            - data-testid="error"가 비어있는지 확인
+                        3) 버튼들이 존재하는지 확인
+
+                5-2) subscribeToRoom 테스트
+                    5-2-1) 정상 구독 테스트
+                        - subscribeToRoom 버튼 클릭 시:
+                            1) data-testid="is-connected"가 "true"로 변경되는지 확인 (timeout: 2000ms)
+                            2) data-testid="error"가 비어있는지 확인
+                            3) 실제 Supabase Realtime 채널이 구독되는지 확인 (네트워크 요청 확인)
+
+                    5-2-2) 중복 구독 방지 테스트
+                        - 동일한 roomId로 subscribeToRoom 버튼을 두 번 클릭 시:
+                            1) isConnected 상태가 한 번만 변경되는지 확인
+                            2) 네트워크 요청이 한 번만 발생하는지 확인
+
+                    5-2-3) 다른 roomId로 전환 테스트
+                        - roomId 1로 구독 후 roomId 2로 전환 시:
+                            1) 이전 채널이 해제되는지 확인
+                            2) 새 채널이 구독되는지 확인
+                            3) isConnected가 유지되는지 확인
+
+                    5-2-4) 세션 없을 때 구독 실패 테스트
+                        - page.route()로 /api/auth/session를 실패 응답으로 모킹:
+                            1) subscribeToRoom 버튼 클릭
+                            2) isConnected가 "false"로 유지되는지 확인
+                            3) error 상태에 에러 메시지가 표시되는지 확인
+
+                    5-2-5) user?.id 없을 때 구독 실패 테스트
+                        - 비로그인 상태에서:
+                            1) subscribeToRoom 버튼 클릭
+                            2) isConnected가 "false"로 유지되는지 확인
+                            3) error 상태에 에러 메시지가 표시되는지 확인
+
+                    5-2-6) 채널 에러 처리 테스트
+                        - Realtime 채널 에러 발생 시:
+                            1) isConnected가 "false"로 변경되는지 확인
+                            2) error 상태에 에러 메시지가 표시되는지 확인
+
+                5-3) sendMessage 테스트
+                    5-3-1) 정상 전송 테스트
+                        - subscribeToRoom 후 sendMessage 버튼 클릭 시:
+                            1) DB에 메시지가 저장되는지 확인 (실제 Supabase 사용)
+                            2) data-testid="messages-list"에 메시지가 표시되는지 확인
+                            3) Broadcast로 실시간 전송되는지 확인 (다른 클라이언트에서 수신 가능)
+
+                    5-3-2) contentType 기본값 테스트
+                        - sendMessage 호출 시 (contentType 미지정):
+                            1) DB에 저장된 메시지의 content_type이 'text'인지 확인
+
+                    5-3-3) roomId 없을 때 에러 테스트
+                        - subscribeToRoom 호출 전에 sendMessage 버튼 클릭 시:
+                            1) error 상태에 에러 메시지가 표시되는지 확인
+                            2) 메시지가 DB에 저장되지 않는지 확인
+
+                    5-3-4) senderId 없을 때 에러 테스트
+                        - 비로그인 상태에서 sendMessage 버튼 클릭 시:
+                            1) error 상태에 에러 메시지가 표시되는지 확인
+                            2) 메시지가 DB에 저장되지 않는지 확인
+
+                    5-3-5) Repository 저장 실패 테스트
+                        - page.route()로 DB insert 요청을 실패 응답으로 모킹:
+                            1) sendMessage 버튼 클릭
+                            2) error 상태에 에러 메시지가 표시되는지 확인
+                            3) 메시지가 표시되지 않는지 확인
+
+                    5-3-6) Broadcast 전송 테스트
+                        - 메시지 전송 후:
+                            1) Broadcast로 실시간 전송되는지 확인
+                            2) onMessage 콜백이 호출되는지 확인 (messages-list에 표시)
+
+                5-4) unsubscribe 테스트
+                    5-4-1) 정상 해제 테스트
+                        - subscribeToRoom 후 unsubscribe 버튼 클릭 시:
+                            1) isConnected가 "false"로 변경되는지 확인
+                            2) error가 비어있는지 확인
+                            3) 채널이 해제되는지 확인 (네트워크 요청 확인)
+
+                    5-4-2) 구독 전 unsubscribe 호출 테스트
+                        - subscribeToRoom 호출 전에 unsubscribe 버튼 클릭 시:
+                            1) 에러가 발생하지 않는지 확인
+                            2) isConnected가 "false"로 유지되는지 확인
+
+                5-5) onMessage 콜백 테스트
+                    5-5-1) 메시지 수신 테스트
+                        - Broadcast 이벤트 수신 시:
+                            1) data-testid="messages-list"에 메시지가 추가되는지 확인
+                            2) 메시지 payload 형식 확인 (id, contentType 포함)
+                            3) 중복 수신 방지 확인 (동일 id의 메시지가 중복 표시되지 않는지)
+
+                    5-5-2) 콜백 미지정 시 테스트
+                        - onMessage 콜백이 없을 때:
+                            1) 에러가 발생하지 않는지 확인
+                            2) 메시지 수신 시에도 에러가 발생하지 않는지 확인
+
+                5-6) roomId prop 기반 자동 구독 테스트
+                    5-6-1) roomId prop 전달 시 자동 구독 테스트
+                        - 테스트 컴포넌트에 roomId prop 전달 시:
+                            1) 컴포넌트 로드 시 자동으로 subscribeToRoom이 호출되는지 확인
+                            2) isConnected가 "true"로 변경되는지 확인
+
+                    5-6-2) roomId prop 변경 시 재구독 테스트
+                        - roomId가 변경될 때:
+                            1) 이전 채널이 해제되는지 확인
+                            2) 새 채널이 구독되는지 확인
+
+                5-7) Cleanup 처리 테스트
+                    5-7-1) 컴포넌트 언마운트 시 cleanup 테스트
+                        - subscribeToRoom 후 페이지 이동 또는 컴포넌트 언마운트 시:
+                            1) 채널이 정리되는지 확인
+                            2) 네트워크 요청 확인
+
+            6) 테스트 데이터
+                6-1) 실제 테스트 데이터
+                    - 실제 Supabase 계정 사용 (로그인 필요)
+                    - 실제 채팅방(roomId) 사용
+                    - 실제 메시지 전송/수신
+
+                6-2) 테스트 계정
+                    - 사용할 계정: email: "a@c.com", password: "1234qwer"
+                    - 로그인 상태에서 테스트 수행
+
+            7) 테스트 실행 순서
+                7-1) beforeEach
+                    - 페이지 이동 (테스트 컴포넌트가 있는 페이지)
+                    - 로그인 상태 확인 (필요시 로그인)
+                    - data-testid="realtime-chat-test-page" 대기
+
+                7-2) 테스트 독립성
+                    - 각 테스트는 독립적으로 실행 가능
+                    - 테스트 간 상태 공유 최소화
+                    - 각 테스트 전에 초기 상태로 리셋
+
+            8) 테스트 주의사항
+                8-1) 비동기 처리
+                    - Realtime 구독/해제는 비동기이므로 적절한 대기 시간 필요
+                    - page.waitForSelector() 사용하여 상태 변경 대기
+                    - timeout 설정 주의 (network 통신: 2000ms 미만)
+
+                8-2) 실제 Supabase 사용
+                    - 성공 시나리오는 실제 Supabase 사용
+                    - 실제 네트워크 요청 발생
+                    - 실제 DB에 데이터 저장/조회
+
+                8-3) 실패 시나리오 모킹
+                    - page.route()로 HTTP 요청 가로채기
+                    - 실패 응답 반환
+                    - 모킹 패턴:
+                        - **/api/auth/session (세션 확인 실패)
+                        - **/rest/v1/chat_messages (메시지 저장 실패)
+
+            9) 테스트 파일 구조
+                9-1) Import
+                    - @playwright/test: test, expect
+                    - 테스트 컴포넌트 경로
+
+                9-2) 테스트 그룹
+                    - test.describe('useRealtimeChat', () => { ... })
+                    - test.describe('subscribeToRoom', () => { ... })
+                    - test.describe('sendMessage', () => { ... })
+                    - test.describe('unsubscribe', () => { ... })
+                    - test.describe('onMessage callback', () => { ... })
+                    - test.describe('roomId prop auto-subscribe', () => { ... })
+                    - test.describe('cleanup', () => { ... })
+
+==============================================
+
+구현 완료 후 아래 2가지 체크리스트를 반환할 것.
+
+1) 커서룰(@01-common.mdc, @04-func.mdc) 적용 결과 체크리스트
+   - 파일 경로 준수 여부
+   - 테스트 라이브러리 사용 규칙 준수 여부
+   - 코드 구조 및 네이밍 규칙 준수 여부
+   - timeout 설정 규칙 준수 여부
+
+2) 기능 요구사항 구현 체크리스트
+   - playwright 사용 여부 (vitest, jest, @testing-library/react 제외 확인)
+   - 테스트 컴포넌트 생성 여부 (RealtimeChatTestComponent.tsx)
+   - data-testid 기반 로드 대기 구현 여부
+   - timeout 규칙 준수 여부 (network: 2000ms 미만, 기타: 500ms 미만)
+   - 실제 Supabase 사용 여부 (성공 시나리오)
+   - page.route() 모킹 구현 여부 (실패 시나리오)
+   - Hook 초기화 테스트 구현 여부
+   - subscribeToRoom 정상 구독 테스트 구현 여부
+   - subscribeToRoom 중복 구독 방지 테스트 구현 여부
+   - subscribeToRoom 다른 roomId 전환 테스트 구현 여부
+   - subscribeToRoom 세션 없을 때 실패 테스트 구현 여부 (모킹)
+   - subscribeToRoom user?.id 없을 때 실패 테스트 구현 여부
+   - subscribeToRoom 채널 에러 처리 테스트 구현 여부
+   - sendMessage 정상 전송 테스트 구현 여부
+   - sendMessage contentType 기본값 테스트 구현 여부
+   - sendMessage roomId 없을 때 에러 테스트 구현 여부
+   - sendMessage senderId 없을 때 에러 테스트 구현 여부
+   - sendMessage Repository 저장 실패 테스트 구현 여부 (모킹)
+   - sendMessage Broadcast 전송 테스트 구현 여부
+   - unsubscribe 정상 해제 테스트 구현 여부
+   - unsubscribe 구독 전 호출 테스트 구현 여부
+   - onMessage 콜백 테스트 구현 여부
+   - onMessage 중복 수신 방지 테스트 구현 여부
+   - roomId prop 기반 자동 구독 테스트 구현 여부
+   - roomId prop 변경 시 재구독 테스트 구현 여부
+   - cleanup 컴포넌트 언마운트 테스트 구현 여부
+   - cleanup roomId 변경 테스트 구현 여부
+   - beforeEach 페이지 초기화 구현 여부
+   - 테스트 독립성 보장 여부
+   - 실제 Supabase 사용 확인 여부 (성공 시나리오)
+   - 실패 시나리오 모킹 확인 여부
+

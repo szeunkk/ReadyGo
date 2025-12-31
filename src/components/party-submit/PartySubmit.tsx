@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Controller } from 'react-hook-form';
 import { DatePicker } from 'antd';
+import type { DatePickerProps } from 'antd';
+import dayjs from 'dayjs';
 import styles from './styles.module.css';
 import Searchbar from '@/commons/components/searchbar';
 import Input from '@/commons/components/input';
@@ -107,10 +109,10 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
     { id: 'hell', value: '지옥' },
   ];
 
-  // 시간 옵션 (10분 간격)
+  // 시간 옵션 (30분 간격)
   const timeOptions: SelectboxItem[] = Array.from({ length: 24 }, (_, hour) =>
-    Array.from({ length: 6 }, (_, minuteIndex) => {
-      const minute = minuteIndex * 10;
+    Array.from({ length: 2 }, (_, minuteIndex) => {
+      const minute = minuteIndex * 30;
       const period = hour < 12 ? '오전' : '오후';
       const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
       const displayMinute = minute.toString().padStart(2, '0');
@@ -135,6 +137,11 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
   const handleVoiceChatToggle = (value: 'required' | 'optional') => {
     const newValue = voiceChat === value ? null : value;
     setValue('voice_chat', newValue, { shouldValidate: true });
+  };
+
+  // 날짜 제한: 과거 날짜 선택 차단
+  const disabledDate: DatePickerProps['disabledDate'] = (current) => {
+    return current && current.isBefore(dayjs().startOf('day'));
   };
 
   return (
@@ -172,6 +179,8 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
             </label>
             <div className={styles.gameSearchWrapper} ref={gameSearchRef}>
               <Searchbar
+                size="l"
+                icon="right"
                 placeholder="게임 검색"
                 value={gameSearchQuery}
                 onChange={handleGameSearchChange}
@@ -180,24 +189,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
                     setIsGameOptionsOpen(true);
                   }
                 }}
-              >
-                <input
-                  type="text"
-                  className={styles.searchInput}
-                  placeholder="게임 검색"
-                  value={gameSearchQuery}
-                  onChange={handleGameSearchChange}
-                  onFocus={() => {
-                    if (
-                      gameSearchQuery.length > 0 &&
-                      filteredGames.length > 0
-                    ) {
-                      setIsGameOptionsOpen(true);
-                    }
-                  }}
-                />
-                <Icon name="search" size={20} />
-              </Searchbar>
+              />
               {isGameOptionsOpen && filteredGames.length > 0 && (
                 <div className={styles.gameOptionsGroup}>
                   {filteredGames.map((game) => {
@@ -271,6 +263,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
                           field.onChange(date);
                         }}
                         format="YYYY-MM-DD"
+                        disabledDate={disabledDate}
                         suffixIcon={<Icon name="calendar" size={20} />}
                         getPopupContainer={(trigger) => {
                           return (
@@ -389,6 +382,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Selectbox
+                    size="l"
                     label="컨트롤 수준"
                     required
                     placeholder="옵션 선택"
@@ -408,6 +402,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Selectbox
+                    size="l"
                     label="난이도"
                     required
                     placeholder="난이도 선택"
