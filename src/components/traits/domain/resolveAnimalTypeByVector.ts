@@ -11,11 +11,6 @@ import type { TraitVector } from '@/commons/constants/animal/animal.vector';
 import { calculateEuclideanDistance } from './calculateVectorDistance';
 
 /**
- * 기존 호환 타입
- */
-export type TraitScores = TraitVector;
-
-/**
  * 거리 계산 결과
  */
 export type AnimalDistanceResult = {
@@ -152,37 +147,5 @@ export const analyzeVectorDifference = (
     leadership: userVector.leadership - animalVector.leadership,
     social: userVector.social - animalVector.social,
   };
-};
-
-// ============================================
-// 기존 인터페이스 호환 함수
-// ============================================
-
-/**
- * 성향 점수를 기반으로 가장 적합한 동물 유형을 결정 (기존 인터페이스 호환)
- *
- * @param traitScores - 5가지 성향별 점수 (0~100)
- * @returns 가장 적합한 동물 유형
- *
- * @example
- * ```ts
- * const scores = {
- *   cooperation: 80,
- *   leadership: 90,
- *   strategy: 50,
- *   exploration: 60,
- *   social: 70
- * };
- * const animal = resolveAnimalType(scores);
- * // AnimalType.WOLF
- * ```
- * 
- * 새로운 시스템:
- * - 유클리드 거리 기반 매칭
- * - 16개 동물 모두 구분 가능
- * - 균등성 91.5% (기존 시스템 대비 크게 개선)
- */
-export const resolveAnimalType = (traitScores: TraitScores): AnimalType => {
-  return resolveAnimalTypeByVector(traitScores);
 };
 

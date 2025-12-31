@@ -9,9 +9,16 @@ import type { TraitScores } from '../domain/calculateTraitScores';
 export const useTraitResult = (answers: Record<string, AnswerType>) => {
   /**
    * answers → traitScores
+   * ScheduleAnswer를 제외하고 숫자 답변만 필터링
    */
   const traitScores: TraitScores = useMemo(() => {
-    return calculateTraitScores(answers);
+    const numericAnswers: Record<string, number> = {};
+    for (const [key, value] of Object.entries(answers)) {
+      if (typeof value === 'number') {
+        numericAnswers[key] = value;
+      }
+    }
+    return calculateTraitScores(numericAnswers);
   }, [answers]);
 
   /**

@@ -21,6 +21,7 @@ export type TraitsResultDTO = {
     social: number;
   };
   animalType: string;
+  nickname: string;
   schedule: {
     dayTypes: string[];
     timeSlots: string[];
@@ -36,9 +37,10 @@ export const getTraitsResult = async (
     throw new Error('traits not found');
   }
 
-  // 2. user_profiles 조회 (animal_type)
+  // 2. user_profiles 조회 (animal_type, nickname)
   const userProfile = await findUserProfile(userId);
   const animalType = userProfile?.animal_type || '';
+  const nickname = userProfile?.nickname || '';
 
   // 3. user_play_schedules 조회
   const playSchedules = await findPlaySchedules(userId);
@@ -69,6 +71,7 @@ export const getTraitsResult = async (
   return {
     traits,
     animalType,
+    nickname,
     schedule: {
       dayTypes: Array.from(dayTypesSet),
       timeSlots: Array.from(timeSlotsSet),

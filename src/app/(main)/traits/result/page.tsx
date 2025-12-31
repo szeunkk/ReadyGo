@@ -19,6 +19,7 @@ type TraitsResultApiResponse = {
     social: number;
   };
   animalType: string;
+  nickname: string;
   schedule: {
     dayTypes: string[];
     timeSlots: string[];
@@ -101,7 +102,7 @@ export default async function Page() {
   return (
     <TraitsResultPage
       animalType={animalType}
-      nickname={animalMeta.label}
+      nickname={result.nickname}
       radarData={radarData}
       mainRole={{
         label: animalMeta.mainRole.name,
