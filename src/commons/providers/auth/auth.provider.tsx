@@ -12,6 +12,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import type { User } from '@supabase/supabase-js';
 
 import { useAuthStore } from '@/stores/auth.store';
+import { useSidePanelStore } from '@/stores/sidePanel.store';
+import { useOverlayStore } from '@/stores/overlay.store';
 import { URL_PATHS } from '@/commons/constants/url';
 
 // 공개 페이지 목록 (자동 리다이렉트 예외)
@@ -189,22 +191,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
    * Supabase 세션 관리 일원화:
    * - API를 통해 서버 쿠키 삭제 및 Supabase 세션 제거
    * - 클라이언트 store 초기화
+   * - UI 상태 정리 (사이드 패널, 오버레이)
    */
   const logout = async () => {
     try {
-      // API를 통해 로그아웃 처리 (서버 쿠키 삭제 및 Supabase 세션 제거)
+      // 1. UI 상태 정리 (API 호출 전)
+      useSidePanelStore.getState().close();
+      useOverlayStore.getState().close();
+
+      // 2. API를 통해 로그아웃 처리 (서버 쿠키 삭제 및 Supabase 세션 제거)
       await fetch('/api/auth/session', {
         method: 'DELETE',
         credentials: 'include', // 쿠키 포함
       });
-      // Zustand store 초기화
+
+      // 3. Zustand store 초기화 (이 시점에서 user가 null이 되면서 Provider들이 자동 cleanup)
       clearAuth();
-      // 로그인 페이지로 이동
+
+      // 4. 로그인 페이지로 이동
       router.push(URL_PATHS.LOGIN);
     } catch (error) {
       console.error('Failed to logout:', error);
       // 에러가 발생해도 상태는 초기화
       clearAuth();
+      useSidePanelStore.getState().close();
+      useOverlayStore.getState().close();
       router.push(URL_PATHS.LOGIN);
     }
   };
