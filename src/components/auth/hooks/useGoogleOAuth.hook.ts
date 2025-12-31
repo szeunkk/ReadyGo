@@ -272,6 +272,9 @@ export const useGoogleOAuth = () => {
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}${URL_PATHS.LOGIN}`,
+          queryParams: {
+            prompt: 'select_account', // 항상 계정 선택 화면 표시
+          },
         },
       });
 
