@@ -11,23 +11,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 /**
- * user_status 수동 변경 API
- * POST /api/user-status/update
+ * user_status 시딩 API
+ * POST /api/user/status/seed
  *
- * 유저가 직접 설정하는 상태를 Supabase DB에 upsert 수행합니다.
+ * 로그인 직후 user_status 테이블에 해당 user의 row가 없을 수 있으므로,
+ * 1회 upsert를 수행합니다.
  */
-export const POST = async function (request: NextRequest) {
+export const POST = async function (_request: NextRequest) {
   try {
-    const body = await request.json();
-    const { status } = body;
-
-    if (!status || !['online', 'away', 'dnd', 'offline'].includes(status)) {
-      return NextResponse.json(
-        { error: '유효하지 않은 상태입니다.' },
-        { status: 400 }
-      );
-    }
-
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('sb-access-token')?.value;
     const refreshToken = cookieStore.get('sb-refresh-token')?.value;
@@ -116,13 +107,16 @@ export const POST = async function (request: NextRequest) {
       }
 
       // user_status 테이블에 upsert 수행
+      // 이미 row가 존재하는 경우 status를 덮어쓰지 않도록
+      // onConflict: user_id로 설정
+      // 타입 정의에 user_status가 없을 수 있으므로 any로 캐스팅
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: upsertError } = await (refreshedSupabase as any)
         .from('user_status')
         .upsert(
           {
             user_id: user.id,
-            status,
+            status: 'online',
           },
           {
             onConflict: 'user_id',
@@ -130,9 +124,9 @@ export const POST = async function (request: NextRequest) {
         );
 
       if (upsertError) {
-        console.error('Failed to update user_status:', upsertError);
+        console.error('Failed to seed user_status:', upsertError);
         return NextResponse.json(
-          { error: 'user_status 업데이트에 실패했습니다.' },
+          { error: 'user_status 시딩에 실패했습니다.' },
           { status: 500 }
         );
       }
@@ -206,7 +200,7 @@ export const POST = async function (request: NextRequest) {
               .upsert(
                 {
                   user_id: refreshedUser.id,
-                  status,
+                  status: 'online',
                 },
                 {
                   onConflict: 'user_id',
@@ -214,9 +208,9 @@ export const POST = async function (request: NextRequest) {
               );
 
             if (upsertError) {
-              console.error('Failed to update user_status:', upsertError);
+              console.error('Failed to seed user_status:', upsertError);
               return NextResponse.json(
-                { error: 'user_status 업데이트에 실패했습니다.' },
+                { error: 'user_status 시딩에 실패했습니다.' },
                 { status: 500 }
               );
             }
@@ -239,7 +233,7 @@ export const POST = async function (request: NextRequest) {
       .upsert(
         {
           user_id: user.id,
-          status,
+          status: 'online',
         },
         {
           onConflict: 'user_id',
@@ -247,19 +241,20 @@ export const POST = async function (request: NextRequest) {
       );
 
     if (upsertError) {
-      console.error('Failed to update user_status:', upsertError);
+      console.error('Failed to seed user_status:', upsertError);
       return NextResponse.json(
-        { error: 'user_status 업데이트에 실패했습니다.' },
+        { error: 'user_status 시딩에 실패했습니다.' },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Update user_status API error:', error);
+    console.error('Seed user_status API error:', error);
     return NextResponse.json(
       { error: '서버 오류가 발생했습니다.' },
       { status: 500 }
     );
   }
 };
+

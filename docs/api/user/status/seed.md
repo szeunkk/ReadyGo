@@ -35,7 +35,7 @@
 
 ## URL
 
-- /api/user-status/seed
+- /api/user/status/seed
 
 ---
 
