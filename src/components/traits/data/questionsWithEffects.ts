@@ -1,9 +1,9 @@
 /**
- * ReadyGo 성향 테스트 질문 세트 (Effect 기반 V2)
- *
+ * ReadyGo 성향 테스트 질문 세트 (Effect 기반)
+ * 
  * 총 10문항, 5개 성향 축을 기반으로 구성
  * 각 선택지는 주 성향 + 보조 효과를 가짐
- *
+ * 
  * Effect 범위:
  * - 주 특성: -20 ~ +20
  * - 보조 특성: -10 ~ +10
@@ -11,25 +11,6 @@
 
 import type { QuestionWithEffect } from './questionEffects.types';
 
-/**
- * 기존 Question 타입 (호환성 유지)
- */
-export interface QuestionChoice {
-  value: 1 | 2 | 3 | 4 | 5;
-  label: string;
-}
-
-export interface Question {
-  id: string;
-  axis: string; // deprecated: effect 기반 시스템에서는 사용하지 않음
-  weight: number; // deprecated
-  text: string;
-  choices: QuestionChoice[];
-}
-
-/**
- * Effect 기반 질문 목록
- */
 export const QUESTIONS_WITH_EFFECTS: QuestionWithEffect[] = [
   // =============================
   // 1. 협동성 (COOPERATION)
@@ -433,8 +414,3 @@ export const QUESTIONS_WITH_EFFECTS: QuestionWithEffect[] = [
   },
 ];
 
-/**
- * 기존 코드 호환성을 위한 QUESTIONS export
- * Effect 기반 시스템으로 마이그레이션되었습니다.
- */
-export const QUESTIONS = QUESTIONS_WITH_EFFECTS as unknown as Question[];
