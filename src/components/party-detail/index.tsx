@@ -64,7 +64,7 @@ export default function PartyDetail() {
                 <span className={styles.buttonText}>수정하기</span>
               </button>
               <button className={styles.actionButton} type="button">
-                <Icon name="x" size={20} className={styles.buttonIcon} />
+                <Icon name="trash" size={20} className={styles.buttonIcon} />
                 <span className={styles.buttonText}>삭제하기</span>
               </button>
             </div>

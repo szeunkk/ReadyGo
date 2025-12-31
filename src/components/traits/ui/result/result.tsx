@@ -36,7 +36,7 @@ export default function Result({
   radarData,
   mainRole,
   subRole,
-  matchTypes,
+  matchTypes: _matchTypes,
   characteristics,
   onPrevious,
   onComplete,
