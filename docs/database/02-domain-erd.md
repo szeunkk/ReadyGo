@@ -14,7 +14,7 @@
 
 ### 1️⃣ User / Profile Domain
 
-- 유저의 기본 프로필, 설정, 성향, 태그, 신고 정보를 관리
+- 유저의 기본 프로필, 설정, 성향, 태그, 신고, 차단 정보를 관리
 - auth.users는 논리적 기준이며 ERD에는 포함하지 않음
 
 ```mermaid
@@ -27,6 +27,7 @@ erDiagram
   tags ||--o{ user_tags : mapped_by
   user_profiles ||--o{ user_reports : reported
   user_profiles ||--o{ user_play_schedules : plays_at
+  user_profiles ||--o{ user_blocks : blocks
 ```
 
 ---
@@ -34,7 +35,7 @@ erDiagram
 ### 2️⃣ Chat Domain
 
 - 1:1 및 그룹 채팅 구조
-- 채팅방, 참여자, 메시지, 읽음 상태, 차단 관계 포함
+- 채팅방, 참여자, 메시지, 읽음 상태 포함
 
 ```mermaid
 erDiagram
@@ -43,7 +44,6 @@ erDiagram
   chat_messages ||--o{ chat_message_reads : read_by
   user_profiles ||--o{ chat_room_members : joins
   user_profiles ||--o{ chat_messages : sends
-  user_profiles ||--o{ chat_blocks : blocks
 ```
 
 ---
@@ -142,8 +142,8 @@ erDiagram
 
 - **Author**: ReadyGo / Eunkyoung Kim(김은경)
 - **Created At**: 2025-12-24
-- **Last Updated At**: 2025-12-29
-- **Document Version**: v1.0.3
+- **Last Updated At**: 2025-12-31
+- **Document Version**: v1.0.4
 - **Status**: Active
 - **Source of Truth**:
   - Supabase Production Database
@@ -151,9 +151,10 @@ erDiagram
 
 ## Version History
 
-| Version | Date       | Description                                     |
-| ------: | ---------- | ----------------------------------------------- |
-|  v1.0.0 | 2025-12-24 | Domain-level ERD diagrams                       |
-|  v1.0.1 | 2025-12-26 | Steam 도메인 ERD 수정                           |
-|  v1.0.2 | 2025-12-29 | User/Profile Domain에 user_status 추가          |
-|  v1.0.3 | 2025-12-29 | user_play_schedules 테이블 추가에 따른 ERD 수정 |
+| Version | Date       | Description                                                    |
+| ------: | ---------- | -------------------------------------------------------------- |
+|  v1.0.0 | 2025-12-24 | Domain-level ERD diagrams                                      |
+|  v1.0.1 | 2025-12-26 | Steam 도메인 ERD 수정                                          |
+|  v1.0.2 | 2025-12-29 | User/Profile Domain에 user_status 추가                         |
+|  v1.0.3 | 2025-12-29 | user_play_schedules 테이블 추가에 따른 ERD 수정                |
+|  v1.0.4 | 2025-01-13 | chat_blocks를 user_blocks로 변경, User/Profile Domain으로 이동 |

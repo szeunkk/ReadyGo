@@ -140,11 +140,25 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | comment        | text        | ⭕       | 신고 내용   |
 | created_at     | timestamptz | ⭕       | 신고 시각   |
 
+#### 10. user_blocks
+
+- 유저 차단
+
+| Column          | Type        | Nullable | Description    |
+| --------------- | ----------- | -------- | -------------- |
+| id              | bigint      | ❌       | PK             |
+| user_id         | uuid        | ⭕       | 차단한 유저    |
+| blocked_user_id | uuid        | ⭕       | 차단 대상 유저 |
+| created_at      | timestamptz | ⭕       | 차단 시각      |
+
 ---
 
 ### 2️⃣ Chat Domain
 
-#### 10. chat_rooms
+- 1:1 및 그룹 채팅 구조
+- 채팅방, 참여자, 메시지, 읽음 상태 포함
+
+#### 11. chat_rooms
 
 - 채팅방
 
@@ -154,7 +168,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | type       | text        | ⭕       | 채팅방 타입 (direct) |
 | created_at | timestamptz | ⭕       | 생성 시각            |
 
-#### 11. chat_room_members
+#### 12. chat_room_members
 
 - 채팅방 참여자
 
@@ -165,7 +179,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | user_id   | uuid        | ⭕       | 참여 유저   |
 | joined_at | timestamptz | ⭕       | 참여 시각   |
 
-#### 12. chat_messages
+#### 13. chat_messages
 
 - 채팅 메시지
 
@@ -179,7 +193,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | is_read      | boolean     | ⭕       | 읽음 여부   |
 | created_at   | timestamptz | ⭕       | 전송 시각   |
 
-#### 13. chat_message_reads
+#### 14. chat_message_reads
 
 - 메시지 읽음 기록
 
@@ -189,17 +203,6 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | message_id | bigint      | ⭕       | 메시지 ID   |
 | user_id    | uuid        | ⭕       | 읽은 유저   |
 | read_at    | timestamptz | ⭕       | 읽은 시각   |
-
-#### 14. chat_blocks
-
-- 채팅 차단
-
-| Column          | Type        | Nullable | Description    |
-| --------------- | ----------- | -------- | -------------- |
-| id              | bigint      | ❌       | PK             |
-| user_id         | uuid        | ⭕       | 차단한 유저    |
-| blocked_user_id | uuid        | ⭕       | 차단 대상 유저 |
-| created_at      | timestamptz | ⭕       | 차단 시각      |
 
 ---
 
@@ -525,8 +528,8 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 - **Author**: ReadyGo / Eunkyoung Kim(김은경)
 - **Created At**: 2025-12-24
-- **Last Updated At**: 2025-12-29
-- **Document Version**: v1.0.7
+- **Last Updated At**: 2025-12-31
+- **Document Version**: v1.0.8
 - **Status**: Active
 - **Source of Truth**:
   - Supabase Production Database
@@ -544,3 +547,4 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 |  v1.0.5 | 2025-12-27 | title => game_title 컬럼 명 변경                                                          |
 |  v1.0.6 | 2025-12-29 | User/Profile Domain에 user_status 테이블 추가                                             |
 |  v1.0.7 | 2025-12-29 | user_play_schedules 테이블 추가, 테이블 번호 순서 정리 (5번 중복 해결, 6~36번으로 재정렬) |
+|  v1.0.8 | 2025-01-13 | chat_blocks 테이블명을 user_blocks로 변경, User/Profile Domain으로 이동                   |

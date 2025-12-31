@@ -85,3 +85,20 @@
 - 이유: 유저의 플레이 시간대 성향 관리를 위한 테이블 추가
 - 영향: Traits의 성향축 5개 외 주 플레이 시간대 저장 지원
 - 관련 기능: 성향 분석 결과 저장 외 프로필 조회, 매칭 로직 간 활용
+
+---
+
+## v1.0.5
+
+**Date**: 2025-12-31  
+**Author**: ReadyGo / Jiyoun Han(한지연)
+
+### user_blocks (RENAME from chat_blocks)
+
+- RENAME TABLE: `chat_blocks` → `user_blocks`
+- 이유: 유저 차단 기능이 채팅 도메인에 국한되지 않고 전체 서비스 전반에서 활용되는 기능이므로, User/Profile Domain으로 이동하여 도메인 구조를 명확히 함
+- 영향:
+  - Chat Domain에서 User/Profile Domain으로 도메인 재분류
+  - 테이블명 변경에 따른 코드 레벨 마이그레이션 필요 (repository, API endpoint, 타입 정의 등)
+- 관련 기능: 채팅, 파티, 매칭 등 모든 유저 간 상호작용에서 차단 기능 지원
+- Backward Compatibility: ❌ Breaking Change (테이블명 변경)
