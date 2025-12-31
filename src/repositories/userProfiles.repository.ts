@@ -9,6 +9,7 @@ import { AnimalType } from '@/commons/constants/animal/animal.enum';
 export type UserProfileRow = {
   id: string;
   animal_type: string | null;
+  nickname: string | null;
   created_at: string;
   updated_at: string;
 };

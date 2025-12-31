@@ -1,40 +1,47 @@
 /**
- * Effect 기반 특성 점수 계산 모듈 (V2)
+ * Effect 기반 특성 점수 계산 모듈
  * 
  * 사용자의 답변에 따른 effect를 누적하여 최종 특성 벡터를 계산합니다.
- * 
- * 기존 시스템에서 마이그레이션:
- * - 기존: 리커트 척도 점수(-2~2) × 가중치
- * - 신규: Effect 누적 (-20~20) + Radial Clipping
  */
 
 import type { TraitVector } from '@/commons/constants/animal/animal.vector';
 import { createInitialVector, normalizeVector, applyRadialClipping } from './calculateVectorDistance';
 import type { QuestionWithEffect, TraitEffect } from '../data/questionEffects.types';
 import type { TraitKey } from '@/commons/constants/animal/trait.enum';
-import { QUESTIONS_WITH_EFFECTS } from '../data/questions';
 
 /**
- * 사용자 답변 타입 (기존 호환)
- */
-export type AnswerType = number;
-
-/**
- * 사용자 답변 맵 타입
+ * 사용자 답변 타입 (Effect 기반)
  */
 export type UserAnswers = Record<string, number>; // questionId -> choice value (1~5)
 
 /**
- * 성향 점수 타입 (기존 호환)
- */
-export type TraitScores = TraitVector;
-
-/**
- * Effect 기반으로 특성 점수 계산 (내부 함수)
+ * Effect 기반으로 특성 점수 계산
  * 
  * @param answers - 사용자의 답변 맵 (questionId -> choice value)
  * @param questions - Effect가 포함된 질문 목록
  * @returns 계산된 특성 벡터 (0~100)
+ * 
+ * @example
+ * ```ts
+ * const answers = {
+ *   'Q1': 5,  // 1번 질문에 5번 선택
+ *   'Q2': 3,  // 2번 질문에 3번 선택
+ *   // ...
+ * };
+ * 
+ * const vector = calculateTraitScoresByEffect(answers, QUESTIONS_WITH_EFFECT);
+ * // { cooperation: 65, exploration: 58, strategy: 42, ... }
+ * ```
+ * 
+ * 계산 방식:
+ * 1. 초기값: 모든 특성 50점으로 시작
+ * 2. 각 질문의 답변에 따른 effect를 누적 적용
+ * 3. 최종값을 0~100 범위로 클램핑
+ * 
+ * Effect 적용 예시:
+ * - 초기: { cooperation: 50, ... }
+ * - Q1 답변 5: cooperation +20 → { cooperation: 70, ... }
+ * - Q2 답변 2: cooperation -10 → { cooperation: 60, ... }
  */
 export const calculateTraitScoresByEffect = (
   answers: UserAnswers,
@@ -172,37 +179,5 @@ export const calculateTotalEffects = (
   }
 
   return totalEffect;
-};
-
-// ============================================
-// 기존 인터페이스 호환 함수
-// ============================================
-
-/**
- * 사용자 답변을 기반으로 5가지 성향 점수를 계산 (기존 인터페이스 호환)
- *
- * @param answers - questionId를 key로 하는 답변 맵
- * @returns 0~100 사이로 정규화된 성향 점수
- *
- * @example
- * ```ts
- * const answers = {
- *   'Q1': 5,  // 매우 그렇다
- *   'Q2': 3,  // 보통이다
- *   // ...
- * };
- * const scores = calculateTraitScores(answers);
- * // { cooperation: 65, exploration: 50, ... }
- * ```
- * 
- * 새로운 시스템:
- * - Effect 기반 점수 누적
- * - Radial Clipping 적용
- * - 유클리드 거리 기반 매칭
- */
-export const calculateTraitScores = (
-  answers: Record<string, AnswerType>
-): TraitScores => {
-  return calculateTraitScoresByEffect(answers, QUESTIONS_WITH_EFFECTS);
 };
 

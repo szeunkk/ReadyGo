@@ -31,6 +31,23 @@ export {
 };
 
 // ============================================
+// Vector Data
+// ============================================
+import {
+  type TraitVector,
+  ANIMAL_VECTORS,
+  getAnimalVector,
+  TRAIT_KEYS,
+} from './animal.vector';
+
+export {
+  type TraitVector,
+  ANIMAL_VECTORS,
+  getAnimalVector,
+  TRAIT_KEYS,
+};
+
+// ============================================
 // Copy Data
 // ============================================
 import { type AnimalCopy, animalCopies, getAnimalCopy } from './animal.copy';

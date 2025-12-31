@@ -41,16 +41,14 @@ export default function Result({
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>당신의 게임 타입은?</h1>
-      </div>
-
       <div className={styles.content}>
         {/* Main Card */}
         <div className={styles.mainCard}>
           <div className={styles.mainCardHeader}>
             <div className={styles.nicknameSection}>
-              <p className={styles.nickname}>{nickname}</p>
+              <p className={styles.nickname}>
+                {nickname} 님, 당신의 게임 성향은?
+              </p>
             </div>
           </div>
 
