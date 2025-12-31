@@ -37,7 +37,7 @@
 
 ## URL
 
-- /api/user-status/update
+- /api/user/status/update
 
 ---
 
