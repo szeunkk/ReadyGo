@@ -209,10 +209,6 @@ export default function ProfilePanel({
     fetchUserProfile();
   }, [userId]);
 
-  const handleChatClick = () => {
-    // TODO: 채팅 시작 로직 구현
-  };
-
   if (isLoading) {
     return (
       <div className={`${styles.profilePanel} ${className}`}>
