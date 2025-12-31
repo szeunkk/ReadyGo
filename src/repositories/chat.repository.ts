@@ -441,8 +441,8 @@ export const markMessagesAsRead = async (
 
   try {
     // upsert를 사용하여 중복 생성 방지
-    // (message_id, user_id) 조합의 유니크 제약이 있다는 전제
-    // Supabase에서는 onConflict에 컬럼 이름을 문자열로 지정
+    // UNIQUE 제약조건 (message_id, user_id)이 데이터베이스에 설정되어 있음
+    // 이미 읽음 처리된 메시지는 자동으로 업데이트됨
     const { error: upsertError } = await supabaseAdmin
       .from('chat_message_reads')
       .upsert(readsData, {
@@ -464,29 +464,7 @@ export const markMessagesAsRead = async (
         'messageIds:',
         validMessageIds
       );
-
-      // upsert가 실패하면 개별 insert 시도 (중복은 무시)
-      for (const readData of readsData) {
-        const { error: insertError } = await supabaseAdmin
-          .from('chat_message_reads')
-          .insert(readData)
-          .select()
-          .maybeSingle();
-
-        // 중복 에러는 무시 (이미 읽음 처리된 경우)
-        if (
-          insertError &&
-          !insertError.message?.includes('duplicate') &&
-          !insertError.code?.includes('23505')
-        ) {
-          console.error(
-            'markMessagesAsRead - individual insert error:',
-            insertError,
-            'for:',
-            readData
-          );
-        }
-      }
+      throw upsertError;
     }
 
     // chat_messages 테이블의 is_read 필드도 업데이트
