@@ -79,3 +79,17 @@
 ==============================================
 
 4차추가요구사항) 시작시간 selectbox timeOption item이 10분 단위로 구현되어 있는데 30분 단위로 구현할 것.(ex. 13:00/ 13:30)
+
+==============================================
+
+5차추가요구사항) 기존 antd DatePicker를 shadcn의 DatePicker로 대체할 것.
+               
+                •	기존 antd DatePicker를 완전히 제거하고 shadcn의 DatePicker로 대체할 것.
+                •	크기는 기존 antd DatePicker와 동일하게 유지할 것.
+                •	우측에 달력 아이콘을 추가할 것. 로컬 아이콘 라이브러리(public/icons/calendar.svg)를 사용하여 구현할 것.
+                •	디자인은 프로젝트의 전반적인 디자인 시스템에 맞게 구현할 것.
+                •	shadcn DatePicker 패널(팝업)은 모달 위에 중첩되어 표시되어야 하며, 모달 아래로 깔리면 안 됨.
+                •	필요 시 z-index를 조정하여 모달 위에 표시되도록 할 것.
+                •	placeholder는 "날짜 선택"으로 설정할 것.
+                •	날짜 포맷은 "YYYY-MM-DD" 형식으로 표시할 것.
+                •	selectbox 컴포넌트의 state에 따라 default, hover, active, filled를 참고해서 backgroudcolor, border색상, 폰트 색상 수정할 것.
