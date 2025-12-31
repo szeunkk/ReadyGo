@@ -5,10 +5,8 @@ import styles from './styles.module.css';
 import AnimalCard from '../../components/animal-card';
 import RadarChart, { RadarChartData } from '../../components/radar-chart';
 import BarChart, { BarChartDataItem } from '../../components/bar-chart';
-import Button from '../../components/button';
 import { AnimalType } from '../../constants/animal';
 import { TierType } from '../../constants/tierType.enum';
-import { usePathname } from 'next/navigation';
 
 export interface ProfilePanelProps {
   userId: string;
@@ -26,7 +24,8 @@ interface UserProfileData {
   weeklyAverage: string;
   matchPercentage: number;
   matchReasons: string[];
-  playStyleData: RadarChartData[];
+  myPlayStyleData: RadarChartData[]; // 내 플레이스타일 데이터
+  userPlayStyleData?: RadarChartData[]; // 상대방 플레이스타일 데이터 (optional)
   recentPlayPattern: BarChartDataItem[];
 }
 
@@ -36,8 +35,6 @@ export default function ProfilePanel({
 }: ProfilePanelProps) {
   const [profileData, setProfileData] = useState<UserProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const pathname = usePathname();
-  const isChatPage = pathname?.startsWith('/chat/');
 
   useEffect(() => {
     // TODO: userId를 사용하여 실제 사용자 데이터 페칭
@@ -60,7 +57,14 @@ export default function ProfilePanel({
               '유사한 플레이 시간대',
               '비슷한 실력대',
             ],
-            playStyleData: [
+            myPlayStyleData: [
+              { trait: 'leadership', value: 85 },
+              { trait: 'cooperation', value: 75 },
+              { trait: 'strategy', value: 80 },
+              { trait: 'exploration', value: 70 },
+              { trait: 'social', value: 60 },
+            ],
+            userPlayStyleData: [
               { trait: 'leadership', value: 90 },
               { trait: 'cooperation', value: 70 },
               { trait: 'strategy', value: 85 },
@@ -92,7 +96,14 @@ export default function ProfilePanel({
             weeklyAverage: '8.7 시간',
             matchPercentage: 87,
             matchReasons: ['유사한 플레이 시간대', '같은 장르 선호'],
-            playStyleData: [
+            myPlayStyleData: [
+              { trait: 'leadership', value: 65 },
+              { trait: 'cooperation', value: 75 },
+              { trait: 'strategy', value: 75 },
+              { trait: 'exploration', value: 85 },
+              { trait: 'social', value: 80 },
+            ],
+            userPlayStyleData: [
               { trait: 'leadership', value: 60 },
               { trait: 'cooperation', value: 80 },
               { trait: 'strategy', value: 70 },
@@ -124,7 +135,14 @@ export default function ProfilePanel({
             weeklyAverage: '5.4 시간',
             matchPercentage: 94,
             matchReasons: ['동일 게임 선호', '유사한 플레이 시간대'],
-            playStyleData: [
+            myPlayStyleData: [
+              { trait: 'leadership', value: 70 },
+              { trait: 'cooperation', value: 80 },
+              { trait: 'strategy', value: 85 },
+              { trait: 'exploration', value: 65 },
+              { trait: 'social', value: 75 },
+            ],
+            userPlayStyleData: [
               { trait: 'leadership', value: 75 },
               { trait: 'cooperation', value: 85 },
               { trait: 'strategy', value: 90 },
@@ -161,7 +179,14 @@ export default function ProfilePanel({
             weeklyAverage: '0 시간',
             matchPercentage: 0,
             matchReasons: [],
-            playStyleData: [
+            myPlayStyleData: [
+              { trait: 'leadership', value: 50 },
+              { trait: 'cooperation', value: 50 },
+              { trait: 'strategy', value: 50 },
+              { trait: 'exploration', value: 50 },
+              { trait: 'social', value: 50 },
+            ],
+            userPlayStyleData: [
               { trait: 'leadership', value: 50 },
               { trait: 'cooperation', value: 50 },
               { trait: 'strategy', value: 50 },
@@ -183,10 +208,6 @@ export default function ProfilePanel({
 
     fetchUserProfile();
   }, [userId]);
-
-  const handleChatClick = () => {
-    // TODO: 채팅 시작 로직 구현
-  };
 
   if (isLoading) {
     return (
@@ -214,7 +235,8 @@ export default function ProfilePanel({
     weeklyAverage,
     matchPercentage,
     matchReasons,
-    playStyleData,
+    myPlayStyleData,
+    userPlayStyleData,
     recentPlayPattern,
   } = profileData;
   const containerClasses = [styles.profilePanel, className]
@@ -237,38 +259,33 @@ export default function ProfilePanel({
         matchReasons={matchReasons}
       />
 
-      {/* 플레이스타일 섹션 */}
-      <div className={styles.playStyleSection}>
-        <div className={styles.sectionHeader}>
-          <h4 className={styles.sectionTitle}>플레이스타일</h4>
+      {/* 플레이스타일과 최근 플레이 패턴을 포함하는 통합 섹션 */}
+      <div className={styles.statsContainer}>
+        {/* 플레이스타일 섹션 */}
+        <div className={styles.playStyleSection}>
+          <div className={styles.sectionHeader}>
+            <h4 className={styles.sectionTitle}>플레이스타일</h4>
+          </div>
+          <div className={styles.radarChartWrapper}>
+            <RadarChart
+              myData={myPlayStyleData}
+              userData={userPlayStyleData}
+              size="m"
+              showLabels={true}
+            />
+          </div>
         </div>
-        <div className={styles.radarChartWrapper}>
-          <RadarChart myData={playStyleData} size="m" showLabels={true} />
+
+        {/* 최근 플레이 패턴 섹션 */}
+        <div className={styles.playPatternSection}>
+          <div className={styles.sectionHeader}>
+            <h4 className={styles.sectionTitle}>최근 플레이 패턴</h4>
+          </div>
+          <div className={styles.barChartWrapper}>
+            <BarChart data={recentPlayPattern} size="s" showValues={true} />
+          </div>
         </div>
       </div>
-
-      {/* 최근 플레이 패턴 섹션 */}
-      <div className={styles.playPatternSection}>
-        <div className={styles.sectionHeader}>
-          <h4 className={styles.sectionTitle}>최근 플레이 패턴</h4>
-        </div>
-        <div className={styles.barChartWrapper}>
-          <BarChart data={recentPlayPattern} size="s" showValues={true} />
-        </div>
-      </div>
-
-      {/* 채팅 하기 버튼 */}
-      {!isChatPage && (
-        <Button
-          variant="primary"
-          size="m"
-          shape="round"
-          className={styles.chatButton}
-          onClick={handleChatClick}
-        >
-          채팅 하기
-        </Button>
-      )}
     </div>
   );
 }
