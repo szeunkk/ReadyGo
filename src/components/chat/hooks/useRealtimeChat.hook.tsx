@@ -80,6 +80,7 @@ export const useRealtimeChat = (
   const channelRef = useRef<RealtimeChannel | null>(null);
   const subscribedRoomIdRef = useRef<number | null>(null);
   const onMessageRef = useRef(onMessage);
+  const isSendingRef = useRef(false); // 중복 전송 방지
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -198,6 +199,14 @@ export const useRealtimeChat = (
    */
   const sendMessage = useCallback(
     async (content: string, contentType: string = 'text'): Promise<void> => {
+      // 중복 전송 방지
+      if (isSendingRef.current) {
+        console.warn(
+          'Message is already being sent, ignoring duplicate request'
+        );
+        return;
+      }
+
       // user.id가 없으면 전송하지 않음
       if (!user?.id) {
         throw new Error('User is not authenticated');
@@ -210,6 +219,9 @@ export const useRealtimeChat = (
       if (!roomId || !senderId) {
         throw new Error('Room ID or sender ID is missing');
       }
+
+      // 전송 시작
+      isSendingRef.current = true;
 
       try {
         // 1) API를 통해 메시지 저장 (서버 사이드 Repository 함수 호출)
@@ -260,6 +272,9 @@ export const useRealtimeChat = (
         // API 호출 실패 시 에러 throw
         console.error('Failed to send message:', error);
         throw error;
+      } finally {
+        // 전송 완료
+        isSendingRef.current = false;
       }
     },
     [user?.id]

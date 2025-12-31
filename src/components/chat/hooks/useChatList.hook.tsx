@@ -5,7 +5,6 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 import { supabase as baseSupabase } from '@/lib/supabase/client';
 import { useAuth } from '@/commons/providers/auth/auth.provider';
-import type { Database } from '@/types/supabase';
 import type { ChatRoomListItem } from '@/repositories/chat.repository';
 
 /**
@@ -69,6 +68,7 @@ export interface UseChatListReturn {
   chatRooms: ChatRoomListItem[];
   isLoading: boolean;
   error: string | null;
+  markRoomAsReadOptimistic: (roomId: number) => void; // 낙관적 업데이트 함수
 }
 
 /**
@@ -79,9 +79,7 @@ export interface UseChatListReturn {
  * - 읽지 않은 메시지 수 표시 관리
  * - 자동 새로고침 (선택사항)
  */
-export const useChatList = (
-  props?: UseChatListProps
-): UseChatListReturn => {
+export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
   const { autoRefresh = true, refreshInterval = 30000 } = props || {};
   const { user } = useAuth();
 
@@ -157,11 +155,26 @@ export const useChatList = (
   }, [user?.id]);
 
   /**
+   * 낙관적 업데이트: 특정 채팅방의 unreadCount를 즉시 0으로 설정
+   */
+  const markRoomAsReadOptimistic = useCallback((roomId: number) => {
+    if (!isMountedRef.current) {
+      return;
+    }
+
+    setChatRooms((prev) =>
+      prev.map((room) =>
+        room.room.id === roomId ? { ...room, unreadCount: 0 } : room
+      )
+    );
+  }, []);
+
+  /**
    * debounced refresh 함수 (필수에 가까운 권장)
    */
   const debouncedRefresh = useCallback(
-    debounce(() => {
-      refresh();
+    debounce((...args: Parameters<typeof refresh>) => {
+      refresh(...args);
     }, 300),
     [refresh]
   );
@@ -295,8 +308,31 @@ export const useChatList = (
                 table: 'chat_message_reads',
                 filter: `user_id=eq.${userId}`,
               },
-              () => {
+              async (payload) => {
                 // chat_message_reads INSERT: 메시지 읽음 처리 시 unreadCount 업데이트
+                try {
+                  // 이벤트 페이로드에서 message_id 추출
+                  const messageId = payload.new?.message_id;
+
+                  if (messageId) {
+                    // message_id로 room_id 조회 (낙관적 업데이트를 위해)
+                    const { data: messageData } = await baseSupabase
+                      .from('chat_messages')
+                      .select('room_id')
+                      .eq('id', messageId)
+                      .single();
+
+                    if (messageData?.room_id) {
+                      // 즉시 낙관적 업데이트 (0ms 지연)
+                      markRoomAsReadOptimistic(messageData.room_id);
+                    }
+                  }
+                } catch (error) {
+                  // 에러 발생 시 기존 방식으로 fallback
+                  console.warn('Failed to get room_id from message_id:', error);
+                }
+
+                // 백그라운드에서 최종 동기화 (debounce 적용)
                 debouncedRefresh();
               }
             )
@@ -304,7 +340,8 @@ export const useChatList = (
               if (status === 'SUBSCRIBED') {
                 // 구독 성공
               } else if (status === 'CHANNEL_ERROR') {
-                const errorMessage = 'Realtime error: Channel subscription failed';
+                const errorMessage =
+                  'Realtime error: Channel subscription failed';
                 console.error(errorMessage);
                 if (isMountedRef.current) {
                   // 백그라운드 처리이므로 error 상태는 선택사항
@@ -335,7 +372,7 @@ export const useChatList = (
 
       await setupRealtimeSubscription();
     },
-    [cleanupChannel, debouncedRefresh]
+    [cleanupChannel, debouncedRefresh, markRoomAsReadOptimistic]
   );
 
   /**
@@ -461,6 +498,6 @@ export const useChatList = (
     chatRooms,
     isLoading,
     error,
+    markRoomAsReadOptimistic,
   };
 };
-
