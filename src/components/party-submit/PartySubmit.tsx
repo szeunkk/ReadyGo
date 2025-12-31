@@ -2,9 +2,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Controller } from 'react-hook-form';
-import { DatePicker } from 'antd';
-import type { DatePickerProps } from 'antd';
 import dayjs from 'dayjs';
+import { DatePicker } from '@/components/ui/date-picker';
 import styles from './styles.module.css';
 import Searchbar from '@/commons/components/searchbar';
 import Input from '@/commons/components/input';
@@ -140,8 +139,8 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
   };
 
   // 날짜 제한: 과거 날짜 선택 차단
-  const disabledDate: DatePickerProps['disabledDate'] = (current) => {
-    return current && current.isBefore(dayjs().startOf('day'));
+  const disabledDate = (date: Date) => {
+    return dayjs(date).isBefore(dayjs().startOf('day'));
   };
 
   return (
@@ -256,23 +255,13 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
                         <span className={styles.required}>*</span>
                       </label>
                       <DatePicker
-                        className={styles.datePicker}
-                        placeholder="날짜 선택"
                         value={field.value}
                         onChange={(date) => {
                           field.onChange(date);
                         }}
-                        format="YYYY-MM-DD"
                         disabledDate={disabledDate}
-                        suffixIcon={<Icon name="calendar" size={20} />}
-                        getPopupContainer={(trigger) => {
-                          return (
-                            bodyRef.current ||
-                            trigger.parentElement ||
-                            document.body
-                          );
-                        }}
-                        popupClassName={styles.datePickerPopup}
+                        state={fieldState.error ? 'error' : 'default'}
+                        placeholder="날짜 선택"
                       />
                       {fieldState.error && (
                         <span className={styles.errorMessage}>

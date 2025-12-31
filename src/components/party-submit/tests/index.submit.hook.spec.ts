@@ -117,11 +117,11 @@ test.describe('파티 모집 글 등록 기능', () => {
     await page.waitForTimeout(100);
 
     // 시작일 선택 (DatePicker)
-    const datePicker = page.locator('.ant-picker-input input');
+    const datePicker = page.locator('[data-testid="date-picker-trigger"]');
     await datePicker.click({ timeout: 500 });
     await page.waitForTimeout(200);
     // 오늘 날짜 선택
-    const todayCell = page.locator('.ant-picker-cell-today');
+    const todayCell = page.locator('[data-today="true"]').first();
     await todayCell.click({ timeout: 500 });
     await page.waitForTimeout(100);
 
@@ -209,10 +209,10 @@ test.describe('파티 모집 글 등록 기능', () => {
     await page.waitForTimeout(100);
 
     // 시작일 선택
-    const datePicker = page.locator('.ant-picker-input input');
+    const datePicker = page.locator('[data-testid="date-picker-trigger"]');
     await datePicker.click({ timeout: 500 });
     await page.waitForTimeout(200);
-    const todayCell = page.locator('.ant-picker-cell-today');
+    const todayCell = page.locator('[data-today="true"]').first();
     await todayCell.click({ timeout: 500 });
     await page.waitForTimeout(100);
 
@@ -300,10 +300,10 @@ test.describe('파티 모집 글 등록 기능', () => {
     await page.waitForTimeout(100);
 
     // 시작일 선택
-    const datePicker = page.locator('.ant-picker-input input');
+    const datePicker = page.locator('[data-testid="date-picker-trigger"]');
     await datePicker.click({ timeout: 500 });
     await page.waitForTimeout(200);
-    const todayCell = page.locator('.ant-picker-cell-today');
+    const todayCell = page.locator('[data-today="true"]').first();
     await todayCell.click({ timeout: 500 });
     await page.waitForTimeout(100);
 
@@ -398,10 +398,10 @@ test.describe('파티 모집 글 등록 기능', () => {
     await page.waitForTimeout(100);
 
     // 시작일 선택
-    const datePicker = page.locator('.ant-picker-input input');
+    const datePicker = page.locator('[data-testid="date-picker-trigger"]');
     await datePicker.click({ timeout: 500 });
     await page.waitForTimeout(200);
-    const todayCell = page.locator('.ant-picker-cell-today');
+    const todayCell = page.locator('[data-today="true"]').first();
     await todayCell.click({ timeout: 500 });
     await page.waitForTimeout(100);
 
@@ -519,10 +519,10 @@ test.describe('파티 모집 글 등록 기능', () => {
     await page.waitForTimeout(100);
 
     // 시작일 선택
-    const datePicker = page.locator('.ant-picker-input input');
+    const datePicker = page.locator('[data-testid="date-picker-trigger"]');
     await datePicker.click({ timeout: 500 });
     await page.waitForTimeout(200);
-    const todayCell = page.locator('.ant-picker-cell-today');
+    const todayCell = page.locator('[data-today="true"]').first();
     await todayCell.click({ timeout: 500 });
     await page.waitForTimeout(100);
 
@@ -633,10 +633,10 @@ test.describe('파티 모집 글 등록 기능', () => {
     await page.waitForTimeout(100);
 
     // 시작일 선택
-    const datePicker = page.locator('.ant-picker-input input');
+    const datePicker = page.locator('[data-testid="date-picker-trigger"]');
     await datePicker.click({ timeout: 500 });
     await page.waitForTimeout(200);
-    const todayCell = page.locator('.ant-picker-cell-today');
+    const todayCell = page.locator('[data-today="true"]').first();
     await todayCell.click({ timeout: 500 });
     await page.waitForTimeout(100);
 

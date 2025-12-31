@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 :root {
-
   /* Layout */
   --side-bar-width: 80px;
   --header-height: 80px;
@@ -778,8 +777,6 @@ body {
   }
 }
 
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -835,8 +832,6 @@ body {
     --chart-5: 340 75% 55%;
   }
 }
-
-
 
 @layer base {
   * {
