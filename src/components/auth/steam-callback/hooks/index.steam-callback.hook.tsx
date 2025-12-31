@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useModal } from '@/commons/providers/modal';
 import { URL_PATHS } from '@/commons/constants/url';
 import { useSteamOAuth } from '@/components/auth/hooks/useSteamOAuth.hook';
-import { supabase } from '@/lib/supabase/client';
 
 /**
  * Steam 콜백 처리를 위한 Hook
@@ -66,28 +65,19 @@ export const useSteamCallback = (initialParams?: Record<string, string>) => {
         }
 
         // 서버 API Route로 OpenID 검증 요청
-        // 현재 세션의 access token 가져오기
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        const accessToken = session?.access_token;
-
+        // HttpOnly 쿠키에 저장된 세션을 사용하므로 Authorization 헤더 불필요
+        // credentials: 'include'로 쿠키가 자동으로 전달됨
         const requestBody = JSON.stringify(openIdParams);
 
         const headers: HeadersInit = {
           'Content-Type': 'application/json',
         };
 
-        // access token이 있으면 Authorization 헤더에 추가
-        if (accessToken) {
-          headers['Authorization'] = `Bearer ${accessToken}`;
-        }
-
         const response = await fetch('/api/auth/steam/callback', {
           method: 'POST',
           headers,
           body: requestBody,
-          credentials: 'include', // cookies 포함
+          credentials: 'include', // HttpOnly 쿠키 포함
         });
 
         if (!response.ok) {

@@ -62,27 +62,6 @@ export type Database = {
         }
         Relationships: []
       }
-      chat_blocks: {
-        Row: {
-          blocked_user_id: string | null
-          created_at: string | null
-          id: number
-          user_id: string | null
-        }
-        Insert: {
-          blocked_user_id?: string | null
-          created_at?: string | null
-          id?: number
-          user_id?: string | null
-        }
-        Update: {
-          blocked_user_id?: string | null
-          created_at?: string | null
-          id?: number
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       chat_message_reads: {
         Row: {
           id: number
@@ -772,6 +751,27 @@ export type Database = {
           current_tier?: string | null
           id?: number
           previous_tier?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_blocks: {
+        Row: {
+          blocked_user_id: string | null
+          created_at: string | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          blocked_user_id?: string | null
+          created_at?: string | null
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          blocked_user_id?: string | null
+          created_at?: string | null
+          id?: number
           user_id?: string | null
         }
         Relationships: []

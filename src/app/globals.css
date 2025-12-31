@@ -4,8 +4,8 @@
 
 :root {
   /* Layout */
-  --side-bar-width: 80px;
-  --header-height: 80px;
+  --side-bar-width: fit-content;
+  --header-height: fit-content;
 
   /* Z-Index */
   --z-header: 100;
@@ -769,6 +769,8 @@ body {
     BlinkMacSystemFont,
     system-ui,
     sans-serif;
+  font-size: 16px;
+  box-sizing: border-box;
 }
 
 @layer utilities {

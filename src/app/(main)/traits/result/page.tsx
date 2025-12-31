@@ -8,6 +8,8 @@ import {
 import { URL_PATHS } from '@/commons/constants/url';
 import { redirect } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 type TraitsResultApiResponse = {
   traits: {
     cooperation: number;
@@ -17,6 +19,7 @@ type TraitsResultApiResponse = {
     social: number;
   };
   animalType: string;
+  nickname: string;
   schedule: {
     dayTypes: string[];
     timeSlots: string[];
@@ -99,7 +102,7 @@ export default async function Page() {
   return (
     <TraitsResultPage
       animalType={animalType}
-      nickname={animalMeta.label}
+      nickname={result.nickname}
       radarData={radarData}
       mainRole={{
         label: animalMeta.mainRole.name,
