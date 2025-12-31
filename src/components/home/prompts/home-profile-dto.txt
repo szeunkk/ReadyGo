@@ -1,0 +1,69 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+	•	타입 정의는 단일 진실(Single Source of Truth) 이어야 한다.
+	•	DTO는 UI 컴포넌트 폴더 내부에 존재해서는 안 된다.
+	•	API / Service / FE 어디에서도 동일 타입을 import 하여 사용 가능해야 한다.
+	•	런타임 로직, 계산, 변환 함수는 포함하지 않는다.
+	•	타입 변경 시 영향 범위를 명시적으로 주석으로 남긴다.
+
+==============================================
+
+조건-파일경로) 구현해야할 DTO 파일 경로: src/commons/types/profile/profileCore.dto.ts
+조건-파일경로) 참고해야할 animalType 파일 경로: src/commons/constants/animal/animal.enum.ts
+조건-파일경로) 참고해야할 TraitVector 파일 경로: src/commons/constants/animal/animal.vector.ts
+조건-파일경로) 참고해야할 supabase database.types 파일 경로: src/types/supabase.ts
+
+조건-파일경로) 아래 참고해야할 UI 파일 경로의 경우, 현재 구현되어있는 UI에서 재사용 가능한 구조인지 검증용으로 사용하고, 해당 파일들의 수정은 허용하지 않는다.
+            - 참고해야할 내 프로필 UI 경로: src/components/home/ui/profile-section/profileSection.tsx
+            - 참고해야할 상대방 프로필 UI 경로: src/commons/side-panel/ui/profilePanel.tsx
+
+==============================================
+
+조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
+	•	commons/types 하위 DTO는 interface 또는 type alias 만 정의한다.
+	•	DB 컬럼/도메인 타입과 1:1 매핑 가능한 구조를 유지한다.
+	•	optional + null 가능성은 타입 레벨에서 명시한다 (?: T | null)
+
+==============================================
+
+핵심요구사항) 다음 기능을 step-by-step으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
+	1.	ProfileCoreDTO 타입을 새로 정의한다. 이 때, 필요한 테이블과 컬럼은 아래를 참고할 것.
+        •	user_profiles → nickname, animal_type
+        •	user_traits → 5개 trait score
+        •	user_play_schedules → day_type[], time_slot[]
+        필수 필드 vs 선택 필드 구분
+        •	필수: userId (uuid), nickname(없으면 ‘’/fallback)
+        •	선택: schedule(없으면 빈 배열), animalType(없으면 빈 값/unknown 정책), traits(5개 모두)
+}
+	2.	Steam, 외부 플랫폼, 인증 관련 필드는 절대 포함하지 않는다.
+	3.	내 프로필 / 상대 프로필 모두에서 재사용 가능한 구조인지 검증한다.
+	4.	필수 필드와 선택 필드를 명확히 구분한다.
+	5.	DB 값이 없는 경우의 정책을 타입/주석으로 명확히 표현한다.
+	6.	DTO 변경 시 영향을 받는 레이어(API, Service, FE)를 주석으로 명시한다.
+
+==============================================
+
+조건-Hook 책임)
+	•	해당 DTO는 hook 로직을 포함하지 않는다.
+	•	hook은 이 DTO를 소비만 할 수 있으며, 수정 책임이 없다.
+
+==============================================
+
+조건-UI 책임)
+	•	UI 컴포넌트는 ProfileCoreDTO를 import 하여 사용만 한다.
+	•	UI 내부에 중복 DTO 정의를 생성하지 않는다.
+
+==============================================
+
+구현 완료 후 반환) 아래 체크리스트를 반드시 반환할 것.
+	•	ProfileCoreDTO가 ssrc/commons/types/profile/profileCore.dto.ts 에 정의되어 있다
+	•	UI 컴포넌트 폴더 내부에 DTO 정의가 존재하지 않는다
+	•	API / Service / FE 에서 동일 타입 import 사용이 가능하다
+	•	userId, nickname 필수 필드가 정확히 정의되어 있다
+	•	optional 필드의 undefined / null 정책이 타입으로 명확히 표현되어 있다
+	•	Steam/외부 플랫폼 필드가 포함되지 않았다
+	•	DTO 변경 시 영향 범위 주석이 추가되어 있다
