@@ -1,0 +1,426 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 참고할 Repository 파일경로: src/repositories/chat.repository.ts
+조건-파일경로) 참고할 useChatRoom Hook 파일경로: src/components/chat/hooks/useChatRoom.hook.tsx
+조건-파일경로) 참고할 useRealtimeChat Hook 파일경로: src/components/chat/hooks/useRealtimeChat.hook.tsx
+조건-파일경로) 참고할 user-status Provider 파일경로: src/commons/providers/user-status/user-status.provider.tsx
+조건-파일경로) 구현될 Hook 파일경로: src/components/chat/hooks/useChatList.hook.tsx
+조건-파일경로) 참고할 Supabase 클라이언트: src/lib/supabase/client.ts
+조건-파일경로) 참고할 API 라우트: src/app/api/chat/rooms/route.ts
+
+==============================================
+
+핵심요구사항) 채팅방 목록 조회, postgres_changes로 목록 실시간 업데이트, 읽지 않은 메시지 수 표시 관리를 포함한 채팅방 목록 Hook을 구현하고, 적용 결과를 체크리스트로 반환할 것.
+
+            1) Hook 기본 구조
+                1-1) 파일 위치 및 네이밍
+                    - 파일 경로: src/components/chat/hooks/useChatList.hook.tsx
+                    - Hook 이름: useChatList
+                    - 'use client' 디렉티브 필수
+                
+                1-2) Import
+                    - React hooks: useEffect, useRef, useState, useCallback
+                    - Supabase: RealtimeChannel 타입
+                    - Supabase 클라이언트: src/lib/supabase/client.ts에서 'supabase as baseSupabase' import
+                    - 인증: useAuth() hook import
+                    - 타입: Database 타입 import (경로: @/types/supabase)
+                        import type { Database } from '@/types/supabase';
+                    - Repository 타입: ChatRoomListItem 타입 import (src/repositories/chat.repository.ts)
+
+            2) 채팅방 목록 조회 (API)
+                2-1) 초기 목록 조회
+                    - user?.id가 있을 때 API를 통해 채팅방 목록 조회
+                    - API 엔드포인트: GET /api/chat/rooms
+                    - API 응답 형식: { data: ChatRoomListItem[] }
+                    - API 라우트: src/app/api/chat/rooms/route.ts (이미 존재)
+                    - Repository 함수는 서버 사이드 전용이므로 클라이언트 Hook에서는 API 사용 필수
+                    - credentials: 'include' 설정 필수
+
+                2-2) 목록 정렬 및 데이터 구조
+                    - Repository의 getUserChatRooms는 최신 메시지 기준으로 정렬하여 반환
+                    - API 응답 데이터를 그대로 사용 (추가 정렬 불필요)
+                    - ChatRoomListItem 타입 구조:
+                        {
+                          room: ChatRoom;
+                          otherMember?: UserProfile; // 1:1 채팅의 상대방 사용자 정보 (닉네임 포함)
+                          lastMessage?: ChatMessage; // 가장 최근 메시지 정보
+                          unreadCount: number; // 읽지 않은 메시지 수
+                        }
+                    - 핵심 데이터 바인딩:
+                        1) 사용자 닉네임: otherMember?.nickname 사용 (1:1 채팅의 경우)
+                        2) 최근 메시지: lastMessage?.content 사용 (가장 최근 메시지 내용)
+                        3) 최근 메시지 시간: lastMessage?.created_at 사용 (타임스탬프)
+                        4) 읽지 않은 메시지 수: unreadCount 사용
+
+                2-3) 로딩 상태 관리
+                    - isLoading: boolean 상태로 초기 로딩 상태 관리
+                    - user?.id 변경 시 isLoading을 true로 리셋 (새 사용자 로딩 시작)
+                    - 초기 로드 완료 후 isLoading을 false로 설정
+                    - 에러 발생 시 error 상태에 에러 메시지 저장 및 isLoading을 false로 설정
+
+            3) postgres_changes로 목록 실시간 업데이트
+                3-1) postgres_changes 채널 구독
+                    - user?.id가 있을 때 postgres_changes 구독 시작
+                    - 채널 이름: `chat_list:${userId}` 형식 사용
+                    - baseSupabase.channel()로 채널 생성
+                    - user-status.provider.tsx의 패턴 참고 (180-217줄)
+                    - 구독할 테이블 및 이벤트:
+                        1) chat_rooms 테이블: INSERT, UPDATE, DELETE
+                        2) chat_room_members 테이블: INSERT, DELETE (사용자가 참여/탈퇴)
+                            - 필터 예시: filter: `user_id=eq.${userId}` (현재 사용자가 참여한 채팅방만)
+                        3) chat_messages 테이블: INSERT (새 메시지 수신 시 목록 업데이트)
+                            - 필터: room_id 기반 필터링은 어려우므로 전체 구독 후 내부에서 필터링
+                        4) chat_message_reads 테이블: INSERT (읽음 처리 시 unreadCount 업데이트)
+                            - 필터: user_id 기반 필터링 가능 (filter: `user_id=eq.${userId}`)
+                    - 필터 구체화:
+                        - chat_room_members: filter: `user_id=eq.${userId}` 필수 (불필요한 이벤트 방지)
+                        - chat_message_reads: filter: `user_id=eq.${userId}` 권장 (현재 사용자 읽음 처리만)
+                        - chat_rooms, chat_messages: 필터링 어려우므로 전체 구독 후 내부에서 처리
+                    - 이벤트 타입: '*' (모든 이벤트) 또는 개별 이벤트 지정
+
+                3-2) INSERT 이벤트 처리 (chat_rooms, chat_room_members)
+                    - chat_rooms INSERT: 새 채팅방 생성 시 목록에 추가
+                    - chat_room_members INSERT: 사용자가 새 채팅방에 참여 시 목록에 추가
+                    - 처리 로직: 내부 refresh 함수를 호출하여 GET /api/chat/rooms API 재호출
+                    - refresh 함수는 내부적으로만 사용 (외부에 노출하지 않음)
+                    - 간단하고 안정적이며 데이터 정확성 보장
+
+                3-3) UPDATE 이벤트 처리 (chat_rooms)
+                    - chat_rooms UPDATE: 채팅방 정보 변경 시 목록 업데이트
+                    - 처리 로직: 내부 refresh 함수를 호출하여 GET /api/chat/rooms API 재호출
+
+                3-4) DELETE 이벤트 처리 (chat_rooms, chat_room_members)
+                    - chat_rooms DELETE: 채팅방 삭제 시 목록에서 제거
+                    - chat_room_members DELETE: 사용자가 채팅방 탈퇴 시 목록에서 제거
+                    - 처리 로직: 내부 refresh 함수를 호출하여 GET /api/chat/rooms API 재조회
+
+                3-5) INSERT 이벤트 처리 (chat_messages)
+                    - chat_messages INSERT: 새 메시지 수신 시 목록 업데이트
+                    - 처리 로직: 내부 refresh 함수를 호출하여 GET /api/chat/rooms API 재호출
+                    - refresh 함수는 내부적으로만 사용 (외부에 노출하지 않음)
+                    - Repository의 getUserChatRooms가 이미 최신 메시지 기준으로 정렬하여 반환
+                    - 간단하고 안정적이며 데이터 정확성 보장
+                    - 새 메시지 수신 시 자동으로 목록이 갱신됨
+
+                3-6) INSERT 이벤트 처리 (chat_message_reads)
+                    - chat_message_reads INSERT: 메시지 읽음 처리 시 unreadCount 업데이트
+                    - 처리 로직: 내부 refresh 함수를 호출하여 GET /api/chat/rooms API 재호출
+                    - refresh 함수는 내부적으로만 사용 (외부에 노출하지 않음)
+                    - Repository의 getUserChatRooms가 이미 정확한 unreadCount를 계산하여 반환
+                    - 간단하고 안정적이며 데이터 정확성 보장
+                    - 읽음 처리 시 자동으로 unreadCount가 갱신됨
+
+                3-7) 채널 관리
+                    - channelRef: useRef<RealtimeChannel | null>(null) 사용
+                    - subscribedUserIdRef: useRef<string | null>(null) 사용
+                    - user?.id 변경 시 이전 채널 정리 후 새 채널 구독
+                    - user-status.provider.tsx의 채널 관리 패턴 참고 (153-163줄)
+
+                3-8) 중복 구독 방지
+                    - subscribedUserIdRef.current === user?.id && channelRef.current 존재 시 no-op
+                    - user-status.provider.tsx의 패턴 참고 (154-156줄)
+
+                3-9) 세션 확인
+                    - user-status.provider.tsx의 checkSession 패턴을 그대로 복사하여 사용 (20-38줄)
+                    - checkSession 함수 구현:
+                        - /api/auth/session API를 GET으로 호출 (credentials: 'include')
+                        - 응답이 ok이고 user가 있으면 sessionData 반환
+                        - 그 외에는 null 반환
+                    - baseSupabase 클라이언트 재사용 (Multiple GoTrueClient 인스턴스 방지)
+                    - subscribeToPostgresChanges 실행 전에 checkSession() 호출
+                    - 세션이 없으면:
+                        1) 구독하지 않음
+                        2) chatRooms를 빈 배열([])로 리셋
+                        3) isLoading을 false로 설정 (로딩 완료 상태)
+                        4) error 상태는 null로 유지 (세션 없음은 정상 상태)
+
+            4) 읽지 않은 메시지 수 표시 관리
+                4-1) unreadCount 초기값
+                    - API 응답의 ChatRoomListItem.unreadCount를 그대로 사용
+                    - Repository의 getUserChatRooms가 이미 unreadCount를 계산하여 반환
+
+                4-2) unreadCount 실시간 업데이트
+                    - postgres_changes 이벤트 수신 시 API를 통해 전체 목록 재조회
+                    - Repository의 getUserChatRooms가 정확한 unreadCount를 계산하여 반환
+                    - 로컬 상태 업데이트 없이 API 재조회로 처리 (데이터 정확성 보장)
+
+                4-3) unreadCount 정확성 보장
+                    - postgres_changes 이벤트만으로는 정확한 unreadCount 계산이 어려울 수 있음
+                    - 주기적으로 API를 통해 전체 목록 재조회 (선택사항)
+                    - 또는 특정 이벤트 발생 시 API 재조회 (권장)
+                    - 예: 채팅방 목록 화면으로 돌아올 때 (focus 이벤트)
+
+            5) Hook 반환 값
+                5-1) 반환 객체
+                    interface UseChatListReturn {
+                      chatRooms: ChatRoomListItem[];
+                      isLoading: boolean;
+                      error: string | null;
+                    }
+                    - refresh 함수는 외부에 노출하지 않음 (내부적으로만 사용)
+                    - postgres_changes와 autoRefresh가 자동으로 목록을 갱신하므로 수동 새로고침 불필요
+
+                5-2) chatRooms: ChatRoomListItem[]
+                    - 현재 사용자가 참여한 채팅방 목록
+                    - 초기 로드된 목록 + 실시간 업데이트된 목록
+                    - 최신 메시지 기준으로 정렬된 목록
+                    - unreadCount 포함
+                    - postgres_changes 이벤트 발생 시 자동 갱신
+                    - autoRefresh가 활성화된 경우 주기적으로 자동 갱신
+
+                5-3) isLoading: boolean
+                    - 초기 목록 로딩 상태
+                    - true: 로딩 중
+                    - false: 로딩 완료
+
+                5-4) error: string | null
+                    - 에러 발생 시 에러 메시지
+                    - 정상 작동 시 null
+
+            6) Hook 파라미터
+                6-1) 파라미터 타입
+                    interface UseChatListProps {
+                      autoRefresh?: boolean; // 선택: 자동 새로고침 여부 (기본값: true)
+                      refreshInterval?: number; // 선택: 자동 새로고침 간격(ms) (기본값: 30000, 30초)
+                    }
+
+                6-2) autoRefresh?: boolean (선택)
+                    - 자동 새로고침 여부
+                    - true: 주기적으로 목록 재조회 (기본값)
+                    - false: 자동 새로고침 비활성화
+
+                6-3) refreshInterval?: number (선택)
+                    - 자동 새로고침 간격 (밀리초)
+                    - 기본값: 30000 (30초)
+                    - autoRefresh가 false이면 무시
+
+            7) 타입 정의
+                7-1) ChatRoomListItem 타입
+                    - 반드시 src/repositories/chat.repository.ts에서 import
+                    - 별도 interface 정의 금지 (Repository 타입과 일치하도록)
+                    - 타입 import:
+                        import type { ChatRoomListItem } from '@/repositories/chat.repository';
+
+                7-2) Hook 파라미터 타입
+                    interface UseChatListProps {
+                      autoRefresh?: boolean; // 기본값: true
+                      refreshInterval?: number; // 기본값: 30000 (30초)
+                    }
+                    - autoRefresh 기본값: true (자동 새로고침 활성화)
+                    - refreshInterval 기본값: 30000 (30초, 밀리초 단위)
+                    - 기본값은 타입 정의와 함께 명시하여 혼동 방지
+
+                7-3) Hook 반환 타입
+                    interface UseChatListReturn {
+                      chatRooms: ChatRoomListItem[];
+                      isLoading: boolean;
+                      error: string | null;
+                    }
+                    - refresh 함수는 내부적으로만 사용 (외부에 노출하지 않음)
+                    - postgres_changes와 autoRefresh가 자동으로 목록을 갱신하므로 수동 새로고침 불필요
+
+            8) 에러 처리
+                8-1) 초기 목록 로드 실패
+                    - API 호출 실패 시 error 상태에 에러 메시지 저장
+                    - 에러 메시지 포맷: "API error: [구체적인 에러 메시지]"
+                        예시: "API error: 채팅방 목록 조회 실패: Network error"
+                    - console.error 로깅 (포맷: "API error: ...")
+                    - isLoading을 false로 설정
+
+                8-2) postgres_changes 구독 실패
+                    - 채널 구독 실패 시:
+                        1) error 상태에 에러 메시지 저장 (선택사항, 백그라운드 처리이므로)
+                            - 에러 메시지 포맷: "Realtime error: [구체적인 에러 메시지]"
+                            예시: "Realtime error: Channel subscription failed"
+                        2) console.error 로깅 (포맷: "Realtime error: ...")
+                        3) channelRef.current를 null로 설정
+                        4) subscribedUserIdRef.current를 null로 설정
+                    - 구독 실패해도 목록 조회는 계속 작동 (postgres_changes는 보조 수단)
+
+                8-3) 실시간 업데이트 실패
+                    - postgres_changes 이벤트 처리 중 에러 발생 시:
+                        1) console.error 로깅 (포맷: "Realtime error: ...")
+                        2) 전체 목록 재조회로 폴백 (안정성 확보)
+                    - 에러 발생해도 목록 조회는 계속 작동
+                    - 에러 메시지 포맷 통일: "API error: ...", "Realtime error: ..." 형식 사용
+
+            9) Cleanup 처리
+                9-1) user?.id 변경 시 (순서 중요)
+                    - 반드시 다음 순서로 처리 (상태 꼬임 방지):
+                        1) 이전 채널 정리 (postgres_changes 채널)
+                            - baseSupabase.removeChannel(channelRef.current)
+                            - channelRef.current = null
+                            - subscribedUserIdRef.current = null
+                        2) 상태 초기화
+                            - chatRooms 배열 초기화 (새 사용자 데이터 로드 전 초기화 필수)
+                            - error 상태 초기화 (null로 설정)
+                        3) 로딩 상태 설정
+                            - isLoading을 true로 리셋 (새 사용자 로딩 시작)
+                        4) 새 구독 및 데이터 로드
+                            - user?.id가 있으면 새 채널 구독 및 초기 목록 로드
+                    - 순서를 지키지 않으면 상태 꼬임 발생 가능
+
+                9-2) 컴포넌트 언마운트 시
+                    - postgres_changes 채널 정리
+                    - 모든 ref 초기화 (channelRef, subscribedUserIdRef 등)
+                    - 자동 새로고침 타이머 정리 (setInterval clear)
+                    - setState after unmount 방지:
+                        - isMountedRef: useRef<boolean>(true) 사용
+                        - 컴포넌트 언마운트 시 isMountedRef.current = false 설정
+                        - 모든 async 작업(setState 포함) 전에 isMountedRef.current 체크
+                        - 예시:
+                            if (!isMountedRef.current) return;
+                            setChatRooms(data);
+                        - 메모리 누수 경고 방지 및 안전성 향상
+
+                9-3) user?.id가 없을 때
+                    - 채널 정리 (postgres_changes 채널)
+                    - chatRooms 배열 초기화
+                    - isLoading을 false로 설정 (로딩 완료 상태)
+
+            10) 구현 주의사항
+                10-1) postgres_changes 구독 패턴 (user-status.provider.tsx 참고)
+                    - channelRef.current로 채널 인스턴스 관리
+                    - subscribedUserIdRef로 현재 구독 중인 user?.id 추적
+                    - 중복 구독 방지: subscribedUserIdRef.current === user?.id && channelRef.current 존재 시 no-op
+                    - 채널 전환: 다른 user?.id로 변경 시:
+                        1) baseSupabase.removeChannel(channelRef.current)
+                        2) channelRef.current = null
+                        3) subscribedUserIdRef.current = null
+                        4) 새 채널 생성
+                    - user-status.provider.tsx의 158-163줄 패턴 참고
+
+                10-2) 실시간 업데이트 전략
+                    - 모든 postgres_changes 이벤트 발생 시 API를 통해 전체 목록 재조회
+                    - refresh() 함수를 호출하여 GET /api/chat/rooms API 재호출
+                    - 구현이 간단하고 데이터 정확성 보장
+                    - Repository의 getUserChatRooms가 이미 최신 메시지 기준 정렬 및 unreadCount 계산을 수행
+                    - 네트워크 요청 폭발 방지: debounce 처리는 필수에 가까운 권장 (반드시 구현 권장)
+                    - 여러 이벤트가 연속 발생 시 API 호출 폭증을 방지하기 위해 debounce 필수
+                    - 모든 이벤트 타입(INSERT, UPDATE, DELETE)에 동일하게 적용
+
+                10-3) API 라우트 스펙
+                    - 채팅방 목록 조회: GET /api/chat/rooms
+                        - Query: 없음
+                        - 응답: { data: ChatRoomListItem[] }
+                        - 현재 존재: src/app/api/chat/rooms/route.ts
+                    - 모든 API 호출은 credentials: 'include' 설정 필수
+
+                10-4) 성능 최적화
+                    - postgres_changes 이벤트 발생 시 debounce 처리 필수에 가까운 권장 (반드시 구현 권장)
+                    - debounce 시간: 300-500ms 정도로 설정 (너무 짧으면 의미 없음)
+                    - 구현 예시:
+                        const debouncedRefresh = useCallback(
+                          debounce(() => {
+                            refresh();
+                          }, 300),
+                          []
+                        );
+                    - 모든 postgres_changes 이벤트 핸들러에서 debouncedRefresh 호출
+                    - 자동 새로고침 간격을 적절히 설정 (기본 30초)
+                    - 목록이 많을 경우 가상화(virtualization) 고려 (UI 레벨)
+                    - 예시: debounce를 사용하여 연속된 이벤트 발생 시 마지막 이벤트만 처리
+
+                10-5) Supabase 클라이언트 사용
+                    - src/lib/supabase/client.ts에서 'supabase as baseSupabase' import
+                    - 반드시 baseSupabase 사용 (클라이언트 Hook이므로)
+                    - supabaseAdmin 사용 금지 (서버 사이드 전용)
+                    - Multiple GoTrueClient 인스턴스 방지를 위해 동일 클라이언트 재사용
+                    - user-status.provider.tsx의 11줄 패턴 참고
+
+                10-6) 자동 새로고침 구현
+                    - autoRefresh가 true일 때 setInterval로 주기적 재조회
+                    - refreshInterval 간격으로 내부 refresh() 함수 호출
+                    - refresh 함수는 내부적으로만 사용 (외부에 노출하지 않음)
+                    - 컴포넌트 언마운트 시 clearInterval로 타이머 정리
+                    - user?.id 변경 시 기존 타이머 정리 후 새 타이머 시작
+                    - postgres_changes가 실시간으로 갱신하므로, autoRefresh는 백업용 (postgres_changes 실패 시 대비)
+
+            11) 사용 예시
+                11-1) Hook 사용 패턴
+                    const { chatRooms, isLoading, error } = useChatList({
+                      autoRefresh: true,
+                      refreshInterval: 30000,
+                    });
+                    - refresh 함수는 반환하지 않음 (내부적으로만 사용)
+                    - postgres_changes와 autoRefresh가 자동으로 목록을 갱신
+
+                11-2) 목록 표시
+                    {isLoading ? (
+                      <div>로딩 중...</div>
+                    ) : (
+                      <div>
+                        {chatRooms.map((item) => (
+                          <div key={item.room.id}>
+                            {/* 사용자 실제 닉네임 표시 */}
+                            <div>{item.otherMember?.nickname || '알 수 없음'}</div>
+                            {/* 가장 최근 메시지 표시 */}
+                            <div>{item.lastMessage?.content || '메시지가 없습니다'}</div>
+                            {/* 읽지 않은 메시지 수 표시 */}
+                            {item.unreadCount > 0 && (
+                              <div>읽지 않음: {item.unreadCount}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    - 중요: otherMember?.nickname은 사용자의 실제 닉네임을 표시
+                    - 중요: lastMessage?.content는 가장 최근 메시지 내용을 표시
+                    - Repository의 getUserChatRooms가 이미 otherMember와 lastMessage를 포함하여 반환
+                    - postgres_changes 이벤트 발생 시 자동으로 목록이 갱신됨
+                    - 수동 새로고침 불필요 (자동으로 실시간 갱신됨)
+
+==============================================
+
+구현 완료 후 아래 2가지 체크리스트를 반환할 것.
+
+1) 커서룰(@01-common.mdc, @04-func.mdc) 적용 결과 체크리스트
+   - 파일 경로 준수 여부
+   - 라이브러리 사용 규칙 준수 여부
+   - 코드 구조 및 네이밍 규칙 준수 여부
+
+2) 기능 요구사항 구현 체크리스트
+   - baseSupabase 클라이언트 사용 여부 (supabaseAdmin 사용 금지 확인)
+   - checkSession 패턴 구현 여부 (user-status.provider.tsx 패턴 복사)
+   - 세션/user?.id 없을 때 구독 중단 및 refs 초기화 구현 여부
+   - channelRef, subscribedUserIdRef로 현재 사용자 추적 구현 여부
+   - 다른 user?.id로 전환 시 이전 채널 cleanup 및 null 처리 구현 여부
+   - 초기 채팅방 목록 조회 (API) 구현 여부
+   - GET /api/chat/rooms API 호출 구현 여부
+   - 로딩 상태 관리 (isLoading) 구현 여부
+   - user?.id 변경 시 isLoading 리셋 구현 여부
+   - postgres_changes로 목록 실시간 업데이트 구현 여부
+   - postgres_changes 채널 관리 (channelRef, subscribedUserIdRef) 구현 여부
+   - postgres_changes 이벤트 처리 구현 여부 (chat_rooms, chat_room_members, chat_messages, chat_message_reads)
+   - postgres_changes 이벤트 try/catch 에러 처리 구현 여부
+   - debounce 처리 구현 여부 (필수에 가까운 권장)
+   - isMountedRef를 사용한 setState after unmount 방지 구현 여부
+   - 에러 메시지 포맷 통일 구현 여부 (API error:, Realtime error:)
+   - user?.id 변경 시 cleanup 순서 준수 여부 (채널 정리 → 상태 초기화 → isLoading → 새 구독)
+   - 세션 실패 시 chatRooms=[], isLoading=false 처리 구현 여부
+   - postgres_changes 필터 구체화 구현 여부 (chat_room_members, chat_message_reads 필터)
+   - 읽지 않은 메시지 수 표시 관리 구현 여부
+   - unreadCount 실시간 업데이트 구현 여부
+   - chatRooms 상태 관리 구현 여부
+   - 목록 정렬 구현 여부 (최신 메시지 기준)
+   - user?.id 변경 시 자동 처리 구현 여부 (채널 정리, chatRooms 초기화, 초기 로드, 구독)
+   - Cleanup 처리 구현 여부 (언마운트, user?.id 변경)
+   - user?.id가 없을 때 처리 구현 여부
+   - postgres_changes 구독 실패 시 상태 초기화 구현 여부
+   - 에러 처리 구현 여부
+   - 타입 정의 구현 여부 (ChatRoomListItem 타입 import)
+   - Hook 반환 값 구현 여부 (chatRooms, isLoading, error)
+   - refresh 함수는 내부적으로만 사용하고 외부에 노출하지 않음
+   - 자동 새로고침 구현 여부 (autoRefresh, refreshInterval)
+   - 내부 refresh 함수 구현 여부 (외부에 노출하지 않음)
+   - user-status.provider.tsx 패턴 준수 여부
+

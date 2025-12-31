@@ -65,21 +65,21 @@ export type Database = {
       chat_message_reads: {
         Row: {
           id: number
-          message_id: number | null
+          message_id: number
           read_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           id?: number
-          message_id?: number | null
+          message_id: number
           read_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           id?: number
-          message_id?: number | null
+          message_id?: number
           read_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
