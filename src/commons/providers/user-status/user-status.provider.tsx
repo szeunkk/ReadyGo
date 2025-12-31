@@ -85,7 +85,7 @@ export const UserStatusProvider = ({ children }: UserStatusProviderProps) => {
     const seedUserStatus = async () => {
       try {
         // 서버 API를 통해 user_status 시딩 수행
-        const response = await fetch('/api/user-status/seed', {
+        const response = await fetch('/api/user/status/seed', {
           method: 'POST',
           credentials: 'include', // 쿠키 포함
         });
@@ -129,7 +129,7 @@ export const UserStatusProvider = ({ children }: UserStatusProviderProps) => {
 
         // 로그아웃 시 user_status 테이블의 status를 offline으로 업데이트
         if (previousUserId) {
-          fetch('/api/user-status/update', {
+          fetch('/api/user/status/update', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -263,7 +263,7 @@ export const UserStatusProvider = ({ children }: UserStatusProviderProps) => {
 
         try {
           // 서버 API를 통해 user_status 업데이트 수행
-          const response = await fetch('/api/user-status/update', {
+          const response = await fetch('/api/user/status/update', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
