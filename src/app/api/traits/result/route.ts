@@ -3,6 +3,8 @@ import { cookies } from 'next/headers';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getTraitsResult } from '@/services/traits/getTraitsResult.service';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/traits/result
  *

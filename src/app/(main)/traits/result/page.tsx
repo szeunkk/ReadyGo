@@ -8,6 +8,8 @@ import {
 import { URL_PATHS } from '@/commons/constants/url';
 import { redirect } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 type TraitsResultApiResponse = {
   traits: {
     cooperation: number;
