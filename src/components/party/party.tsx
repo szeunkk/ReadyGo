@@ -7,6 +7,7 @@ import Searchbar from '@/commons/components/searchbar';
 import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
 import Card from './ui/card';
+import SkeletonCard from './ui/skeleton-card/skeleton-card';
 import { useLinkModal } from './hooks/index.link.modal.hook';
 import { useInfinitePartyList } from './hooks/index.infinityScroll.hook';
 import { useLinkRouting } from './hooks/index.link.routing.hook';
@@ -104,7 +105,11 @@ export default function Party() {
         >
           <div className={styles.mainArea} data-testid="party-main-area">
             {isLoading && partyList.length === 0 ? (
-              <div>로딩 중...</div>
+              <>
+                {[0, 1, 2, 3, 4, 5].map((index) => (
+                  <SkeletonCard key={index} />
+                ))}
+              </>
             ) : error ? (
               <div>데이터를 불러오는 중 오류가 발생했습니다.</div>
             ) : partyList.length === 0 ? (
