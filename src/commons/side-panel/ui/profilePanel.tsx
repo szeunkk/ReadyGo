@@ -5,10 +5,8 @@ import styles from './styles.module.css';
 import AnimalCard from '../../components/animal-card';
 import RadarChart, { RadarChartData } from '../../components/radar-chart';
 import BarChart, { BarChartDataItem } from '../../components/bar-chart';
-import Button from '../../components/button';
 import { AnimalType } from '../../constants/animal';
 import { TierType } from '../../constants/tierType.enum';
-import { usePathname } from 'next/navigation';
 
 export interface ProfilePanelProps {
   userId: string;
@@ -37,8 +35,6 @@ export default function ProfilePanel({
 }: ProfilePanelProps) {
   const [profileData, setProfileData] = useState<UserProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const pathname = usePathname();
-  const isChatPage = pathname?.startsWith('/chat/');
 
   useEffect(() => {
     // TODO: userId를 사용하여 실제 사용자 데이터 페칭
@@ -294,19 +290,6 @@ export default function ProfilePanel({
           </div>
         </div>
       </div>
-
-      {/* 채팅 하기 버튼 */}
-      {!isChatPage && (
-        <Button
-          variant="primary"
-          size="m"
-          shape="round"
-          className={styles.chatButton}
-          onClick={handleChatClick}
-        >
-          채팅 하기
-        </Button>
-      )}
     </div>
   );
 }
