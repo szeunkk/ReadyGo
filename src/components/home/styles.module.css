@@ -1,10 +1,10 @@
 /* 홈페이지 전체 컨테이너 */
 .container {
   display: flex;
-  gap: 32px;
+  gap: 16px;
   align-items: flex-start;
   justify-content: center;
-  padding: 32px;
+  padding: 16px;
   width: 100%;
   height: fit-content;
 }
@@ -13,12 +13,16 @@
 .leftSection {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  flex: 1;
+  gap: 16px;
+  /* flex: 1; */
   min-width: 408px;
   max-width: 1336px;
   width: 100%;
   transition: margin-right 0.25s ease;
+}
+
+.leftSection.sidePanelOpen {
+  margin-right: -424px; /*ProfileSection width(408px) + gap(16px)*/
 }
 
 /* 반응형 디자인 - 중형 데스크탑 (1440px ~ 1799px) - 3열 */
@@ -33,10 +37,6 @@
   .leftSection {
     max-width: 1600px;
   }
-}
-
-.leftSection.sidePanelOpen {
-  margin-right: -456px; /* ProfileSection width(408px) + gap(32px) */
 }
 
 /* 매치 섹션 */
