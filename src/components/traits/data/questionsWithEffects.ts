@@ -1,9 +1,9 @@
 /**
  * ReadyGo 성향 테스트 질문 세트 (Effect 기반)
- * 
+ *
  * 총 10문항, 5개 성향 축을 기반으로 구성
  * 각 선택지는 주 성향 + 보조 효과를 가짐
- * 
+ *
  * Effect 범위:
  * - 주 특성: -20 ~ +20
  * - 보조 특성: -10 ~ +10
@@ -413,4 +413,3 @@ export const QUESTIONS_WITH_EFFECTS: QuestionWithEffect[] = [
     ],
   },
 ];
-

@@ -1,16 +1,23 @@
 /**
  * Effect 기반 특성 점수 계산 모듈 (V2)
- * 
+ *
  * 사용자의 답변에 따른 effect를 누적하여 최종 특성 벡터를 계산합니다.
- * 
+ *
  * 기존 시스템에서 마이그레이션:
  * - 기존: 리커트 척도 점수(-2~2) × 가중치
  * - 신규: Effect 누적 (-20~20) + Radial Clipping
  */
 
 import type { TraitVector } from '@/commons/constants/animal/animal.vector';
-import { createInitialVector, normalizeVector, applyRadialClipping } from './calculateVectorDistance';
-import type { QuestionWithEffect, TraitEffect } from '../data/questionEffects.types';
+import {
+  createInitialVector,
+  normalizeVector,
+  applyRadialClipping,
+} from './calculateVectorDistance';
+import type {
+  QuestionWithEffect,
+  TraitEffect,
+} from '../data/questionEffects.types';
 import type { TraitKey } from '@/commons/constants/animal/trait.enum';
 import { QUESTIONS_WITH_EFFECTS } from '../data/questions';
 
@@ -31,7 +38,7 @@ export type TraitScores = TraitVector;
 
 /**
  * Effect 기반으로 특성 점수 계산 (내부 함수)
- * 
+ *
  * @param answers - 사용자의 답변 맵 (questionId -> choice value)
  * @param questions - Effect가 포함된 질문 목록
  * @returns 계산된 특성 벡터 (0~100)
@@ -72,7 +79,7 @@ export const calculateTraitScoresByEffect = (
 
 /**
  * 벡터에 Effect 적용
- * 
+ *
  * @param vector - 적용할 대상 벡터 (mutable)
  * @param effect - 적용할 effect
  */
@@ -95,11 +102,11 @@ const applyEffect = (vector: TraitVector, effect: TraitEffect): void => {
 
 /**
  * 특정 질문의 답변이 특성에 미치는 영향 미리보기
- * 
+ *
  * @param question - 질문
  * @param choiceValue - 선택지 값 (1~5)
  * @returns 해당 선택지의 effect
- * 
+ *
  * @example
  * ```ts
  * const effect = previewQuestionEffect(question1, 5);
@@ -116,11 +123,11 @@ export const previewQuestionEffect = (
 
 /**
  * 현재까지 답변한 내용의 중간 결과 계산
- * 
+ *
  * @param answers - 현재까지의 답변
  * @param questions - 질문 목록
  * @returns 현재까지의 특성 벡터
- * 
+ *
  * 용도: 진행 중인 설문에서 중간 결과를 보여줄 때 사용
  */
 export const calculateIntermediateScores = (
@@ -132,11 +139,11 @@ export const calculateIntermediateScores = (
 
 /**
  * Effect 총합 계산 (디버깅용)
- * 
+ *
  * @param answers - 사용자 답변
  * @param questions - 질문 목록
  * @returns 각 특성별 총 effect 합계
- * 
+ *
  * @example
  * ```ts
  * const totalEffects = calculateTotalEffects(answers, questions);
@@ -194,7 +201,7 @@ export const calculateTotalEffects = (
  * const scores = calculateTraitScores(answers);
  * // { cooperation: 65, exploration: 50, ... }
  * ```
- * 
+ *
  * 새로운 시스템:
  * - Effect 기반 점수 누적
  * - Radial Clipping 적용
@@ -205,4 +212,3 @@ export const calculateTraitScores = (
 ): TraitScores => {
   return calculateTraitScoresByEffect(answers, QUESTIONS_WITH_EFFECTS);
 };
-

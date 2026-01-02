@@ -1,6 +1,6 @@
 /**
  * 질문 Effect 시스템 타입 정의
- * 
+ *
  * 각 질문의 답변이 5가지 특성에 미치는 영향을 정의합니다.
  */
 
@@ -8,7 +8,7 @@ import type { TraitKey } from '@/commons/constants/animal/trait.enum';
 
 /**
  * 특성별 효과값
- * 
+ *
  * - 양수: 해당 특성 증가
  * - 음수: 해당 특성 감소
  * - 범위: 주 특성 -20~+20, 보조 특성 -10~+10
@@ -41,7 +41,7 @@ export type QuestionSet = QuestionWithEffect[];
 
 /**
  * Effect 예시
- * 
+ *
  * @example
  * ```ts
  * const questionExample: QuestionWithEffect = {
@@ -74,4 +74,3 @@ export type QuestionSet = QuestionWithEffect[];
  * };
  * ```
  */
-

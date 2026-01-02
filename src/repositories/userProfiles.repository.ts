@@ -16,26 +16,15 @@ export type UserProfileRow = {
 
 /**
  * user_profiles 레코드를 user_id(id)로 조회한다
- * - RLS 기반 쿼리
- * - 존재하지 않으면 null 반환
+ * - DB 접근만 수행, 에러 처리 및 데이터 가공 없음
+ * - Supabase 응답 구조를 그대로 반환
  */
-export const findByUserId = async (
-  userId: string
-): Promise<UserProfileRow | null> => {
-  const { data, error } = await supabaseAdmin
+export const findByUserId = async (userId: string) => {
+  return await supabaseAdmin
     .from('user_profiles')
     .select('*')
     .eq('id', userId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') {
-      return null;
-    }
-    throw new Error(`Failed to find user_profiles: ${error.message}`);
-  }
-
-  return data;
+    .maybeSingle();
 };
 
 /**
