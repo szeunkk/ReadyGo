@@ -1,0 +1,82 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+	        - 단일 Service 함수로 구현할 것
+	        - Service는 데이터 조회 + 최소 조립 책임만 가진다
+	        - Repository는 이미 구현되어 있다고 가정하고 재구현하지 않는다
+	        - 예외는 throw 로 처리하되, 메시지 포맷/UI 기준은 고려하지 않는다
+	        - 타입 안정성을 최우선으로 한다 (ProfileCoreDTO 기준)
+	        - 불필요한 로직, boolean flag, UI 전용 분기 로직 추가 금지
+
+==============================================
+
+조건-파일경로) 참고할 repositories 파일 경로
+            - src/repositories/userProfiles.repository.ts
+	        - src/repositories/userTraits.repository.ts
+	        - src/repositories/userPlaySchedules.repository.tsx
+
+조건-파일경로) 참고할 profileDTO 파일 경로
+	        - src/commons/types/profile/profileCore.dto.ts
+
+조건-파일경로) 구현할 services 파일 경로
+	        - src/services/profile/getMyProfileService.ts
+
+==============================================
+
+조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
+	        - Service 레벨에서 여러 Repository 결과를 조합하는 패턴
+	        - Repository는 findByUserId(userId: string) 형태의 단일 조회 함수
+	        - DTO는 Service에서만 조립하며, Repository는 DB row 그대로 반환
+
+==============================================
+
+핵심요구사항) 다음 기능을 step-by-step으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
+	1.	입력으로 userId: string을 받는 getMyProfileService 함수 구현
+	2.	userProfilesRepository.findByUserId(userId) 호출
+	3.	profile row가 없을 경우 즉시 error throw
+	4.	userTraitsRepository.findByUserId(userId) 호출
+	5.	userPlaySchedulesRepository.findByUserId(userId) 호출
+	6.	traits와 schedule 모두 없는 경우
+	•	정상 흐름
+	•	ProfileCoreDTO에 traits, schedule을 undefined로 설정
+	7.	traits만 있거나 schedule만 있는 경우
+	•	데이터 불일치로 판단
+	•	error throw
+	8.	traits와 schedule이 모두 있는 경우
+	•	ProfileCoreDTO에 그대로 매핑
+	9.	nickname, animalType은 DB 값이 없을 경우 undefined 허용
+	10.	Service는 크래시 없이 명시적 throw만 수행
+	11.	반환 타입은 ProfileCoreDTO로 고정
+	12.	DB row → DTO 조립까지만 수행
+	13.	UI/ViewModel/매칭/판단 로직 일절 포함하지 않음
+
+==============================================
+
+조건-Hook 책임)
+	        - Hook 로직 없음
+	        - Service 단독 함수로만 동작
+
+==============================================
+
+조건-UI 책임)
+	        - UI 분기 판단 없음
+	        - boolean 상태 반환 없음
+	        - 메시지 가공 없음
+
+==============================================
+
+구현 완료 후 반환) 아래 체크리스트를 반드시 반환할 것.
+	        - getMyProfileService(userId) 함수 구현
+	        - profile 미존재 시 error throw
+	        - traits/schedule 조회 로직 분리 호출
+	        - traits + schedule 모두 없는 정상 케이스 처리
+	        - traits/schedule 불일치 error 처리
+	        - traits + schedule 모두 있는 정상 케이스 처리
+	        - ProfileCoreDTO 타입 정확히 사용
+	        - nickname / animalType undefined 허용
+	        - auth / 권한 체크 미포함
+	        - UI 분기용 로직 미포함
+	        - 온보딩 boolean 미추가
