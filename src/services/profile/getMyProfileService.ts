@@ -21,9 +21,9 @@ import { TraitVector } from '@/commons/constants/animal/animal.vector';
  * - 온보딩 상태 판단
  * - 권한/인증 체크
  */
-export async function getMyProfileService(
+export const getMyProfileService = async (
   userId: string
-): Promise<ProfileCoreDTO> {
+): Promise<ProfileCoreDTO> => {
   // 1. user_profiles 조회
   const profileResult = await userProfilesRepository.findByUserId(userId);
 
@@ -108,4 +108,4 @@ export async function getMyProfileService(
     traits,
     schedule,
   };
-}
+};
