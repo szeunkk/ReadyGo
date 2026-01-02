@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { cookies } from 'next/headers';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { AnimalType } from '@/commons/constants/animal/animal.enum';
 import { TraitKey } from '@/commons/constants/animal/trait.enum';
 import {
@@ -75,17 +74,14 @@ const SubmitTraitsSchema = z
 
 export const POST = async (request: NextRequest) => {
   try {
-    // 1. 인증 확인 (쿠키 우선, Authorization 헤더 대체)
-    const cookieStore = await cookies();
-    const accessToken =
-      cookieStore.get('sb-access-token')?.value ||
-      request.headers.get('Authorization')?.replace('Bearer ', '') ||
-      '';
+    // 1. Supabase 클라이언트 생성 (쿠키 자동 처리)
+    const supabase = createClient();
 
+    // 2. 사용자 정보 확인
     const {
       data: { user },
       error: authError,
-    } = await supabaseAdmin.auth.getUser(accessToken);
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json(
@@ -97,7 +93,7 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    // 2. 요청 Body 파싱
+    // 3. 요청 Body 파싱
     let body: unknown;
     try {
       body = await request.json();
@@ -111,7 +107,7 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    // 3. user_id 체크 (body에 포함된 경우 즉시 거부)
+    // 4. user_id 체크 (body에 포함된 경우 즉시 거부)
     if (body && typeof body === 'object' && 'user_id' in body) {
       return NextResponse.json(
         {
@@ -122,7 +118,7 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    // 4. Validation
+    // 5. Validation
     const validationResult = SubmitTraitsSchema.safeParse(body);
     if (!validationResult.success) {
       const errorMessages = validationResult.error.issues
@@ -139,7 +135,7 @@ export const POST = async (request: NextRequest) => {
 
     const payload = validationResult.data;
 
-    // 5. traits 5개 모두 포함 검증
+    // 6. traits 5개 모두 포함 검증
     for (const key of traitKeys) {
       if (!(key in payload.traits)) {
         return NextResponse.json(
@@ -152,18 +148,18 @@ export const POST = async (request: NextRequest) => {
       }
     }
 
-    // 6. Service 호출
-    await submitTraits(user.id, {
+    // 7. Service 호출
+    await submitTraits(supabase, user.id, {
       traits: payload.traits,
       animalType: payload.animalType as AnimalType,
       dayTypes: payload.dayTypes,
       timeSlots: payload.timeSlots,
     });
 
-    // 7. 성공 응답
+    // 8. 성공 응답
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (error) {
-    // 8. 에러 처리
+    // 9. 에러 처리
     console.error('[POST /api/traits/submit] Error:', error);
     return NextResponse.json(
       {

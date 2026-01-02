@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { getTraitsResult } from '@/services/traits/getTraitsResult.service';
 
 export const dynamic = 'force-dynamic';
@@ -16,19 +15,15 @@ export const dynamic = 'force-dynamic';
 
 export const GET = async (request: NextRequest) => {
   try {
-    // 1. 인증 확인 (쿠키 우선, Authorization 헤더 대체)
-    const cookieStore = await cookies();
-    const accessToken =
-      cookieStore.get('sb-access-token')?.value ||
-      request.headers.get('Authorization')?.replace('Bearer ', '') ||
-      '';
+    // 1. Supabase 클라이언트 생성 (쿠키 자동 처리)
+    const supabase = createClient();
 
+    // 2. 사용자 정보 확인
     const {
       data: { user },
       error: authError,
-    } = await supabaseAdmin.auth.getUser(accessToken);
+    } = await supabase.auth.getUser();
 
-    // 2. 비로그인 상태면 즉시 401 반환
     if (authError || !user) {
       return NextResponse.json(
         {
@@ -43,7 +38,7 @@ export const GET = async (request: NextRequest) => {
     const userId = user.id;
 
     // 4. Service 호출
-    const result = await getTraitsResult(userId);
+    const result = await getTraitsResult(supabase, userId);
 
     // 5. 성공 응답
     return NextResponse.json(result, { status: 200 });
