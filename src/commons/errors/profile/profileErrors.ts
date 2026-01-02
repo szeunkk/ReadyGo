@@ -54,10 +54,7 @@ export class ProfileDataInconsistencyError extends Error {
   readonly code = 'PROFILE_DATA_INCONSISTENCY';
   readonly statusCode = 500;
 
-  constructor(
-    userId: string,
-    reason: 'traits_only' | 'schedules_only'
-  ) {
+  constructor(userId: string, reason: 'traits_only' | 'schedules_only') {
     const message =
       reason === 'traits_only'
         ? `Data inconsistency for userId ${userId}: traits exist but schedules are missing`
@@ -100,4 +97,3 @@ export class ProfileFetchError extends Error {
     Object.setPrototypeOf(this, ProfileFetchError.prototype);
   }
 }
-
