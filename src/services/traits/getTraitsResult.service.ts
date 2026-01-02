@@ -1,6 +1,8 @@
 import { findByUserId as findUserTraits } from '@/repositories/userTraits.repository';
 import { findByUserId as findUserProfile } from '@/repositories/userProfiles.repository';
 import { findByUserId as findPlaySchedules } from '@/repositories/userPlaySchedules.repository';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/supabase';
 
 /**
  * getTraitsResult Service
@@ -29,21 +31,24 @@ export type TraitsResultDTO = {
 };
 
 export const getTraitsResult = async (
+  client: SupabaseClient<Database>,
   userId: string
 ): Promise<TraitsResultDTO> => {
   // 1. user_traits 조회 (필수)
-  const userTraits = await findUserTraits(userId);
-  if (!userTraits) {
+  const userTraitsResult = await findUserTraits(client, userId);
+  if (!userTraitsResult.data) {
     throw new Error('traits not found');
   }
+  const userTraits = userTraitsResult.data;
 
   // 2. user_profiles 조회 (animal_type, nickname)
-  const userProfile = await findUserProfile(userId);
-  const animalType = userProfile?.animal_type || '';
-  const nickname = userProfile?.nickname || '';
+  const userProfileResult = await findUserProfile(client, userId);
+  const animalType = userProfileResult.data?.animal_type || '';
+  const nickname = userProfileResult.data?.nickname || '';
 
   // 3. user_play_schedules 조회
-  const playSchedules = await findPlaySchedules(userId);
+  const playSchedulesResult = await findPlaySchedules(client, userId);
+  const playSchedules = playSchedulesResult.data || [];
 
   // 4. schedule 데이터 가공 (중복 제거)
   const dayTypesSet = new Set<string>();

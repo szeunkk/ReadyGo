@@ -12,6 +12,8 @@ import {
   ProfileDataInconsistencyError,
   ProfileFetchError,
 } from '@/commons/errors/profile/profileErrors';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/supabase';
 
 /**
  * 내 프로필 조회 Service
@@ -27,10 +29,14 @@ import {
  * - 권한/인증 체크
  */
 export const getMyProfileService = async (
+  client: SupabaseClient<Database>,
   userId: string
 ): Promise<ProfileCoreDTO> => {
   // 1. user_profiles 조회
-  const profileResult = await userProfilesRepository.findByUserId(userId);
+  const profileResult = await userProfilesRepository.findByUserId(
+    client,
+    userId
+  );
 
   // 1-1. Repository 에러 처리
   if (profileResult.error) {
@@ -45,7 +51,7 @@ export const getMyProfileService = async (
   const profileRow = profileResult.data;
 
   // 2. user_traits 조회
-  const traitsResult = await userTraitsRepository.findByUserId(userId);
+  const traitsResult = await userTraitsRepository.findByUserId(client, userId);
 
   // 2-1. Repository 에러 처리
   if (traitsResult.error) {
@@ -53,8 +59,10 @@ export const getMyProfileService = async (
   }
 
   // 3. user_play_schedules 조회
-  const schedulesResult =
-    await userPlaySchedulesRepository.findByUserId(userId);
+  const schedulesResult = await userPlaySchedulesRepository.findByUserId(
+    client,
+    userId
+  );
 
   // 3-1. Repository 에러 처리
   if (schedulesResult.error) {

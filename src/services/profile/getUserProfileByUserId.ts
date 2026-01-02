@@ -12,6 +12,8 @@ import {
   ProfileDataInconsistencyError,
   ProfileFetchError,
 } from '@/commons/errors/profile/profileErrors';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/supabase';
 
 /**
  * 특정 사용자의 프로필 조회 Service
@@ -28,10 +30,14 @@ import {
  * - 매칭 / 노출 정책 로직
  */
 export const getUserProfileByUserId = async (
+  client: SupabaseClient<Database>,
   targetUserId: string
 ): Promise<ProfileCoreDTO> => {
   // 1. user_profiles 조회
-  const profileResult = await userProfilesRepository.findByUserId(targetUserId);
+  const profileResult = await userProfilesRepository.findByUserId(
+    client,
+    targetUserId
+  );
 
   // 1-1. Repository 에러 처리
   if (profileResult.error) {
@@ -46,7 +52,10 @@ export const getUserProfileByUserId = async (
   const profileRow = profileResult.data;
 
   // 2. user_traits 조회
-  const traitsResult = await userTraitsRepository.findByUserId(targetUserId);
+  const traitsResult = await userTraitsRepository.findByUserId(
+    client,
+    targetUserId
+  );
 
   // 2-1. Repository 에러 처리
   if (traitsResult.error) {
@@ -54,8 +63,10 @@ export const getUserProfileByUserId = async (
   }
 
   // 3. user_play_schedules 조회
-  const schedulesResult =
-    await userPlaySchedulesRepository.findByUserId(targetUserId);
+  const schedulesResult = await userPlaySchedulesRepository.findByUserId(
+    client,
+    targetUserId
+  );
 
   // 3-1. Repository 에러 처리
   if (schedulesResult.error) {
