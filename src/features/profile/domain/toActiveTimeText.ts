@@ -41,9 +41,9 @@ import type { ProfileCoreDTO } from '@/commons/types/profile/profileCore.dto';
  * const emptySchedule = toActiveTimeText([]); // undefined
  * ```
  */
-export function toActiveTimeText(
+export const toActiveTimeText = (
   schedule: ProfileCoreDTO['schedule']
-): string | undefined {
+): string | undefined => {
   // schedule이 undefined인 경우 → undefined 반환
   if (!schedule) {
     return undefined;
@@ -78,4 +78,4 @@ export function toActiveTimeText(
 
   // 최종 텍스트 조합: "dayTypes / timeSlots"
   return `${dayTypesText} / ${timeSlotsText}`;
-}
+};

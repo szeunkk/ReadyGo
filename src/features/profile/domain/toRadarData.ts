@@ -62,9 +62,9 @@ const RADAR_TRAIT_ORDER: RadarTraitKey[] = [
  * const emptyRadarData2 = toRadarData(undefined); // []
  * ```
  */
-export function toRadarData(
+export const toRadarData = (
   traits: ProfileCoreDTO['traits']
-): RadarChartData[] {
+): RadarChartData[] => {
   // traits가 없는 경우 빈 배열 반환
   if (!traits) {
     return [];
@@ -75,5 +75,4 @@ export function toRadarData(
     trait,
     value: traits[trait], // 값 그대로 사용 (가공 X)
   }));
-}
-
+};

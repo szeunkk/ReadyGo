@@ -71,9 +71,9 @@ import { toAnimalTypeMeta } from '@/features/profile/domain/toAnimalTypeMeta';
  * // }
  * ```
  */
-export function toProfileViewModel(
+export const toProfileViewModel = (
   coreDTO: ProfileCoreDTO
-): ProfileViewModel {
+): ProfileViewModel => {
   // 기존 domain 변환 함수를 사용하여 UI 데이터 생성
   const radarData = toRadarData(coreDTO.traits);
   const activeTimeText = toActiveTimeText(coreDTO.schedule);
@@ -95,5 +95,5 @@ export function toProfileViewModel(
     activeTimeText,
     animalMeta,
   };
-}
+};
 

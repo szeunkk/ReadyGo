@@ -70,9 +70,9 @@ const ANIMAL_TYPE_META_MAP: Record<AnimalType, AnimalTypeMeta> = Object.values(
  * const noMeta2 = toAnimalTypeMeta(undefined); // undefined
  * ```
  */
-export function toAnimalTypeMeta(
+export const toAnimalTypeMeta = (
   animalType: ProfileCoreDTO['animalType']
-): AnimalTypeMeta | undefined {
+): AnimalTypeMeta | undefined => {
   // animalType이 없는 경우 undefined 반환
   if (!animalType) {
     return undefined;
@@ -80,4 +80,4 @@ export function toAnimalTypeMeta(
 
   // enum → meta 단방향 매핑
   return ANIMAL_TYPE_META_MAP[animalType];
-}
+};
