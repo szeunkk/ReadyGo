@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { Database } from '@/types/supabase';
 
-export function createClient() {
+export const createClient = () => {
   const cookieStore = cookies();
 
   return createServerClient<Database>(
@@ -17,4 +17,4 @@ export function createClient() {
       },
     }
   );
-}
+};

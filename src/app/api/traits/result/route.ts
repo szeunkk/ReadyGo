@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
  * - 응답 반환
  */
 
-export const GET = async (request: NextRequest) => {
+export const GET = async (_request: NextRequest) => {
   try {
     // 1. Supabase 클라이언트 생성 (쿠키 자동 처리)
     const supabase = createClient();

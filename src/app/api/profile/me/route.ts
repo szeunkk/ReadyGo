@@ -23,7 +23,7 @@ export const dynamic = 'force-dynamic';
  * - Service 로직 재구현 금지
  * - UI 가공, ViewModel 변환, 상태 판단 로직 금지
  */
-export const GET = async (request: NextRequest) => {
+export const GET = async (_request: NextRequest) => {
   try {
     // 1. Supabase 클라이언트 생성 (쿠키 자동 처리)
     const supabase = createClient();

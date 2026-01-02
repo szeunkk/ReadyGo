@@ -25,7 +25,7 @@ export const dynamic = 'force-dynamic';
  * - 관계/차단/매칭 로직 금지
  */
 export const GET = async (
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { userId: string } }
 ) => {
   try {
@@ -112,4 +112,3 @@ export const GET = async (
     );
   }
 };
-
