@@ -1,0 +1,86 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+	        - 단일 Service 함수로 구현한다
+	        - 입력 파라미터는 targetUserId 하나만 받는다
+	        - auth / 권한 / 관계 / 차단 로직을 절대 포함하지 않는다
+	        - Repository는 userId 기준 단일 조회만 수행한다
+	        - DB row → DTO 변환까지만 수행한다
+	        - UI, ViewModel, 매칭, 노출 정책 로직을 포함하지 않는다
+	        - 조건 누락 시 합리적인 기본 구현을 보완하되, 책임 범위를 넘지 않는다
+
+==============================================
+
+조건-파일경로) 구현할 services 파일 경로
+            - Service: src/services/profile/getUserProfileByUserId.ts
+
+조건-파일경로) 참고할 profileDTO 파일 경로
+	        - src/commons/types/profile/profileCore.dto.ts
+
+조건-파일경로) 참고할 repositories 파일 경로
+            - src/repositories/userProfiles.repository.ts
+	        - src/repositories/userTraits.repository.ts
+	        - src/repositories/userPlaySchedules.repository.tsx
+
+==============================================
+
+조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
+	        - 내 프로필 조회 Service(getMyProfile 계열)의 상태 처리 규칙
+	        - Repository는 데이터 가공 없이 DB row 그대로 반환
+	        - ProfileCoreDTO 조립은 Service 책임
+	        - traits + schedule 동시 존재 여부에 따른 상태 분기
+
+==============================================
+
+핵심요구사항) 다음 기능을 step-by-step으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
+	1.	입력으로 targetUserId(string)를 받는다
+	2.	userProfilesRepository.findByUserId(targetUserId) 호출
+	3.	profile row가 없을 경우 즉시 error throw
+	4.	userTraitsRepository.findByUserId(targetUserId) 호출
+	5.	userPlaySchedulesRepository.findByUserId(targetUserId) 호출
+	6.	상태 처리 규칙 적용
+	    - traits와 schedule이 모두 없는 경우
+	    - 정상 처리
+	    - ProfileCoreDTO에서 traits, schedule = undefined
+	    - traits만 있거나 schedule만 있는 경우
+	    - 데이터 불일치로 error 처리
+	    - traits와 schedule이 모두 있는 경우
+	    - 정상 ProfileCoreDTO 조립
+	7.	profile 필드 처리
+	    - nickname 없음 허용 (undefined)
+	    - animalType 없음 허용 (undefined)
+	8.	Service 레벨에서 크래시 발생 X
+	9.	반환 타입은 ProfileCoreDTO로 고정
+	10.	DB → DTO까지만 처리하고 그 외 로직 포함 X
+
+==============================================
+
+조건-Hook 책임)
+	        - Hook 로직 없음
+	        - React / 상태 관리 코드 포함 ❌
+
+==============================================
+
+조건-UI 책임)
+	        - UI 판단 로직 없음
+	        - ViewModel 변환 없음
+	        - 노출 필드 필터링 없음
+
+==============================================
+
+구현 완료 후 반환) 아래 체크리스트를 반드시 반환할 것.
+	        - targetUserId 단일 입력으로 Service 구현
+	        - userProfilesRepository.findByUserId 호출
+	        - profile row 없음 시 error 처리
+	        - userTraitsRepository.findByUserId 호출
+	        - userPlaySchedulesRepository.findByUserId 호출
+	        - traits + schedule 동시 없음 → 정상 처리
+	        - traits/schedule 단일 존재 → error 처리
+	        - traits + schedule 동시 존재 → 정상 DTO 조립
+	        - nickname / animalType 누락 허용
+	        - auth / 권한 / 관계 로직 미포함
+	        - UI / ViewModel / 매칭 로직 미포함
+	        - 반환 타입 ProfileCoreDTO 고정

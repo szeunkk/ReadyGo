@@ -76,13 +76,13 @@ export const Layout = ({ children }: LayoutProps) => {
           <aside className={`${styles.sidePanel} ${isOpen ? styles.open : ''}`}>
             <SidePanel />
           </aside>
-        </div>
 
-        {/* Overlay */}
-        <LayoutOverlays
-          currentOverlay={currentOverlay}
-          onClose={closeOverlay}
-        />
+          {/* Overlay */}
+          <LayoutOverlays
+            currentOverlay={currentOverlay}
+            onClose={closeOverlay}
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
 import { AnimalType } from '@/commons/constants/animal/animal.enum';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/supabase';
 
 /**
  * user_profiles Repository
@@ -16,42 +17,32 @@ export type UserProfileRow = {
 
 /**
  * user_profiles 레코드를 user_id(id)로 조회한다
- * - RLS 기반 쿼리
- * - 존재하지 않으면 null 반환
+ * - DB 접근만 수행, 에러 처리 및 데이터 가공 없음
+ * - Supabase 응답 구조를 그대로 반환
  */
 export const findByUserId = async (
+  client: SupabaseClient<Database>,
   userId: string
-): Promise<UserProfileRow | null> => {
-  const { data, error } = await supabaseAdmin
+) => {
+  return await client
     .from('user_profiles')
     .select('*')
     .eq('id', userId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') {
-      return null;
-    }
-    throw new Error(`Failed to find user_profiles: ${error.message}`);
-  }
-
-  return data;
+    .maybeSingle();
 };
 
 /**
  * user_profiles의 animal_type을 업데이트한다
- * - user_profiles.id = user_id
+ * - DB 접근만 수행, 에러 처리는 상위 레이어에서 담당
+ * - Supabase 응답 구조를 그대로 반환
  */
 export const updateAnimalType = async (
+  client: SupabaseClient<Database>,
   userId: string,
   animalType: AnimalType
-): Promise<void> => {
-  const { error } = await supabaseAdmin
+) => {
+  return await client
     .from('user_profiles')
     .update({ animal_type: animalType })
     .eq('id', userId);
-
-  if (error) {
-    throw new Error(`Failed to update animal_type: ${error.message}`);
-  }
 };

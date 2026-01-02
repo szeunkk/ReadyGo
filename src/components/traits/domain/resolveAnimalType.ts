@@ -1,6 +1,6 @@
 /**
  * 벡터 거리 기반 동물 유형 결정 모듈
- * 
+ *
  * 사용자의 특성 벡터와 각 동물의 이상적 벡터 간의 거리를 계산하여
  * 가장 가까운(유사한) 동물을 매칭합니다.
  */
@@ -26,10 +26,10 @@ export type AnimalDistanceResult = {
 
 /**
  * 벡터 거리 기반으로 가장 적합한 동물 유형을 결정
- * 
+ *
  * @param userVector - 사용자의 특성 벡터 (0~100)
  * @returns 가장 가까운 동물 유형
- * 
+ *
  * @example
  * ```ts
  * const userVector = {
@@ -42,11 +42,11 @@ export type AnimalDistanceResult = {
  * const animal = resolveAnimalTypeByVector(userVector);
  * // AnimalType.WOLF (리더십+모험성이 높아 늑대와 유사)
  * ```
- * 
+ *
  * 계산 방식:
  * 1. 각 동물의 이상적 벡터와 사용자 벡터 간의 유클리드 거리 계산
  * 2. 거리가 가장 짧은(가장 유사한) 동물 선택
- * 
+ *
  * 거리 공식:
  * distance = sqrt(
  *   (user.cooperation - animal.cooperation)^2 +
@@ -78,11 +78,11 @@ export const resolveAnimalTypeByVector = (
 
 /**
  * 상위 N개의 유사한 동물 목록 반환 (디버깅/분석용)
- * 
+ *
  * @param userVector - 사용자의 특성 벡터
  * @param topN - 반환할 동물 수 (기본값: 3)
  * @returns 거리가 가까운 순서대로 정렬된 동물 목록
- * 
+ *
  * @example
  * ```ts
  * const results = getTopMatchingAnimals(userVector, 5);
@@ -112,7 +112,7 @@ export const getTopMatchingAnimals = (
 
 /**
  * 모든 동물과의 거리 정보 반환 (디버깅용)
- * 
+ *
  * @param userVector - 사용자의 특성 벡터
  * @returns 모든 동물과의 거리 정보 (거리 순 정렬)
  */
@@ -124,11 +124,11 @@ export const getAllAnimalDistances = (
 
 /**
  * 사용자 벡터와 동물 벡터 간의 특성별 차이 분석
- * 
+ *
  * @param userVector - 사용자의 특성 벡터
  * @param animal - 비교할 동물
  * @returns 특성별 차이값
- * 
+ *
  * @example
  * ```ts
  * const diff = analyzeVectorDifference(userVector, AnimalType.WOLF);
@@ -176,7 +176,7 @@ export const analyzeVectorDifference = (
  * const animal = resolveAnimalType(scores);
  * // AnimalType.WOLF
  * ```
- * 
+ *
  * 새로운 시스템:
  * - 유클리드 거리 기반 매칭
  * - 16개 동물 모두 구분 가능
@@ -185,4 +185,3 @@ export const analyzeVectorDifference = (
 export const resolveAnimalType = (traitScores: TraitScores): AnimalType => {
   return resolveAnimalTypeByVector(traitScores);
 };
-

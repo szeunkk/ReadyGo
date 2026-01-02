@@ -1,6 +1,6 @@
 /**
  * 벡터 간 거리 계산 유틸리티
- * 
+ *
  * 사용자의 특성 벡터와 각 동물의 이상적 벡터 간의 유사도를 계산
  */
 
@@ -9,13 +9,13 @@ import { TRAIT_KEYS } from '@/commons/constants/animal/animal.vector';
 
 /**
  * 유클리드 거리 계산
- * 
+ *
  * @param vector1 - 첫 번째 벡터 (사용자)
  * @param vector2 - 두 번째 벡터 (동물)
  * @returns 거리 (낮을수록 유사함)
- * 
+ *
  * 공식: sqrt((v1.x - v2.x)^2 + (v1.y - v2.y)^2 + ...)
- * 
+ *
  * @example
  * ```ts
  * const userVector = { cooperation: 70, exploration: 60, ... };
@@ -40,13 +40,13 @@ export const calculateEuclideanDistance = (
 
 /**
  * 코사인 유사도 계산
- * 
+ *
  * @param vector1 - 첫 번째 벡터
  * @param vector2 - 두 번째 벡터
  * @returns 유사도 (1에 가까울수록 유사함, -1에 가까울수록 반대)
- * 
+ *
  * 공식: (v1 · v2) / (||v1|| × ||v2||)
- * 
+ *
  * @example
  * ```ts
  * const similarity = calculateCosineSimilarity(userVector, wolfVector);
@@ -79,13 +79,13 @@ export const calculateCosineSimilarity = (
 
 /**
  * 맨해튼 거리 (L1 거리) 계산
- * 
+ *
  * @param vector1 - 첫 번째 벡터
  * @param vector2 - 두 번째 벡터
  * @returns 거리 (낮을수록 유사함)
- * 
+ *
  * 공식: |v1.x - v2.x| + |v1.y - v2.y| + ...
- * 
+ *
  * 특징: 유클리드 거리보다 계산이 빠르고, 차원별 차이를 동등하게 취급
  */
 export const calculateManhattanDistance = (
@@ -103,14 +103,14 @@ export const calculateManhattanDistance = (
 
 /**
  * 가중 유클리드 거리 계산
- * 
+ *
  * @param vector1 - 첫 번째 벡터
  * @param vector2 - 두 번째 벡터
  * @param weights - 각 특성의 가중치 (선택적)
  * @returns 거리 (낮을수록 유사함)
- * 
+ *
  * 특정 특성을 더 중요하게 고려하고 싶을 때 사용
- * 
+ *
  * @example
  * ```ts
  * // 리더십과 사교성을 더 중요하게 고려
@@ -142,7 +142,7 @@ export const calculateWeightedEuclideanDistance = (
 
 /**
  * 벡터 정규화 (0~100 범위로 클램핑)
- * 
+ *
  * @param vector - 정규화할 벡터
  * @returns 정규화된 벡터
  */
@@ -158,16 +158,16 @@ export const normalizeVector = (vector: TraitVector): TraitVector => {
 
 /**
  * Radial Clipping: 중심에서 너무 멀어지지 않도록 제한
- * 
+ *
  * @param vector - 클리핑할 벡터
  * @param maxDistance - 중심(50)에서 허용되는 최대 거리 (기본값: 120)
  * @returns 클리핑된 벡터
- * 
+ *
  * 원리:
  * 1. 중심점(50, 50, 50, 50, 50)에서의 거리 계산
  * 2. maxDistance를 초과하면 방향은 유지하되 거리를 maxDistance로 제한
  * 3. 극단적인 조합을 방지하여 모든 동물이 도달 가능한 범위 유지
- * 
+ *
  * @example
  * ```ts
  * const extreme = { cooperation: 10, exploration: 10, strategy: 90, leadership: 10, social: 10 };
@@ -212,7 +212,7 @@ export const applyRadialClipping = (
 
 /**
  * 빈 벡터 생성 (모든 값 50으로 초기화)
- * 
+ *
  * @returns 초기 벡터
  */
 export const createInitialVector = (): TraitVector => {
@@ -224,4 +224,3 @@ export const createInitialVector = (): TraitVector => {
     social: 50,
   };
 };
-

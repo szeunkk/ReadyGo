@@ -1,0 +1,99 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+	        - Cursor 환경에서 TypeScript 기반으로 구현한다.
+	        - Service 레이어에서만 예외를 정의하고 throw 한다.
+	        - Repository는 수정하지 않는다.
+	        - 에러는 명시적인 Error 클래스 또는 통일된 error factory를 사용한다.
+	        - 조건 분기 누락 없이 모든 케이스를 코드로 강제한다.
+	        - 구현 완료 후, 각 규칙 충족 여부를 체크리스트로 반환한다.
+
+==============================================
+
+조건-파일경로) 참고할 services 파일 경로
+	        - src/services/profile/getUserProfileByUserId.ts
+
+
+조건-파일경로) 참고할 profileDTO 파일 경로
+	        - src/commons/types/profile/profileCore.dto.ts
+
+
+조건-파일경로) 참고할 repositories 파일 경로
+            - src/repositories/userProfiles.repository.ts
+	        - src/repositories/userTraits.repository.ts
+	        - src/repositories/userPlaySchedules.repository.tsx
+
+조건-파일경로) 구현할 errors 파일 경로
+	        - src/commons/errors/profile/profileErrors.ts
+
+==============================================
+
+조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
+	        - 기존 “내 프로필 조회 Service”의 상태 처리 규칙을 기준으로 한다.
+	        - Repository는 null 또는 row 그대로 반환한다는 전제를 유지한다.
+	        - DTO 조립은 Service 책임이며, UI 가공은 절대 포함하지 않는다.
+	        - error 발생 시 즉시 throw 하고 이후 로직은 실행되지 않아야 한다.
+
+==============================================
+
+핵심요구사항) 다음 기능을 step-by-step으로 구현하라.
+
+1. profile 없음 처리
+	        - userProfilesRepository.findByUserId(targetUserId) 호출
+	        - 결과가 null 또는 undefined 인 경우
+	        - 즉시 NotFound 에러 throw
+	        - 에러 코드와 메시지는 공통 규칙으로 통일
+	        - 이후 traits/schedule 조회 로직 실행 ❌
+
+2. traits / schedule 불일치 처리
+	        - traits 조회: userTraitsRepository.findByUserId
+	        - schedule 조회: userPlaySchedulesRepository.findByUserId
+	        - 아래 두 경우 모두 에러로 처리
+	        - traits만 존재하고 schedule이 없는 경우
+	        - schedule만 존재하고 traits가 없는 경우
+	        - 에러는 데이터 불일치(DataInconsistency) 성격을 명확히 드러내야 한다.
+
+3. 정상 허용 케이스
+	        - traits + schedule 모두 없는 경우
+	        - 정상 처리
+	        - ProfileCoreDTO에 traits, schedule = undefined
+	        - traits + schedule 모두 있는 경우
+	        - 정상 처리
+	        - ProfileCoreDTO를 완전 조립
+	        - nickname 누락 → 허용
+	        - animalType 누락 → 허용
+	        - 기본값 자동 생성 ❌
+
+4. 반환 규칙
+	        - 반환 타입은 반드시 ProfileCoreDTO
+	        - DB row → DTO까지만 처리
+	        - UI / ViewModel / 관계 판단 로직 포함 ❌
+
+==============================================
+
+조건-Hook 책임)
+	        - Hook 로직 없음
+	        - React / 상태 관리 코드 포함 ❌
+
+==============================================
+
+조건-UI 책임)
+	        - UI 기준 메시지 생성 ❌
+	        - i18n / 사용자 노출 문자열 ❌
+
+==============================================
+
+구현 완료 후 반환) 아래 체크리스트를 반드시 코드 실행 결과와 함께 반환할 것.
+	        - profile 없음 시 NotFound 에러 throw
+	        - traits만 존재 시 error 처리
+	        - schedule만 존재 시 error 처리
+	        - traits + schedule 모두 없음 정상 처리
+	        - traits + schedule 모두 있음 정상 처리
+	        - nickname 누락 허용 확인
+	        - animalType 누락 허용 확인
+	        - 기본값 자동 생성 로직 없음
+	        - UI / ViewModel 로직 미포함
+	        - Service 레벨에서만 예외 정의됨
