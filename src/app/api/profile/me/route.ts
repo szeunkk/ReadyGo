@@ -59,8 +59,8 @@ export const GET = async (_request: NextRequest) => {
     if (error instanceof ProfileNotFoundError) {
       return NextResponse.json(
         {
-          message: 'Profile not found',
-          detail: error.message,
+          code: error.code,
+          message: error.message,
         },
         { status: 404 }
       );
@@ -70,8 +70,8 @@ export const GET = async (_request: NextRequest) => {
     if (error instanceof ProfileDataInconsistencyError) {
       return NextResponse.json(
         {
-          message: 'Profile data inconsistency',
-          detail: error.message,
+          code: error.code,
+          message: error.message,
         },
         { status: 500 }
       );
@@ -81,18 +81,18 @@ export const GET = async (_request: NextRequest) => {
     if (error instanceof ProfileFetchError) {
       return NextResponse.json(
         {
-          message: 'Profile fetch failed',
-          detail: error.message,
+          code: error.code,
+          message: error.message,
         },
         { status: 500 }
       );
     }
 
-    // 6-4. 기타 예상치 못한 에러 → 500
+    // 6-4. 기타 예상치 못한 에러 → 500 (fallback)
     return NextResponse.json(
       {
-        message: 'Internal Server Error',
-        detail: error instanceof Error ? error.message : 'Unknown error',
+        code: 'INTERNAL_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );
