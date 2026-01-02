@@ -4,71 +4,76 @@
 ==============================================
 
 조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
-	        - 타입 정의 작업만 수행할 것
-	        - UI / API / Service / Repository 로직 구현 금지
-	        - 기존 DTO를 수정하지 말 것
-	        - ViewModel은 UI 전용 타입임을 명확히 드러낼 것
-	        - Core DTO를 import 하여 재노출(re-export)하지 말 것
+	        - 단일 책임 원칙(SRP)을 준수할 것
+	        - 순수 함수(pure function)로만 구현할 것
+	        - 외부 의존성(API, hook, store, router 등)을 참조하지 말 것
+	        - 기존 domain 변환 함수들을 그대로 재사용할 것 (중복 로직 작성 금지)
+	        - 타입 안정성을 유지하고 any 사용 금지
+	        - 파일 간 import 방향(domain → ui 금지)을 준수할 것
 
 ==============================================
 
-조건-파일경로) 참고할 profileDTO 파일 경로
-	        - src/commons/types/profile/profileCore.dto.ts
+조건-파일경로) 참고할 파일 경로
+	        - src/features/profile/domain/toRadarData.ts
+	        - src/features/profile/domain/toActiveTimeText.ts
+	        - src/features/profile/domain/toAnimalMeta.ts
 
-조건-파일경로) 구현할 viewModel 파일 경로
-	        - src/viewmodels/profile/ProfileViewModel.ts
+조건-파일경로) 구현할 파일 경로
+	        - src/viewmodels/profile/toProfileViewModel.ts
 
 ==============================================
 
 조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
-	        - Core DTO는 API / Service / FE 공용 타입이다
-	        - ViewModel은 UI 계층 내부에서만 사용된다
-	        - ViewModel은 “UI 렌더링에 필요한 최소 필드”만 포함한다
-	        - null / undefined 정책은 타입 레벨에서 명확히 표현한다
+	        - 각 변환 함수는 Core DTO의 일부 필드만 입력으로 받아 UI 친화적 구조로 변환한다
+	        - undefined 입력에 대해 undefined 또는 빈 구조를 반환하며 예외를 발생시키지 않는다
+	        - enum → UI meta 변환은 단방향이다
+	        - 숫자 계산, 상태 판단, 비즈니스 규칙은 포함하지 않는다
 
 ==============================================
 
 핵심요구사항) 다음 기능을 step-by-step으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
-
-1. ProfileViewModel 타입을 신규 정의한다
-	        - interface 또는 type alias 중 합리적인 방식을 선택한다
-
-2. Core DTO 필드를 그대로 노출하지 않는다
-	        - ProfileCoreDTO 타입을 직접 포함하거나 extends ❌
-	        - UI 목적에 맞게 재구성된 필드만 정의
-
-3. UI에서 실제 사용하는 필드만 포함한다
-	        - userId
-	        - nickname
-	        - animalType (optional 여부 명확히)
-	        - traits (optional 여부 명확히)
-	        - schedule (optional 여부 명확히)
-
-4. optional / required 필드를 명확히 구분한다
-	        - UI에서 항상 존재하는 값 vs 조건부 값 구분
-	        - undefined / null 중 하나로 일관성 있게 표현
-
-5. 주석으로 타입 책임을 명확히 남긴다
-	        - “UI 전용 ViewModel”임을 파일 상단에 명시
-	        - Core DTO와의 차이를 간단히 설명
+	1.	toProfileViewModel 단일 진입 함수 구현
+	        - 입력: ProfileCoreDTO
+	        - 출력: ProfileViewModel
+	        - src/viewmodels/profile/toProfileViewModel.ts에 위치
+	2.	내부에서 아래 기존 domain 변환 함수를 조합하여 사용
+	        - toRadarData
+	        - toActiveTimeText
+	        - toAnimalMeta
+	3.	ProfileViewModel 구성 규칙
+	        - Core DTO를 그대로 노출하지 말 것
+	        - UI에서 실제로 사용하는 필드만 포함
+	        - optional 필드는 명확히 optional로 유지
+	        - 변환 결과가 없는 경우 undefined 반환
+	4.	함수 특성
+	        - side effect 없음
+	        - try/catch 사용 금지
+	        - 에러 throw 금지
+	        - 상태 판단 로직(온보딩 여부, 완성 여부 등) 포함 금지
+	        - API 호출 포함 금지
 
 ==============================================
 
 조건-Hook 책임)
-	        - Hook 구현 X
-	        - Hook 타입 정의 X
+	        - hook을 호출하거나 hook과 결합된 로직을 포함하지 않는다
+	        - React 의존성(useEffect, useMemo 등)을 전혀 포함하지 않는다
 
 ==============================================
 
 조건-UI 책임)
-	        - UI 컴포넌트 수정 X
-	        - ViewModel 타입 정의까지만 수행
+	        - 문자열 i18n 처리 금지
+	        - UI 문구 생성 금지
+	        - 색상/아이콘 결정은 기존 meta 변환 결과만 사용
+	        - ViewModel은 “렌더링 직전 데이터”까지만 책임진다
 
 ==============================================
 
 구현 완료 후 반환) 아래 체크리스트를 반드시 반환할 것.
-	        - ProfileViewModel 타입이 신규 파일에 정의되었다
-	        - Core DTO를 직접 노출하거나 extends 하지 않았다
-	        - UI에 필요한 최소 필드만 포함되었다
-	        - optional / required 필드가 명확히 구분되었다
-	        - UI 전용 타입임을 설명하는 주석이 포함되었다
+	        - toProfileViewModel 함수가 단일 진입점으로 구현되었는가
+	        - ProfileCoreDTO → ProfileViewModel 변환만 수행하는가
+	        - 기존 domain 변환 함수들을 직접 재사용했는가
+	        - Core DTO 필드를 그대로 노출하지 않았는가
+	        - side effect / API / try-catch / throw가 전혀 없는가
+	        - 상태 판단 로직이 포함되지 않았는가
+	        - 타입 안정성이 유지되었는가
+	        - 커서룰(SRP, import 방향, pure function)이 모두 지켜졌는가

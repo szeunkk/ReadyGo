@@ -21,6 +21,22 @@ import type { AnimalType } from '@/commons/constants/animal/animal.enum';
 import type { TraitVector } from '@/commons/constants/animal/animal.vector';
 
 /**
+ * RadarChart UI 데이터
+ */
+export interface RadarChartData {
+  trait: string;
+  value: number;
+}
+
+/**
+ * AnimalType UI 메타 정보
+ */
+export interface AnimalTypeMeta {
+  image: string;
+  label: string;
+}
+
+/**
  * 플레이 스케줄 항목 (UI 전용)
  */
 export interface PlayScheduleViewModel {
@@ -61,4 +77,19 @@ export interface ProfileViewModel {
    * 플레이 스케줄 (선택)
    */
   schedule?: PlayScheduleViewModel[];
+
+  /**
+   * 레이더 차트 데이터 (변환된 UI 데이터)
+   */
+  radarData?: RadarChartData[];
+
+  /**
+   * 활동 시간 텍스트 (변환된 UI 텍스트)
+   */
+  activeTimeText?: string;
+
+  /**
+   * 동물 타입 메타 정보 (변환된 UI 메타)
+   */
+  animalMeta?: AnimalTypeMeta;
 }
