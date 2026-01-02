@@ -14,7 +14,7 @@ import {
 } from '@/commons/errors/profile/profileErrors';
 
 /**
- * 내 프로필 조회 Service
+ * 특정 사용자의 프로필 조회 Service
  *
  * 책임:
  * - user_profiles, user_traits, user_play_schedules 데이터 조회
@@ -22,15 +22,16 @@ import {
  * - 데이터 일관성 검증 (traits/schedule 불일치)
  *
  * 비책임:
+ * - auth / 권한 / 관계 / 차단 로직
  * - UI 분기 판단
- * - 온보딩 상태 판단
- * - 권한/인증 체크
+ * - ViewModel 변환
+ * - 매칭 / 노출 정책 로직
  */
-export const getMyProfileService = async (
-  userId: string
+export const getUserProfileByUserId = async (
+  targetUserId: string
 ): Promise<ProfileCoreDTO> => {
   // 1. user_profiles 조회
-  const profileResult = await userProfilesRepository.findByUserId(userId);
+  const profileResult = await userProfilesRepository.findByUserId(targetUserId);
 
   // 1-1. Repository 에러 처리
   if (profileResult.error) {
@@ -39,13 +40,13 @@ export const getMyProfileService = async (
 
   // 1-2. profile이 없으면 NotFound 에러 throw (즉시 종료)
   if (!profileResult.data) {
-    throw new ProfileNotFoundError(userId);
+    throw new ProfileNotFoundError(targetUserId);
   }
 
   const profileRow = profileResult.data;
 
   // 2. user_traits 조회
-  const traitsResult = await userTraitsRepository.findByUserId(userId);
+  const traitsResult = await userTraitsRepository.findByUserId(targetUserId);
 
   // 2-1. Repository 에러 처리
   if (traitsResult.error) {
@@ -54,7 +55,7 @@ export const getMyProfileService = async (
 
   // 3. user_play_schedules 조회
   const schedulesResult =
-    await userPlaySchedulesRepository.findByUserId(userId);
+    await userPlaySchedulesRepository.findByUserId(targetUserId);
 
   // 3-1. Repository 에러 처리
   if (schedulesResult.error) {
@@ -70,12 +71,12 @@ export const getMyProfileService = async (
   // 4. 데이터 일관성 검증
   // traits만 존재하고 schedule이 없는 경우 → DataInconsistency 에러
   if (hasTraits && !hasSchedules) {
-    throw new ProfileDataInconsistencyError(userId, 'traits_only');
+    throw new ProfileDataInconsistencyError(targetUserId, 'traits_only');
   }
 
   // schedule만 존재하고 traits가 없는 경우 → DataInconsistency 에러
   if (!hasTraits && hasSchedules) {
-    throw new ProfileDataInconsistencyError(userId, 'schedules_only');
+    throw new ProfileDataInconsistencyError(targetUserId, 'schedules_only');
   }
 
   // 5. 정상 케이스 처리 및 ProfileCoreDTO 조립

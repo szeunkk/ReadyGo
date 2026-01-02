@@ -81,13 +81,14 @@ export interface ProfileCoreDTO {
   /**
    * 닉네임
    *
-   * 필수 필드 (UI 레벨에서 fallback 처리)
-   * DB: user_profiles.nickname (nullable in DB, but required in DTO)
+   * 선택 필드 (UI 레벨에서 fallback 처리)
+   * DB: user_profiles.nickname (nullable)
    *
-   * - DB에서 null일 경우: API/Service layer에서 fallback 값 제공
-   * - Fallback 예시: '익명 사용자', 'User#{랜덤숫자}'
+   * - DB에서 null일 경우: undefined로 반환
+   * - Service는 기본값 자동 생성하지 않음
+   * - UI에서 fallback 값 제공 (예: '익명 사용자', 'User#{랜덤숫자}')
    */
-  nickname: string;
+  nickname?: string;
 
   /**
    * 동물 유형 (특성 검사 결과)
