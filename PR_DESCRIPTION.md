@@ -61,3 +61,4 @@ style(ui): 파티 페이지 로딩 스켈레톤 UI 구현
 - SkeletonCard 컴포넌트가 실제 Card 컴포넌트와 레이아웃 일치 여부
 - 스켈레톤 애니메이션 적용 여부 (기본 Skeleton 컴포넌트에 animate-pulse 적용)
 - CSS 모듈 구조 및 스타일링 방식
+
