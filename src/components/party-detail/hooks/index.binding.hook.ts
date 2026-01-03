@@ -11,8 +11,8 @@ export interface PartyDetailData {
   start_date: string; // mm/dd 형식
   start_time: string; // "오전 hh:mm" 또는 "오후 hh:mm" 형식
   max_members: number;
-  control_level: string; // 한국어 값
-  difficulty: string; // 한국어 값
+  control_level: string; // 한글 값
+  difficulty: string; // 한글 값
   voice_chat: string | null;
   tags: string[]; // 배열로 변환
   created_at: string;
@@ -49,31 +49,6 @@ const formatTime = (timeString: string): string => {
     hour === 0 ? 12 : hour > 12 ? hour - 12 : hour === 12 ? 12 : hour;
 
   return `${period} ${displayHour.toString().padStart(2, '0')}:${minute}`;
-};
-
-// 컨트롤 수준 한국어 변환: 영어 id를 한국어 label로 변환
-const getControlLevelLabel = (controlLevel: string): string => {
-  const controlLevelMap: Record<string, string> = {
-    beginner: '미숙',
-    intermediate: '반숙',
-    advanced: '완숙',
-    expert: '빡숙',
-    master: '장인',
-  };
-  return controlLevelMap[controlLevel] || controlLevel;
-};
-
-// 난이도 한국어 변환: 영어 id를 한국어 label로 변환
-const getDifficultyLabel = (difficulty: string): string => {
-  const difficultyMap: Record<string, string> = {
-    undefined: '미정',
-    flexible: '유동',
-    easy: '이지',
-    normal: '노멀',
-    hard: '하드',
-    hell: '지옥',
-  };
-  return difficultyMap[difficulty] || difficulty;
 };
 
 // voice_chat 표시 텍스트 변환: null이면 "사용 안함", 'required'는 "필수 사용", 'optional'은 "선택적 사용"으로 변환
@@ -168,8 +143,8 @@ export const usePartyBinding = (): UsePartyBindingReturn => {
           start_date: formatDate(partyData.start_date),
           start_time: formatTime(partyData.start_time),
           max_members: partyData.max_members,
-          control_level: getControlLevelLabel(partyData.control_level),
-          difficulty: getDifficultyLabel(partyData.difficulty),
+          control_level: partyData.control_level,
+          difficulty: partyData.difficulty,
           voice_chat: getVoiceChatLabel(partyData.voice_chat),
           tags: parseTags(partyData.tags),
           created_at: partyData.created_at,

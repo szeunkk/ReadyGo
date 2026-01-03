@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export type SteamGameSyncStatus = 'success' | 'skipped' | 'failed';
 
@@ -41,5 +41,5 @@ export const getSuccessAppIds = async (appIds: number[]) => {
     throw error;
   }
 
-  return new Set<number>((data ?? []).map((r) => r.app_id));
+  return new Set<number>((data ?? []).map((r) => r.app_id).filter((id): id is number => id !== null));
 };

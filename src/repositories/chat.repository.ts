@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import type { Database } from '@/types/supabase';
 
 // 타입 정의
@@ -583,7 +583,8 @@ export const blockUser = async (
 ): Promise<void> => {
   // upsert를 사용하여 중복 차단 방지
   // (user_id, blocked_user_id) 조합의 유니크 제약이 있다는 전제
-  const { error } = await supabaseAdmin.from('chat_blocks').upsert(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabaseAdmin as any).from('chat_blocks').upsert(
     {
       user_id: userId,
       blocked_user_id: blockedUserId,
@@ -603,9 +604,8 @@ export const unblockUser = async (
   userId: string,
   blockedUserId: string
 ): Promise<void> => {
-  const { error } = await supabaseAdmin
-    .from('chat_blocks')
-    .delete()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabaseAdmin as any).from('chat_blocks').delete()
     .eq('user_id', userId)
     .eq('blocked_user_id', blockedUserId);
 
@@ -621,9 +621,8 @@ export const isUserBlocked = async (
   userId: string,
   otherUserId: string
 ): Promise<boolean> => {
-  const { data, error } = await supabaseAdmin
-    .from('chat_blocks')
-    .select('id')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabaseAdmin as any).from('chat_blocks').select('id')
     .eq('user_id', userId)
     .eq('blocked_user_id', otherUserId)
     .maybeSingle();

@@ -10,19 +10,29 @@ import Input from '@/commons/components/input';
 import Selectbox, { SelectboxItem } from '@/commons/components/selectbox';
 import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
+import { useModal } from '@/commons/providers/modal';
 import { usePartySubmit } from './hooks/index.submit.hook';
+import { usePartyUpdate } from './hooks/index.update.hook';
 import { useLinkModalClose } from './hooks/index.link.modal.close.hook';
 
 interface PartySubmitProps {
   onClose?: () => void;
+  partyId?: number;
 }
 
-export default function PartySubmit({ onClose }: PartySubmitProps) {
-  const { form, onSubmit, isSubmitting, isValid, errors } = usePartySubmit();
-  const { control, setValue } = form;
+export default function PartySubmit({ onClose, partyId }: PartySubmitProps) {
+  const isEditMode = !!partyId;
+  const submitHook = usePartySubmit();
+  // 항상 hook을 호출하되, 수정 모드가 아닐 때는 사용하지 않음
+  const updateHook = usePartyUpdate({ partyId: partyId || 0 });
+  const hook = isEditMode ? updateHook : submitHook;
+  const { form, onSubmit, isSubmitting, isValid, errors } = hook;
+  const { control, setValue, reset } = form;
   const { openCancelModal } = useLinkModalClose();
+  const { openModal } = useModal();
   const [gameSearchQuery, setGameSearchQuery] = useState('');
   const [isGameOptionsOpen, setIsGameOptionsOpen] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(false);
   const gameSearchRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
 
@@ -54,6 +64,131 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
   const filteredGames = gameMockData.filter((game) =>
     game.value.toLowerCase().includes(gameSearchQuery.toLowerCase())
   );
+
+  // 시간 형식 변환: HH:mm:ss → "오전 hh:mm" 또는 "오후 hh:mm"
+  const formatTimeForForm = (timeString: string): string => {
+    const match = timeString.match(/(\d{2}):(\d{2}):(\d{2})/);
+    if (!match) {
+      return timeString;
+    }
+
+    const [, hourStr, minuteStr] = match;
+    const hour = parseInt(hourStr, 10);
+    const minute = minuteStr;
+    const period = hour < 12 ? '오전' : '오후';
+    const displayHour =
+      hour === 0 ? 12 : hour > 12 ? hour - 12 : hour === 12 ? 12 : hour;
+
+    return `${period} ${displayHour.toString().padStart(2, '0')}:${minute}`;
+  };
+
+  // 태그 배열을 문자열로 변환: string[] → "#태그1#태그2"
+  const formatTagsForForm = (tags: string[] | null | undefined): string => {
+    if (!tags || tags.length === 0) {
+      return '';
+    }
+    return tags.map((tag) => `#${tag}`).join('');
+  };
+
+  // 수정 모드일 때 데이터 조회
+  useEffect(() => {
+    if (!isEditMode || !partyId) {
+      return;
+    }
+
+    const fetchPartyData = async () => {
+      try {
+        setIsLoadingData(true);
+
+        const response = await fetch(`/api/party/${partyId}`, {
+          method: 'GET',
+          credentials: 'include', // HttpOnly 쿠키 포함 (중요!)
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            openModal({
+              variant: 'dual',
+              title: '인증 필요',
+              description: '로그인이 필요합니다.',
+              onConfirm: () => {
+                // 모달 닫기
+              },
+            });
+            return;
+          }
+          if (response.status === 403) {
+            openModal({
+              variant: 'dual',
+              title: '권한 없음',
+              description: '수정 권한이 없습니다.',
+              onConfirm: () => {
+                // 모달 닫기
+              },
+            });
+            return;
+          }
+          if (response.status === 404) {
+            openModal({
+              variant: 'dual',
+              title: '파티 없음',
+              description: '파티를 찾을 수 없습니다.',
+              onConfirm: () => {
+                // 모달 닫기
+              },
+            });
+            return;
+          }
+          throw new Error('데이터를 불러오는 중 오류가 발생했습니다.');
+        }
+
+        const { data: partyData } = await response.json();
+
+        if (!partyData) {
+          throw new Error('파티 데이터를 찾을 수 없습니다.');
+        }
+
+        // 폼 필드에 기본값 설정
+        reset({
+          game_title: partyData.game_title || '',
+          party_title: partyData.party_title || '',
+          start_date: partyData.start_date
+            ? dayjs(partyData.start_date)
+            : null,
+          start_time: partyData.start_time
+            ? formatTimeForForm(partyData.start_time)
+            : '',
+          description: partyData.description || '',
+          max_members: partyData.max_members || 4,
+          control_level: partyData.control_level || '',
+          difficulty: partyData.difficulty || '',
+          voice_chat: partyData.voice_chat || null,
+          tags: formatTagsForForm(partyData.tags),
+        });
+
+        // 게임 검색어도 설정
+        setGameSearchQuery(partyData.game_title || '');
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : '데이터를 불러오는 중 오류가 발생했습니다.';
+
+        openModal({
+          variant: 'dual',
+          title: '오류',
+          description: `데이터를 불러오는 중 오류가 발생했습니다. ${errorMessage}`,
+          onConfirm: () => {
+            // 모달 닫기
+          },
+        });
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+
+    fetchPartyData();
+  }, [isEditMode, partyId, reset, openModal]);
 
   // 외부 클릭 감지
   useEffect(() => {
@@ -149,9 +284,13 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.headerText}>
-            <h1 className={styles.title}>새 파티 만들기</h1>
+            <h1 className={styles.title}>
+              {isEditMode ? '파티 수정하기' : '새 파티 만들기'}
+            </h1>
             <p className={styles.subtitle}>
-              파티 정보를 입력하고 멤버를 모집하세요
+              {isEditMode
+                ? '파티 정보를 수정하고 저장하세요'
+                : '파티 정보를 입력하고 멤버를 모집하세요'}
             </p>
           </div>
           <button
@@ -369,40 +508,64 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
               <Controller
                 name="control_level"
                 control={control}
-                render={({ field, fieldState }) => (
-                  <Selectbox
-                    size="l"
-                    label="컨트롤 수준"
-                    required
-                    placeholder="옵션 선택"
-                    items={controlLevelOptions}
-                    selectedId={field.value || undefined}
-                    onSelect={(item) => {
-                      field.onChange(item.id);
-                    }}
-                    state={fieldState.error ? 'error' : 'default'}
-                  />
-                )}
+                render={({ field, fieldState }) => {
+                  const selectedItem = controlLevelOptions.find(
+                    (item) => item.value === field.value
+                  );
+                  return (
+                    <>
+                      <Selectbox
+                        size="l"
+                        label="컨트롤 수준"
+                        required
+                        placeholder="옵션 선택"
+                        items={controlLevelOptions}
+                        selectedId={selectedItem?.id || undefined}
+                        onSelect={(item) => {
+                          field.onChange(item.value);
+                        }}
+                        state={fieldState.error ? 'error' : 'default'}
+                      />
+                      {fieldState.error && (
+                        <span className={styles.errorMessage}>
+                          {fieldState.error.message}
+                        </span>
+                      )}
+                    </>
+                  );
+                }}
               />
             </div>
             <div className={styles.col}>
               <Controller
                 name="difficulty"
                 control={control}
-                render={({ field, fieldState }) => (
-                  <Selectbox
-                    size="l"
-                    label="난이도"
-                    required
-                    placeholder="난이도 선택"
-                    items={difficultyOptions}
-                    selectedId={field.value || undefined}
-                    onSelect={(item) => {
-                      field.onChange(item.id);
-                    }}
-                    state={fieldState.error ? 'error' : 'default'}
-                  />
-                )}
+                render={({ field, fieldState }) => {
+                  const selectedItem = difficultyOptions.find(
+                    (item) => item.value === field.value
+                  );
+                  return (
+                    <>
+                      <Selectbox
+                        size="l"
+                        label="난이도"
+                        required
+                        placeholder="난이도 선택"
+                        items={difficultyOptions}
+                        selectedId={selectedItem?.id || undefined}
+                        onSelect={(item) => {
+                          field.onChange(item.value);
+                        }}
+                        state={fieldState.error ? 'error' : 'default'}
+                      />
+                      {fieldState.error && (
+                        <span className={styles.errorMessage}>
+                          {fieldState.error.message}
+                        </span>
+                      )}
+                    </>
+                  );
+                }}
               />
             </div>
           </div>
@@ -465,10 +628,10 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
           shape="rectangle"
           className={styles.submitButton}
           onClick={onSubmit}
-          disabled={!isFormValid || isSubmitting}
+          disabled={!isFormValid || isSubmitting || isLoadingData}
           data-testid="party-submit-button"
         >
-          파티 만들기
+          {isEditMode ? '수정하기' : '파티 만들기'}
         </Button>
       </div>
     </div>
