@@ -4,38 +4,26 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Icon from '@/commons/components/icon';
 import { URL_PATHS } from '@/commons/constants/url';
-import { useAuth } from '@/commons/providers/auth/auth.provider';
-import { useModal } from '@/commons/providers/modal';
-import PartySubmit from '@/components/party-submit/partySubmit';
 import ChatNull from './ui/chat-null/chatNull';
 import ChatRoom from './ui/chat-room/chatRoom';
 import MemberList from './ui/member-list/memberList';
 import PartyInfo from './ui/party-info/partyInfo';
 import { usePartyBinding } from './hooks/index.binding.hook';
+import { useLinkUpdateModal } from './hooks/index.link.update.modal.hook';
 import styles from './styles.module.css';
 
 export default function PartyDetail() {
   const [isJoined, setIsJoined] = useState(false);
   const { data, isLoading, error } = usePartyBinding();
-  const { user } = useAuth();
-  const { openModal } = useModal();
+  const { openUpdateModal } = useLinkUpdateModal();
 
   const handleJoinClick = () => {
     setIsJoined(true);
   };
 
   const handleEditClick = () => {
-    if (!data?.id) {
-      return;
-    }
-    openModal({
-      component: PartySubmit,
-      componentProps: { partyId: data.id },
-    });
+    openUpdateModal();
   };
-
-  // 권한 검증: 작성자인지 확인
-  const canEdit = data?.creator_id === user?.id;
 
   return (
     <div className={styles.container} data-testid="party-detail-page">
@@ -80,9 +68,8 @@ export default function PartyDetail() {
               <button
                 className={styles.actionButton}
                 type="button"
-                disabled={!canEdit}
-                onClick={canEdit ? handleEditClick : undefined}
-                data-testid="party-edit-button"
+                onClick={handleEditClick}
+                data-testid="party-detail-edit-button"
               >
                 <Icon name="edit" size={20} className={styles.buttonIcon} />
                 <span className={styles.buttonText}>수정하기</span>
