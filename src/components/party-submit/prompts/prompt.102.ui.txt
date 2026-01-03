@@ -79,3 +79,42 @@
 ==============================================
 
 4차추가요구사항) 시작시간 selectbox timeOption item이 10분 단위로 구현되어 있는데 30분 단위로 구현할 것.(ex. 13:00/ 13:30)
+
+==============================================
+
+5차추가요구사항) 기존 antd DatePicker를 shadcn의 DatePicker로 대체할 것.
+                [구현 경로]
+                •	DatePicker 컴포넌트는 src/components/ui 디렉토리에 구현할 것.
+                •	구현 후 import하여 사용하는 방식으로 적용할 것.
+
+                [크기 및 디자인]
+                •	크기는 기존 antd DatePicker와 동일하게 유지할 것.
+                •	디자인은 프로젝트의 전반적인 디자인 시스템에 맞게 구현할 것.
+                •	Selectbox 컴포넌트의 state 시스템을 참고하여 구현할 것:
+                    - state: default, hover, active, filled
+                    - 각 state에 따른 background-color, border 색상, 폰트 색상 적용
+                    - Selectbox 컴포넌트 경로: src/commons/components/selectbox/index.tsx
+                    - Selectbox 스타일 참고 경로: src/commons/components/selectbox/styles.module.css
+                
+                [색상 토큰 매핑 상세]
+                •	Selectbox 스타일을 참고하여 다음 색상 토큰을 정확히 적용할 것:
+                    - default state:
+                        * background-color: var(--color-bg-secondary)
+                        * border: 1px solid transparent (기본)
+                        * text: var(--color-text-primary)
+                        * placeholder text: var(--color-text-interactive-secondary)
+                    - hover state:
+                        * border-color: var(--color-border-interactive-secondary)
+                    - active/filled state:
+                        * border-color: var(--color-border-interactive-primary)
+                  
+                [기능 요구사항]
+                •	placeholder는 "날짜 선택"으로 설정할 것.
+                •	날짜 포맷은 "YYYY-MM-DD" 형식으로 표시할 것.
+
+                [레이어링 및 z-index]
+                •	shadcn DatePicker 패널(팝업)은 모달 위에 중첩되어 표시되어야 하며, 모달 아래로 깔리면 안 됨.
+                •	필요 시 z-index를 조정하여 모달 위에 표시되도록 할 것.
+                •	참고: 모달의 실제 z-index는 9999 + (모달 인덱스 * 10)으로 계산되므로(modal.provider.tsx 참고), 
+                    DatePicker 패널의 z-index는 최소 10000 이상으로 설정하여 모든 모달 위에 표시되도록 할 것.
+                •	globals.css의 --z-overlay: 1000은 참고용이며, 실제 구현 시에는 모달의 동적 z-index 값을 고려해야 함.

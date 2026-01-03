@@ -1,13 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
 import Selectbox, { type SelectboxItem } from '@/commons/components/selectbox';
 import Searchbar from '@/commons/components/searchbar';
 import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
 import Card from './ui/card';
+import SkeletonCard from './ui/skeleton-card/skeleton-card';
 import { useLinkModal } from './hooks/index.link.modal.hook';
-import { usePartyListBinding } from './hooks/index.binding.hook';
+import { useInfinitePartyList } from './hooks/index.infinityScroll.hook';
 import { useLinkRouting } from './hooks/index.link.routing.hook';
 import { useFloatButton } from './hooks/index.float.hook';
 import styles from './styles.module.css';
@@ -17,9 +19,26 @@ export default function Party() {
     undefined
   );
   const { openPartySubmitModal } = useLinkModal();
-  const { data: partyList, isLoading, error } = usePartyListBinding();
+  const {
+    data: partyList,
+    hasMore,
+    loadMore,
+    isLoading,
+    error,
+  } = useInfinitePartyList();
   const { navigateToPartyDetail } = useLinkRouting();
   const { scrollToTop } = useFloatButton();
+
+  // Layout의 children 영역(.children)의 스크롤을 감지하는 함수
+  const getScrollParent = useCallback(() => {
+    if (typeof document === 'undefined') {
+      return null;
+    }
+    // Layout의 children 영역을 찾기 (main 요소)
+    const childrenElement = document.querySelector('main[class*="children"]');
+    return childrenElement as HTMLElement | null;
+  }, []);
+
   const genreItems: SelectboxItem[] = [
     { id: 'all', value: '모든 게임 장르' },
     { id: 'action', value: '액션' },
@@ -70,27 +89,53 @@ export default function Party() {
             </Button>
           </div>
         </div>
-        <div className={styles.mainArea}>
-          {isLoading ? (
-            <div>로딩 중...</div>
-          ) : error ? (
-            <div>데이터를 불러오는 중 오류가 발생했습니다.</div>
-          ) : partyList.length === 0 ? (
-            <div>파티가 없습니다</div>
-          ) : (
-            partyList.map((party) => (
-              <Card
-                key={party.partyId || party.title}
-                {...party}
-                onJoinClick={() => {
-                  if (party.partyId) {
-                    navigateToPartyDetail(party.partyId);
-                  }
-                }}
-              />
-            ))
-          )}
-        </div>
+        <InfiniteScroll
+          pageStart={0}
+          loadMore={loadMore}
+          hasMore={hasMore}
+          loader={
+            <div key="loader" className={styles.loader}>
+              로딩 중...
+            </div>
+          }
+          useWindow={false}
+          getScrollParent={getScrollParent}
+          threshold={250}
+          initialLoad={false}
+        >
+          <div className={styles.mainArea} data-testid="party-main-area">
+            {isLoading && partyList.length === 0 ? (
+              <>
+                {[0, 1, 2, 3, 4, 5].map((index) => (
+                  <SkeletonCard key={index} />
+                ))}
+              </>
+            ) : error ? (
+              <div>데이터를 불러오는 중 오류가 발생했습니다.</div>
+            ) : partyList.length === 0 ? (
+              <div>파티가 없습니다</div>
+            ) : (
+              <>
+                {partyList.map((party) => (
+                  <Card
+                    key={party.partyId || party.title}
+                    {...party}
+                    onJoinClick={() => {
+                      if (party.partyId) {
+                        navigateToPartyDetail(party.partyId);
+                      }
+                    }}
+                  />
+                ))}
+                {!hasMore && partyList.length > 0 && (
+                  <div className={styles.statusMessage}>
+                    마지막 게시물입니다
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </InfiniteScroll>
       </div>
       <button
         className={styles.floatButton}

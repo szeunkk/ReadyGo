@@ -34,25 +34,23 @@ export const GET = async (request: NextRequest) => {
         : {},
     });
 
-    // 쿼리 파라미터 처리 (선택사항)
+    // 쿼리 파라미터 처리
     const { searchParams } = new URL(request.url);
-    const limit = searchParams.get('limit');
-    // 주의: party_posts 테이블에 status 컬럼이 없으므로 status 필터링 제거
-    // const status = searchParams.get('status');
+    const limitParam = searchParams.get('limit');
+    const offsetParam = searchParams.get('offset');
+
+    // limit 기본값 10, offset 기본값 0
+    const limit = limitParam ? parseInt(limitParam, 10) : 10;
+    const offset = offsetParam ? parseInt(offsetParam, 10) : 0;
 
     let query = supabase
       .from('party_posts')
       .select('*')
       .order('created_at', { ascending: false });
 
-    // status 컬럼이 없으므로 필터링 제거
-    // if (status) {
-    //   query = query.eq('status', status);
-    // }
-
-    if (limit) {
-      query = query.limit(parseInt(limit, 10));
-    }
+    // range를 사용해서 페이징 처리 (limit과 함께 사용하면 충돌하므로 range만 사용)
+    // range(from, to): from부터 to까지 (포함)
+    query = query.range(offset, offset + limit - 1);
 
     const { data: partyList, error } = await query;
 

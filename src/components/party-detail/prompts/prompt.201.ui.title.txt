@@ -27,3 +27,8 @@
 핵심요구사항) MCP를 연동하여 피그마의 디자인의 모든 속성과 변형을 확인하여 해당 컴포넌트를 구현할 것.
 
 핵심요구사항) main-area는 background-color만 구현할 것.(그 외 구현은 나중에)
+
+==============================================
+
+1차추가요구사항) title-area에 버튼 두개 추가되고, html 구조가 바뀌었는데 아래 링크 참고해서 수정해줘
+            - 구현될 figma링크: https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2267-50750&m=dev

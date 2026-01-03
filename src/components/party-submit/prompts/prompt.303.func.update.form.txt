@@ -1,0 +1,88 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 참고할 TSX  파일경로: src/components/party-submit/partySubmit.tsx
+조건-파일경로) 참고할 CSS  파일경로: src/components/party-submit/styles.module.css
+조건-파일경로) 참고할 파티상세 TSX 파일경로: src/components/party-detail/index.tsx
+조건-파일경로) 참고할 파티상세 HOOK 파일경로: src/components/party-detail/hooks/index.binding.hook.ts
+조건-파일경로) 참고할 파티상세 모달 HOOK 파일경로: src/components/party-detail/hooks/index.link.update.modal.hook.ts
+조건-파일경로) 수정할 HOOK 파일경로: src/components/party-submit/hooks/index.submit.hook.ts
+조건-파일경로) 수정할 파티상세 HOOK 파일경로: src/components/party-detail/hooks/index.binding.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/components/party-submit/tests/index.update.hook.spec.ts
+
+==============================================
+
+핵심요구사항) 병렬처리 구현을 위한 작업 방식 조건
+            - 다른 채팅에서 개발중인 파일을 수정 및 삭제 하지 말 것.
+            - 테스트 충돌을 방지하기 위해, 빌드테스트, 전체테스트를 하지 말 것.
+
+핵심요구사항) 다음의 기능을 playwright 테스트를 활용하여 TDD기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+            1) 테스트 제외 라이브러리
+                - jest
+                - @testing-library/react
+
+            2) 테스트 조건
+                - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+                - 모든 페이지의 로드 식별 조건은 아래를 따를 것.
+                    - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+                    - 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+            3) 테스트 데이터 조건
+                3-1) 데이터
+                    - 실제데이터를 사용할 것.
+                    - Mock데이터 사용하지 말 것.
+                    
+                3-2) 성공시나리오
+                    - API 모킹하지 말 것.
+
+                3-3) 실패시나리오
+                    - API 모킹하지 말 것.
+            
+            4) 테스트 데이터타입
+                - 저장소: Supabase 데이터베이스
+                - 테이블: party 테이블
+                - 데이터 구조: 파티 상세 정보 (party_title, description, start_date, start_time, max_members, control_level, difficulty, voice_chat, tags 등)
+
+            5) 테스트시나리오(로그인유저)
+                1. /party/[id]에 접속하여 페이지 로드 확인 (data-testid="party-detail-page" 대기)
+                2. 하단 유저시나리오에 적절한 테스트시나리오를 생성하여 진행
+
+핵심요구사항) 다음의 조건에 맞게 파티 상세 수정 기능을 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+            1) 라이브러리조건
+                - 폼: 이미 설치되어있는 react-hook-form, @hookform/resolvers를 사용할 것.
+                - 검증: 이미 설치되어있는 zod를 사용할 것.
+            
+            2) 유저시나리오(파티 수정하기)
+                1. 파티 상세 페이지(/party/[id])에서 수정하기 버튼(data-testid="party-detail-edit-button")을 클릭
+                2. 수정 모달이 열리고, isEdit=true로 설정된 PartySubmit 컴포넌트가 모달로 표시됨을 확인
+                3. 수정 모달에서 기존 파티 데이터가 폼에 로드되었음을 확인 (party_title, description, start_date, start_time, max_members, control_level, difficulty, voice_chat, tags 등)
+                4. 수정 모달에서 파티 정보(party_title, description 등 수정 가능한 필드)를 변경
+                5. 수정하기 버튼(data-testid="party-submit-button")을 클릭하여 수정 요청
+                6. 수정 요청이 Supabase에 성공적으로 전달되었음을 확인
+                7. 수정 완료 모달이 표시되고 확인 버튼을 클릭하면 수정 모달이 닫힘
+                8. 수정 모달이 닫힌 후, 페이지 새로고침 없이 파티 상세 페이지의 데이터가 자동으로 갱신되어 수정된 내용이 표시됨을 확인
+                9. usePartyBinding hook의 데이터가 자동으로 재조회되어 최신 데이터로 업데이트되었음을 확인
+            
+            3) 데이터 동기화 요구사항
+                3-1) usePartyBinding hook 수정
+                    - usePartyBinding hook에 refetch 함수를 추가하여 외부에서 데이터 재조회를 트리거할 수 있도록 구현할 것.
+                    - refetch 함수는 수동으로 호출 가능해야 하며, 호출 시 최신 파티 데이터를 다시 조회해야 함.
+                    - 참고: src/components/party-detail/hooks/index.binding.hook.ts 파일의 usePartyBinding hook 구조를 참고할 것.
+                
+                3-2) usePartySubmit hook 수정
+                    - 수정 모드(isEdit=true)에서 수정 완료 후, 페이지 이동 없이 모달만 닫도록 수정할 것.
+                    - 수정 완료 후 usePartyBinding hook의 refetch 함수를 호출하여 파티 상세 데이터를 자동으로 재조회하도록 구현할 것.
+                    - 수정 완료 모달의 확인 버튼 클릭 시, 모달을 닫고 refetch를 호출한 후, 페이지 새로고침 없이 상세 화면의 데이터가 실시간으로 업데이트되어야 함.
+                    - 참고: src/components/party-submit/hooks/index.submit.hook.ts 파일의 usePartySubmit hook 구조를 참고할 것.
+                
+                3-3) 데이터 갱신 확인
+                    - 수정 완료 후 파티 상세 페이지의 모든 필드(party_title, description, start_date, start_time, max_members, control_level, difficulty, voice_chat, tags 등)가 수정된 내용으로 자동 업데이트되어야 함.
+                    - 페이지 새로고침 없이 데이터가 갱신되어야 함.

@@ -88,31 +88,6 @@ const getVoiceChatLabel = (voiceChat: string | null): string => {
   return '사용 안함';
 };
 
-// control_level 값을 한글로 변환: 영어 id를 한국어 label로 변환
-const getControlLevelLabel = (controlLevel: string): string => {
-  const controlLevelMap: Record<string, string> = {
-    beginner: '미숙',
-    intermediate: '반숙',
-    advanced: '완숙',
-    expert: '빡숙',
-    master: '장인',
-  };
-  return controlLevelMap[controlLevel] || controlLevel;
-};
-
-// difficulty 값을 한글로 변환: 영어 id를 한국어 label로 변환
-const getDifficultyLabel = (difficulty: string): string => {
-  const difficultyMap: Record<string, string> = {
-    undefined: '미정',
-    flexible: '유동',
-    easy: '이지',
-    normal: '노멀',
-    hard: '하드',
-    hell: '지옥',
-  };
-  return difficultyMap[difficulty] || difficulty;
-};
-
 // Mock 데이터: party_members
 const mockPartyMembers: MockPartyMember[] = [
   {
@@ -268,8 +243,8 @@ export const usePartyListBinding = (): UsePartyListBindingReturn => {
             categories: {
               startTime: formatDateTime(party.start_date, party.start_time),
               voiceChat: getVoiceChatLabel(party.voice_chat),
-              difficulty: getDifficultyLabel(party.difficulty),
-              controlLevel: getControlLevelLabel(party.control_level),
+              difficulty: party.difficulty,
+              controlLevel: party.control_level,
             },
             partyId: party.id,
           };

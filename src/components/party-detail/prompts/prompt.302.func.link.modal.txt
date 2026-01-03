@@ -9,10 +9,10 @@
 
 ==============================================
 
-조건-파일경로) 참고할 TSX  파일경로: src/components/party-submit/partySubmit.tsx
-조건-파일경로) 참고할 CSS  파일경로: src/components/party-submit/styles.module.css
-조건-파일경로) 구현될 HOOK 파일경로: src/components/party-submit/hooks/index.link.modal.close.hook.tsx
-조건-파일경로) 구현될 TEST 파일경로: src/components/party-submit/tests/index.link.modal.close.hook.spec.ts
+조건-파일경로) 참고할 TSX  파일경로: src/components/party-detail/index.tsx
+조건-파일경로) 참고할 CSS  파일경로: src/components/party-detail/styles.module.css
+조건-파일경로) 구현될 HOOK 파일경로: src/components/party-detail/hooks/index.binding.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/components/party-detail/tests/index.link.modal.hook.spec.ts
 
 ==============================================
 
@@ -23,20 +23,20 @@
 
             2) 테스트 조건
                 - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
-                - /party 페이지가 완전히 로드된 후 일기쓰기버튼을 클릭한 이후 테스트할 것.
+                - /party/[id] 페이지가 완전히 로드된 후 테스트할 것.
                     - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
                     - 페이지 로드 식별 금지사항: networkidle 대기 방법
 
 핵심요구사항) 다음의 조건에 맞게 모달 열람 기능을 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
             1) 모달조건
+                - 파티 작성/수정 모달 컴포넌트 경로: src/components/party-submit/partySubmit.tsx
                 - 모달 프로바이더 경로: src/commons/providers/modal/modal.provider.tsx
                 - 이미 셋팅되어있는 modal.provider를 사용할 것.
                 - 이미 셋팅되어있는 modal.provider를 수정하지 말 것.
-            
+                - 공통컴포넌트 모달의 커스텀 모달로 구현할 것.
             2) 상세 구현 내용
-                - 취소버튼: 클릭시, 등록취소모달 컴포넌트를 이미 열려있는 파티만들기폼모달(부모) 위 중앙에 2중 모달로 overlay 하여 겹칠 것.
-                - 등록취소모달(자식) 내부 계속작성버튼: modal.provider를 사용하여 등록취소모달(자식)만 종료할 것.
-                - 등록취소모달(자식) 내부 등록취소버튼: modal.provider를 사용하여 등록취소모달(자식)과 파티만들기폼모달(부모)를 모두 종료할 것.
-
-            3) 공통컴포넌트조건
-                - 등록취소모달: <Modal />, variant: 'dual'
+                - 수정하기 버튼: 클릭시, 모달 컴포넌트를 기존의 페이지 위 중앙에 overlay 하여 겹칠 것.
+                - 모달 컴포넌트는 수정모드와 작성모드를 분기처리하여 동작할 것.
+                    - 수정모드: 기존 파티 데이터를 폼에 초기값으로 설정하고, 제목을 "파티 수정하기"로 표시하며, API는 PATCH 메서드로 호출할 것.
+                    - 작성모드: 빈 폼으로 시작하고, 제목을 "새 파티 만들기"로 표시하며, API는 POST 메서드로 호출할 것.
+                - 수정모드일 경우, party-detail 페이지의 파티 데이터를 모달 컴포넌트에 전달할 것.
