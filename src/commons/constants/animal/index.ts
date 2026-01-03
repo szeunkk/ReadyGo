@@ -40,12 +40,7 @@ import {
   TRAIT_KEYS,
 } from './animal.vector';
 
-export {
-  type TraitVector,
-  ANIMAL_VECTORS,
-  getAnimalVector,
-  TRAIT_KEYS,
-};
+export { type TraitVector, ANIMAL_VECTORS, getAnimalVector, TRAIT_KEYS };
 
 // ============================================
 // Copy Data

@@ -1,6 +1,6 @@
 /**
  * 동물별 이상적 특성 벡터
- * 
+ *
  * 각 동물의 "이상적 플레이 스타일"을 5차원 벡터로 표현
  * 사용자의 답변으로 계산된 벡터와의 거리를 측정하여 가장 가까운 동물을 매칭
  */
@@ -12,23 +12,23 @@ import type { TraitKey } from './trait.enum';
  * 5가지 특성의 벡터 (각 0~100)
  */
 export type TraitVector = {
-  cooperation: number;  // 협동성
-  exploration: number;  // 모험성
-  strategy: number;     // 전략성
-  leadership: number;   // 리더십
-  social: number;       // 교류성
+  cooperation: number; // 협동성
+  exploration: number; // 모험성
+  strategy: number; // 전략성
+  leadership: number; // 리더십
+  social: number; // 교류성
 };
 
 /**
  * 동물별 이상적 특성 벡터 (V2 - Dominant Axis 분화 적용)
- * 
+ *
  * 각 값은 0~100 범위:
  * - 85~100: 매우 높음 (Dominant Axis)
  * - 70~84:  높음
  * - 50~69:  중간
  * - 30~49:  낮음
  * - 0~29:   매우 낮음
- * 
+ *
  * 설계 원칙:
  * 1. Radial Clipping: 중심(50)에서 극단적으로 벗어나지 않도록 조정
  * 2. Dominant Axis: 겹치는 동물들을 방향으로 차별화
@@ -194,4 +194,3 @@ export const TRAIT_KEYS: TraitKey[] = [
   'leadership',
   'social',
 ];
-
