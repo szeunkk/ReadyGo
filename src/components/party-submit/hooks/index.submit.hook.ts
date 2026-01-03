@@ -315,7 +315,7 @@ export const usePartySubmit = (options?: UsePartySubmitOptions) => {
         onConfirm: () => {
           // 모든 모달 닫기
           closeAllModals();
-          
+
           if (isEdit) {
             // 수정 모드일 경우: 페이지 이동 없이 모달만 닫고 refetch 호출
             options?.onRefetch?.();

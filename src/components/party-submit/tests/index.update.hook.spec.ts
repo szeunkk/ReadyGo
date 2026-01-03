@@ -104,7 +104,9 @@ test.describe('파티 수정 기능', () => {
       const uniqueTitle = `수정 테스트 파티 ${Date.now()}`;
       await partyTitleInput.fill(uniqueTitle, { timeout: 500 });
       await partyTitleInput.evaluate((el) => {
-        el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+        el.dispatchEvent(
+          new Event('input', { bubbles: true, cancelable: true })
+        );
         el.dispatchEvent(
           new Event('change', { bubbles: true, cancelable: true })
         );
@@ -133,7 +135,9 @@ test.describe('파티 수정 기능', () => {
       );
       await descriptionInput.fill('수정 테스트 설명입니다', { timeout: 500 });
       await descriptionInput.evaluate((el) => {
-        el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+        el.dispatchEvent(
+          new Event('input', { bubbles: true, cancelable: true })
+        );
         el.dispatchEvent(
           new Event('change', { bubbles: true, cancelable: true })
         );
@@ -519,4 +523,3 @@ test.describe('파티 수정 기능', () => {
     });
   });
 });
-

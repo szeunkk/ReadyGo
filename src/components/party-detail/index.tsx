@@ -10,12 +10,14 @@ import MemberList from './ui/member-list/memberList';
 import PartyInfo from './ui/party-info/partyInfo';
 import { usePartyBinding } from './hooks/index.binding.hook';
 import { useLinkUpdateModal } from './hooks/index.link.update.modal.hook';
+import { useDeleteParty } from './hooks/index.delete.hook';
 import styles from './styles.module.css';
 
 export default function PartyDetail() {
   const [isJoined, setIsJoined] = useState(false);
   const { data, isLoading, error, refetch } = usePartyBinding();
   const { openUpdateModal } = useLinkUpdateModal({ onRefetch: refetch });
+  const { openDeleteModal } = useDeleteParty({ onRefetch: refetch });
 
   const handleJoinClick = () => {
     setIsJoined(true);
@@ -23,6 +25,10 @@ export default function PartyDetail() {
 
   const handleEditClick = () => {
     openUpdateModal();
+  };
+
+  const handleDeleteClick = () => {
+    openDeleteModal();
   };
 
   return (
@@ -74,7 +80,12 @@ export default function PartyDetail() {
                 <Icon name="edit" size={20} className={styles.buttonIcon} />
                 <span className={styles.buttonText}>수정하기</span>
               </button>
-              <button className={styles.actionButton} type="button">
+              <button
+                className={styles.actionButton}
+                type="button"
+                onClick={handleDeleteClick}
+                data-testid="party-detail-delete-button"
+              >
                 <Icon name="trash" size={20} className={styles.buttonIcon} />
                 <span className={styles.buttonText}>삭제하기</span>
               </button>

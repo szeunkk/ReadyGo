@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 import { supabase as baseSupabase } from '@/lib/supabase/client';
@@ -172,10 +172,11 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
   /**
    * debounced refresh 함수 (필수에 가까운 권장)
    */
-  const debouncedRefresh = useCallback(
-    debounce((...args: Parameters<typeof refresh>) => {
-      refresh(...args);
-    }, 300),
+  const debouncedRefresh = useMemo(
+    () =>
+      debounce((...args: Parameters<typeof refresh>) => {
+        refresh(...args);
+      }, 300),
     [refresh]
   );
 

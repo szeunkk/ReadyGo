@@ -11,9 +11,7 @@ export interface SkeletonCardProps {
   className?: string;
 }
 
-export default function SkeletonCard({
-  className = '',
-}: SkeletonCardProps) {
+export default function SkeletonCard({ className = '' }: SkeletonCardProps) {
   const containerClasses = [styles.skeletonCard, className]
     .filter(Boolean)
     .join(' ');
@@ -63,4 +61,3 @@ export default function SkeletonCard({
     </div>
   );
 }
-

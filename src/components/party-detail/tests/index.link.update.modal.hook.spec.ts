@@ -72,9 +72,11 @@ test.describe('파티 수정 모달 열기 기능', () => {
 
     // 로딩이 완료될 때까지 대기 (data-testid 사용)
     const loadingElement = page.locator('[data-testid="party-submit-loading"]');
-    await loadingElement.waitFor({ state: 'hidden', timeout: 499 }).catch(() => {
-      // 로딩 요소가 없으면 이미 로드된 것으로 간주
-    });
+    await loadingElement
+      .waitFor({ state: 'hidden', timeout: 499 })
+      .catch(() => {
+        // 로딩 요소가 없으면 이미 로드된 것으로 간주
+      });
 
     // 폼 필드들이 채워져 있는지 확인
     // 파티 제목 필드 확인
@@ -142,24 +144,21 @@ test.describe('파티 수정 모달 열기 기능', () => {
     }
 
     // 파티 데이터 조회
-    const partyData = await page.evaluate(
-      async (id) => {
-        try {
-          const response = await fetch(`/api/party/${id}`, {
-            method: 'GET',
-            credentials: 'include',
-          });
-          if (response.ok) {
-            const result = await response.json();
-            return result.data;
-          }
-        } catch (err) {
-          console.error('파티 데이터 조회 실패:', err);
+    const partyData = await page.evaluate(async (id) => {
+      try {
+        const response = await fetch(`/api/party/${id}`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const result = await response.json();
+          return result.data;
         }
-        return null;
-      },
-      validPartyId
-    );
+      } catch (err) {
+        console.error('파티 데이터 조회 실패:', err);
+      }
+      return null;
+    }, validPartyId);
 
     if (!partyData) {
       test.skip();
@@ -195,9 +194,11 @@ test.describe('파티 수정 모달 열기 기능', () => {
 
     // 로딩이 완료될 때까지 대기 (data-testid 사용)
     const loadingElement = page.locator('[data-testid="party-submit-loading"]');
-    await loadingElement.waitFor({ state: 'hidden', timeout: 499 }).catch(() => {
-      // 로딩 요소가 없으면 이미 로드된 것으로 간주
-    });
+    await loadingElement
+      .waitFor({ state: 'hidden', timeout: 499 })
+      .catch(() => {
+        // 로딩 요소가 없으면 이미 로드된 것으로 간주
+      });
 
     // 폼 필드 값 확인
     // 파티 제목 확인
@@ -225,4 +226,3 @@ test.describe('파티 수정 모달 열기 기능', () => {
     expect(maxMembersText).toBe(partyData.max_members.toString());
   });
 });
-

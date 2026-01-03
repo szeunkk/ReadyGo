@@ -39,4 +39,3 @@ export const useLinkUpdateModal = (options?: UseLinkUpdateModalOptions) => {
     openUpdateModal,
   };
 };
-

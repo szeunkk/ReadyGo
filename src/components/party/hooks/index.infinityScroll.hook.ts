@@ -180,21 +180,21 @@ export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
         const memberAvatars = getMemberAvatars(party.id);
         const currentMembers = getCurrentMembers(party.id);
 
-          return {
-            title: party.party_title,
-            description: truncateDescription(party.description),
-            gameTag: party.game_title,
-            memberAvatars,
-            currentMembers,
-            maxMembers: party.max_members,
-            categories: {
-              startTime: formatDateTime(party.start_date, party.start_time),
-              voiceChat: getVoiceChatLabel(party.voice_chat),
-              difficulty: party.difficulty,
-              controlLevel: party.control_level,
-            },
-            partyId: party.id,
-          };
+        return {
+          title: party.party_title,
+          description: truncateDescription(party.description),
+          gameTag: party.game_title,
+          memberAvatars,
+          currentMembers,
+          maxMembers: party.max_members,
+          categories: {
+            startTime: formatDateTime(party.start_date, party.start_time),
+            voiceChat: getVoiceChatLabel(party.voice_chat),
+            difficulty: party.difficulty,
+            controlLevel: party.control_level,
+          },
+          partyId: party.id,
+        };
       });
     },
     []
