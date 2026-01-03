@@ -141,6 +141,7 @@ interface UsePartySubmitOptions {
   onError?: (error: string) => void;
   isEdit?: boolean;
   partyId?: number;
+  onRefetch?: () => Promise<void>;
 }
 
 export const usePartySubmit = (options?: UsePartySubmitOptions) => {
@@ -202,7 +203,8 @@ export const usePartySubmit = (options?: UsePartySubmitOptions) => {
           game_title: partyData.game_title || '',
           party_title: partyData.party_title || '',
           start_date: convertSupabaseDateToDayjs(partyData.start_date),
-          start_time: convertSupabaseTimeToFormFormat(partyData.start_time) || '',
+          start_time:
+            convertSupabaseTimeToFormFormat(partyData.start_time) || '',
           description: partyData.description || '',
           max_members: partyData.max_members || 4,
           control_level: partyData.control_level || '',
@@ -313,9 +315,16 @@ export const usePartySubmit = (options?: UsePartySubmitOptions) => {
         onConfirm: () => {
           // 모든 모달 닫기
           closeAllModals();
-          // 상세 페이지로 이동
-          router.push(getPartyDetailUrl(responseData.id));
-          options?.onSuccess?.();
+          
+          if (isEdit) {
+            // 수정 모드일 경우: 페이지 이동 없이 모달만 닫고 refetch 호출
+            options?.onRefetch?.();
+            options?.onSuccess?.();
+          } else {
+            // 작성 모드일 경우: 상세 페이지로 이동
+            router.push(getPartyDetailUrl(responseData.id));
+            options?.onSuccess?.();
+          }
         },
       });
     } catch (error: unknown) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 
 export interface PartyDetailData {
@@ -23,6 +23,7 @@ interface UsePartyBindingReturn {
   data: PartyDetailData | null;
   isLoading: boolean;
   error: Error | null;
+  refetch: () => Promise<void>;
 }
 
 // 날짜 형식 변환: YYYY-MM-DD → mm/dd
@@ -90,82 +91,82 @@ export const usePartyBinding = (): UsePartyBindingReturn => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
+  const fetchPartyData = useCallback(async () => {
     if (!partyId) {
       setError(new Error('파티 ID가 없습니다.'));
       setIsLoading(false);
       return;
     }
 
-    const fetchPartyData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+    try {
+      setIsLoading(true);
+      setError(null);
 
-        const id = parseInt(partyId, 10);
-        if (isNaN(id)) {
-          throw new Error('유효하지 않은 파티 ID입니다.');
+      const id = parseInt(partyId, 10);
+      if (isNaN(id)) {
+        throw new Error('유효하지 않은 파티 ID입니다.');
+      }
+
+      // API Route를 통해 데이터 조회
+      const response = await fetch(`/api/party/${id}`, {
+        method: 'GET',
+        credentials: 'include', // HttpOnly 쿠키 포함 (중요!)
+      });
+
+      // 응답 상태 확인
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('인증이 필요합니다.');
         }
-
-        // API Route를 통해 데이터 조회
-        const response = await fetch(`/api/party/${id}`, {
-          method: 'GET',
-          credentials: 'include', // HttpOnly 쿠키 포함 (중요!)
-        });
-
-        // 응답 상태 확인
-        if (!response.ok) {
-          if (response.status === 401) {
-            throw new Error('인증이 필요합니다.');
-          }
-          if (response.status === 404) {
-            throw new Error('파티 데이터를 찾을 수 없습니다.');
-          }
-          const errorData = await response.json();
-          throw new Error(
-            errorData.error || '데이터를 불러오는 중 오류가 발생했습니다.'
-          );
-        }
-
-        // JSON 파싱
-        const { data: partyData } = await response.json();
-
-        if (!partyData) {
+        if (response.status === 404) {
           throw new Error('파티 데이터를 찾을 수 없습니다.');
         }
-
-        // 데이터 변환
-        const transformedData: PartyDetailData = {
-          id: partyData.id,
-          party_title: partyData.party_title,
-          game_title: partyData.game_title,
-          description: partyData.description,
-          start_date: formatDate(partyData.start_date),
-          start_time: formatTime(partyData.start_time),
-          max_members: partyData.max_members,
-          control_level: partyData.control_level,
-          difficulty: partyData.difficulty,
-          voice_chat: getVoiceChatLabel(partyData.voice_chat),
-          tags: parseTags(partyData.tags),
-          created_at: partyData.created_at,
-          creator_id: partyData.creator_id,
-        };
-
-        setData(transformedData);
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err
-            : new Error('데이터를 불러오는 중 오류가 발생했습니다.')
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error || '데이터를 불러오는 중 오류가 발생했습니다.'
         );
-        setData(null);
-      } finally {
-        setIsLoading(false);
       }
-    };
 
-    fetchPartyData();
+      // JSON 파싱
+      const { data: partyData } = await response.json();
+
+      if (!partyData) {
+        throw new Error('파티 데이터를 찾을 수 없습니다.');
+      }
+
+      // 데이터 변환
+      const transformedData: PartyDetailData = {
+        id: partyData.id,
+        party_title: partyData.party_title,
+        game_title: partyData.game_title,
+        description: partyData.description,
+        start_date: formatDate(partyData.start_date),
+        start_time: formatTime(partyData.start_time),
+        max_members: partyData.max_members,
+        control_level: partyData.control_level,
+        difficulty: partyData.difficulty,
+        voice_chat: getVoiceChatLabel(partyData.voice_chat),
+        tags: parseTags(partyData.tags),
+        created_at: partyData.created_at,
+        creator_id: partyData.creator_id,
+      };
+
+      setData(transformedData);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err
+          : new Error('데이터를 불러오는 중 오류가 발생했습니다.')
+      );
+      setData(null);
+    } finally {
+      setIsLoading(false);
+    }
   }, [partyId]);
 
-  return { data, isLoading, error };
+  useEffect(() => {
+    fetchPartyData();
+  }, [fetchPartyData]);
+
+  return { data, isLoading, error, refetch: fetchPartyData };
 };

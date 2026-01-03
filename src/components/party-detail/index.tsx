@@ -14,8 +14,8 @@ import styles from './styles.module.css';
 
 export default function PartyDetail() {
   const [isJoined, setIsJoined] = useState(false);
-  const { data, isLoading, error } = usePartyBinding();
-  const { openUpdateModal } = useLinkUpdateModal();
+  const { data, isLoading, error, refetch } = usePartyBinding();
+  const { openUpdateModal } = useLinkUpdateModal({ onRefetch: refetch });
 
   const handleJoinClick = () => {
     setIsJoined(true);

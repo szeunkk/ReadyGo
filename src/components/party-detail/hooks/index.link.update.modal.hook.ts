@@ -5,7 +5,11 @@ import { useParams } from 'next/navigation';
 import { useModal } from '@/commons/providers/modal';
 import PartySubmit from '@/components/party-submit/partySubmit';
 
-export const useLinkUpdateModal = () => {
+interface UseLinkUpdateModalOptions {
+  onRefetch?: () => Promise<void>;
+}
+
+export const useLinkUpdateModal = (options?: UseLinkUpdateModalOptions) => {
   const { openModal } = useModal();
   const params = useParams();
   const partyId = params?.id as string | undefined;
@@ -26,9 +30,10 @@ export const useLinkUpdateModal = () => {
       componentProps: {
         isEdit: true,
         partyId: id,
+        onRefetch: options?.onRefetch,
       },
     });
-  }, [openModal, partyId]);
+  }, [openModal, partyId, options?.onRefetch]);
 
   return {
     openUpdateModal,

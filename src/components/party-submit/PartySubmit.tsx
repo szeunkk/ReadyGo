@@ -17,17 +17,20 @@ interface PartySubmitProps {
   onClose?: () => void;
   isEdit?: boolean;
   partyId?: number;
+  onRefetch?: () => Promise<void>;
 }
 
 export default function PartySubmit({
   onClose,
   isEdit = false,
   partyId,
+  onRefetch,
 }: PartySubmitProps) {
   const { form, onSubmit, isSubmitting, isValid, errors, isLoadingPartyData } =
     usePartySubmit({
       isEdit,
       partyId,
+      onRefetch,
     });
   const { control, setValue } = form;
   const { openCancelModal } = useLinkModalClose();
