@@ -53,7 +53,10 @@ export const sendMessageService = async (
 
     return message;
   } catch (error) {
-    if (error instanceof ChatCreateError || error instanceof ChatValidationError) {
+    if (
+      error instanceof ChatCreateError ||
+      error instanceof ChatValidationError
+    ) {
       throw error;
     }
 
@@ -63,4 +66,3 @@ export const sendMessageService = async (
     );
   }
 };
-

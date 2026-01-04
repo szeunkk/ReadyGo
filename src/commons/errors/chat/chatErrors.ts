@@ -70,9 +70,7 @@ export class ChatRoomAccessDeniedError extends Error {
   readonly statusCode = 403;
 
   constructor(roomId: number, userId: string) {
-    super(
-      `User ${userId} does not have access to chat room ${roomId}`
-    );
+    super(`User ${userId} does not have access to chat room ${roomId}`);
     this.name = 'ChatRoomAccessDeniedError';
 
     // Error 클래스 상속 시 prototype chain 보정
@@ -100,9 +98,7 @@ export class ChatFetchError extends Error {
     resource: 'room' | 'rooms' | 'message' | 'messages' | 'members' | 'reads',
     originalError?: string
   ) {
-    super(
-      `Failed to fetch ${resource}: ${originalError || 'Unknown error'}`
-    );
+    super(`Failed to fetch ${resource}: ${originalError || 'Unknown error'}`);
     this.name = 'ChatFetchError';
     this.originalError = originalError;
 
@@ -126,13 +122,8 @@ export class ChatCreateError extends Error {
   readonly statusCode = 500;
   readonly originalError?: string;
 
-  constructor(
-    resource: 'room' | 'message',
-    originalError?: string
-  ) {
-    super(
-      `Failed to create ${resource}: ${originalError || 'Unknown error'}`
-    );
+  constructor(resource: 'room' | 'message', originalError?: string) {
+    super(`Failed to create ${resource}: ${originalError || 'Unknown error'}`);
     this.name = 'ChatCreateError';
     this.originalError = originalError;
 
@@ -155,13 +146,8 @@ export class ChatUpdateError extends Error {
   readonly statusCode = 500;
   readonly originalError?: string;
 
-  constructor(
-    resource: 'read_status' | 'message',
-    originalError?: string
-  ) {
-    super(
-      `Failed to update ${resource}: ${originalError || 'Unknown error'}`
-    );
+  constructor(resource: 'read_status' | 'message', originalError?: string) {
+    super(`Failed to update ${resource}: ${originalError || 'Unknown error'}`);
     this.name = 'ChatUpdateError';
     this.originalError = originalError;
 
@@ -192,4 +178,3 @@ export class ChatValidationError extends Error {
     Object.setPrototypeOf(this, ChatValidationError.prototype);
   }
 }
-
