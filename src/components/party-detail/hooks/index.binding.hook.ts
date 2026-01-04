@@ -66,6 +66,31 @@ const getVoiceChatLabel = (voiceChat: string | null): string => {
   return voiceChat;
 };
 
+// difficulty 값을 한글로 변환
+const getDifficultyLabel = (difficulty: string): string => {
+  const difficultyMap: Record<string, string> = {
+    undefined: '미정',
+    flexible: '유동',
+    easy: '이지',
+    normal: '노멀',
+    hard: '하드',
+    hell: '지옥',
+  };
+  return difficultyMap[difficulty] || difficulty;
+};
+
+// control_level 값을 한글로 변환
+const getControlLevelLabel = (controlLevel: string): string => {
+  const controlLevelMap: Record<string, string> = {
+    beginner: '미숙',
+    intermediate: '반숙',
+    advanced: '완숙',
+    expert: '빡숙',
+    master: '장인',
+  };
+  return controlLevelMap[controlLevel] || controlLevel;
+};
+
 // tags 배열 변환
 // - 저장 형식: tags는 jsonb 컬럼에 string[] 형태로 저장되어 있음
 // - 조회 시: Supabase에서 조회한 tags는 이미 string[] 배열 형태로 반환됨
@@ -143,8 +168,8 @@ export const usePartyBinding = (): UsePartyBindingReturn => {
         start_date: formatDate(partyData.start_date),
         start_time: formatTime(partyData.start_time),
         max_members: partyData.max_members,
-        control_level: partyData.control_level,
-        difficulty: partyData.difficulty,
+        control_level: getControlLevelLabel(partyData.control_level),
+        difficulty: getDifficultyLabel(partyData.difficulty),
         voice_chat: getVoiceChatLabel(partyData.voice_chat),
         tags: parseTags(partyData.tags),
         created_at: partyData.created_at,
