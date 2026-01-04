@@ -1,10 +1,13 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import type { Database } from '@/types/supabase';
 
 // 타입 정의
 type ChatRoom = Database['public']['Tables']['chat_rooms']['Row'];
 type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
 type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
+type ChatRoomMember = Database['public']['Tables']['chat_room_members']['Row'];
+type ChatMessageRead =
+  Database['public']['Tables']['chat_message_reads']['Row'];
 
 export interface ChatRoomListItem {
   room: ChatRoom;
@@ -38,8 +41,8 @@ export const getChatRoomByMembers = async (
     return null;
   }
 
-  const roomIds = members1
-    .map((m) => m.room_id)
+  const roomIds = (members1 || [])
+    .map((m) => (m as { room_id: number | null }).room_id)
     .filter((id): id is number => id !== null);
 
   // 두 번째 사용자가 참여한 채팅방 중에서 교집합 찾기
@@ -58,8 +61,8 @@ export const getChatRoomByMembers = async (
   }
 
   // 공통 room_id로 chat_rooms 조회 (type='direct'만)
-  const commonRoomIds = members2
-    .map((m) => m.room_id)
+  const commonRoomIds = (members2 || [])
+    .map((m) => (m as { room_id: number | null }).room_id)
     .filter((id): id is number => id !== null);
 
   const { data: rooms, error: error3 } = await supabaseAdmin
@@ -147,8 +150,8 @@ export const getUserChatRooms = async (
     return [];
   }
 
-  const roomIds = members
-    .map((m) => m.room_id)
+  const roomIds = (members || [])
+    .map((m) => (m as { room_id: number | null }).room_id)
     .filter((id): id is number => id !== null);
 
   // chat_rooms 조회
@@ -205,7 +208,7 @@ export const getUserChatRooms = async (
 
   if (!allUnreadMessages || allUnreadMessages.length === 0) {
     // 모든 방의 unreadCount를 0으로 설정
-    roomIds.forEach((roomId) => unreadCountMap.set(roomId, 0));
+    roomIds.forEach((roomId: number) => unreadCountMap.set(roomId, 0));
   } else {
     // room_id별로 메시지 ID 그룹화
     const messageIdsByRoom = new Map<number, number[]>();
@@ -218,7 +221,9 @@ export const getUserChatRooms = async (
     }
 
     // 모든 메시지 ID 수집
-    const allMessageIds = allUnreadMessages.map((m) => m.id);
+    const allMessageIds = allUnreadMessages.map(
+      (m) => (m as { id: number; room_id: number | null }).id
+    );
 
     // 읽음 처리된 메시지 ID 조회 (한 번에)
     const { data: readMessages, error: readError } = await supabaseAdmin
@@ -233,7 +238,7 @@ export const getUserChatRooms = async (
 
     const readMessageIds = new Set(
       (readMessages || [])
-        .map((r) => r.message_id)
+        .map((r) => (r as { message_id: number }).message_id)
         .filter((id): id is number => id !== null)
     );
 
@@ -311,7 +316,7 @@ export const getUserChatRooms = async (
   }
 
   // 결과 조합
-  const result: ChatRoomListItem[] = rooms.map((room) => {
+  const result: ChatRoomListItem[] = rooms.map((room: ChatRoom) => {
     const lastMessage = room.id ? lastMessageMap.get(room.id) : undefined;
     const unreadCount = room.id ? unreadCountMap.get(room.id) || 0 : 0;
     const otherMember = room.id ? otherMemberMap.get(room.id) : undefined;
@@ -508,7 +513,7 @@ export const getUnreadCount = async (
     return 0;
   }
 
-  const messageIds = messages.map((m) => m.id);
+  const messageIds = messages.map((m) => (m as { id: number }).id);
 
   // chat_message_reads 테이블과 조인하여 읽음 처리되지 않은 메시지만 카운트
   const { data: readMessages, error: readError } = await supabaseAdmin
@@ -523,12 +528,14 @@ export const getUnreadCount = async (
 
   const readMessageIds = new Set(
     (readMessages || [])
-      .map((r) => r.message_id)
+      .map((r) => (r as { message_id: number }).message_id)
       .filter((id): id is number => id !== null)
   );
 
   // 읽지 않은 메시지 수
-  const unreadCount = messageIds.filter((id) => !readMessageIds.has(id)).length;
+  const unreadCount = messageIds.filter(
+    (id: number) => !readMessageIds.has(id)
+  ).length;
 
   return unreadCount;
 };
@@ -559,7 +566,7 @@ export const markRoomAsRead = async (
 
   // null이 아닌 id만 필터링
   const messageIds = unreadMessages
-    .map((m) => m.id)
+    .map((m) => (m as { id: number }).id)
     .filter((id): id is number => id !== null && typeof id === 'number');
 
   if (messageIds.length === 0) {
@@ -576,6 +583,7 @@ export const markRoomAsRead = async (
 
 /**
  * 사용자를 차단
+ * TODO: chat_blocks 테이블이 데이터베이스 타입에 없음. 타입 생성 후 활성화 필요
  */
 export const blockUser = async (
   userId: string,
@@ -583,7 +591,7 @@ export const blockUser = async (
 ): Promise<void> => {
   // upsert를 사용하여 중복 차단 방지
   // (user_id, blocked_user_id) 조합의 유니크 제약이 있다는 전제
-  const { error } = await supabaseAdmin.from('chat_blocks').upsert(
+  const { error } = await (supabaseAdmin as any).from('chat_blocks').upsert(
     {
       user_id: userId,
       blocked_user_id: blockedUserId,
@@ -598,12 +606,13 @@ export const blockUser = async (
 
 /**
  * 사용자 차단 해제
+ * TODO: chat_blocks 테이블이 데이터베이스 타입에 없음. 타입 생성 후 활성화 필요
  */
 export const unblockUser = async (
   userId: string,
   blockedUserId: string
 ): Promise<void> => {
-  const { error } = await supabaseAdmin
+  const { error } = await (supabaseAdmin as any)
     .from('chat_blocks')
     .delete()
     .eq('user_id', userId)
@@ -616,12 +625,13 @@ export const unblockUser = async (
 
 /**
  * 사용자가 다른 사용자를 차단했는지 확인
+ * TODO: chat_blocks 테이블이 데이터베이스 타입에 없음. 타입 생성 후 활성화 필요
  */
 export const isUserBlocked = async (
   userId: string,
   otherUserId: string
 ): Promise<boolean> => {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await (supabaseAdmin as any)
     .from('chat_blocks')
     .select('id')
     .eq('user_id', userId)
