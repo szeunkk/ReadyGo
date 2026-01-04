@@ -12,6 +12,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 20px 16px;
+  gap: 16px;
   background-color: var(--color-bg-primary);
   flex-shrink: 0;
 }
@@ -38,6 +39,7 @@
   line-height: var(--typo-body-lg-semibold-line-height);
   font-weight: var(--typo-body-lg-semibold-font-weight);
   color: var(--color-text-primary);
+  white-space: nowrap;
 }
 
 .headerStatus {
@@ -46,6 +48,7 @@
   line-height: var(--typo-body-sm-line-height);
   font-weight: var(--typo-body-sm-font-weight);
   color: var(--color-text-interactive-secondary);
+  white-space: nowrap;
 }
 
 .headerRight {

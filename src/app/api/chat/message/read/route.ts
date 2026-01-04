@@ -1,115 +1,97 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
+import { markRoomAsReadService } from '@/services/chat/markRoomAsReadService';
+import { markMessagesAsReadService } from '@/services/chat/markMessagesAsReadService';
 import {
-  markRoomAsRead,
-  markMessagesAsRead,
-} from '@/repositories/chat.repository';
-import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/types/supabase';
+  ChatUpdateError,
+  ChatValidationError,
+} from '@/commons/errors/chat/chatErrors';
 
 export const dynamic = 'force-dynamic';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
 /**
- * 채팅방의 메시지를 읽음 처리
  * POST /api/chat/message/read
- * body: { roomId: number, messageIds?: number[] }
- * - messageIds가 없으면: 해당 채팅방의 모든 메시지를 읽음 처리
- * - messageIds가 있으면: 특정 메시지들만 읽음 처리
+ *
+ * 책임:
+ * - 인증 확인 (supabase.auth.getUser)
+ * - userId는 auth.uid()에서만 추출
+ * - 요청 본문 파싱 (roomId, messageIds)
+ * - messageIds가 없으면: markRoomAsReadService 호출
+ * - messageIds가 있으면: markMessagesAsReadService 호출
+ * - Service 에러를 HTTP 상태 코드로 매핑
+ *
+ * 비책임:
+ * - Service 로직 재구현 금지
  */
 export const POST = async (request: NextRequest) => {
   try {
-    const cookieStore = cookies();
-    const accessToken = cookieStore.get('sb-access-token')?.value;
+    // 1. Supabase 클라이언트 생성 (쿠키 자동 처리)
+    const supabase = createClient();
 
-    if (!accessToken) {
-      return NextResponse.json(
-        { error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: false,
-      },
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    });
-
+    // 2. 사용자 정보 확인
     const {
       data: { user },
-      error: userError,
+      error: authError,
     } = await supabase.auth.getUser();
 
-    if (userError || !user) {
+    if (authError || !user) {
       return NextResponse.json(
-        { error: '사용자 정보를 가져올 수 없습니다.' },
+        {
+          message: 'Unauthorized',
+          detail: 'Authentication required',
+        },
         { status: 401 }
       );
     }
 
+    // 3. userId는 auth.uid()에서만 추출
+    const userId = user.id;
+
+    // 4. 요청 본문 파싱
     const body = await request.json();
     const { roomId, messageIds } = body;
 
-    if (!roomId || typeof roomId !== 'number') {
+    // 5. Service 호출
+    // messageIds가 제공된 경우: 특정 메시지들만 읽음 처리
+    if (messageIds && Array.isArray(messageIds)) {
+      await markMessagesAsReadService(supabase, roomId, userId, messageIds);
+    } else {
+      // messageIds가 없는 경우: 해당 채팅방의 모든 메시지를 읽음 처리
+      await markRoomAsReadService(supabase, roomId, userId);
+    }
+
+    // 6. 정상 응답
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error) {
+    // 7. Service 에러 매핑
+
+    // 7-1. ChatValidationError → 400
+    if (error instanceof ChatValidationError) {
       return NextResponse.json(
-        { error: 'roomId는 숫자여야 합니다.' },
+        {
+          code: error.code,
+          message: error.message,
+        },
         { status: 400 }
       );
     }
 
-    // messageIds가 제공된 경우: 특정 메시지들만 읽음 처리
-    if (messageIds && Array.isArray(messageIds)) {
-      // messageIds 유효성 검사
-      if (
-        !messageIds.every((id: unknown) => typeof id === 'number' && !isNaN(id))
-      ) {
-        return NextResponse.json(
-          { error: 'messageIds는 숫자 배열이어야 합니다.' },
-          { status: 400 }
-        );
-      }
-
-      if (messageIds.length === 0) {
-        return NextResponse.json({ success: true }, { status: 200 });
-      }
-
-      // Repository 함수를 통해 특정 메시지들 읽음 처리
-      await markMessagesAsRead(roomId, user.id, messageIds);
-    } else {
-      // messageIds가 없는 경우: 해당 채팅방의 모든 메시지를 읽음 처리
-      try {
-        await markRoomAsRead(roomId, user.id);
-      } catch (markError) {
-        console.error('markRoomAsRead error:', markError);
-        throw markError;
-      }
+    // 7-2. ChatUpdateError → 500
+    if (error instanceof ChatUpdateError) {
+      return NextResponse.json(
+        {
+          code: error.code,
+          message: error.message,
+        },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ success: true }, { status: 200 });
-  } catch (error) {
-    console.error('API /api/chat/message/read POST error:', error);
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : error instanceof Object && 'message' in error
-          ? String(error.message)
-          : 'Unknown error';
-
-    // 에러 상세 정보 로깅
-    if (error instanceof Error) {
-      console.error('Error stack:', error.stack);
-    }
-
+    // 7-3. 기타 예상치 못한 에러 → 500 (fallback)
     return NextResponse.json(
       {
-        error: `메시지 읽음 처리 실패: ${errorMessage}`,
+        code: 'INTERNAL_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

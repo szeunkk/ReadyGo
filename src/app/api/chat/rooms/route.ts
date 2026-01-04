@@ -1,64 +1,71 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { getUserChatRooms } from '@/repositories/chat.repository';
-import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/types/supabase';
+import { createClient } from '@/lib/supabase/server';
+import { getUserChatRoomsService } from '@/services/chat/getUserChatRoomsService';
+import { ChatFetchError } from '@/commons/errors/chat/chatErrors';
 
 export const dynamic = 'force-dynamic';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
 /**
- * 현재 사용자가 참여한 모든 채팅방 목록 조회
  * GET /api/chat/rooms
+ *
+ * 책임:
+ * - 인증 확인 (supabase.auth.getUser)
+ * - userId는 auth.uid()에서만 추출
+ * - getUserChatRoomsService 호출
+ * - Service 에러를 HTTP 상태 코드로 매핑
+ * - 응답 데이터는 Service 반환값 그대로 전달
+ *
+ * 비책임:
+ * - Service 로직 재구현 금지
  */
 export const GET = async (_request: NextRequest) => {
   try {
-    const cookieStore = cookies();
-    const accessToken = cookieStore.get('sb-access-token')?.value;
+    // 1. Supabase 클라이언트 생성 (쿠키 자동 처리)
+    const supabase = createClient();
 
-    if (!accessToken) {
-      return NextResponse.json(
-        { error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: false,
-      },
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    });
-
+    // 2. 사용자 정보 확인
     const {
       data: { user },
-      error: userError,
+      error: authError,
     } = await supabase.auth.getUser();
 
-    if (userError || !user) {
+    if (authError || !user) {
       return NextResponse.json(
-        { error: '사용자 정보를 가져올 수 없습니다.' },
+        {
+          message: 'Unauthorized',
+          detail: 'Authentication required',
+        },
         { status: 401 }
       );
     }
 
-    // Repository 함수를 통해 채팅방 목록 조회
-    const chatRooms = await getUserChatRooms(user.id);
+    // 3. userId는 auth.uid()에서만 추출
+    const userId = user.id;
 
+    // 4. Service 호출
+    const chatRooms = await getUserChatRoomsService(supabase, userId);
+
+    // 5. 정상 응답
     return NextResponse.json({ data: chatRooms }, { status: 200 });
   } catch (error) {
-    console.error('API /api/chat/rooms GET error:', error);
+    // 6. Service 에러 매핑
+
+    // 6-1. ChatFetchError → 500
+    if (error instanceof ChatFetchError) {
+      return NextResponse.json(
+        {
+          code: error.code,
+          message: error.message,
+        },
+        { status: 500 }
+      );
+    }
+
+    // 6-2. 기타 예상치 못한 에러 → 500 (fallback)
     return NextResponse.json(
       {
-        error: `채팅방 목록 조회 실패: ${
-          error instanceof Error ? error.message : 'Unknown error'
-        }`,
+        code: 'INTERNAL_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

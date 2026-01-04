@@ -634,7 +634,7 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
                     alt={MOCK_OTHER_USER.nickname}
                     size="s"
                     status={MOCK_OTHER_USER.status}
-                    showStatus={true}
+                    showStatus={false}
                     className={styles.messageAvatar}
                   />
                 )}
