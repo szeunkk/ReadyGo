@@ -103,3 +103,12 @@
 
 핵심요구사항) avatar 공통컴포넌트를 import해서 사용하고 status를 표시해줄 것. mock데이터의 각 avatar마다 다른 status를 표시하도록 할 것.
             - <Avatar /> (사용자 / status 표시 )
+
+==============================================
+
+참고사항) 다음 단계 구현을 위한 수정사항
+
+            이 프롬프트는 UI 퍼블리싱 전용이며, Mock 데이터를 사용합니다.
+            실제 데이터 바인딩은 다음 프롬프트를 참고하세요:
+            - prompt.302.func.binding.txt: useChatList Hook을 사용한 실제 데이터 바인딩
+            - Mock 데이터 제거 및 useChatList Hook 연동 방법 포함
