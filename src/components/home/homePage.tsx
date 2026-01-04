@@ -4,9 +4,12 @@ import React from 'react';
 import styles from './styles.module.css';
 import MatchSection from './ui/match-section/matchSection';
 import PartySection from './ui/party-section/partySection';
+import ProfileSection from './ui/profile-section/profileSection';
 import { MatchCardProps } from './ui/match-section/card/matchCard';
 import { PartyCardProps } from './ui/party-section/card/partyCard';
 import { AnimalType } from '@/commons/constants/animal';
+import { TierType } from '@/commons/constants/tierType.enum';
+import { BarChartDataItem } from '@/commons/components/bar-chart';
 import { useGoogleOAuth } from '@/components/auth/hooks/useGoogleOAuth.hook';
 import { useKakaoOAuth } from '@/components/auth/hooks/useKakaoOAuth.hook';
 import { useSidePanelStore } from '@/stores/sidePanel.store';
@@ -137,6 +140,14 @@ const mockPartyData: PartyCardProps[] = [
   },
 ];
 
+// 임시 Bar Chart 데이터 (최근 플레이 패턴)
+const mockBarData: BarChartDataItem[] = [
+  { label: 'FPS', value: 23.6 },
+  { label: '생존', value: 18.2 },
+  { label: '모험', value: 12.5 },
+  { label: '캐주얼', value: 8.7 },
+];
+
 export default function Home() {
   // OAuth 콜백 처리를 위한 Hook 호출
   useGoogleOAuth();
@@ -144,9 +155,9 @@ export default function Home() {
 
   const { isOpen } = useSidePanelStore();
 
-  // 프로필 데이터 fetch + 상태 관리
+  // 프로필 데이터 fetch + 상태 관리 (ProfileViewModel 반환)
   const {
-    data: profileData,
+    data: profileViewModel,
     loading: profileLoading,
     error: profileError,
   } = useProfile();
@@ -191,25 +202,24 @@ export default function Home() {
             )}
 
             {/* Empty 상태 (데이터 없음) */}
-            {!profileLoading && !profileError && !profileData && (
+            {!profileLoading && !profileError && !profileViewModel && (
               <div className={styles.profileState}>
                 <p>프로필 정보가 없습니다.</p>
               </div>
             )}
 
-            {/* 데이터 있음 - ViewModel 변환은 다음 PR에서 처리 */}
-            {!profileLoading && !profileError && profileData && (
-              <div className={styles.profileState}>
-                <p>프로필 데이터 로드 완료</p>
-                <p
-                  style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}
-                >
-                  userId: {profileData.userId}
-                </p>
-                <p style={{ fontSize: '12px', color: '#888' }}>
-                  nickname: {profileData.nickname || '(없음)'}
-                </p>
-              </div>
+            {/* 데이터 있음 - ProfileSection 컴포넌트 사용 */}
+            {!profileLoading && !profileError && profileViewModel && (
+              <ProfileSection
+                nickname={profileViewModel.nickname || '익명 사용자'}
+                tier={profileViewModel.tier}
+                animal={profileViewModel.animalType || AnimalType.rabbit}
+                activeTime={profileViewModel.activeTimeText}
+                perfectMatchTypes={profileViewModel.perfectMatchTypes}
+                radarData={profileViewModel.radarData || []}
+                barData={mockBarData}
+                className={styles.profileSection}
+              />
             )}
           </div>
         )}

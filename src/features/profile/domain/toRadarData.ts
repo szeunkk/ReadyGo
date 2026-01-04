@@ -8,15 +8,7 @@
 
 import type { ProfileCoreDTO } from '@/commons/types/profile/profileCore.dto';
 import type { RadarTraitKey } from '@/commons/constants/animal';
-
-/**
- * RadarChart 컴포넌트에서 사용하는 데이터 구조
- * (UI 레이어 타입을 그대로 재사용)
- */
-export interface RadarChartData {
-  trait: RadarTraitKey;
-  value: number; // 0-100
-}
+import type { RadarChartData } from '@/commons/components/radar-chart';
 
 /**
  * RadarChart에서 사용하는 고정 trait 순서

@@ -16,6 +16,7 @@ import type { ProfileViewModel } from './ProfileViewModel';
 import { toRadarData } from '@/features/profile/domain/toRadarData';
 import { toActiveTimeText } from '@/features/profile/domain/toActiveTimeText';
 import { toAnimalTypeMeta } from '@/features/profile/domain/toAnimalTypeMeta';
+import { toPerfectMatchTypes } from '@/features/profile/domain/toPerfectMatchTypes';
 
 /**
  * ProfileCoreDTO를 ProfileViewModel로 변환
@@ -78,11 +79,13 @@ export const toProfileViewModel = (
   const radarData = toRadarData(coreDTO.traits);
   const activeTimeText = toActiveTimeText(coreDTO.schedule);
   const animalMeta = toAnimalTypeMeta(coreDTO.animalType);
+  const perfectMatchTypes = toPerfectMatchTypes(coreDTO.animalType);
 
   // ProfileViewModel 구성
   return {
     // 필수 필드
     userId: coreDTO.userId,
+    tier: coreDTO.tier,
 
     // 선택 필드 (Core DTO에서 그대로 전달)
     nickname: coreDTO.nickname,
@@ -94,5 +97,6 @@ export const toProfileViewModel = (
     radarData,
     activeTimeText,
     animalMeta,
+    perfectMatchTypes,
   };
 };

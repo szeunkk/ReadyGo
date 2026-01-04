@@ -7,6 +7,7 @@ import {
 } from '@/commons/types/profile/profileCore.dto';
 import { AnimalType } from '@/commons/constants/animal/animal.enum';
 import { TraitVector } from '@/commons/constants/animal/animal.vector';
+import { TierType } from '@/commons/constants/tierType.enum';
 import {
   ProfileNotFoundError,
   ProfileDataInconsistencyError,
@@ -112,6 +113,7 @@ export const getMyProfileService = async (
   return {
     userId: profileRow.id,
     nickname: profileRow.nickname ?? undefined,
+    tier: profileRow.tier as TierType,
     animalType: profileRow.animal_type as AnimalType | null | undefined,
     traits,
     schedule,

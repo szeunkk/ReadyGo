@@ -11,6 +11,7 @@ export type UserProfileRow = {
   id: string;
   animal_type: string | null;
   nickname: string | null;
+  tier: string;
   created_at: string;
   updated_at: string;
 };
