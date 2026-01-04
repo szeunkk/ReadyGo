@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
 
 // 타입 정의
@@ -8,6 +8,7 @@ type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
 type ChatRoomMember = Database['public']['Tables']['chat_room_members']['Row'];
 type ChatMessageRead =
   Database['public']['Tables']['chat_message_reads']['Row'];
+type UserBlock = Database['public']['Tables']['user_blocks']['Row'];
 
 export interface ChatRoomListItem {
   room: ChatRoom;
@@ -22,13 +23,16 @@ export interface ChatRoomListItem {
 
 /**
  * 두 사용자 간의 1:1 채팅방이 존재하는지 조회
+ * - DB 접근만 수행, 에러 처리 및 데이터 가공 없음
+ * - Supabase 응답 구조를 그대로 반환
  */
 export const getChatRoomByMembers = async (
+  client: SupabaseClient<Database>,
   userId1: string,
   userId2: string
 ): Promise<ChatRoom | null> => {
   // chat_room_members를 기준으로 두 사용자가 모두 참여한 채팅방 조회
-  const { data: members1, error: error1 } = await supabaseAdmin
+  const { data: members1, error: error1 } = await client
     .from('chat_room_members')
     .select('room_id')
     .eq('user_id', userId1);
@@ -46,7 +50,7 @@ export const getChatRoomByMembers = async (
     .filter((id): id is number => id !== null);
 
   // 두 번째 사용자가 참여한 채팅방 중에서 교집합 찾기
-  const { data: members2, error: error2 } = await supabaseAdmin
+  const { data: members2, error: error2 } = await client
     .from('chat_room_members')
     .select('room_id')
     .eq('user_id', userId2)
@@ -65,7 +69,7 @@ export const getChatRoomByMembers = async (
     .map((m) => (m as { room_id: number | null }).room_id)
     .filter((id): id is number => id !== null);
 
-  const { data: rooms, error: error3 } = await supabaseAdmin
+  const { data: rooms, error: error3 } = await client
     .from('chat_rooms')
     .select('*')
     .in('id', commonRoomIds)
@@ -81,23 +85,16 @@ export const getChatRoomByMembers = async (
 };
 
 /**
- * 새로운 1:1 채팅방 생성 (중복 방지)
+ * 새로운 1:1 채팅방 생성
+ * - DB 접근만 수행, 에러 처리 및 비즈니스 로직 없음
+ * - Supabase 응답 구조를 그대로 반환
  */
 export const createChatRoom = async (
+  client: SupabaseClient<Database>,
   memberIds: string[]
 ): Promise<ChatRoom> => {
-  if (memberIds.length !== 2) {
-    throw new Error('1:1 채팅방은 정확히 2명의 멤버가 필요합니다.');
-  }
-
-  // 중복 방지: 기존 채팅방 확인
-  const existingRoom = await getChatRoomByMembers(memberIds[0], memberIds[1]);
-  if (existingRoom) {
-    return existingRoom;
-  }
-
   // 새 채팅방 생성
-  const { data: newRoom, error: roomError } = await supabaseAdmin
+  const { data: newRoom, error: roomError } = await client
     .from('chat_rooms')
     .insert({ type: 'direct' })
     .select()
@@ -119,7 +116,7 @@ export const createChatRoom = async (
     joined_at: now,
   }));
 
-  const { error: membersError } = await supabaseAdmin
+  const { error: membersError } = await client
     .from('chat_room_members')
     .insert(membersData);
 
@@ -131,13 +128,16 @@ export const createChatRoom = async (
 };
 
 /**
- * 특정 사용자가 참여한 모든 채팅방 목록 조회 (성능 최적화)
+ * 특정 사용자가 참여한 모든 채팅방 목록 조회
+ * - DB 접근만 수행, 에러 처리 및 데이터 가공 없음
+ * - Supabase 응답 구조를 그대로 반환
  */
 export const getUserChatRooms = async (
+  client: SupabaseClient<Database>,
   userId: string
 ): Promise<ChatRoomListItem[]> => {
   // 1차: chat_room_members를 기준으로 chat_rooms 목록 조회 (room_ids 수집)
-  const { data: members, error: membersError } = await supabaseAdmin
+  const { data: members, error: membersError } = await client
     .from('chat_room_members')
     .select('room_id')
     .eq('user_id', userId);
@@ -155,7 +155,7 @@ export const getUserChatRooms = async (
     .filter((id): id is number => id !== null);
 
   // chat_rooms 조회
-  const { data: rooms, error: roomsError } = await supabaseAdmin
+  const { data: rooms, error: roomsError } = await client
     .from('chat_rooms')
     .select('*')
     .in('id', roomIds)
@@ -170,7 +170,7 @@ export const getUserChatRooms = async (
   }
 
   // 2차: 마지막 메시지 조회 (room_ids를 IN 조건으로 처리하여 N+1 문제 방지)
-  const { data: lastMessages, error: messagesError } = await supabaseAdmin
+  const { data: lastMessages, error: messagesError } = await client
     .from('chat_messages')
     .select('*')
     .in('room_id', roomIds)
@@ -196,7 +196,7 @@ export const getUserChatRooms = async (
   const unreadCountMap = new Map<number, number>();
 
   // 모든 room_id에 대해 한 번에 메시지 조회
-  const { data: allUnreadMessages, error: unreadError } = await supabaseAdmin
+  const { data: allUnreadMessages, error: unreadError } = await client
     .from('chat_messages')
     .select('id, room_id')
     .in('room_id', roomIds)
@@ -226,7 +226,7 @@ export const getUserChatRooms = async (
     );
 
     // 읽음 처리된 메시지 ID 조회 (한 번에)
-    const { data: readMessages, error: readError } = await supabaseAdmin
+    const { data: readMessages, error: readError } = await client
       .from('chat_message_reads')
       .select('message_id')
       .eq('user_id', userId)
@@ -256,12 +256,11 @@ export const getUserChatRooms = async (
   const otherMemberMap = new Map<number, UserProfile>();
 
   // 모든 방의 다른 멤버 조회 (한 번에)
-  const { data: allOtherMembers, error: otherMembersError } =
-    await supabaseAdmin
-      .from('chat_room_members')
-      .select('room_id, user_id')
-      .in('room_id', roomIds)
-      .neq('user_id', userId);
+  const { data: allOtherMembers, error: otherMembersError } = await client
+    .from('chat_room_members')
+    .select('room_id, user_id')
+    .in('room_id', roomIds)
+    .neq('user_id', userId);
 
   if (otherMembersError) {
     throw otherMembersError;
@@ -285,7 +284,7 @@ export const getUserChatRooms = async (
 
     if (otherUserIds.length > 0) {
       // user_profiles 조회 (한 번에)
-      const { data: profiles, error: profileError } = await supabaseAdmin
+      const { data: profiles, error: profileError } = await client
         .from('user_profiles')
         .select('*')
         .in('id', otherUserIds);
@@ -345,13 +344,16 @@ export const getUserChatRooms = async (
 
 /**
  * 특정 채팅방의 메시지 목록 조회
+ * - DB 접근만 수행, 에러 처리 및 데이터 가공 없음
+ * - Supabase 응답 구조를 그대로 반환
  */
 export const getChatMessages = async (
+  client: SupabaseClient<Database>,
   roomId: number,
   limit: number = 50,
   offset: number = 0
 ): Promise<ChatMessage[]> => {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await client
     .from('chat_messages')
     .select('*')
     .eq('room_id', roomId)
@@ -367,14 +369,17 @@ export const getChatMessages = async (
 
 /**
  * 새로운 메시지 저장
+ * - DB 접근만 수행, 에러 처리 및 데이터 가공 없음
+ * - Supabase 응답 구조를 그대로 반환
  */
 export const sendMessage = async (
+  client: SupabaseClient<Database>,
   roomId: number,
   senderId: string,
   content: string,
   contentType: string = 'text'
 ): Promise<ChatMessage> => {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await client
     .from('chat_messages')
     .insert({
       room_id: roomId,
@@ -399,9 +404,13 @@ export const sendMessage = async (
 
 /**
  * 메시지 삭제 (hard delete)
+ * - DB 접근만 수행, 에러 처리 없음
  */
-export const deleteMessage = async (messageId: number): Promise<void> => {
-  const { error } = await supabaseAdmin
+export const deleteMessage = async (
+  client: SupabaseClient<Database>,
+  messageId: number
+): Promise<void> => {
+  const { error } = await client
     .from('chat_messages')
     .delete()
     .eq('id', messageId);
@@ -417,8 +426,10 @@ export const deleteMessage = async (messageId: number): Promise<void> => {
 
 /**
  * 특정 메시지들을 읽음 처리
+ * - DB 접근만 수행, 에러 처리 없음
  */
 export const markMessagesAsRead = async (
+  client: SupabaseClient<Database>,
   roomId: number,
   userId: string,
   messageIds: number[]
@@ -433,7 +444,6 @@ export const markMessagesAsRead = async (
   );
 
   if (validMessageIds.length === 0) {
-    console.warn('markMessagesAsRead: 유효한 messageIds가 없습니다.');
     return;
   }
 
@@ -444,62 +454,42 @@ export const markMessagesAsRead = async (
     read_at: now,
   }));
 
-  try {
-    // upsert를 사용하여 중복 생성 방지
-    // UNIQUE 제약조건 (message_id, user_id)이 데이터베이스에 설정되어 있음
-    // 이미 읽음 처리된 메시지는 자동으로 업데이트됨
-    const { error: upsertError } = await supabaseAdmin
-      .from('chat_message_reads')
-      .upsert(readsData, {
-        onConflict: 'message_id,user_id',
-        ignoreDuplicates: false,
-      });
+  // upsert를 사용하여 중복 생성 방지
+  // UNIQUE 제약조건 (message_id, user_id)이 데이터베이스에 설정되어 있음
+  // 이미 읽음 처리된 메시지는 자동으로 업데이트됨
+  const { error: upsertError } = await client
+    .from('chat_message_reads')
+    .upsert(readsData, {
+      onConflict: 'message_id,user_id',
+      ignoreDuplicates: false,
+    });
 
-    if (upsertError) {
-      console.error(
-        'markMessagesAsRead - chat_message_reads upsert error:',
-        upsertError
-      );
-      console.error('upsert data:', readsData);
-      console.error(
-        'roomId:',
-        roomId,
-        'userId:',
-        userId,
-        'messageIds:',
-        validMessageIds
-      );
-      throw upsertError;
-    }
+  if (upsertError) {
+    throw upsertError;
+  }
 
-    // chat_messages 테이블의 is_read 필드도 업데이트
-    const { error: updateError } = await supabaseAdmin
-      .from('chat_messages')
-      .update({ is_read: true })
-      .in('id', validMessageIds);
+  // chat_messages 테이블의 is_read 필드도 업데이트
+  const { error: updateError } = await client
+    .from('chat_messages')
+    .update({ is_read: true })
+    .in('id', validMessageIds);
 
-    if (updateError) {
-      console.error(
-        'markMessagesAsRead - chat_messages update error:',
-        updateError
-      );
-      throw updateError;
-    }
-  } catch (error) {
-    console.error('markMessagesAsRead - 전체 에러:', error);
-    throw error;
+  if (updateError) {
+    throw updateError;
   }
 };
 
 /**
  * 특정 채팅방에서 읽지 않은 메시지 수 계산
+ * - DB 접근만 수행, 에러 처리 없음
  */
 export const getUnreadCount = async (
+  client: SupabaseClient<Database>,
   roomId: number,
   userId: string
 ): Promise<number> => {
   // chat_messages에서 room_id로 필터링하고, sender_id가 userId가 아닌 메시지 조회
-  const { data: messages, error: messagesError } = await supabaseAdmin
+  const { data: messages, error: messagesError } = await client
     .from('chat_messages')
     .select('id')
     .eq('room_id', roomId)
@@ -516,7 +506,7 @@ export const getUnreadCount = async (
   const messageIds = messages.map((m) => (m as { id: number }).id);
 
   // chat_message_reads 테이블과 조인하여 읽음 처리되지 않은 메시지만 카운트
-  const { data: readMessages, error: readError } = await supabaseAdmin
+  const { data: readMessages, error: readError } = await client
     .from('chat_message_reads')
     .select('message_id')
     .eq('user_id', userId)
@@ -542,13 +532,15 @@ export const getUnreadCount = async (
 
 /**
  * 특정 채팅방의 모든 읽지 않은 메시지를 읽음 처리
+ * - DB 접근만 수행, 에러 처리 없음
  */
 export const markRoomAsRead = async (
+  client: SupabaseClient<Database>,
   roomId: number,
   userId: string
 ): Promise<void> => {
   // 해당 채팅방에서 현재 사용자가 읽지 않은 모든 메시지 ID 조회
-  const { data: unreadMessages, error: messagesError } = await supabaseAdmin
+  const { data: unreadMessages, error: messagesError } = await client
     .from('chat_messages')
     .select('id')
     .eq('room_id', roomId)
@@ -556,7 +548,6 @@ export const markRoomAsRead = async (
     .not('id', 'is', null);
 
   if (messagesError) {
-    console.error('markRoomAsRead - messagesError:', messagesError);
     throw messagesError;
   }
 
@@ -574,7 +565,7 @@ export const markRoomAsRead = async (
   }
 
   // markMessagesAsRead 함수를 활용하여 일괄 읽음 처리
-  await markMessagesAsRead(roomId, userId, messageIds);
+  await markMessagesAsRead(client, roomId, userId, messageIds);
 };
 
 // ============================================
@@ -583,15 +574,16 @@ export const markRoomAsRead = async (
 
 /**
  * 사용자를 차단
- * TODO: chat_blocks 테이블이 데이터베이스 타입에 없음. 타입 생성 후 활성화 필요
+ * - DB 접근만 수행, 에러 처리 없음
  */
 export const blockUser = async (
+  client: SupabaseClient<Database>,
   userId: string,
   blockedUserId: string
 ): Promise<void> => {
   // upsert를 사용하여 중복 차단 방지
   // (user_id, blocked_user_id) 조합의 유니크 제약이 있다는 전제
-  const { error } = await (supabaseAdmin as any).from('chat_blocks').upsert(
+  const { error } = await client.from('user_blocks').upsert(
     {
       user_id: userId,
       blocked_user_id: blockedUserId,
@@ -606,14 +598,15 @@ export const blockUser = async (
 
 /**
  * 사용자 차단 해제
- * TODO: chat_blocks 테이블이 데이터베이스 타입에 없음. 타입 생성 후 활성화 필요
+ * - DB 접근만 수행, 에러 처리 없음
  */
 export const unblockUser = async (
+  client: SupabaseClient<Database>,
   userId: string,
   blockedUserId: string
 ): Promise<void> => {
-  const { error } = await (supabaseAdmin as any)
-    .from('chat_blocks')
+  const { error } = await client
+    .from('user_blocks')
     .delete()
     .eq('user_id', userId)
     .eq('blocked_user_id', blockedUserId);
@@ -625,14 +618,15 @@ export const unblockUser = async (
 
 /**
  * 사용자가 다른 사용자를 차단했는지 확인
- * TODO: chat_blocks 테이블이 데이터베이스 타입에 없음. 타입 생성 후 활성화 필요
+ * - DB 접근만 수행, 에러 처리 없음
  */
 export const isUserBlocked = async (
+  client: SupabaseClient<Database>,
   userId: string,
   otherUserId: string
 ): Promise<boolean> => {
-  const { data, error } = await (supabaseAdmin as any)
-    .from('chat_blocks')
+  const { data, error } = await client
+    .from('user_blocks')
     .select('id')
     .eq('user_id', userId)
     .eq('blocked_user_id', otherUserId)
