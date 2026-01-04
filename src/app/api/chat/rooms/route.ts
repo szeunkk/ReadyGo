@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAuthenticatedClient } from '../utils/auth';
 import { getUserChatRoomsService } from '@/services/chat/getUserChatRoomsService';
 import { ChatFetchError } from '@/commons/errors/chat/chatErrors';
 
@@ -20,16 +20,10 @@ export const dynamic = 'force-dynamic';
  */
 export const GET = async (_request: NextRequest) => {
   try {
-    // 1. Supabase 클라이언트 생성 (쿠키 자동 처리)
-    const supabase = createClient();
+    // 1. 인증된 클라이언트 생성
+    const { supabase, user, error: authError } = await createAuthenticatedClient();
 
-    // 2. 사용자 정보 확인
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (authError || !supabase || !user) {
       return NextResponse.json(
         {
           message: 'Unauthorized',
@@ -39,18 +33,18 @@ export const GET = async (_request: NextRequest) => {
       );
     }
 
-    // 3. userId는 auth.uid()에서만 추출
+    // 2. userId는 auth.uid()에서만 추출
     const userId = user.id;
 
-    // 4. Service 호출
+    // 3. Service 호출
     const chatRooms = await getUserChatRoomsService(supabase, userId);
 
-    // 5. 정상 응답
+    // 4. 정상 응답
     return NextResponse.json({ data: chatRooms }, { status: 200 });
   } catch (error) {
-    // 6. Service 에러 매핑
+    // 5. Service 에러 매핑
 
-    // 6-1. ChatFetchError → 500
+    // 5-1. ChatFetchError → 500
     if (error instanceof ChatFetchError) {
       return NextResponse.json(
         {
@@ -61,7 +55,7 @@ export const GET = async (_request: NextRequest) => {
       );
     }
 
-    // 6-2. 기타 예상치 못한 에러 → 500 (fallback)
+    // 5-2. 기타 예상치 못한 에러 → 500 (fallback)
     return NextResponse.json(
       {
         code: 'INTERNAL_ERROR',
