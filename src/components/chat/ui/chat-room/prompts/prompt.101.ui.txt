@@ -164,3 +164,13 @@
 
 
 핵심요구사항) menuButton이 눌렸을 때, 버튼 안에 icon의 색상이 var(--color-icon-interactive-primary, #5FFCE2);
+
+==============================================
+
+참고사항) 다음 단계 구현을 위한 수정사항
+
+            이 프롬프트는 UI 퍼블리싱 전용이며, Mock 데이터를 사용합니다.
+            실제 데이터 바인딩은 다음 프롬프트를 참고하세요:
+            - prompt.302.func.binding.txt: useChatRoom Hook을 사용한 실제 데이터 바인딩
+            - Mock 데이터 제거 및 useChatRoom Hook 연동 방법 포함
+            - 메시지 전송 기능 구현 방법 포함
