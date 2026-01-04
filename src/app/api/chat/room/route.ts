@@ -47,7 +47,7 @@ export const POST = async (request: NextRequest) => {
     const { memberIds } = body;
 
     // 4. Service 호출
-    const newRoom = await createChatRoomService(supabase as any, memberIds);
+    const newRoom = await createChatRoomService(supabase, memberIds);
 
     // 5. 정상 응답
     return NextResponse.json({ data: newRoom }, { status: 201 });

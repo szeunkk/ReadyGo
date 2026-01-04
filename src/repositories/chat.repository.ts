@@ -5,10 +5,6 @@ import type { Database } from '@/types/supabase';
 type ChatRoom = Database['public']['Tables']['chat_rooms']['Row'];
 type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
 type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
-type ChatRoomMember = Database['public']['Tables']['chat_room_members']['Row'];
-type ChatMessageRead =
-  Database['public']['Tables']['chat_message_reads']['Row'];
-type UserBlock = Database['public']['Tables']['user_blocks']['Row'];
 
 export interface ChatRoomListItem {
   room: ChatRoom;

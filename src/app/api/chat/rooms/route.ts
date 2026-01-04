@@ -43,7 +43,7 @@ export const GET = async (_request: NextRequest) => {
     const userId = user.id;
 
     // 4. Service 호출
-    const chatRooms = await getUserChatRoomsService(supabase as any, userId);
+    const chatRooms = await getUserChatRoomsService(supabase, userId);
 
     // 5. 정상 응답
     return NextResponse.json({ data: chatRooms }, { status: 200 });

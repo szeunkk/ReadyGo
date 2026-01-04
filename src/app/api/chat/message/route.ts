@@ -65,7 +65,7 @@ export const GET = async (request: NextRequest) => {
 
     // 4. Service 호출
     const messages = await getChatMessagesService(
-      supabase as any,
+      supabase,
       roomId,
       limit,
       offset
@@ -152,7 +152,7 @@ export const POST = async (request: NextRequest) => {
 
     // 5. Service 호출
     const savedMessage = await sendMessageService(
-      supabase as any,
+      supabase,
       roomId,
       userId,
       content,

@@ -54,15 +54,10 @@ export const POST = async (request: NextRequest) => {
     // 5. Service 호출
     // messageIds가 제공된 경우: 특정 메시지들만 읽음 처리
     if (messageIds && Array.isArray(messageIds)) {
-      await markMessagesAsReadService(
-        supabase as any,
-        roomId,
-        userId,
-        messageIds
-      );
+      await markMessagesAsReadService(supabase, roomId, userId, messageIds);
     } else {
       // messageIds가 없는 경우: 해당 채팅방의 모든 메시지를 읽음 처리
-      await markRoomAsReadService(supabase as any, roomId, userId);
+      await markRoomAsReadService(supabase, roomId, userId);
     }
 
     // 6. 정상 응답

@@ -1,8 +1,5 @@
 import * as chatRepository from '@/repositories/chat.repository';
-import {
-  ChatFetchError,
-  ChatRoomNotFoundError,
-} from '@/commons/errors/chat/chatErrors';
+import { ChatFetchError } from '@/commons/errors/chat/chatErrors';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
 import type { ChatRoom } from '@/types/supabase';
@@ -38,4 +35,3 @@ export const getChatRoomByMembersService = async (
     );
   }
 };
-
