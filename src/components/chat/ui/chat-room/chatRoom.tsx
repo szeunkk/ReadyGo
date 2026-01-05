@@ -7,7 +7,6 @@ import Icon from '@/commons/components/icon';
 import Input from '@/commons/components/input';
 import Button from '@/commons/components/button';
 import Searchbar from '@/commons/components/searchbar';
-import { mockChatRooms } from '../chat-list/chatList';
 import { AnimalType } from '@/commons/constants/animal';
 import { useSideProfilePanel } from '@/hooks/useSideProfilePanel';
 
@@ -409,42 +408,8 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
       return MOCK_ROOM_DATA[roomId];
     }
 
-    // 2. chatList의 mock 데이터에서 roomId 찾기
-    if (roomId) {
-      const chatRoomData = mockChatRooms.find(
-        (room) => room.room.room_id === roomId
-      );
-
-      if (chatRoomData) {
-        const [otherMember] = chatRoomData.members;
-        const { isBlocked } = chatRoomData;
-
-        // chatList의 데이터를 기반으로 chatRoom mock 데이터 생성
-        return {
-          otherUser: {
-            id: otherMember.user_id,
-            nickname: otherMember.nickname,
-            animalType: otherMember.animalType,
-            status: otherMember.status || 'offline',
-          },
-          messages: chatRoomData.lastMessage
-            ? [
-                {
-                  id: 1,
-                  content: chatRoomData.lastMessage.content,
-                  content_type: chatRoomData.lastMessage.content_type || 'text',
-                  created_at: chatRoomData.lastMessage.created_at,
-                  sender_id: chatRoomData.lastMessage.sender_id,
-                  room_id: parseInt(roomId.replace('room-', '')) || 1,
-                  is_read: chatRoomData.unreadCount === 0,
-                },
-              ]
-            : [],
-          messageReads: [],
-          isBlocked,
-        };
-      }
-    }
+    // 2. chatList의 mock 데이터는 제거됨 (useChatList Hook 사용)
+    // 추후 useChatRoom Hook을 사용하여 실제 데이터를 가져올 예정
 
     // 3. 기본 mock 데이터 사용
     return DEFAULT_MOCK_DATA;
