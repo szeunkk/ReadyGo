@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useChatRoom } from '@/components/chat/hooks/useChatRoom.hook';
-import { useChatList } from '@/components/chat/hooks/useChatList.hook';
+import { useChatRoom, useChatList } from '@/components/chat/hooks';
 import { useAuth } from '@/commons/providers/auth/auth.provider';
 import { supabase } from '@/lib/supabase/client';
 import Button from '@/commons/components/button';
@@ -436,7 +435,7 @@ export default function RealtimeChatTestPage() {
         }}
       >
         <p>
-          <strong>현재 사용자:</strong>{' '}
+          <strong>현재 사용자 (useAuth):</strong>{' '}
           {user?.id ? (
             <>
               <span style={{ color: 'green' }}>
@@ -715,7 +714,35 @@ export default function RealtimeChatTestPage() {
       </div>
 
       {/* 채팅 목록 (chatList UI 스타일) */}
-      {chatListError && (
+      {!user?.id && (
+        <div
+          style={{
+            marginBottom: '20px',
+            padding: '15px',
+            background: '#fff3cd',
+            borderRadius: '4px',
+            border: '1px solid #ffc107',
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              color: '#856404',
+              fontSize: '14px',
+              fontWeight: 'bold',
+            }}
+          >
+            ⚠️ 로그인이 필요합니다
+          </p>
+          <p
+            style={{ margin: '8px 0 0 0', color: '#856404', fontSize: '12px' }}
+          >
+            채팅 기능을 사용하려면 먼저 로그인해주세요. 401 에러는 로그인하지
+            않은 상태에서 발생하는 정상적인 동작입니다.
+          </p>
+        </div>
+      )}
+      {chatListError && user?.id && (
         <div
           style={{
             marginBottom: '20px',
@@ -727,6 +754,12 @@ export default function RealtimeChatTestPage() {
           <p style={{ margin: 0, color: 'red', fontSize: '14px' }}>
             채팅 목록 에러: {chatListError}
           </p>
+          {chatListError.includes('401') && (
+            <p style={{ margin: '8px 0 0 0', color: '#666', fontSize: '12px' }}>
+              인증 에러가 발생했습니다. 페이지를 새로고침하거나 다시
+              로그인해주세요.
+            </p>
+          )}
         </div>
       )}
       {isLoadingChatRooms ? (
