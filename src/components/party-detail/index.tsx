@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import Icon from '@/commons/components/icon';
 import { URL_PATHS } from '@/commons/constants/url';
 import ChatNull from './ui/chat-null/chatNull';
@@ -11,16 +12,29 @@ import PartyInfo from './ui/party-info/partyInfo';
 import { usePartyBinding } from './hooks/index.binding.hook';
 import { useLinkUpdateModal } from './hooks/index.link.update.modal.hook';
 import { useDeleteParty } from './hooks/index.delete.hook';
+import { useJoinParty } from './hooks/index.join.hook';
 import styles from './styles.module.css';
 
 export default function PartyDetail() {
   const [isJoined, setIsJoined] = useState(false);
+  const params = useParams();
+  const partyId = params?.id as string | undefined;
   const { data, isLoading, error, refetch } = usePartyBinding();
   const { openUpdateModal } = useLinkUpdateModal({ onRefetch: refetch });
   const { openDeleteModal } = useDeleteParty({ onRefetch: refetch });
+  const { joinParty } = useJoinParty({ onRefetch: refetch });
 
-  const handleJoinClick = () => {
-    setIsJoined(true);
+  const handleJoinClick = async () => {
+    if (partyId) {
+      try {
+        await joinParty(partyId);
+        // 참여 성공 시 ChatRoom 렌더링
+        setIsJoined(true);
+      } catch {
+        // 에러는 joinParty 내부에서 모달로 처리되므로 여기서는 상태만 유지
+        // 참여 실패 시 isJoined는 false로 유지됨
+      }
+    }
   };
 
   const handleEditClick = () => {
