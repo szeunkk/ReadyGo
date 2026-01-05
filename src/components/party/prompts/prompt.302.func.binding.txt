@@ -122,7 +122,7 @@
                                 - 'cat' → 'cat.svg'
                                 - 'deer' → 'deer.svg'
                                 - 'dog' → 'dog.svg'
-                                - 'dolphin' → 'dolpin.svg' (파일명은 dolpin으로 되어 있음)
+                                - 'dolphin' → 'dolphin.svg' 
                                 - 'fox' → 'fox.svg'
                                 - 'hawk' → 'hawk.svg'
                                 - 'hedgehog' → 'hedgehog.svg'

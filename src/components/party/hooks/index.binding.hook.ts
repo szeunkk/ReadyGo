@@ -168,13 +168,14 @@ const fetchPartyMembersAndProfiles = async (
     if (partyMembers) {
       for (const member of partyMembers) {
         const postId = member.post_id;
-        if (postId) {
+        const userId = member.user_id;
+        if (postId && userId) {
           if (!membersMap.has(postId)) {
             membersMap.set(postId, []);
           }
           membersMap.get(postId)!.push({
             post_id: postId,
-            user_id: member.user_id,
+            user_id: userId,
             role: member.role || '',
             joined_at: member.joined_at || '',
           });
