@@ -30,19 +30,22 @@
             3) 테스트 데이터 조건
                 3-1) 데이터
                     - party_posts 테이블: 실제 데이터를 사용할 것.
-                    - party_members, user_profiles 등 기타 테이블: Mock 데이터를 사용할 것.
+                    - party_members 테이블: 실제 데이터를 사용할 것.
+                    - user_profiles 테이블: 실제 데이터를 사용할 것.
 
                 3-2) 성공시나리오
                     - party_posts 테이블은 실제 Supabase 데이터를 사용할 것.
-                    - party_members, user_profiles 등 기타 테이블은 Mock 데이터를 사용할 것.
+                    - party_members 테이블은 실제 Supabase 데이터를 사용할 것.
+                    - user_profiles 테이블은 실제 Supabase 데이터를 사용할 것.
 
                 3-3) 실패시나리오
                     - party_posts 테이블은 실제 Supabase 데이터를 사용할 것.
-                    - party_members, user_profiles 등 기타 테이블은 Mock 데이터를 사용할 것.
+                    - party_members 테이블은 실제 Supabase 데이터를 사용할 것.
+                    - user_profiles 테이블은 실제 Supabase 데이터를 사용할 것.
 
-핵심요구사항) 현재의 모든 구조를 그대로 유지하고, party_posts 테이블은 API 기반 실제 데이터를 바인딩하고, party_members 및 user_profiles 등 기타 데이터는 Mock 데이터를 사용할 것.
+핵심요구사항) 현재의 모든 구조를 그대로 유지하고, party_posts, party_members, user_profiles 테이블은 모두 API 기반 실제 데이터를 바인딩할 것.
             1) 데이터조건
-                - 데이터 소스: API 라우트를 통한 조회 (party_posts만 실제 데이터)
+                - 데이터 소스: API 라우트를 통한 조회 (party_posts, party_members, user_profiles 모두 실제 데이터)
                 - API 엔드포인트: GET /api/party
                 - API 라우트 파일 경로: src/app/api/party/route.ts 참고
                 - 응답 형식: { data: PartyPost[] } 또는 { error: string }
@@ -62,15 +65,15 @@
                         - tags: jsonb (선택: string[] 형태) - 태그
                         - status: text (필수, default: 'recruiting') - 모집 상태
                         - created_at: timestamptz (필수, default: now())
-                    - party_members 테이블 (Mock 데이터 사용):
+                    - party_members 테이블 (실제 데이터 사용):
                         - post_id: bigint - 파티 ID
                         - user_id: uuid - 참여 유저 ID
                         - role: text - 역할
                         - joined_at: timestamptz - 참여 시각
-                        - 참여자 수(currentMembers)는 Mock 데이터에서 계산할 것.
-                    - user_profiles 테이블 (Mock 데이터 사용):
+                        - 참여자 수(currentMembers)는 party_members 테이블에서 같은 post_id의 row 개수로 계산할 것.
+                    - user_profiles 테이블 (실제 데이터 사용):
                         - user_id: uuid
-                        - animal_type: text - 동물 아바타 타입
+                        - animal_type: text - 동물 아바타 타입 (AnimalType enum 값: 'wolf', 'tiger', 'hawk', 'owl', 'fox', 'hedgehog', 'raven', 'bear', 'deer', 'koala', 'dog', 'dolphin', 'panda', 'rabbit', 'leopard', 'cat')
 
             2) 인증/권한 조건
                 - API는 쿠키의 'sb-access-token'을 통해 인증을 처리한다.
@@ -84,7 +87,10 @@
                     - 쿼리 파라미터: status='recruiting' (모집 중인 파티만 표시).
                     - API 응답은 created_at 기준 내림차순 정렬된 데이터를 반환한다 (최신순).
                     - API 응답은 party_posts 테이블의 데이터만 포함하며, party_members 조인 정보는 포함하지 않는다.
-                    - party_members 및 user_profiles 데이터는 클라이언트에서 Mock 데이터를 사용할 것.
+                    - party_members 및 user_profiles 데이터는 별도 API 호출을 통해 실제 데이터를 조회할 것.
+                        - party_members 조회: 각 party_posts.id에 대해 GET /api/party/[id]/members 또는 Supabase 클라이언트를 통해 조회
+                        - user_profiles 조회: party_members의 user_id 목록을 기반으로 GET /api/profile/[userId] 또는 Supabase 클라이언트를 통해 조회
+                        - 또는 API를 수정하여 party_posts 조회 시 party_members와 user_profiles를 함께 조인하여 반환하도록 할 수 있음
 
                 3-2) 데이터 변환
                     - start_date와 start_time을 조합하여 "MM/DD 오전/오후 HH:mm" 형식으로 변환할 것.
@@ -107,11 +113,30 @@
                         - 'normal' → "노멀"
                         - 'hard' → "하드"
                         - 'hell' → "지옥"
-                    - memberAvatars를 생성할 것 (Mock 데이터 사용).
-                        - party_posts의 id를 기반으로 Mock party_members 데이터에서 해당 파티의 참여자 정보를 가져올 것.
+                    - memberAvatars를 생성할 것 (실제 데이터 사용).
+                        - party_posts의 id를 기반으로 실제 party_members 데이터에서 해당 파티의 참여자 정보를 가져올 것.
+                        - party_members의 user_id를 사용하여 실제 user_profiles 데이터에서 animal_type을 조회할 것.
+                        - animal_type 값을 아바타 아이콘 파일명과 매칭시킬 것.
+                            - animal_type 값과 아바타 아이콘 파일명 매칭 규칙:
+                                - 'bear' → 'bear.svg'
+                                - 'cat' → 'cat.svg'
+                                - 'deer' → 'deer.svg'
+                                - 'dog' → 'dog.svg'
+                                - 'dolphin' → 'dolpin.svg' (파일명은 dolpin으로 되어 있음)
+                                - 'fox' → 'fox.svg'
+                                - 'hawk' → 'hawk.svg'
+                                - 'hedgehog' → 'hedgehog.svg'
+                                - 'koala' → 'koala.svg'
+                                - 'leopard' → 'leopard.svg'
+                                - 'owl' → 'owl.svg'
+                                - 'panda' → 'panda.svg'
+                                - 'rabbit' → 'rabbit.svg'
+                                - 'raven' → 'raven.svg'
+                                - 'tiger' → 'tiger.svg'
+                                - 'wolf' → 'wolf.svg'
                         - 참여자 수만큼 동물 아바타를 표시할 것 (최대 4개).
                         - 참여자가 없는 경우 빈 배열로 처리할 것.
-                        - 참여자 아바타는 Mock user_profiles 데이터의 animal_type을 사용하거나, 기본값을 사용할 것.
+                        - user_profiles에서 animal_type이 없는 경우 기본값을 사용할 수 있음.
 
             4) 구현 방법
                 4-1) API 호출
@@ -119,21 +144,24 @@
                     - 쿠키는 자동으로 포함되므로 별도로 설정할 필요 없음
                     - Content-Type: application/json 헤더 사용
                     - API는 party_posts 테이블의 데이터만 반환하며, party_members나 user_profiles 정보는 포함하지 않음
+                    - party_members 데이터 조회: 각 party_posts.id에 대해 Supabase 클라이언트를 사용하여 party_members 테이블에서 post_id로 필터링하여 조회
+                        - 예시: supabase.from('party_members').select('*').eq('post_id', postId)
+                    - user_profiles 데이터 조회: party_members의 user_id 목록을 기반으로 Supabase 클라이언트를 사용하여 user_profiles 테이블에서 조회
+                        - 예시: supabase.from('user_profiles').select('user_id, animal_type').in('user_id', userIds)
                 
-                4-2) Mock 데이터 설정
-                    - party_members Mock 데이터: 각 party_posts.id에 대응하는 참여자 정보를 Mock 데이터로 정의할 것
-                        - 예시 구조: { post_id: number, user_id: string, role: string, joined_at: string }[]
-                    - user_profiles Mock 데이터: 각 user_id에 대응하는 동물 아바타 정보를 Mock 데이터로 정의할 것
-                        - 예시 구조: { user_id: string, animal_type: string }[]
-                    - Mock 데이터는 클라이언트 측에 정의하거나 별도 파일로 관리할 것
+                4-2) 데이터 조회 및 변환
+                    - party_posts 목록을 조회한 후, 각 파티에 대해 party_members를 조회할 것.
+                    - party_members 조회 결과에서 user_id 목록을 추출하고, 해당 user_id들로 user_profiles를 조회할 것.
+                    - user_profiles 조회 결과를 user_id를 키로 하는 Map 또는 객체로 변환하여 빠른 조회가 가능하도록 할 것.
                 
                 4-3) 데이터 변환 및 바인딩
                     - API 응답의 data 배열을 순회하며 각 파티 데이터를 변환할 것.
                     - title: party_posts.party_title (실제 데이터)
                     - description: party_posts.description (실제 데이터) => 카드 사이즈를 넘어가는 경우, "..."으로 표현하여 카드 사이즈를 넘어가지 않도록 할 것.
                     - gameTag: party_posts.game_title (실제 데이터)
-                    - memberAvatars: Mock party_members 데이터에서 해당 post_id의 user_id 목록을 기반으로 생성 (최대 4개, Mock 데이터 사용)
-                    - currentMembers: Mock party_members 데이터에서 해당 post_id의 참여자 수 (COUNT, Mock 데이터 사용)
+                    - memberAvatars: 실제 party_members 데이터에서 해당 post_id의 user_id 목록을 가져오고, 각 user_id에 대응하는 user_profiles의 animal_type을 사용하여 아바타 아이콘 파일명으로 변환 (최대 4개, 실제 데이터 사용)
+                        - animal_type 값은 AnimalType enum 값이며, 이를 아바타 아이콘 파일명(예: 'bear.svg')으로 변환하거나, Avatar 컴포넌트에 직접 animal_type 값을 전달할 수 있음
+                    - currentMembers: 실제 party_members 데이터에서 해당 post_id의 row 개수 (COUNT, 실제 데이터 사용)
                     - maxMembers: party_posts.max_members (실제 데이터)
                     - categories.startTime: start_date와 start_time을 조합하여 변환한 값 (실제 데이터)
                     - categories.voiceChat: voice_chat 값을 한글로 변환한 값 (실제 데이터)
