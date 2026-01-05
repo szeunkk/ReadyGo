@@ -15,6 +15,7 @@ export const useJoinParty = (
   options?: UseJoinPartyOptions
 ): UseJoinPartyReturn => {
   const { openModal } = useModal();
+  const onRefetch = options?.onRefetch;
 
   const joinParty = useCallback(
     async (partyId: number | string) => {
@@ -53,8 +54,8 @@ export const useJoinParty = (
         }
 
         // API 호출 성공 시 (201 상태 코드)
-        if (options?.onRefetch) {
-          await options.onRefetch();
+        if (onRefetch) {
+          await onRefetch();
         }
       } catch (error) {
         // 네트워크 오류 등 예외 처리
@@ -71,7 +72,7 @@ export const useJoinParty = (
         });
       }
     },
-    [openModal, options?.onRefetch]
+    [openModal, onRefetch]
   );
 
   return {

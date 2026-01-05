@@ -9,11 +9,12 @@
 
 ==============================================
 
-조건-파일경로) 참고할 TSX  파일경로: src/components/party/ui/card/card.tsx
-조건-파일경로) 참고할 CSS  파일경로: src/components/party/ui/card/styles.module.css
+조건-파일경로) 참고할 TSX  파일경로: src/components/party-detail/ui/party-info/partyInfo.tsx
+조건-파일경로) 참고할 CSS  파일경로: src/components/party-detail/ui/party-info/styles.module.css
 조건-파일경로) 참고할 API  파일경로: src/app/api/party/[id]/members/route.ts
-조건-파일경로) 구현될 HOOK 파일경로: src/components/party/hooks/index.join.hook.ts
-조건-파일경로) 구현될 TEST 파일경로: src/components/party/tests/index.join.hook.spec.ts
+조건-파일경로) 수정할 컴포넌트 파일경로: src/components/party-detail/index.tsx
+조건-파일경로) 구현될 HOOK 파일경로: src/components/party-detail/hooks/index.join.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/components/party-detail/tests/index.join.hook.spec.ts
 
 ==============================================
 
@@ -24,14 +25,13 @@
 
             2) 테스트 조건
                 - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
-                - /party 페이지가 완전히 로드된 후 테스트할 것.
-                    - 페이지 로드 식별 요구사항: 고정식별자 data-testid="party-page" 대기 방법
+                - 파티 상세 페이지(/party/[id])가 완전히 로드된 후 테스트할 것.
+                    - 페이지 로드 식별 요구사항: 고정식별자 data-testid="party-detail-page" 대기 방법
                     - 페이지 로드 식별 금지사항: networkidle 대기 방법
 
 핵심요구사항) 다음의 조건에 맞게 파티 참여 기능을 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
             1) Hook 조건
                 - Hook 이름: useJoinParty
-                - 참고할 Hook 패턴: src/components/party-detail/hooks/index.delete.hook.ts
                 - useCallback을 사용하여 함수를 메모이제이션할 것.
                 - 모든 기능 및 데이터는 해당 파일 안에서 처리하여, 다른 파일에 의존하지 않도록 구현할 것.
 
@@ -68,35 +68,51 @@
                 - 파티 ID는 파라미터로 받은 값을 parseInt하여 숫자로 변환
                 - 숫자 변환 실패 시 early return
 
-            7) 테스트 검증 포인트(Playwright)
-                - /party 페이지 로드 후 data-testid="party-page"로 대기
-                - 카드의 상세보기 버튼(data-testid="party-card-join-button-[partyId]") 클릭 시 API 호출 확인
+            7) 컴포넌트 통합 조건
+                - 파티 상세 컴포넌트(src/components/party-detail/index.tsx)에서 useJoinParty Hook 사용
+                - useParams를 사용하여 파티 ID 가져오기
+                - usePartyBinding의 refetch를 onRefetch 옵션으로 전달
+                - handleJoinClick 함수에서 Hook의 joinParty 함수 호출
+                - joinParty 호출 시 useParams로 가져온 partyId 전달
+                - 참여하기 버튼 클릭 시 API 호출이 실행되도록 구현
+
+            8) 테스트 검증 포인트(Playwright)
+                - 파티 상세 페이지(/party/[id]) 로드 후 data-testid="party-detail-page"로 대기
+                - 파티 인포의 참여하기 버튼 클릭 시 API 호출 확인 (POST /api/party/[id]/members)
                 - 성공 시나리오: API 호출 성공 후 적절한 처리 확인
                 - 실패 시나리오: 에러 발생 시 모달 노출 확인
                 - 중복 참여 시나리오: 이미 참여한 파티에 재참여 시도 시 에러 처리 확인
                 - 인원 초과 시나리오: 최대 인원이 가득 찬 파티 참여 시도 시 에러 처리 확인
 
-            8) 구현 방법
-                8-1) Hook 구조
+            9) 구현 방법
+                9-1) Hook 구조
                     - useModal로 모달 함수 가져오기
                     - useCallback으로 joinParty 함수 메모이제이션
                     - joinParty 함수는 partyId를 파라미터로 받음
                     - joinParty 함수에서 API 호출 및 에러/성공 처리
 
-                8-2) API 호출
+                9-2) API 호출
                     - fetch를 사용하여 POST /api/party/[partyId]/members 호출
                     - credentials: 'include' 사용
                     - Content-Type: application/json 헤더 설정
                     - 응답 상태 코드 확인
                     - 응답 JSON 파싱
 
-                8-3) 에러 처리
+                9-3) 에러 처리
                     - HTTP 상태 코드 확인 (4xx, 5xx)
                     - 응답의 error 필드 확인
                     - 에러 발생 시 openModal을 사용하여 에러 모달 표시
                     - 네트워크 오류 시 catch 블록에서 처리
 
-                8-4) 성공 처리
+                9-4) 성공 처리
                     - API 호출 성공 시 (201 상태 코드)
                     - options?.onRefetch가 있으면 호출
                     - 추가적인 UI 업데이트는 컴포넌트에서 처리
+
+                9-5) 컴포넌트 통합
+                    - src/components/party-detail/index.tsx 파일에서 useJoinParty Hook import
+                    - useParams로 파티 ID 가져오기 (const params = useParams(); const partyId = params?.id)
+                    - usePartyBinding의 refetch를 onRefetch 옵션으로 전달하여 Hook 초기화
+                    - handleJoinClick 함수를 수정하여 Hook의 joinParty 함수 호출
+                    - joinParty 호출 시 partyId를 파라미터로 전달 (await joinParty(partyId))
+                    - 기존의 setIsJoined(true) 로직은 제거하거나 참여 성공 후 처리하도록 변경
