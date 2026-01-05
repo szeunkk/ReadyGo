@@ -183,6 +183,9 @@ export const useSignupForm = () => {
           console.warn(
             'Auto-login after signup failed, but signup was successful'
           );
+        } else {
+          // 쿠키가 브라우저에 반영될 시간을 주기 위해 약간의 지연
+          await new Promise((resolve) => setTimeout(resolve, 300));
         }
       }
 
