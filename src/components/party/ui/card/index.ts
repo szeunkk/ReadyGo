@@ -1,1 +1,3 @@
-export { default, type PartyCardProps } from './card';
+export { default } from './card';
+export * from './card';
+
