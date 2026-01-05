@@ -19,14 +19,8 @@
 
 import type { AnimalType } from '@/commons/constants/animal/animal.enum';
 import type { TraitVector } from '@/commons/constants/animal/animal.vector';
-
-/**
- * RadarChart UI 데이터
- */
-export interface RadarChartData {
-  trait: string;
-  value: number;
-}
+import type { TierType } from '@/commons/constants/tierType.enum';
+import type { RadarChartData } from '@/commons/components/radar-chart';
 
 /**
  * AnimalType UI 메타 정보
@@ -62,6 +56,12 @@ export interface ProfileViewModel {
   nickname?: string;
 
   /**
+   * 티어 (필수)
+   * 게임 실력 등급
+   */
+  tier: TierType;
+
+  /**
    * 동물 유형 (선택)
    * null: 특성 검사 미완료
    */
@@ -92,4 +92,9 @@ export interface ProfileViewModel {
    * 동물 타입 메타 정보 (변환된 UI 메타)
    */
   animalMeta?: AnimalTypeMeta;
+
+  /**
+   * 천생연분 동물 타입들 (bestMatches + goodMatches)
+   */
+  perfectMatchTypes?: AnimalType[];
 }

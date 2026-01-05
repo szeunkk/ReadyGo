@@ -10,23 +10,33 @@
 import type { ProfileCoreDTO } from '@/commons/types/profile/profileCore.dto';
 
 /**
+ * 시간대 → 한글 시간 표시 매핑
+ */
+const TIME_SLOT_LABEL_MAP: Record<string, string> = {
+  dawn: '00 - 06시',
+  morning: '06 - 12시',
+  afternoon: '12 - 18시',
+  evening: '18 - 24시',
+};
+
+/**
  * ProfileCoreDTO의 schedule을 요약 텍스트로 변환
  *
  * @param schedule - ProfileCoreDTO['schedule'] (PlayScheduleItem[] | undefined)
- * @returns string | undefined - "WEEKDAY, WEEKEND / EVENING" 형식의 텍스트
+ * @returns string | undefined - "18시 - 24시" 형식의 시간대 텍스트
  *
  * @example
  * ```typescript
  * const profile: ProfileCoreDTO = {
  *   userId: 'uuid-1234',
  *   schedule: [
- *     { dayType: 'WEEKDAY', timeSlot: 'EVENING' },
- *     { dayType: 'WEEKEND', timeSlot: 'EVENING' }
+ *     { dayType: 'weekday', timeSlot: 'evening' },
+ *     { dayType: 'weekend', timeSlot: 'evening' }
  *   ]
  * };
  *
  * const text = toActiveTimeText(profile.schedule);
- * // "WEEKDAY, WEEKEND / EVENING"
+ * // "18시 - 24시"
  * ```
  *
  * @example
@@ -54,14 +64,6 @@ export const toActiveTimeText = (
     return undefined;
   }
 
-  // dayTypes 추출 (입력 순서 유지, 중복 제거)
-  const dayTypes: string[] = [];
-  for (const item of schedule) {
-    if (!dayTypes.includes(item.dayType)) {
-      dayTypes.push(item.dayType);
-    }
-  }
-
   // timeSlots 추출 (입력 순서 유지, 중복 제거)
   const timeSlots: string[] = [];
   for (const item of schedule) {
@@ -70,12 +72,11 @@ export const toActiveTimeText = (
     }
   }
 
-  // dayTypes 부분 생성
-  const dayTypesText = dayTypes.join(', ');
+  // timeSlots를 한글 시간 표시로 변환
+  const timeSlotsLabels = timeSlots
+    .map((timeSlot) => TIME_SLOT_LABEL_MAP[timeSlot.toLowerCase()] || timeSlot)
+    .join(', ');
 
-  // timeSlots 부분 생성
-  const timeSlotsText = timeSlots.join(', ');
-
-  // 최종 텍스트 조합: "dayTypes / timeSlots"
-  return `${dayTypesText} / ${timeSlotsText}`;
+  // 시간대만 반환
+  return timeSlotsLabels;
 };

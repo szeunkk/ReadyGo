@@ -9,9 +9,11 @@ import { MatchCardProps } from './ui/match-section/card/matchCard';
 import { PartyCardProps } from './ui/party-section/card/partyCard';
 import { AnimalType } from '@/commons/constants/animal';
 import { TierType } from '@/commons/constants/tierType.enum';
+import { BarChartDataItem } from '@/commons/components/bar-chart';
 import { useGoogleOAuth } from '@/components/auth/hooks/useGoogleOAuth.hook';
 import { useKakaoOAuth } from '@/components/auth/hooks/useKakaoOAuth.hook';
 import { useSidePanelStore } from '@/stores/sidePanel.store';
+import { useProfile } from './hooks/useProfile';
 
 // 임시 데이터 - 추후 API로 대체될 예정
 const mockMatchData: MatchCardProps[] = [
@@ -138,30 +140,13 @@ const mockPartyData: PartyCardProps[] = [
   },
 ];
 
-// 프로필 섹션 임시 데이터
-const mockProfileData = {
-  nickname: '호쾌한망토',
-  tier: TierType.silver,
-  animal: AnimalType.wolf,
-  favoriteGenre: 'FPS',
-  activeTime: '20 - 24시',
-  gameStyle: '경쟁적',
-  weeklyAverage: '5.4 시간',
-  perfectMatchTypes: [AnimalType.fox, AnimalType.bear, AnimalType.raven],
-  radarData: [
-    { trait: 'social' as const, value: 70 },
-    { trait: 'exploration' as const, value: 85 },
-    { trait: 'cooperation' as const, value: 75 },
-    { trait: 'strategy' as const, value: 60 },
-    { trait: 'leadership' as const, value: 90 },
-  ],
-  barData: [
-    { label: 'FPS', value: 23.6 },
-    { label: '생존', value: 12.5 },
-    { label: '모험', value: 7.2 },
-    { label: '캐주얼', value: 3.8 },
-  ],
-};
+// 임시 Bar Chart 데이터 (최근 플레이 패턴)
+const mockBarData: BarChartDataItem[] = [
+  { label: 'FPS', value: 23.6 },
+  { label: '생존', value: 18.2 },
+  { label: '모험', value: 12.5 },
+  { label: '캐주얼', value: 8.7 },
+];
 
 export default function Home() {
   // OAuth 콜백 처리를 위한 Hook 호출
@@ -169,6 +154,13 @@ export default function Home() {
   useKakaoOAuth();
 
   const { isOpen } = useSidePanelStore();
+
+  // 프로필 데이터 fetch + 상태 관리 (ProfileViewModel 반환)
+  const {
+    data: profileViewModel,
+    loading: profileLoading,
+    error: profileError,
+  } = useProfile();
 
   return (
     <div className={styles.container}>
@@ -194,18 +186,42 @@ export default function Home() {
       {/* 오른쪽 사이드바 영역 */}
       <div className={styles.rightSection}>
         {!isOpen && (
-          <ProfileSection
-            nickname={mockProfileData.nickname}
-            tier={mockProfileData.tier}
-            animal={mockProfileData.animal}
-            favoriteGenre={mockProfileData.favoriteGenre}
-            activeTime={mockProfileData.activeTime}
-            gameStyle={mockProfileData.gameStyle}
-            weeklyAverage={mockProfileData.weeklyAverage}
-            perfectMatchTypes={mockProfileData.perfectMatchTypes}
-            radarData={mockProfileData.radarData}
-            barData={mockProfileData.barData}
-          />
+          <div className={styles.profileStateContainer}>
+            {/* 로딩 상태 */}
+            {profileLoading && (
+              <div className={styles.profileState}>
+                <p>프로필을 불러오는 중...</p>
+              </div>
+            )}
+
+            {/* 에러 상태 */}
+            {!profileLoading && profileError && (
+              <div className={styles.profileState}>
+                <p>프로필을 불러올 수 없습니다.</p>
+              </div>
+            )}
+
+            {/* Empty 상태 (데이터 없음) */}
+            {!profileLoading && !profileError && !profileViewModel && (
+              <div className={styles.profileState}>
+                <p>프로필 정보가 없습니다.</p>
+              </div>
+            )}
+
+            {/* 데이터 있음 - ProfileSection 컴포넌트 사용 */}
+            {!profileLoading && !profileError && profileViewModel && (
+              <ProfileSection
+                nickname={profileViewModel.nickname || '익명 사용자'}
+                tier={profileViewModel.tier}
+                animal={profileViewModel.animalType || AnimalType.rabbit}
+                activeTime={profileViewModel.activeTimeText}
+                perfectMatchTypes={profileViewModel.perfectMatchTypes}
+                radarData={profileViewModel.radarData || []}
+                barData={mockBarData}
+                className={styles.profileSection}
+              />
+            )}
+          </div>
         )}
       </div>
     </div>

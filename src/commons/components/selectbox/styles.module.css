@@ -144,12 +144,11 @@
   z-index: 10;
   display: none;
   flex-direction: column;
-  margin-top: 4px;
   padding: 8px 0;
   border-radius: var(--border-radius-12, 12px);
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: 232px; /* 6개 옵션 높이 (36px * 6) + padding (8px * 2) */
+  max-height: 240px;
   box-shadow:
     0 2px 8px 0 rgba(0, 0, 0, 0.12),
     0 0 2px 0 rgba(0, 0, 0, 0.08);
@@ -166,11 +165,11 @@
 .optionItem {
   display: flex;
   align-items: center;
-  gap: 2px;
-  padding: 10px 8px;
+  gap: 4px;
+  padding: 12px 8px;
   cursor: pointer;
   transition: background-color 0.2s;
-  height: 36px;
+  height: 100%;
   width: 100%;
   box-sizing: border-box;
 }
@@ -198,7 +197,7 @@
 .optionValue {
   flex: 1 1 0%;
   min-width: 0;
-  margin-left: 22px; /* leadingbox space: 20px icon + 2px gap */
+  margin: 0px 24px;
   font-family:
     var(--font-pretendard, 'Pretendard'),
     -apple-system,

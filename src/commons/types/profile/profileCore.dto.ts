@@ -19,6 +19,7 @@
 
 import type { AnimalType } from '@/commons/constants/animal/animal.enum';
 import type { TraitVector } from '@/commons/constants/animal/animal.vector';
+import type { TierType } from '@/commons/constants/tierType.enum';
 
 /**
  * 플레이 스케줄 항목
@@ -89,6 +90,16 @@ export interface ProfileCoreDTO {
    * - UI에서 fallback 값 제공 (예: '익명 사용자', 'User#{랜덤숫자}')
    */
   nickname?: string;
+
+  /**
+   * 티어 (게임 실력 등급)
+   *
+   * 필수 필드
+   * DB: user_profiles.tier (not null, default: 'bronze')
+   *
+   * - TierType enum 값 (bronze, silver, gold, platinum, diamond, master, champion)
+   */
+  tier: TierType;
 
   /**
    * 동물 유형 (특성 검사 결과)
