@@ -1,262 +1,117 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styles from './styles.module.css';
 import AnimalCard from '../../components/animal-card';
-import RadarChart, { RadarChartData } from '../../components/radar-chart';
-import BarChart, { BarChartDataItem } from '../../components/bar-chart';
+import RadarChart from '../../components/radar-chart';
+import { useProfileByUserId } from '@/hooks/useProfileByUserId';
+import { useAuthStore } from '@/stores/auth.store';
 import { AnimalType } from '../../constants/animal';
-import { TierType } from '../../constants/tierType.enum';
 
 export interface ProfilePanelProps {
   userId: string;
   className?: string;
 }
 
-// TODO: 실제 API 호출로 대체 필요
-interface UserProfileData {
-  nickname: string;
-  tier: TierType;
-  animal: AnimalType;
-  favoriteGenre: string;
-  activeTime: string;
-  gameStyle: string;
-  weeklyAverage: string;
-  matchPercentage: number;
-  matchReasons: string[];
-  myPlayStyleData: RadarChartData[]; // 내 플레이스타일 데이터
-  userPlayStyleData?: RadarChartData[]; // 상대방 플레이스타일 데이터 (optional)
-  recentPlayPattern: BarChartDataItem[];
-}
-
 export default function ProfilePanel({
   userId,
   className = '',
 }: ProfilePanelProps) {
-  const [profileData, setProfileData] = useState<UserProfileData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // 쿠키에서 내 userId 가져오기
+  const myUserId = useAuthStore((state) => state.user?.id);
 
-  useEffect(() => {
-    // TODO: userId를 사용하여 실제 사용자 데이터 페칭
-    const fetchUserProfile = async () => {
-      setIsLoading(true);
-      try {
-        // userId별 Mock 데이터 매핑 (테스트용)
-        const mockDataMap: Record<string, UserProfileData> = {
-          'user-1': {
-            nickname: '게이머호랑이',
-            tier: TierType.diamond,
-            animal: AnimalType.tiger,
-            favoriteGenre: 'FPS',
-            activeTime: '18 - 22시',
-            gameStyle: '공격적',
-            weeklyAverage: '12.3 시간',
-            matchPercentage: 94,
-            matchReasons: [
-              '동일 게임 선호',
-              '유사한 플레이 시간대',
-              '비슷한 실력대',
-            ],
-            myPlayStyleData: [
-              { trait: 'leadership', value: 85 },
-              { trait: 'cooperation', value: 75 },
-              { trait: 'strategy', value: 80 },
-              { trait: 'exploration', value: 70 },
-              { trait: 'social', value: 60 },
-            ],
-            userPlayStyleData: [
-              { trait: 'leadership', value: 90 },
-              { trait: 'cooperation', value: 70 },
-              { trait: 'strategy', value: 85 },
-              { trait: 'exploration', value: 75 },
-              { trait: 'social', value: 65 },
-            ],
-            recentPlayPattern: [
-              { label: 'FPS', value: 35.2, color: 'var(--color-bg-brand)' },
-              {
-                label: '전략',
-                value: 8.5,
-                color: 'var(--color-icon-interactive-primary-hover)',
-              },
-              {
-                label: 'RPG',
-                value: 5.3,
-                color: 'var(--color-text-info-bold)',
-              },
-              { label: '생존', value: 2.1, color: 'var(--color-icon-info)' },
-            ],
-          },
-          'user-2': {
-            nickname: '호쾌한망토',
-            tier: TierType.gold,
-            animal: AnimalType.fox,
-            favoriteGenre: 'RPG',
-            activeTime: '22 - 02시',
-            gameStyle: '탐험 지향',
-            weeklyAverage: '8.7 시간',
-            matchPercentage: 87,
-            matchReasons: ['유사한 플레이 시간대', '같은 장르 선호'],
-            myPlayStyleData: [
-              { trait: 'leadership', value: 65 },
-              { trait: 'cooperation', value: 75 },
-              { trait: 'strategy', value: 75 },
-              { trait: 'exploration', value: 85 },
-              { trait: 'social', value: 80 },
-            ],
-            userPlayStyleData: [
-              { trait: 'leadership', value: 60 },
-              { trait: 'cooperation', value: 80 },
-              { trait: 'strategy', value: 70 },
-              { trait: 'exploration', value: 95 },
-              { trait: 'social', value: 85 },
-            ],
-            recentPlayPattern: [
-              { label: 'RPG', value: 28.4, color: 'var(--color-bg-brand)' },
-              {
-                label: '모험',
-                value: 15.6,
-                color: 'var(--color-icon-interactive-primary-hover)',
-              },
-              {
-                label: '캐주얼',
-                value: 8.9,
-                color: 'var(--color-text-info-bold)',
-              },
-              { label: 'FPS', value: 4.2, color: 'var(--color-icon-info)' },
-            ],
-          },
-          'user-3': {
-            nickname: '까칠한까마귀',
-            tier: TierType.platinum,
-            animal: AnimalType.raven,
-            favoriteGenre: 'FPS',
-            activeTime: '20 - 24시',
-            gameStyle: '전략적',
-            weeklyAverage: '5.4 시간',
-            matchPercentage: 94,
-            matchReasons: ['동일 게임 선호', '유사한 플레이 시간대'],
-            myPlayStyleData: [
-              { trait: 'leadership', value: 70 },
-              { trait: 'cooperation', value: 80 },
-              { trait: 'strategy', value: 85 },
-              { trait: 'exploration', value: 65 },
-              { trait: 'social', value: 75 },
-            ],
-            userPlayStyleData: [
-              { trait: 'leadership', value: 75 },
-              { trait: 'cooperation', value: 85 },
-              { trait: 'strategy', value: 90 },
-              { trait: 'exploration', value: 60 },
-              { trait: 'social', value: 70 },
-            ],
-            recentPlayPattern: [
-              { label: 'FPS', value: 23.6, color: 'var(--color-bg-brand)' },
-              {
-                label: '생존',
-                value: 12.5,
-                color: 'var(--color-icon-interactive-primary-hover)',
-              },
-              {
-                label: '모험',
-                value: 7.2,
-                color: 'var(--color-text-info-bold)',
-              },
-              { label: '캐주얼', value: 3.8, color: 'var(--color-icon-info)' },
-            ],
-          },
-        };
+  // 내 프로필 가져오기 (비교용)
+  const { viewModel: myProfile } = useProfileByUserId(myUserId);
 
-        // userId에 해당하는 Mock 데이터 가져오기, 없으면 기본 데이터 사용
-        const mockData = mockDataMap[userId] ||
-          mockDataMap['user-3'] || {
-            // 기본값으로 user-3 데이터 사용
-            nickname: '알 수 없는 사용자',
-            tier: TierType.bronze,
-            animal: AnimalType.rabbit,
-            favoriteGenre: '알 수 없음',
-            activeTime: '알 수 없음',
-            gameStyle: '알 수 없음',
-            weeklyAverage: '0 시간',
-            matchPercentage: 0,
-            matchReasons: [],
-            myPlayStyleData: [
-              { trait: 'leadership', value: 50 },
-              { trait: 'cooperation', value: 50 },
-              { trait: 'strategy', value: 50 },
-              { trait: 'exploration', value: 50 },
-              { trait: 'social', value: 50 },
-            ],
-            userPlayStyleData: [
-              { trait: 'leadership', value: 50 },
-              { trait: 'cooperation', value: 50 },
-              { trait: 'strategy', value: 50 },
-              { trait: 'exploration', value: 50 },
-              { trait: 'social', value: 50 },
-            ],
-            recentPlayPattern: [],
-          };
+  // 상대방 프로필 가져오기
+  const { loading, viewModel, error, empty } = useProfileByUserId(userId);
 
-        // API 호출 시뮬레이션
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        setProfileData(mockData);
-      } catch (error) {
-        console.error('Failed to fetch user profile:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const containerClasses = [styles.profilePanel, className]
+    .filter(Boolean)
+    .join(' ');
 
-    fetchUserProfile();
-  }, [userId]);
-
-  if (isLoading) {
+  // Loading 상태 (상대방 프로필 로딩 중)
+  // 내 프로필은 로딩 중이어도 상대방 프로필만 먼저 표시 가능
+  if (loading) {
     return (
-      <div className={`${styles.profilePanel} ${className}`}>
+      <div className={containerClasses}>
         <div className={styles.loading}>프로필 로딩 중...</div>
       </div>
     );
   }
 
-  if (!profileData) {
+  // Empty 상태 (userId가 없음)
+  if (empty) {
     return (
-      <div className={`${styles.profilePanel} ${className}`}>
+      <div className={containerClasses}>
+        <div className={styles.error}>사용자 정보가 없습니다.</div>
+      </div>
+    );
+  }
+
+  // Error 상태 처리
+  if (error) {
+    // 401: Unauthorized
+    if (error.status === 401) {
+      return (
+        <div className={containerClasses}>
+          <div className={styles.error}>로그인이 필요합니다.</div>
+        </div>
+      );
+    }
+
+    // 403: Forbidden
+    if (error.status === 403) {
+      return (
+        <div className={containerClasses}>
+          <div className={styles.error}>접근 권한이 없습니다.</div>
+        </div>
+      );
+    }
+
+    // 404: Not Found
+    if (error.status === 404) {
+      return (
+        <div className={containerClasses}>
+          <div className={styles.error}>프로필을 찾을 수 없습니다.</div>
+        </div>
+      );
+    }
+
+    // 기타 에러
+    return (
+      <div className={containerClasses}>
         <div className={styles.error}>프로필을 불러올 수 없습니다.</div>
       </div>
     );
   }
 
-  const {
-    nickname,
-    tier,
-    animal,
-    favoriteGenre,
-    activeTime,
-    gameStyle,
-    weeklyAverage,
-    matchPercentage,
-    matchReasons,
-    myPlayStyleData,
-    userPlayStyleData,
-    recentPlayPattern,
-  } = profileData;
-  const containerClasses = [styles.profilePanel, className]
-    .filter(Boolean)
-    .join(' ');
+  // Success 상태 - ViewModel이 없는 경우
+  if (!viewModel) {
+    return (
+      <div className={containerClasses}>
+        <div className={styles.error}>프로필 데이터가 없습니다.</div>
+      </div>
+    );
+  }
+
+  // Success 상태 - ViewModel로 렌더링
+  const { nickname, tier, animalType, radarData, activeTimeText } = viewModel;
 
   return (
     <div className={containerClasses}>
       {/* Animal Card - 사용자 프로필 */}
       <AnimalCard
         property="user"
-        nickname={nickname}
+        nickname={nickname || '익명 사용자'}
         tier={tier}
-        animal={animal}
-        favoriteGenre={favoriteGenre}
-        activeTime={activeTime}
-        gameStyle={gameStyle}
-        weeklyAverage={weeklyAverage}
-        matchPercentage={matchPercentage}
-        matchReasons={matchReasons}
+        animal={animalType ?? AnimalType.rabbit}
+        favoriteGenre="알 수 없음"
+        activeTime={activeTimeText || '알 수 없음'}
+        gameStyle="알 수 없음"
+        weeklyAverage="알 수 없음"
+        matchPercentage={0}
+        matchReasons={[]}
       />
 
       {/* 플레이스타일과 최근 플레이 패턴을 포함하는 통합 섹션 */}
@@ -266,25 +121,33 @@ export default function ProfilePanel({
           <div className={styles.sectionHeader}>
             <h4 className={styles.sectionTitle}>플레이스타일</h4>
           </div>
-          <div className={styles.radarChartWrapper}>
-            <RadarChart
-              myData={myPlayStyleData}
-              userData={userPlayStyleData}
-              size="m"
-              showLabels={true}
-            />
-          </div>
+          {radarData && radarData.length > 0 ? (
+            <div className={styles.radarChartWrapper}>
+              <RadarChart
+                myData={myProfile?.radarData || []}
+                userData={radarData}
+                size="m"
+                showLabels={true}
+              />
+            </div>
+          ) : (
+            <div
+              style={{ padding: '20px', textAlign: 'center', color: '#999' }}
+            >
+              특성 검사를 완료하지 않은 사용자입니다.
+            </div>
+          )}
         </div>
 
-        {/* 최근 플레이 패턴 섹션 */}
-        <div className={styles.playPatternSection}>
+        {/* 최근 플레이 패턴 섹션 - 현재 ViewModel에 없으므로 숨김 */}
+        {/* <div className={styles.playPatternSection}>
           <div className={styles.sectionHeader}>
             <h4 className={styles.sectionTitle}>최근 플레이 패턴</h4>
           </div>
           <div className={styles.barChartWrapper}>
-            <BarChart data={recentPlayPattern} size="s" showValues={true} />
+            <BarChart data={[]} size="s" showValues={true} />
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

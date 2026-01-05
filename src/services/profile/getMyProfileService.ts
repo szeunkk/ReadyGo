@@ -110,10 +110,11 @@ export const getMyProfileService = async (
 
   // 6. ProfileCoreDTO 반환
   // nickname, animalType 누락 허용 (기본값 자동 생성 ❌)
+  // tier는 필수 필드이므로 기본값(silver) 제공
   return {
     userId: profileRow.id,
     nickname: profileRow.nickname ?? undefined,
-    tier: profileRow.tier as TierType,
+    tier: (profileRow.tier as TierType) ?? TierType.silver,
     animalType: profileRow.animal_type as AnimalType | null | undefined,
     traits,
     schedule,

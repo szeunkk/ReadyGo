@@ -15,117 +15,109 @@
 
 ==============================================
 
-조건-파일경로) 참고 및 기준 파일 경로는 다음과 같다.
-	        - API Route(이미 존재): app/api/profile/[userId]/route.ts
-	        - DTO: src/commons/dto/profile/ProfileCoreDTO.ts
-	        - ViewModel 타입: src/features/profile/view-model/ProfileViewModel.ts (또는 프로젝트 내 동일 역할 파일)
-	        - DTO→VM 단일 진입 함수: src/features/profile/domain/toProfileViewModel.ts
-	        - Side Panel UI: src/features//components/SidePanel/ (프로젝트에서 실제 Side Panel 컴포넌트가 있는 경로를 찾아 적용)
-	        - (선호) Hook/Container 레벨: src/features/profile/hooks/** 또는 src/features/profile/containers/**
+조건-파일경로) 참고할 route handler 파일 경로
+	        - src/app/api/profile/[userId]/route.ts
+
+조건-파일경로) 참고할 profileDTO 파일 경로
+	        - src/commons/types/profile/profileCore.dto.ts
+
+조건-파일경로) 참고할 ViewModel 파일 경로
+	        - ViewModel 타입: src/viewmodels/profile/ProfileViewModel.ts)
+	        - DTO→VM 단일 진입 함수: src/viewmodels/profile/toProfileViewModel.ts
+
+조건-파일경로) 참고할 Side-Panel UI 파일 경로
+	        - 페이지컴포넌트: src/commons/side-panel/sidePanel.tsx
+			- UI컴포넌트 : src/commons/side-panel/ui/profilePanel.tsx
 
 ==============================================
 
 조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
-	•	“/api/profile/me UI 연결”에서 사용한 fetch/hook 패턴을 그대로 따른다 (loading/empty/error 상태 구조, fetch 호출 위치, dependency 처리 방식).
-	•	“DTO → ViewModel 변환”은 반드시 toProfileViewModel 단일 함수로 수행한다.
-	•	UI 컴포넌트는 가능한 한 ViewModel과 UI 상태만 받도록 유지한다(직접 DTO 사용 최소화).
+			- “/api/profile/me UI 연결”에서 사용한 fetch/hook 패턴을 그대로 따른다 (loading/empty/error 상태 구조, fetch 호출 위치, dependency 처리 방식).
+			- “DTO → ViewModel 변환”은 반드시 toProfileViewModel 단일 함수로 수행한다.
+			- UI 컴포넌트는 가능한 한 ViewModel과 UI 상태만 받도록 유지한다(직접 DTO 사용 최소화).
 
 ==============================================
 
 핵심요구사항) 다음 기능을 step-by-step으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
-
-{{CORE_REQUIREMENTS}}
 	1.	userId 전달 경로 확정 및 연결
-
-	•	Side Panel이 열릴 때 “대상 유저 userId”를 확실히 받을 수 있도록 한다.
-	•	userId는 다음 중 하나로 전달한다(코드베이스에 맞게 최적 선택):
-	•	props로 전달(권장: SidePanel open 트리거에서 userId를 함께 전달)
-	•	route param으로 전달(이미 SidePanel이 라우팅 기반이면 이 방식)
-	•	UI에서 “내 userId”를 만들거나 추출하는 로직 추가 금지. (auth.uid, supabase auth 호출 금지)
+			- Side Panel이 열릴 때 “대상 유저 userId”를 확실히 받을 수 있도록 한다.
+			- userId는 props로 전달한다(SidePanel open 트리거에서 userId를 함께 전달)
+			- UI에서 “내 userId”를 만들거나 추출하는 로직 추가 금지. (auth.uid, supabase auth 호출 금지)
 
 	2.	/api/profile/:userId fetch 로직 구현 (Hook 또는 Container 레벨)
-
-	•	새 훅(또는 컨테이너) 생성: 예) useProfileByUserId(userId: string | undefined)
-	•	내부에서 endpoint를 정확히 호출: GET /api/profile/${userId}
-	•	userId가 undefined/빈 문자열이면 요청하지 않고 상태를 empty로 둔다(불필요 요청 방지).
-	•	상태 모델을 명확히 정의(예시):
-	•	loading: boolean
-	•	viewModel?: ProfileViewModel
-	•	error?: { status: 403 | 404 | 500 | 401 | number }
-	•	empty: boolean (또는 viewModel undefined로 대체)
-	•	응답 처리 규칙:
-	•	200: JSON을 ProfileCoreDTO로 받고, toProfileViewModel(dto) 호출하여 viewModel 세팅
-	•	403: 권한 없음 상태로만 표시(문구 단순 처리)
-	•	404: 없음 상태로만 표시(문구 단순 처리)
-	•	그 외(500 포함): 일반 에러 상태로만 표시(문구 단순 처리)
-	•	“API 에러 문구 가공” 금지:
-	•	response.json()의 message를 UI 친화적으로 변환하지 말 것
-	•	UI에는 단지 상태(Forbidden/NotFound/Error)만 전달
-	•	domain 변환 함수(예: toRadarData 등)를 UI에서 직접 호출 금지.
-	•	ViewModel 변환은 오직 toProfileViewModel 단일 함수로 수행.
+			- 새 훅(또는 컨테이너) 생성: 예) useProfileByUserId(userId: string | undefined)
+			- 내부에서 endpoint를 정확히 호출: GET /api/profile/${userId}
+			- userId가 undefined/빈 문자열이면 요청하지 않고 상태를 empty로 둔다(불필요 요청 방지).
+			- 상태 모델을 명확히 정의(예시):
+				- loading: boolean
+				- viewModel?: ProfileViewModel
+				- error?: { status: 403 | 404 | 500 | 401 | number }
+				- empty: boolean (또는 viewModel undefined로 대체)
+			- 응답 처리 규칙:
+				- 200: JSON을 ProfileCoreDTO로 받고, toProfileViewModel(dto) 호출하여 viewModel 세팅
+				- 403: 권한 없음 상태로만 표시(문구 단순 처리)
+				- 404: 없음 상태로만 표시(문구 단순 처리)
+				- 그 외(500 포함): 일반 에러 상태로만 표시(문구 단순 처리)
+			- “API 에러 문구 가공” 금지:
+				- response.json()의 message를 UI 친화적으로 변환하지 말 것
+				- UI에는 단지 상태(Forbidden/NotFound/Error)만 전달
+				- domain 변환 함수(예: toRadarData 등)를 UI에서 직접 호출 금지.
+				- ViewModel 변환은 오직 toProfileViewModel 단일 함수로 수행.
 
 	3.	Side Panel UI 분기 구현 (권한/404/기타)
+			- Side Panel 컴포넌트는 훅/컨테이너에서 내려주는 상태를 기반으로만 렌더링 분기한다.
+			- 분기 최소 요구:
+				- loading: 스피너/스켈레톤/텍스트 “Loading” 등
+				- 403: “Forbidden” 또는 “Access denied” 수준의 단순 문구
+				- 404: “Not found” 수준의 단순 문구
+				- 기타 에러: “Error” 수준의 단순 문구
+			- 성공: ProfileViewModel 기반 UI 렌더
+			- UI는 endpoint/path, status code, auth 관련 세부 구현을 알 필요가 없도록 구성한다.
 
-	•	Side Panel 컴포넌트는 훅/컨테이너에서 내려주는 상태를 기반으로만 렌더링 분기한다.
-	•	분기 최소 요구:
-	•	loading: 스피너/스켈레톤/텍스트 “Loading” 등
-	•	403: “Forbidden” 또는 “Access denied” 수준의 단순 문구
-	•	404: “Not found” 수준의 단순 문구
-	•	기타 에러: “Error” 수준의 단순 문구
-	•	성공: ProfileViewModel 기반 UI 렌더
-	•	UI는 endpoint/path, status code, auth 관련 세부 구현을 알 필요가 없도록 구성한다.
-
-	4.	기존 mock/하드코딩 데이터 제거(해당 시)
-
-	•	Side Panel에 프로필 mock 데이터/상수/임시 state가 있으면 제거하고, 훅 결과로 대체한다.
-	•	단, ViewModel 구조 변경은 금지. (기존 UI가 요구하는 ViewModel 필드 유지)
+	4.	기존 mock/하드코딩 데이터 제거
+			- Side Panel에 프로필 mock 데이터/상수/임시 state가 있으면 제거하고, 훅 결과로 대체한다.
+			- 기존 UI에서 사용하던 mock데이터 필드에서 viwModel에서 제공하는 필드 외 추가 필드가 있을 시 체크리스트로 반환할 것.
 
 	5.	코드 품질/안전장치
-
-	•	fetch 중복 호출 방지(의존성 배열/abort controller 등, 기존 패턴과 일치)
-	•	컴포넌트 unmount 시 setState 경고 방지(기존 패턴 준수)
-	•	타입 단에서 ProfileCoreDTO/VM 경계 유지:
-	•	UI 컴포넌트 props로 ProfileCoreDTO를 넘기지 말고 ProfileViewModel만 넘긴다.
+			- fetch 중복 호출 방지(의존성 배열/abort controller 등, 기존 패턴과 일치)
+			- 컴포넌트 unmount 시 setState 경고 방지(기존 패턴 준수)
+			- 타입 단에서 ProfileCoreDTO/VM 경계 유지:
+				- UI 컴포넌트 props로 ProfileCoreDTO를 넘기지 말고 ProfileViewModel만 넘긴다.
 
 ==============================================
 
 조건-Hook 책임)
-{{HOOK_SCOPE}}
-	•	Hook/Container가 담당:
-	•	endpoint 호출: /api/profile/:userId
-	•	status 기반 상태 매핑(loading/forbidden/notFound/error/success)
-	•	성공 시 toProfileViewModel(dto) 단일 호출로 ViewModel 생성
-	•	Hook/Container가 담당하지 말아야 할 것:
-	•	auth 로직(내 userId 계산, 토큰 발급, 로그인 체크)
-	•	UI 문구 가공(서버 message를 재작성/해석)
-	•	도메인 변환 함수(toRadarData 등) 직접 호출(반드시 toProfileViewModel만)
+			- Hook/Container가 담당:
+				- endpoint 호출: /api/profile/:userId
+				- status 기반 상태 매핑(loading/forbidden/notFound/error/success)
+				- 성공 시 toProfileViewModel(dto) 단일 호출로 ViewModel 생성
+			- Hook/Container가 담당하지 말아야 할 것:
+				- auth 로직(내 userId 계산, 토큰 발급, 로그인 체크)
+				- UI 문구 가공(서버 message를 재작성/해석)
+				- 도메인 변환 함수(toRadarData 등) 직접 호출(반드시 toProfileViewModel만)
 
 ==============================================
 
 조건-UI 책임)
-{{UI_SCOPE}}
-	•	UI 컴포넌트가 담당:
-	•	userId를 props/route param으로 “전달받아” 훅에 넘김
-	•	훅의 상태에 따라 렌더링 분기
-	•	성공 시 ViewModel로만 화면 구성
-	•	UI 컴포넌트가 하면 안 되는 것:
-	•	/api/profile/:userId 외 endpoint 사용
-	•	auth 로직 추가
-	•	API 응답 가공/해석(문구 생성/상태 판정 고도화)
+			- UI 컴포넌트가 담당:
+				- userId를 props/route param으로 “전달받아” 훅에 넘김
+				- 훅의 상태에 따라 렌더링 분기
+				- 성공 시 ViewModel로만 화면 구성
+			- UI 컴포넌트가 하면 안 되는 것:
+				- /api/profile/:userId 외 endpoint 사용
+				- auth 로직 추가
+				- API 응답 가공/해석(문구 생성/상태 판정 고도화)
 
 ==============================================
 
 구현 완료 후 반환) 아래 체크리스트를 반드시 반환할 것.
-
-{{CHECKLIST}}
-✅ 구현 체크리스트 (반드시 채워서 반환)
-	•	Side Panel에서 userId를 props 또는 route param으로 전달하도록 연결했다 (UI에서 auth로 userId 만들지 않음)
-	•	/api/profile/:userId endpoint를 사용하여 fetch 로직을 Hook/Container 레벨에 구현했다
-	•	fetch 성공(200) 시 ProfileCoreDTO → toProfileViewModel 단일 함수로만 변환했다
-	•	UI 컴포넌트는 DTO를 직접 받지 않고 ViewModel과 상태만 받는다
-	•	403 / 404 / 기타 에러를 “UI 상태”로만 분기하고, 문구는 단순 처리했다 (서버 message 가공 ❌)
-	•	UI 레벨에 auth 로직(supabase auth 호출 등)을 추가하지 않았다
-	•	domain 변환 함수(toRadarData/toActiveTimeText/toAnimalMeta 등)를 UI에서 직접 호출하지 않았다
-	•	ViewModel 구조(ProfileViewModel 타입/필드)를 변경하지 않았다
-	•	Side Panel의 기존 mock/하드코딩 데이터가 있었다면 제거하고 API 기반으로 대체했다
-	•	타입/린트 경고 없이 빌드 가능한 상태로 정리했다
+			- Side Panel에서 userId를 props 또는 route param으로 전달하도록 연결했다 (UI에서 auth로 userId 만들지 않음)
+			- /api/profile/:userId endpoint를 사용하여 fetch 로직을 Hook/Container 레벨에 구현했다
+			- fetch 성공(200) 시 ProfileCoreDTO → toProfileViewModel 단일 함수로만 변환했다
+			- UI 컴포넌트는 DTO를 직접 받지 않고 ViewModel과 상태만 받는다
+			- 403 / 404 / 기타 에러를 “UI 상태”로만 분기하고, 문구는 단순 처리했다 (서버 message 가공 ❌)
+			- UI 레벨에 auth 로직(supabase auth 호출 등)을 추가하지 않았다
+			- domain 변환 함수(toRadarData/toActiveTimeText/toAnimalMeta 등)를 UI에서 직접 호출하지 않았다
+			- ViewModel 구조(ProfileViewModel 타입/필드)를 변경하지 않았다
+			- Side Panel의 기존 mock/하드코딩 데이터가 있었다면 제거하고 API 기반으로 대체했다
+			- 타입/린트 경고 없이 빌드 가능한 상태로 정리했다
