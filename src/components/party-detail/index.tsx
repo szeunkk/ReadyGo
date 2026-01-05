@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Icon from '@/commons/components/icon';
 import { URL_PATHS } from '@/commons/constants/url';
+import { useAuth } from '@/commons/providers/auth/auth.provider';
 import ChatNull from './ui/chat-null/chatNull';
 import ChatRoom from './ui/chat-room/chatRoom';
 import MemberList from './ui/member-list/memberList';
@@ -19,10 +20,14 @@ export default function PartyDetail() {
   const [isJoined, setIsJoined] = useState(false);
   const params = useParams();
   const partyId = params?.id as string | undefined;
+  const { user } = useAuth();
   const { data, isLoading, error, refetch } = usePartyBinding();
   const { openUpdateModal } = useLinkUpdateModal({ onRefetch: refetch });
   const { openDeleteModal } = useDeleteParty({ onRefetch: refetch });
   const { joinParty } = useJoinParty({ onRefetch: refetch });
+
+  // 작성자 여부 확인
+  const isCreator = data?.creator_id === user?.id;
 
   const handleJoinClick = async () => {
     if (partyId) {
@@ -84,26 +89,28 @@ export default function PartyDetail() {
                 </>
               ) : null}
             </div>
-            <div className={styles.buttonGroup}>
-              <button
-                className={styles.actionButton}
-                type="button"
-                onClick={handleEditClick}
-                data-testid="party-detail-edit-button"
-              >
-                <Icon name="edit" size={20} className={styles.buttonIcon} />
-                <span className={styles.buttonText}>수정하기</span>
-              </button>
-              <button
-                className={styles.actionButton}
-                type="button"
-                onClick={handleDeleteClick}
-                data-testid="party-detail-delete-button"
-              >
-                <Icon name="trash" size={20} className={styles.buttonIcon} />
-                <span className={styles.buttonText}>삭제하기</span>
-              </button>
-            </div>
+            {isCreator && (
+              <div className={styles.buttonGroup}>
+                <button
+                  className={styles.actionButton}
+                  type="button"
+                  onClick={handleEditClick}
+                  data-testid="party-detail-edit-button"
+                >
+                  <Icon name="edit" size={20} className={styles.buttonIcon} />
+                  <span className={styles.buttonText}>수정하기</span>
+                </button>
+                <button
+                  className={styles.actionButton}
+                  type="button"
+                  onClick={handleDeleteClick}
+                  data-testid="party-detail-delete-button"
+                >
+                  <Icon name="trash" size={20} className={styles.buttonIcon} />
+                  <span className={styles.buttonText}>삭제하기</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
