@@ -45,7 +45,7 @@ export const toPerfectMatchTypes = (
 
   // 궁합 데이터 조회
   const compatibility = getAnimalCompatibility(animalType);
-  
+
   // 궁합 데이터가 없는 경우 undefined 반환
   if (!compatibility) {
     return undefined;
@@ -64,4 +64,3 @@ export const toPerfectMatchTypes = (
 
   return perfectMatches;
 };
-

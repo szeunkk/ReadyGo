@@ -8,7 +8,6 @@ import ProfileSection from './ui/profile-section/profileSection';
 import { MatchCardProps } from './ui/match-section/card/matchCard';
 import { PartyCardProps } from './ui/party-section/card/partyCard';
 import { AnimalType } from '@/commons/constants/animal';
-import { TierType } from '@/commons/constants/tierType.enum';
 import { BarChartDataItem } from '@/commons/components/bar-chart';
 import { useGoogleOAuth } from '@/components/auth/hooks/useGoogleOAuth.hook';
 import { useKakaoOAuth } from '@/components/auth/hooks/useKakaoOAuth.hook';
