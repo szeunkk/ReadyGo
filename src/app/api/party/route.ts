@@ -174,6 +174,22 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
+    // party_members 테이블에 작성자를 leader로 자동 추가
+    const { error: memberError } = await supabase.from('party_members').insert({
+      post_id: insertData.id,
+      user_id: user.id,
+      role: 'leader',
+      joined_at: new Date().toISOString(),
+    });
+
+    if (memberError) {
+      console.error('Failed to add creator to party_members:', memberError);
+      return NextResponse.json(
+        { error: '파티 멤버 추가에 실패했습니다.' },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({ data: { id: insertData.id } }, { status: 201 });
   } catch (error) {
     console.error('Party create API error:', error);

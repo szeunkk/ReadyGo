@@ -12,6 +12,7 @@ import { useLinkModal } from './hooks/index.link.modal.hook';
 import { useInfinitePartyList } from './hooks/index.infinityScroll.hook';
 import { useLinkRouting } from './hooks/index.link.routing.hook';
 import { useFloatButton } from './hooks/index.float.hook';
+import { useJoinParty } from './hooks/index.join.hook';
 import styles from './styles.module.css';
 
 export default function Party() {
@@ -25,9 +26,17 @@ export default function Party() {
     loadMore,
     isLoading,
     error,
+    reset,
   } = useInfinitePartyList();
   const { navigateToPartyDetail } = useLinkRouting();
   const { scrollToTop } = useFloatButton();
+  const { joinParty } = useJoinParty({
+    onRefetch: async () => {
+      // 데이터 갱신을 위해 reset 호출
+      // reset()이 isInitialLoad를 true로 설정하면 useEffect가 자동으로 데이터를 불러옴
+      reset();
+    },
+  });
 
   // Layout의 children 영역(.children)의 스크롤을 감지하는 함수
   const getScrollParent = useCallback(() => {
@@ -122,7 +131,7 @@ export default function Party() {
                     {...party}
                     onJoinClick={() => {
                       if (party.partyId) {
-                        navigateToPartyDetail(party.partyId);
+                        joinParty(party.partyId);
                       }
                     }}
                   />
