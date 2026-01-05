@@ -99,7 +99,7 @@
   border: 2px solid var(--color-icon-interactive-inverse);
 }
 
-.status-ban {
+.status-dnd {
   background-color: var(--color-icon-danger);
   border: 2px solid var(--color-icon-interactive-inverse);
 }

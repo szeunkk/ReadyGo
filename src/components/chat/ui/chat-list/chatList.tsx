@@ -23,7 +23,7 @@ interface ChatRoomMember {
   nickname: string;
   animalType?: string;
   joined_at: string;
-  status?: 'online' | 'away' | 'ban' | 'offline';
+  status?: 'online' | 'away' | 'dnd' | 'offline';
 }
 
 interface ChatMessage {
@@ -201,7 +201,7 @@ export const mockChatRooms: ChatListItemData[] = [
         nickname: '차단된유저',
         animalType: 'wolf',
         joined_at: '2024-12-19T06:00:00Z',
-        status: 'ban',
+        status: 'dnd',
       },
     ],
     lastMessage: {

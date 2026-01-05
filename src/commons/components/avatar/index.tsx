@@ -5,7 +5,7 @@ import styles from './styles.module.css';
 import { AnimalType, getAnimalAssets } from '@/commons/constants/animal';
 
 export type AvatarSize = 's' | 'm' | 'L';
-export type AvatarStatus = 'online' | 'away' | 'ban' | 'offline';
+export type AvatarStatus = 'online' | 'away' | 'dnd' | 'offline';
 
 export interface AvatarProps {
   animalType?: AnimalType;
@@ -62,8 +62,8 @@ export default function Avatar({
         return '온라인';
       case 'away':
         return '자리비움';
-      case 'ban':
-        return '차단됨';
+      case 'dnd':
+        return '방해 금지';
       case 'offline':
         return '오프라인';
       default:
