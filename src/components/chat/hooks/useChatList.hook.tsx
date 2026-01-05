@@ -5,7 +5,10 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 import { supabase as baseSupabase } from '@/lib/supabase/client';
 import { useAuth } from '@/commons/providers/auth/auth.provider';
+import { getEffectiveStatus } from '@/stores/user-status.store';
+import { getAvatarImagePath } from '@/lib/avatar/getAvatarImagePath';
 import type { ChatRoomListItem } from '@/repositories/chat.repository';
+import type { ChatRoom, ChatMessage, UserProfile } from '@/types/chat';
 
 /**
  * 세션 확인 (Realtime 구독 전 인증 확인용)
@@ -54,6 +57,78 @@ const debounce = <T extends (...args: unknown[]) => void>(
 };
 
 /**
+ * 시간 포맷 함수 (24h 기준, 오늘은 시간, 그 외는 날짜)
+ */
+const formatMessageTime = (dateString: string | null): string => {
+  if (!dateString) {
+    return '';
+  }
+
+  const messageDate = new Date(dateString);
+  const now = new Date();
+  const isToday =
+    messageDate.getDate() === now.getDate() &&
+    messageDate.getMonth() === now.getMonth() &&
+    messageDate.getFullYear() === now.getFullYear();
+
+  if (isToday) {
+    const diffMs = now.getTime() - messageDate.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+
+    if (diffMins < 1) {
+      return '방금 전';
+    }
+    if (diffMins < 60) {
+      return `${diffMins}분 전`;
+    }
+    if (diffHours < 24) {
+      return `${diffHours}시간 전`;
+    }
+  }
+
+  const month = messageDate.getMonth() + 1;
+  const day = messageDate.getDate();
+  return `${month}월 ${day}일`;
+};
+
+/**
+ * 메시지 내용 포맷 함수
+ */
+const formatMessageContent = (message: ChatMessage | undefined): string => {
+  if (!message) {
+    return '메시지가 없습니다';
+  }
+
+  const contentType = message.content_type;
+  if (contentType === 'image') {
+    return '📷 이미지';
+  }
+  if (contentType === 'system') {
+    return message.content || '시스템 메시지';
+  }
+  return message.content || '메시지가 없습니다';
+};
+
+/**
+ * 채팅방 이름 생성 함수
+ */
+const getChatRoomName = (room: ChatRoom, otherMember?: UserProfile): string => {
+  const roomType = room.type ?? 'direct';
+
+  if (roomType === 'group') {
+    return '그룹 채팅';
+  }
+
+  // 1:1 채팅인 경우
+  if (otherMember?.nickname) {
+    return otherMember.nickname;
+  }
+
+  return '알 수 없음';
+};
+
+/**
  * Hook 파라미터 타입
  */
 export interface UseChatListProps {
@@ -62,10 +137,27 @@ export interface UseChatListProps {
 }
 
 /**
+ * 포맷된 채팅방 아이템 타입 (UI에서 바로 사용 가능)
+ */
+export interface FormattedChatRoomItem {
+  roomId: number;
+  roomName: string;
+  avatarImagePath: string;
+  userStatus: 'online' | 'away' | 'dnd' | 'offline';
+  messageContent: string;
+  messageTime: string;
+  unreadCount: number;
+  isSelected?: boolean;
+  // 원본 데이터 (필요한 경우)
+  originalData: ChatRoomListItem;
+}
+
+/**
  * Hook 반환 타입
  */
 export interface UseChatListReturn {
-  chatRooms: ChatRoomListItem[];
+  chatRooms: ChatRoomListItem[]; // 원본 데이터 (하위 호환성)
+  formattedChatRooms: FormattedChatRoomItem[]; // UI에서 바로 사용 가능한 포맷된 데이터
   isLoading: boolean;
   error: string | null;
   markRoomAsReadOptimistic: (roomId: number) => void; // 낙관적 업데이트 함수
@@ -337,17 +429,22 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
                 debouncedRefresh();
               }
             )
-            .subscribe((status) => {
+            .subscribe((status, err) => {
               if (status === 'SUBSCRIBED') {
                 // 구독 성공
               } else if (status === 'CHANNEL_ERROR') {
                 const errorMessage =
                   'Realtime error: Channel subscription failed';
-                console.error(errorMessage);
-                if (isMountedRef.current) {
-                  // 백그라운드 처리이므로 error 상태는 선택사항
-                  // setError(errorMessage);
+                console.error(errorMessage, err);
+                // Realtime 구독 실패해도 앱은 정상 동작 (폴링으로 대체)
+                // 에러 상태는 설정하지 않음 (백그라운드 기능이므로)
+                if (channelRef.current === channel) {
+                  channelRef.current = null;
+                  subscribedUserIdRef.current = null;
                 }
+              } else if (status === 'TIMED_OUT') {
+                console.warn('⚠️ Realtime subscription timed out');
+                // 타임아웃 시 재시도하지 않음 (폴링으로 대체)
                 if (channelRef.current === channel) {
                   channelRef.current = null;
                   subscribedUserIdRef.current = null;
@@ -366,7 +463,8 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
           const errorMessage = `Realtime error: Failed to setup postgres_changes subscription: ${
             err instanceof Error ? err.message : 'Unknown error'
           }`;
-          console.error(errorMessage);
+          console.error(errorMessage, err);
+          // Realtime 구독 실패해도 앱은 정상 동작 (폴링으로 대체)
           cleanupChannel();
         }
       };
@@ -495,8 +593,51 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
     };
   }, [cleanupChannel]);
 
+  /**
+   * 포맷된 채팅방 목록 계산 (UI에서 바로 사용 가능)
+   */
+  const formattedChatRooms = useMemo<FormattedChatRoomItem[]>(() => {
+    return chatRooms.map((item) => {
+      const { room, otherMember, lastMessage, unreadCount } = item;
+
+      // 채팅방 이름
+      const roomName = getChatRoomName(room, otherMember);
+
+      // 아바타 이미지 경로
+      const avatarImagePath = getAvatarImagePath(
+        otherMember?.avatar_url,
+        otherMember?.animal_type
+      );
+
+      // 사용자 상태
+      const userStatus = otherMember?.id
+        ? getEffectiveStatus(otherMember.id)
+        : 'offline';
+
+      // 메시지 내용
+      const messageContent = formatMessageContent(lastMessage);
+
+      // 메시지 시간
+      const messageTime = lastMessage?.created_at
+        ? formatMessageTime(lastMessage.created_at)
+        : '';
+
+      return {
+        roomId: room.id || 0,
+        roomName,
+        avatarImagePath,
+        userStatus,
+        messageContent,
+        messageTime,
+        unreadCount,
+        originalData: item,
+      };
+    });
+  }, [chatRooms]);
+
   return {
-    chatRooms,
+    chatRooms, // 하위 호환성을 위해 유지
+    formattedChatRooms,
     isLoading,
     error,
     markRoomAsReadOptimistic,

@@ -1,10 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
-
-// 타입 정의
-type ChatRoom = Database['public']['Tables']['chat_rooms']['Row'];
-type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
-type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
+import type { ChatRoom, ChatMessage, UserProfile } from '@/types/chat';
 
 export interface ChatRoomListItem {
   room: ChatRoom;
@@ -248,19 +244,26 @@ export const getUserChatRooms = async (
     }
   }
 
-  // 4차: 상대방 사용자 정보 조회 (1:1 채팅의 경우, N+1 문제 방지를 위해 한 번에 조회)
+  // 4차: 상대방 사용자 정보 조회 (chat_room_members의 user_id 기준으로 조회)
   const otherMemberMap = new Map<number, UserProfile>();
 
-  // 모든 방의 다른 멤버 조회 (한 번에)
-  const { data: allOtherMembers, error: otherMembersError } = await client
+  // chat_room_members에서 해당 방의 모든 멤버 조회 (한 번에)
+  // room_id가 null이 아닌 것만 조회
+  const { data: allMembers, error: allMembersError } = await client
     .from('chat_room_members')
     .select('room_id, user_id')
     .in('room_id', roomIds)
-    .neq('user_id', userId);
+    .not('room_id', 'is', null)
+    .not('user_id', 'is', null);
 
-  if (otherMembersError) {
-    throw otherMembersError;
+  if (allMembersError) {
+    throw allMembersError;
   }
+
+  // 현재 사용자가 아닌 다른 멤버 필터링
+  const allOtherMembers = (allMembers || []).filter(
+    (member) => member.user_id && member.user_id !== userId
+  );
 
   if (allOtherMembers && allOtherMembers.length > 0) {
     // room_id별로 첫 번째 멤버만 선택 (1:1 채팅이므로 각 방당 1명)
@@ -276,7 +279,9 @@ export const getUserChatRooms = async (
     }
 
     // 모든 상대방 user_id 수집
-    const otherUserIds = Array.from(roomToUserIdMap.values());
+    const otherUserIds = Array.from(roomToUserIdMap.values()).filter(
+      (id): id is string => id !== null && id !== undefined
+    );
 
     if (otherUserIds.length > 0) {
       // user_profiles 조회 (한 번에)
@@ -298,8 +303,7 @@ export const getUserChatRooms = async (
       }
 
       // room_id별로 상대방 프로필 매핑
-      Array.from(roomToUserIdMap.keys()).forEach((roomId) => {
-        const otherUserId = roomToUserIdMap.get(roomId);
+      Array.from(roomToUserIdMap.entries()).forEach(([roomId, otherUserId]) => {
         if (otherUserId) {
           const profile = profileMap.get(otherUserId);
           if (profile) {

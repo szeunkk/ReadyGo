@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAuthenticatedClient } from '../utils/auth';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { getUserChatRoomsService } from '@/services/chat/getUserChatRoomsService';
 import { ChatFetchError } from '@/commons/errors/chat/chatErrors';
 
@@ -41,7 +42,9 @@ export const GET = async (_request: NextRequest) => {
     const userId = user.id;
 
     // 3. Service 호출
-    const chatRooms = await getUserChatRoomsService(supabase, userId);
+    // RLS 정책을 우회하기 위해 admin 클라이언트 사용
+    // chat_room_members 테이블에서 다른 멤버를 조회하기 위해 필요
+    const chatRooms = await getUserChatRoomsService(supabaseAdmin, userId);
 
     // 4. 정상 응답
     return NextResponse.json({ data: chatRooms }, { status: 200 });
