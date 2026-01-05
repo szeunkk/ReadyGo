@@ -317,20 +317,16 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
           }
 
           // postgres_changes 채널 생성
+          // 채널 이름에 userId를 포함하여 고유성 보장
+          const channelName = `chat_list:${userId}:${Date.now()}`;
           const channel = baseSupabase
-            .channel(`chat_list:${userId}`)
-            .on(
-              'postgres_changes',
-              {
-                event: 'INSERT',
-                schema: 'public',
-                table: 'chat_rooms',
+            .channel(channelName, {
+              config: {
+                broadcast: { self: false },
+                presence: { key: userId },
               },
-              () => {
-                // chat_rooms INSERT: 새 채팅방 생성 시 목록에 추가
-                debouncedRefresh();
-              }
-            )
+            })
+            // chat_room_members: 사용자가 참여한 채팅방 변경 감지
             .on(
               'postgres_changes',
               {
@@ -340,7 +336,7 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
                 filter: `user_id=eq.${userId}`,
               },
               () => {
-                // chat_room_members INSERT: 사용자가 새 채팅방에 참여 시 목록에 추가
+                // 사용자가 새 채팅방에 참여 시 목록에 추가
                 debouncedRefresh();
               }
             )
@@ -353,10 +349,11 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
                 filter: `user_id=eq.${userId}`,
               },
               () => {
-                // chat_room_members DELETE: 사용자가 채팅방 탈퇴 시 목록에서 제거
+                // 사용자가 채팅방 탈퇴 시 목록에서 제거
                 debouncedRefresh();
               }
             )
+            // chat_rooms: 채팅방 정보 변경 감지 (사용자가 참여한 방만)
             .on(
               'postgres_changes',
               {
@@ -365,7 +362,7 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
                 table: 'chat_rooms',
               },
               () => {
-                // chat_rooms UPDATE: 채팅방 정보 변경 시 목록 업데이트
+                // 채팅방 정보 변경 시 목록 업데이트
                 debouncedRefresh();
               }
             )
@@ -377,10 +374,12 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
                 table: 'chat_rooms',
               },
               () => {
-                // chat_rooms DELETE: 채팅방 삭제 시 목록에서 제거
+                // 채팅방 삭제 시 목록에서 제거
                 debouncedRefresh();
               }
             )
+            // chat_messages: 새 메시지 수신 감지 (사용자가 참여한 방의 메시지만)
+            // RLS 정책에 의해 자동으로 필터링됨
             .on(
               'postgres_changes',
               {
@@ -389,10 +388,11 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
                 table: 'chat_messages',
               },
               () => {
-                // chat_messages INSERT: 새 메시지 수신 시 목록 업데이트
+                // 새 메시지 수신 시 목록 업데이트 (마지막 메시지, 시간 등)
                 debouncedRefresh();
               }
             )
+            // chat_message_reads: 읽음 처리 감지
             .on(
               'postgres_changes',
               {
@@ -402,9 +402,8 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
                 filter: `user_id=eq.${userId}`,
               },
               async (payload) => {
-                // chat_message_reads INSERT: 메시지 읽음 처리 시 unreadCount 업데이트
+                // 메시지 읽음 처리 시 unreadCount 업데이트
                 try {
-                  // 이벤트 페이로드에서 message_id 추출
                   const messageId = payload.new?.message_id;
 
                   if (messageId) {
@@ -416,7 +415,7 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
                       .single();
 
                     if (messageData?.room_id) {
-                      // 즉시 낙관적 업데이트 (0ms 지연)
+                      // 즉시 낙관적 업데이트
                       markRoomAsReadOptimistic(messageData.room_id);
                     }
                   }
@@ -437,7 +436,6 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
                   'Realtime error: Channel subscription failed';
                 console.error(errorMessage, err);
                 // Realtime 구독 실패해도 앱은 정상 동작 (폴링으로 대체)
-                // 에러 상태는 설정하지 않음 (백그라운드 기능이므로)
                 if (channelRef.current === channel) {
                   channelRef.current = null;
                   subscribedUserIdRef.current = null;
