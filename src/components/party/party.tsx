@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 import Selectbox, { type SelectboxItem } from '@/commons/components/selectbox';
 import Searchbar from '@/commons/components/searchbar';
@@ -12,12 +12,12 @@ import { useLinkModal } from './hooks/index.link.modal.hook';
 import { useInfinitePartyList } from './hooks/index.infinityScroll.hook';
 import { useLinkRouting } from './hooks/index.link.routing.hook';
 import { useFloatButton } from './hooks/index.float.hook';
+import { useFilter } from './hooks/index.filter.hook';
 import styles from './styles.module.css';
 
 export default function Party() {
-  const [selectedGenre, setSelectedGenre] = useState<string | undefined>(
-    undefined
-  );
+  const { selectedGenre, searchQuery, setSelectedGenre, setSearchQuery } =
+    useFilter();
   const { openPartySubmitModal } = useLinkModal();
   const {
     data: partyList,
@@ -25,7 +25,7 @@ export default function Party() {
     loadMore,
     isLoading,
     error,
-  } = useInfinitePartyList();
+  } = useInfinitePartyList(selectedGenre, searchQuery);
   const { navigateToPartyDetail } = useLinkRouting();
   const { scrollToTop } = useFloatButton();
 
@@ -40,15 +40,30 @@ export default function Party() {
   }, []);
 
   const genreItems: SelectboxItem[] = [
-    { id: 'all', value: '모든 게임 장르' },
-    { id: 'action', value: '액션' },
-    { id: 'rpg', value: 'RPG' },
-    { id: 'strategy', value: '전략' },
-    { id: 'sports', value: '스포츠' },
+    { id: 'all', value: '전체' },
+
+    { id: 'Action', value: '액션' },
+    { id: 'Adventure', value: '모험' },
+    { id: 'Casual', value: '캐주얼' },
+    { id: 'Early Access', value: '얼리 액세스' },
+    { id: 'Free To Play', value: '무료 플레이' },
+    { id: 'Indie', value: '인디' },
+    { id: 'Massively Multiplayer', value: 'MMO' },
+    { id: 'Nudity', value: '성인 요소' },
+    { id: 'Racing', value: '레이싱' },
+    { id: 'RPG', value: 'RPG' },
+    { id: 'Simulation', value: '시뮬레이션' },
+    { id: 'Sports', value: '스포츠' },
+    { id: 'Strategy', value: '전략' },
+    { id: 'Violent', value: '폭력성' },
   ];
 
   const handleGenreSelect = (item: SelectboxItem) => {
-    setSelectedGenre(item.id);
+    setSelectedGenre(item.id === 'all' ? undefined : item.id);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   return (
@@ -63,16 +78,20 @@ export default function Party() {
             <div className={styles.filterSelect}>
               <Selectbox
                 items={genreItems}
-                selectedId={selectedGenre}
+                selectedId={selectedGenre || 'all'}
                 onSelect={handleGenreSelect}
                 placeholder="모든 게임 장르"
                 className={styles.selectboxWidth}
+                data-testid="party-genre-select"
               />
             </div>
             <div className={styles.searchInput}>
               <Searchbar
                 placeholder="게임 이름으로 검색하기"
                 className={styles.searchbarWidth}
+                value={searchQuery}
+                onChange={handleSearchChange}
+                data-testid="party-search-input"
               />
             </div>
           </div>

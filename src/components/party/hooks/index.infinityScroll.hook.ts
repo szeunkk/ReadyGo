@@ -184,7 +184,10 @@ const truncateDescription = (
   return `${description.substring(0, maxLength)}...`;
 };
 
-export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
+export const useInfinitePartyList = (
+  genre?: string,
+  search?: string
+): UseInfinitePartyListReturn => {
   const [data, setData] = useState<PartyCardProps[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
@@ -220,6 +223,18 @@ export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
     []
   );
 
+  // 필터 변경 시 리셋
+  useEffect(() => {
+    // 필터가 변경되면 데이터 리셋 및 재로드
+    setData([]);
+    setHasMore(true);
+    setError(null);
+    setOffset(0);
+    setIsInitialLoad(true);
+    setIsLoading(true);
+    setIsLoadingMore(false);
+  }, [genre, search]);
+
   // 초기 로드
   useEffect(() => {
     if (!isInitialLoad) {
@@ -231,16 +246,25 @@ export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
         setIsLoading(true);
         setError(null);
 
-        const response = await fetch(
-          `/api/party?limit=${INITIAL_LIMIT}&offset=0`,
-          {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        // 필터 파라미터 구성
+        const params = new URLSearchParams({
+          limit: String(INITIAL_LIMIT),
+          offset: '0',
+        });
+        if (genre && genre !== 'all') {
+          params.append('genre', genre);
+        }
+        if (search && search.trim()) {
+          params.append('search', search.trim());
+        }
+
+        const response = await fetch(`/api/party?${params.toString()}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
         if (!response.ok) {
           if (response.status >= 400 && response.status < 500) {
@@ -307,7 +331,7 @@ export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
 
     fetchInitialData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInitialLoad]);
+  }, [isInitialLoad, genre, search]);
 
   // 추가 데이터 로드
   const loadMore = useCallback(async () => {
@@ -320,16 +344,25 @@ export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
       setIsLoadingMore(true);
       setError(null);
 
-      const response = await fetch(
-        `/api/party?limit=${SCROLL_LIMIT}&offset=${offset}`,
-        {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      // 필터 파라미터 구성
+      const params = new URLSearchParams({
+        limit: String(SCROLL_LIMIT),
+        offset: String(offset),
+      });
+      if (genre && genre !== 'all') {
+        params.append('genre', genre);
+      }
+      if (search && search.trim()) {
+        params.append('search', search.trim());
+      }
+
+      const response = await fetch(`/api/party?${params.toString()}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       if (!response.ok) {
         if (response.status >= 400 && response.status < 500) {
@@ -384,7 +417,7 @@ export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
     }
     // transformPartyData는 useCallback으로 감싸져 있고 의존성이 없으므로 안정적
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInitialLoad, isLoadingMore, hasMore, offset]);
+  }, [isInitialLoad, isLoadingMore, hasMore, offset, genre, search]);
 
   // reset 함수
   const reset = useCallback(() => {
