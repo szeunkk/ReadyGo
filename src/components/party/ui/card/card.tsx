@@ -82,6 +82,48 @@ export default function Card({
   const displayAvatars = memberAvatars.slice(0, 4);
   const remainingCount = Math.max(0, memberAvatars.length - 4);
 
+  // 시작 시간이 지났는지 확인하는 함수
+  // startTime 형식: "MM/DD 오전/오후 HH:mm" (예: "12/25 오후 03:30")
+  const isStartTimePassed = (startTime: string): boolean => {
+    try {
+      // "MM/DD 오전/오후 HH:mm" 형식 파싱
+      const match = startTime.match(
+        /(\d{2})\/(\d{2})\s+(오전|오후)\s+(\d{2}):(\d{2})/
+      );
+      if (!match) {
+        // 파싱 실패 시 false 반환 (비활성화하지 않음)
+        return false;
+      }
+
+      const [, monthStr, dayStr, period, hourStr, minuteStr] = match;
+      const month = parseInt(monthStr, 10) - 1; // JavaScript Date는 0부터 시작
+      const day = parseInt(dayStr, 10);
+      let hour = parseInt(hourStr, 10);
+      const minute = parseInt(minuteStr, 10);
+
+      // 오전/오후 처리
+      if (period === '오후' && hour !== 12) {
+        hour += 12;
+      } else if (period === '오전' && hour === 12) {
+        hour = 0;
+      }
+
+      // 현재 연도 사용
+      const currentYear = new Date().getFullYear();
+      const startDate = new Date(currentYear, month, day, hour, minute);
+      const now = new Date();
+
+      // 시작 시간이 현재 시간보다 이전인지 확인
+      return startDate < now;
+    } catch (error) {
+      // 파싱 오류 시 false 반환 (비활성화하지 않음)
+      console.error('시작 시간 파싱 오류:', error);
+      return false;
+    }
+  };
+
+  const isDisabled = isStartTimePassed(_categories.startTime);
+
   // data-testid 생성
   const cardTestId = partyId ? `party-card-${partyId}` : undefined;
   const titleTestId = partyId ? `party-card-title-${partyId}` : undefined;
@@ -109,6 +151,10 @@ export default function Card({
     : undefined;
 
   const handleDetailClick = () => {
+    // 시작 시간이 지났으면 클릭 무시
+    if (isDisabled) {
+      return;
+    }
     // onJoinClick이 있으면 먼저 실행
     if (onJoinClick) {
       onJoinClick();
@@ -249,11 +295,12 @@ export default function Card({
 
         {/* Button 영역 */}
         <Button
-          variant="primary"
+          variant={isDisabled ? 'outline' : 'primary'}
           size="m"
           shape="round"
           className={styles.joinButton}
           onClick={handleDetailClick}
+          disabled={isDisabled}
           data-testid={joinButtonTestId}
         >
           상세보기
