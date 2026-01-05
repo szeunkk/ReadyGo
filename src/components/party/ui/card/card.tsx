@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './styles.module.css';
 import Avatar from '@/commons/components/avatar';
 import Button from '@/commons/components/button';
@@ -74,6 +75,7 @@ export default function Card({
   className = '',
   partyId,
 }: PartyCardProps) {
+  const router = useRouter();
   const containerClasses = [styles.card, className].filter(Boolean).join(' ');
 
   // 표시할 아바타 개수 (최대 4개)
@@ -105,6 +107,17 @@ export default function Card({
   const joinButtonTestId = partyId
     ? `party-card-join-button-${partyId}`
     : undefined;
+
+  const handleDetailClick = () => {
+    // onJoinClick이 있으면 먼저 실행
+    if (onJoinClick) {
+      onJoinClick();
+    }
+    // partyId가 있으면 상세 페이지로 이동
+    if (partyId) {
+      router.push(`/party/${partyId}`);
+    }
+  };
 
   return (
     <div className={containerClasses} data-testid={cardTestId}>
@@ -240,7 +253,7 @@ export default function Card({
           size="m"
           shape="round"
           className={styles.joinButton}
-          onClick={onJoinClick}
+          onClick={handleDetailClick}
           data-testid={joinButtonTestId}
         >
           상세보기
