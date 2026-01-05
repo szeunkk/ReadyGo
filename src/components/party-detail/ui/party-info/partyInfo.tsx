@@ -98,13 +98,11 @@ export default function PartyInfo({
                   <Icon name="time" size={20} className={styles.infoIcon} />
                   <span className={styles.infoLabel}>시작 시간</span>
                 </div>
-                <span className={styles.infoValue}>
-                  <span data-testid="party-detail-start-date">
-                    {data.start_date}
-                  </span>{' '}
-                  <span data-testid="party-detail-start-time">
-                    {data.start_time}
-                  </span>
+                <span
+                  className={styles.infoValue}
+                  data-testid="party-detail-start-time"
+                >
+                  {data.start_time}
                 </span>
               </div>
               <div className={styles.infoItem}>
