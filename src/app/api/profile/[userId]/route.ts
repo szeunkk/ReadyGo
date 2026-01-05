@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { cookies } from 'next/headers';
+import { createClient } from '@supabase/supabase-js';
+// import { createClient } from '@/lib/supabase/server'; // TODO: server.ts 리팩토링 후 재도입
+import { Database } from '@/types/supabase';
 import { getUserProfileByUserId } from '@/services/profile/getUserProfileByUserId';
 import {
   ProfileNotFoundError,
   ProfileDataInconsistencyError,
   ProfileFetchError,
 } from '@/commons/errors/profile/profileErrors';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -25,12 +35,39 @@ export const dynamic = 'force-dynamic';
  * - 관계/차단/매칭 로직 금지
  */
 export const GET = async (
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { userId: string } }
 ) => {
   try {
-    // 1. Supabase 클라이언트 생성 (쿠키 자동 처리)
-    const supabase = createClient();
+    const cookieStore = cookies();
+    const authHeader = request.headers.get('authorization');
+    const headerToken = authHeader?.startsWith('Bearer ')
+      ? authHeader.slice(7)
+      : undefined;
+    const cookieToken = cookieStore.get('sb-access-token')?.value;
+    const accessToken = cookieToken || headerToken;
+
+    if (!accessToken) {
+      return NextResponse.json(
+        {
+          message: 'Unauthorized',
+          detail: 'Authentication required',
+        },
+        { status: 401 }
+      );
+    }
+
+    // TODO: server.ts 리팩토링이 완료되면 SSR 전용 client 사용으로 전환 검토
+    const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: false,
+      },
+      global: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    });
 
     // 2. 사용자 인증 확인
     const {
