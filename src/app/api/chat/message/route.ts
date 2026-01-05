@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAuthenticatedClient } from '../utils/auth';
 import { getChatMessagesService } from '@/services/chat/getChatMessagesService';
 import { sendMessageService } from '@/services/chat/sendMessageService';
 import {
@@ -24,16 +24,10 @@ export const dynamic = 'force-dynamic';
  */
 export const GET = async (request: NextRequest) => {
   try {
-    // 1. Supabase 클라이언트 생성 (쿠키 자동 처리)
-    const supabase = createClient();
+    // 1. 인증된 클라이언트 생성
+    const { supabase, user, error: authError } = await createAuthenticatedClient();
 
-    // 2. 사용자 정보 확인
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (authError || !supabase || !user) {
       return NextResponse.json(
         {
           message: 'Unauthorized',
@@ -124,16 +118,10 @@ export const GET = async (request: NextRequest) => {
  */
 export const POST = async (request: NextRequest) => {
   try {
-    // 1. Supabase 클라이언트 생성 (쿠키 자동 처리)
-    const supabase = createClient();
+    // 1. 인증된 클라이언트 생성
+    const { supabase, user, error: authError } = await createAuthenticatedClient();
 
-    // 2. 사용자 정보 확인
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (authError || !supabase || !user) {
       return NextResponse.json(
         {
           message: 'Unauthorized',

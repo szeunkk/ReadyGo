@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAuthenticatedClient } from '../../utils/auth';
 import { markRoomAsReadService } from '@/services/chat/markRoomAsReadService';
 import { markMessagesAsReadService } from '@/services/chat/markMessagesAsReadService';
 import {
@@ -25,16 +25,14 @@ export const dynamic = 'force-dynamic';
  */
 export const POST = async (request: NextRequest) => {
   try {
-    // 1. Supabase 클라이언트 생성 (쿠키 자동 처리)
-    const supabase = createClient();
-
-    // 2. 사용자 정보 확인
+    // 1. 인증된 클라이언트 생성
     const {
-      data: { user },
+      supabase,
+      user,
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await createAuthenticatedClient();
 
-    if (authError || !user) {
+    if (authError || !supabase || !user) {
       return NextResponse.json(
         {
           message: 'Unauthorized',
