@@ -21,4 +21,3 @@ export { calculateBaseSimilarity } from './calculateBaseSimilarity';
 export { calculateAnimalCompatibilityFactor } from './applyAnimalCompatibility';
 export { calculateScheduleCompatibilityFactor } from './calculateScheduleCompatibilityFactor';
 export { calculateOnlineFactor } from './calculateAvailabilityFactor';
-
