@@ -1,10 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
-
-// 타입 정의
-type ChatRoom = Database['public']['Tables']['chat_rooms']['Row'];
-type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
-type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
+import type { ChatRoom, ChatMessage, UserProfile } from '@/types/chat';
 
 export interface ChatRoomListItem {
   room: ChatRoom;
@@ -89,6 +85,19 @@ export const createChatRoom = async (
   client: SupabaseClient<Database>,
   memberIds: string[]
 ): Promise<ChatRoom> => {
+  // 세션 확인 (디버깅용)
+  const {
+    data: { session },
+  } = await client.auth.getSession();
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+  console.log('[Repository] createChatRoom - Session check:', {
+    hasSession: !!session,
+    userId: session?.user?.id || user?.id,
+    accessToken: session?.access_token ? 'present' : 'missing',
+  });
+
   // 새 채팅방 생성
   const { data: newRoom, error: roomError } = await client
     .from('chat_rooms')
@@ -97,6 +106,12 @@ export const createChatRoom = async (
     .single();
 
   if (roomError) {
+    console.error('[Repository] Error creating chat room:', {
+      message: roomError.message,
+      details: roomError.details,
+      hint: roomError.hint,
+      code: roomError.code,
+    });
     throw roomError;
   }
 
@@ -117,6 +132,14 @@ export const createChatRoom = async (
     .insert(membersData);
 
   if (membersError) {
+    console.error('[Repository] Error adding chat room members:', {
+      message: membersError.message,
+      details: membersError.details,
+      hint: membersError.hint,
+      code: membersError.code,
+      roomId: newRoom.id,
+      memberIds,
+    });
     throw membersError;
   }
 
@@ -248,19 +271,26 @@ export const getUserChatRooms = async (
     }
   }
 
-  // 4차: 상대방 사용자 정보 조회 (1:1 채팅의 경우, N+1 문제 방지를 위해 한 번에 조회)
+  // 4차: 상대방 사용자 정보 조회 (chat_room_members의 user_id 기준으로 조회)
   const otherMemberMap = new Map<number, UserProfile>();
 
-  // 모든 방의 다른 멤버 조회 (한 번에)
-  const { data: allOtherMembers, error: otherMembersError } = await client
+  // chat_room_members에서 해당 방의 모든 멤버 조회 (한 번에)
+  // room_id가 null이 아닌 것만 조회
+  const { data: allMembers, error: allMembersError } = await client
     .from('chat_room_members')
     .select('room_id, user_id')
     .in('room_id', roomIds)
-    .neq('user_id', userId);
+    .not('room_id', 'is', null)
+    .not('user_id', 'is', null);
 
-  if (otherMembersError) {
-    throw otherMembersError;
+  if (allMembersError) {
+    throw allMembersError;
   }
+
+  // 현재 사용자가 아닌 다른 멤버 필터링
+  const allOtherMembers = (allMembers || []).filter(
+    (member) => member.user_id && member.user_id !== userId
+  );
 
   if (allOtherMembers && allOtherMembers.length > 0) {
     // room_id별로 첫 번째 멤버만 선택 (1:1 채팅이므로 각 방당 1명)
@@ -276,7 +306,9 @@ export const getUserChatRooms = async (
     }
 
     // 모든 상대방 user_id 수집
-    const otherUserIds = Array.from(roomToUserIdMap.values());
+    const otherUserIds = Array.from(roomToUserIdMap.values()).filter(
+      (id): id is string => id !== null && id !== undefined
+    );
 
     if (otherUserIds.length > 0) {
       // user_profiles 조회 (한 번에)
@@ -298,8 +330,7 @@ export const getUserChatRooms = async (
       }
 
       // room_id별로 상대방 프로필 매핑
-      Array.from(roomToUserIdMap.keys()).forEach((roomId) => {
-        const otherUserId = roomToUserIdMap.get(roomId);
+      Array.from(roomToUserIdMap.entries()).forEach(([roomId, otherUserId]) => {
         if (otherUserId) {
           const profile = profileMap.get(otherUserId);
           if (profile) {
@@ -464,14 +495,39 @@ export const markMessagesAsRead = async (
     throw upsertError;
   }
 
-  // chat_messages 테이블의 is_read 필드도 업데이트
-  const { error: updateError } = await client
-    .from('chat_messages')
-    .update({ is_read: true })
-    .in('id', validMessageIds);
+  // chat_message_reads에 INSERT된 후 chat_messages.is_read를 true로 업데이트
+  // 주의: UPDATE RLS 정책이 필요함
+  try {
+    const { data: updateData, error: updateError } = await client
+      .from('chat_messages')
+      .update({ is_read: true })
+      .in('id', validMessageIds)
+      .select();
 
-  if (updateError) {
-    throw updateError;
+    if (updateError) {
+      console.error(
+        'Failed to update is_read in chat_messages:',
+        updateError,
+        'Message IDs:',
+        validMessageIds,
+        'Note: UPDATE RLS policy is required for chat_messages table'
+      );
+      // chat_message_reads는 성공했으므로 에러를 throw하지 않음
+      // 하지만 is_read 업데이트 실패는 로그로 기록
+    } else {
+      if (updateData && updateData.length > 0) {
+        console.log(
+          `Successfully updated is_read for ${updateData.length} messages`
+        );
+      } else {
+        console.warn(
+          'No messages were updated (is_read). This might be due to RLS policies or no matching messages.'
+        );
+      }
+    }
+  } catch (error) {
+    console.error('Unexpected error updating is_read:', error);
+    // chat_message_reads는 성공했으므로 에러를 throw하지 않음
   }
 };
 
@@ -536,32 +592,59 @@ export const markRoomAsRead = async (
   userId: string
 ): Promise<void> => {
   // 해당 채팅방에서 현재 사용자가 읽지 않은 모든 메시지 ID 조회
-  const { data: unreadMessages, error: messagesError } = await client
+  // chat_message_reads 테이블에 없는 메시지만 조회 (더 정확한 방법)
+  // 먼저 읽지 않은 메시지 ID를 조회
+  const { data: allMessages, error: allMessagesError } = await client
     .from('chat_messages')
     .select('id')
     .eq('room_id', roomId)
     .neq('sender_id', userId)
     .not('id', 'is', null);
 
-  if (messagesError) {
-    throw messagesError;
+  if (allMessagesError) {
+    throw allMessagesError;
   }
 
-  if (!unreadMessages || unreadMessages.length === 0) {
+  if (!allMessages || allMessages.length === 0) {
     return;
   }
 
-  // null이 아닌 id만 필터링
-  const messageIds = unreadMessages
+  const allMessageIds = allMessages
     .map((m) => (m as { id: number }).id)
     .filter((id): id is number => id !== null && typeof id === 'number');
 
-  if (messageIds.length === 0) {
+  if (allMessageIds.length === 0) {
+    return;
+  }
+
+  // 이미 읽음 처리된 메시지 ID 조회
+  const { data: readMessages, error: readMessagesError } = await client
+    .from('chat_message_reads')
+    .select('message_id')
+    .eq('user_id', userId)
+    .in('message_id', allMessageIds);
+
+  if (readMessagesError) {
+    throw readMessagesError;
+  }
+
+  const readMessageIds = new Set(
+    (readMessages || [])
+      .map((r) => (r as { message_id: number }).message_id)
+      .filter((id): id is number => id !== null)
+  );
+
+  // 읽지 않은 메시지 ID만 필터링
+  const unreadMessageIds = allMessageIds.filter(
+    (id) => !readMessageIds.has(id)
+  );
+
+  if (unreadMessageIds.length === 0) {
     return;
   }
 
   // markMessagesAsRead 함수를 활용하여 일괄 읽음 처리
-  await markMessagesAsRead(client, roomId, userId, messageIds);
+  await markMessagesAsRead(client, roomId, userId, unreadMessageIds);
 };
 
 // ============================================

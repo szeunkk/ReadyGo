@@ -15,57 +15,85 @@ export const useSignupSuccess = () => {
 
   useEffect(() => {
     const fetchNickname = async () => {
-      try {
-        // 1. API를 통해 현재 로그인한 유저 정보 조회
-        const sessionResponse = await fetch('/api/auth/session', {
-          method: 'GET',
-          credentials: 'include', // 쿠키 포함
-        });
+      // OAuth 콜백 직후 쿠키가 아직 반영되지 않았을 수 있으므로 재시도 로직 추가
+      let retryCount = 0;
+      const maxRetries = 5;
+      const retryDelay = 500; // 500ms
 
-        if (!sessionResponse.ok) {
-          console.error('Failed to get session');
-          router.replace(URL_PATHS.LOGIN);
-          return;
-        }
+      const tryFetchSession = async (): Promise<void> => {
+        try {
+          // 1. API를 통해 현재 로그인한 유저 정보 조회
+          const sessionResponse = await fetch('/api/auth/session', {
+            method: 'GET',
+            credentials: 'include', // 쿠키 포함
+          });
 
-        const sessionData = await sessionResponse.json();
+          if (!sessionResponse.ok) {
+            // 재시도 가능한 경우 재시도
+            if (retryCount < maxRetries) {
+              retryCount++;
+              setTimeout(tryFetchSession, retryDelay);
+              return;
+            }
+            console.error('Failed to get session');
+            router.replace(URL_PATHS.LOGIN);
+            return;
+          }
 
-        // 로그인 세션이 없는 경우 로그인 페이지로 리다이렉트
-        if (!sessionData.user || !sessionData.user.id) {
-          console.error('No user session found');
-          router.replace(URL_PATHS.LOGIN);
-          return;
-        }
+          const sessionData = await sessionResponse.json();
 
-        const userId = sessionData.user.id;
+          // 로그인 세션이 없는 경우 재시도 또는 리다이렉트
+          if (!sessionData.user || !sessionData.user.id) {
+            // 재시도 가능한 경우 재시도
+            if (retryCount < maxRetries) {
+              retryCount++;
+              setTimeout(tryFetchSession, retryDelay);
+              return;
+            }
+            console.error('No user session found');
+            router.replace(URL_PATHS.LOGIN);
+            return;
+          }
 
-        // 2. user_profiles 테이블에서 닉네임 조회
-        // Supabase 클라이언트는 데이터베이스 쿼리용으로 계속 사용
-        const { data: profile, error: profileError } = await supabase
-          .from('user_profiles')
-          .select('nickname')
-          .eq('id', userId)
-          .single();
+          const userId = sessionData.user.id;
 
-        if (profileError || !profile) {
-          console.error('Failed to fetch profile:', profileError);
+          // 2. user_profiles 테이블에서 닉네임 조회
+          // Supabase 클라이언트는 데이터베이스 쿼리용으로 계속 사용
+          const { data: profile, error: profileError } = await supabase
+            .from('user_profiles')
+            .select('nickname')
+            .eq('id', userId)
+            .single();
+
+          if (profileError || !profile) {
+            console.error('Failed to fetch profile:', profileError);
+            setNickname('');
+            setIsLoading(false);
+            return;
+          }
+
+          // 3. 닉네임 설정 (null이거나 빈 문자열인 경우 fallback)
+          if (profile.nickname && profile.nickname.trim()) {
+            setNickname(profile.nickname.trim());
+          } else {
+            setNickname('');
+          }
+          // 성공적으로 세션과 프로필을 가져온 경우 로딩 종료
+          setIsLoading(false);
+        } catch (error) {
+          // 재시도 가능한 경우 재시도
+          if (retryCount < maxRetries) {
+            retryCount++;
+            setTimeout(tryFetchSession, retryDelay);
+            return;
+          }
+          console.error('Unexpected error while fetching nickname:', error);
           setNickname('');
           setIsLoading(false);
-          return;
         }
+      };
 
-        // 3. 닉네임 설정 (null이거나 빈 문자열인 경우 fallback)
-        if (profile.nickname && profile.nickname.trim()) {
-          setNickname(profile.nickname.trim());
-        } else {
-          setNickname('');
-        }
-      } catch (error) {
-        console.error('Unexpected error while fetching nickname:', error);
-        setNickname('');
-      } finally {
-        setIsLoading(false);
-      }
+      tryFetchSession();
     };
 
     fetchNickname();

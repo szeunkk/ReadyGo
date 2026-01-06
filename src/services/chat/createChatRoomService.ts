@@ -6,7 +6,7 @@ import {
 } from '@/commons/errors/chat/chatErrors';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
-import type { ChatRoom } from '@/types/supabase';
+import type { ChatRoom } from '@/types/chat';
 
 /**
  * 새로운 1:1 채팅방 생성 Service
@@ -43,10 +43,14 @@ export const createChatRoomService = async (
       return existingRoom;
     }
   } catch (error) {
-    throw new ChatFetchError(
-      'room',
-      error instanceof Error ? error.message : 'Unknown error'
-    );
+    console.error('[Service] Error checking existing room:', error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : error && typeof error === 'object' && 'message' in error
+          ? String((error as any).message)
+          : 'Unknown error';
+    throw new ChatFetchError('room', errorMessage);
   }
 
   // 새 채팅방 생성
@@ -59,13 +63,27 @@ export const createChatRoomService = async (
 
     return newRoom;
   } catch (error) {
+    console.error('[Service] Error creating chat room:', error);
+
     if (error instanceof ChatCreateError || error instanceof ChatFetchError) {
       throw error;
     }
 
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : error && typeof error === 'object' && 'message' in error
+          ? String((error as any).message)
+          : 'Unknown error';
+
+    const errorDetails =
+      error && typeof error === 'object' && 'details' in error
+        ? String((error as any).details)
+        : undefined;
+
     throw new ChatCreateError(
       'room',
-      error instanceof Error ? error.message : 'Unknown error'
+      errorDetails ? `${errorMessage} (${errorDetails})` : errorMessage
     );
   }
 };

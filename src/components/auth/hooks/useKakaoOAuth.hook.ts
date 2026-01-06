@@ -188,6 +188,8 @@ export const useKakaoOAuth = () => {
           if (typeof window !== 'undefined') {
             localStorage.removeItem(OAUTH_PROCESSING_KEY);
           }
+          // 쿠키가 브라우저에 반영될 시간을 주기 위해 약간의 지연 후 페이지 이동
+          await new Promise((resolve) => setTimeout(resolve, 300));
           // 페이지 새로고침으로 세션 상태 동기화
           window.location.href = URL_PATHS.SIGNUP_SUCCESS;
         } else {
@@ -197,6 +199,8 @@ export const useKakaoOAuth = () => {
           if (typeof window !== 'undefined') {
             localStorage.removeItem(OAUTH_PROCESSING_KEY);
           }
+          // 쿠키가 브라우저에 반영될 시간을 주기 위해 약간의 지연 후 페이지 이동
+          await new Promise((resolve) => setTimeout(resolve, 300));
           // 페이지 새로고침으로 세션 상태 동기화
           window.location.href = URL_PATHS.HOME;
         }
