@@ -74,20 +74,41 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
       return;
     }
 
-    // 비로그인 상태: 테스트 환경이 아니면 모달 표시
+    // 비로그인 상태: OAuth 콜백 후 세션 동기화 지연을 고려하여 짧은 대기 후 확인
     if (!isTestEnv && !hasPromptedRef.current) {
-      hasPromptedRef.current = true;
+      // OAuth 콜백 후 세션 동기화가 완료될 때까지 대기 (최대 1초)
+      const checkAccessToken = async () => {
+        let retries = 0;
+        const maxRetries = 10; // 1초 (100ms * 10)
 
-      openModal({
-        variant: 'single',
-        title: '로그인이 필요합니다',
-        description: '이 페이지에 접근하려면 로그인이 필요합니다.',
-        confirmText: '확인',
-        onConfirm: () => {
-          closeAllModals();
-          loginRedirect();
-        },
-      });
+        while (retries < maxRetries) {
+          const currentAccessToken = useAuthStore.getState().accessToken;
+          if (currentAccessToken) {
+            // accessToken이 설정되었으면 모달 표시하지 않음
+            return;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          retries++;
+        }
+
+        // 1초 후에도 accessToken이 없으면 모달 표시
+        if (!useAuthStore.getState().accessToken && !hasPromptedRef.current) {
+          hasPromptedRef.current = true;
+
+          openModal({
+            variant: 'single',
+            title: '로그인이 필요합니다',
+            description: '이 페이지에 접근하려면 로그인이 필요합니다.',
+            confirmText: '확인',
+            onConfirm: () => {
+              closeAllModals();
+              loginRedirect();
+            },
+          });
+        }
+      };
+
+      checkAccessToken();
     }
   }, [
     isMounted,
