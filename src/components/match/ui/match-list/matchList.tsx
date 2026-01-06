@@ -10,7 +10,7 @@ import {
   matchRateOptions,
   statusOptions,
 } from '@/components/match/constants/filterOptions';
-import { MatchData } from '@/components/match/constants/mockData';
+import { MatchData } from '@/components/match/types/match.types';
 
 export interface MatchListProps {
   /**
@@ -105,6 +105,7 @@ export default function MatchList({
             nickname={match.nickname}
             matchRate={match.matchRate}
             status={match.status}
+            avatarUrl={match.avatarUrl}
             tags={match.tags}
             onProfileClick={() => onProfileClick(match.userId)}
             isProfileOpen={activeProfileUserId === match.userId}
