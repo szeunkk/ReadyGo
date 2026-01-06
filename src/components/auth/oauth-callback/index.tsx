@@ -140,6 +140,9 @@ export function OAuthCallbackHandler() {
             retries++;
           }
 
+          // 추가 대기: store 업데이트가 완전히 반영되도록 (AuthGuard 모달 방지)
+          await new Promise((resolve) => setTimeout(resolve, 200));
+
           // URL 정리
           window.history.replaceState({}, '', window.location.pathname);
 
@@ -239,6 +242,9 @@ export function OAuthCallbackHandler() {
                 retries++;
               }
 
+              // 추가 대기: store 업데이트가 완전히 반영되도록 (AuthGuard 모달 방지)
+              await new Promise((resolve) => setTimeout(resolve, 200));
+
               window.history.replaceState({}, '', window.location.pathname);
               router.replace(URL_PATHS.HOME);
               subscription?.unsubscribe();
@@ -261,6 +267,9 @@ export function OAuthCallbackHandler() {
               await new Promise((resolve) => setTimeout(resolve, 100));
               retries++;
             }
+
+            // 추가 대기: store 업데이트가 완전히 반영되도록 (AuthGuard 모달 방지)
+            await new Promise((resolve) => setTimeout(resolve, 200));
 
             // URL 정리
             window.history.replaceState({}, '', window.location.pathname);
@@ -359,6 +368,9 @@ export function OAuthCallbackHandler() {
               retries++;
             }
 
+            // 추가 대기: store 업데이트가 완전히 반영되도록 (AuthGuard 모달 방지)
+            await new Promise((resolve) => setTimeout(resolve, 200));
+
             window.history.replaceState({}, '', window.location.pathname);
             router.replace(URL_PATHS.HOME);
             subscription?.unsubscribe();
@@ -381,6 +393,9 @@ export function OAuthCallbackHandler() {
             await new Promise((resolve) => setTimeout(resolve, 100));
             retries++;
           }
+
+          // 추가 대기: store 업데이트가 완전히 반영되도록 (AuthGuard 모달 방지)
+          await new Promise((resolve) => setTimeout(resolve, 200));
 
           // URL 정리
           window.history.replaceState({}, '', window.location.pathname);
@@ -468,6 +483,9 @@ export function OAuthCallbackHandler() {
               retries++;
             }
 
+            // 추가 대기: store 업데이트가 완전히 반영되도록 (AuthGuard 모달 방지)
+            await new Promise((resolve) => setTimeout(resolve, 200));
+
             window.history.replaceState({}, '', window.location.pathname);
             router.replace(URL_PATHS.HOME);
             subscription?.unsubscribe();
@@ -490,6 +508,9 @@ export function OAuthCallbackHandler() {
             await new Promise((resolve) => setTimeout(resolve, 100));
             retries++;
           }
+
+          // 추가 대기: store 업데이트가 완전히 반영되도록 (AuthGuard 모달 방지)
+          await new Promise((resolve) => setTimeout(resolve, 200));
 
           // URL 정리
           window.history.replaceState({}, '', window.location.pathname);
