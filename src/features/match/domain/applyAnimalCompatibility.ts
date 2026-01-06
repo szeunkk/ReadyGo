@@ -13,12 +13,12 @@
  * 📌 출력:
  * - number: 동물 궁합 보정 적용된 점수 (0~100)
  *
- * 📌 계산 로직:
- * - 천생연분 (best): +7점
- * - 좋은 궁합 (good): +5점
+ * 📌 계산 로직 (비율 보정):
+ * - 천생연분 (best): baseScore × 1.10 (10% 증가)
+ * - 좋은 궁합 (good): baseScore × 1.07 (7% 증가)
  * - 중립 (neutral): 보정 미적용
- * - 도전적인 궁합 (challenging): -3점
- * - 동일한 동물: +3점
+ * - 도전적인 궁합 (challenging): baseScore × 0.95 (5% 감소)
+ * - 동일한 동물: baseScore × 1.05 (5% 증가)
  * - 궁합 정보 없음: 보정 미적용
  * - 동물 타입 미설정: 보정 미적용
  * - 최종 점수는 0~100 범위 내
@@ -48,7 +48,7 @@ import { getCompatibilityLevel } from '@/commons/constants/animal/animal.compat'
  *   }
  * };
  *
- * const score = applyAnimalCompatibility(80, context); // 87 (80 + 7)
+ * const score = applyAnimalCompatibility(80, context); // 88 (80 × 1.10)
  * ```
  *
  * @example
@@ -65,7 +65,7 @@ import { getCompatibilityLevel } from '@/commons/constants/animal/animal.compat'
  *   }
  * };
  *
- * const score = applyAnimalCompatibility(80, context); // 85 (80 + 5)
+ * const score = applyAnimalCompatibility(80, context); // 85.6 → 86 (80 × 1.07)
  * ```
  *
  * @example
@@ -82,7 +82,7 @@ import { getCompatibilityLevel } from '@/commons/constants/animal/animal.compat'
  *   }
  * };
  *
- * const score = applyAnimalCompatibility(80, context); // 77 (80 - 3)
+ * const score = applyAnimalCompatibility(80, context); // 76 (80 × 0.95)
  * ```
  *
  * @example
@@ -99,7 +99,7 @@ import { getCompatibilityLevel } from '@/commons/constants/animal/animal.compat'
  *   }
  * };
  *
- * const score = applyAnimalCompatibility(80, context); // 83 (80 + 3)
+ * const score = applyAnimalCompatibility(80, context); // 84 (80 × 1.05)
  * ```
  *
  * @example
@@ -126,29 +126,38 @@ export const applyAnimalCompatibility = (
     return baseScore;
   }
 
-  // 동일한 동물: +3점
+  // 동일한 동물: 5% 증가
   if (viewerAnimal === targetAnimal) {
-    return Math.min(100, baseScore + 3);
+    return Math.min(100, Math.round(baseScore * 1.05));
   }
 
   // 궁합 레벨 확인
   const compatibilityLevel = getCompatibilityLevel(viewerAnimal, targetAnimal);
 
-  // 궁합 레벨에 따른 점수 보정
+  // 궁합 레벨에 따른 점수 보정 (비율 적용)
+  let multiplier: number;
+
   switch (compatibilityLevel) {
     case 'best':
-      // 천생연분: +7점
-      return Math.min(100, baseScore + 7);
+      // 천생연분: 10% 증가
+      multiplier = 1.1;
+      break;
     case 'good':
-      // 좋은 궁합: +5점
-      return Math.min(100, baseScore + 5);
+      // 좋은 궁합: 7% 증가
+      multiplier = 1.07;
+      break;
     case 'challenging':
-      // 도전적인 궁합: -3점
-      return Math.max(0, baseScore - 3);
+      // 도전적인 궁합: 5% 감소
+      multiplier = 0.95;
+      break;
     case 'neutral':
     case 'unknown':
     default:
       // 중립 또는 정보 없음: 보정 미적용
-      return baseScore;
+      multiplier = 1.0;
+      break;
   }
+
+  const adjustedScore = baseScore * multiplier;
+  return Math.min(100, Math.max(0, Math.round(adjustedScore)));
 };
