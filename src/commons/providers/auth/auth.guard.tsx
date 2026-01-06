@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth.store';
 import { useAuth } from './auth.provider';
 import { useModal } from '../modal/modal.provider';
-import { isMemberOnlyPath, URL_PATHS } from '@/commons/constants/url';
-import { UnauthorizedPage } from './ui/UnauthorizedPage';
+import { isMemberOnlyPath } from '@/commons/constants/url';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -14,23 +13,17 @@ interface AuthGuardProps {
 
 /**
  * 페이지 접근 권한을 제어하는 가드 컴포넌트
- * - 초기 인가 완료 전까지는 빈 화면 유지
- * - 비회원의 회원 전용 경로 접근 시, 1회 모달 노출 후 로그인 페이지로 안내
+ * - 초기 인가 완료 전까지는 로딩 스피너 표시
+ * - 비회원의 회원 전용 경로 접근 시, 모달 노출 후 로그인 페이지로 안내
  * - 테스트 환경(NEXT_PUBLIC_TEST_ENV=test)에서는 항상 통과
- *
- * HttpOnly 쿠키 방식 전환에 따른 변경:
- * - AuthProvider의 세션 동기화 완료 상태를 확인하여 실제 API 호출 완료 후 인가 진행
- * - 고정 지연 대신 세션 동기화 완료를 명시적으로 확인
  */
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  const router = useRouter();
   const pathname = usePathname();
   const accessToken = useAuthStore((s) => s.accessToken);
-  const { isSessionSynced } = useAuth(); // 세션 동기화 완료 상태 확인
+  const { isSessionSynced, loginRedirect } = useAuth();
   const { openModal, closeAllModals } = useModal();
 
   const [isMounted, setIsMounted] = useState(false);
-  const [didAuthorize, setDidAuthorize] = useState(false);
   const hasPromptedRef = useRef(false);
 
   const isTestEnv = useMemo(() => {
@@ -53,19 +46,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     setIsMounted(true);
   }, []);
 
-  // AuthProvider의 세션 동기화 완료를 확인하여 인가 진행
-  useEffect(() => {
-    if (!isMounted) {
-      return;
-    }
-
-    // 세션 동기화가 완료되면 인가 진행
-    // HttpOnly 쿠키 방식: API 호출 완료 후 세션 상태가 store에 반영됨
-    if (isSessionSynced) {
-      setDidAuthorize(true);
-    }
-  }, [isMounted, isSessionSynced]);
-
   // 경로 변경 시 모달 플래그 리셋
   useEffect(() => {
     hasPromptedRef.current = false;
@@ -73,11 +53,11 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
   // 회원 전용 페이지 접근 제어
   useEffect(() => {
-    if (!isMounted || !didAuthorize) {
+    if (!isMounted || !isSessionSynced) {
       return;
     }
 
-    const isMemberPath = isMemberOnlyPath(pathname);
+    const isMemberPath = isMemberOnlyPath(pathname || '');
 
     // 공개 경로는 인가 검증 불필요
     if (!isMemberPath) {
@@ -105,19 +85,19 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
         confirmText: '확인',
         onConfirm: () => {
           closeAllModals();
-          router.push(URL_PATHS.LOGIN);
+          loginRedirect();
         },
       });
     }
   }, [
     isMounted,
-    didAuthorize,
+    isSessionSynced,
     pathname,
     accessToken,
     isTestEnv,
     openModal,
     closeAllModals,
-    router,
+    loginRedirect,
   ]);
 
   // 테스트 환경: 항상 통과
@@ -125,15 +105,45 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     return <>{children}</>;
   }
 
-  // 초기 마운트 또는 인가 전: 빈 화면
-  if (!isMounted || !didAuthorize) {
-    return null;
+  // 초기 마운트 또는 세션 동기화 전: 로딩 스피너 표시
+  if (!isMounted || !isSessionSynced) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <div
+          style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #3498db',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+          }}
+        />
+        <style jsx>{`
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
+      </div>
+    );
   }
 
   // 회원 전용 페이지 접근 제어
   if (pathname && isMemberOnlyPath(pathname) && !accessToken) {
-    // 빈 화면 유지 (모달은 useEffect에서 표시)
-    return <UnauthorizedPage />;
+    // 모달은 useEffect에서 표시, 빈 화면 유지
+    return null;
   }
 
   return <>{children}</>;

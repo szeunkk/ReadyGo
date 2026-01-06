@@ -8,7 +8,7 @@ import {
   useContext,
   useCallback,
 } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import type { User } from '@supabase/supabase-js';
 
 import { useAuthStore } from '@/stores/auth.store';
@@ -16,20 +16,13 @@ import { useSidePanelStore } from '@/stores/sidePanel.store';
 import { useOverlayStore } from '@/stores/overlay.store';
 import { URL_PATHS } from '@/commons/constants/url';
 
-// 공개 페이지 목록 (자동 리다이렉트 예외)
-const PUBLIC_PATHS = [
-  URL_PATHS.LOGIN,
-  URL_PATHS.SIGNUP,
-  URL_PATHS.SIGNUP_SUCCESS,
-  URL_PATHS.STEAM_CALLBACK,
-] as const;
-
 interface AuthContextValue {
   isLoggedIn: boolean;
   user: User | null;
   isSessionSynced: boolean; // 세션 동기화 완료 여부
   loginRedirect: () => void;
   logout: () => Promise<void>;
+  syncSession: () => Promise<void>; // 세션 동기화 함수 (외부 호출 가능)
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -48,10 +41,8 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const router = useRouter();
-  const pathname = usePathname();
   const { accessToken, user, setAuth, clearAuth } = useAuthStore();
   const isInitializedRef = useRef(false);
-  const isRedirectingRef = useRef(false);
   const isSessionSyncedRef = useRef(false);
   const [isSessionSynced, setIsSessionSynced] = useState(false); // 세션 동기화 완료 상태
   const storeRef = useRef({ accessToken, user });
@@ -149,37 +140,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
   }, [syncSessionToStore]);
 
-  // 로그인 상태 해제 시 자동 리다이렉트 (공개 페이지 제외)
-  useEffect(() => {
-    // 세션 동기화가 완료되지 않았으면 리다이렉트하지 않음
-    if (!isSessionSyncedRef.current) {
-      return;
-    }
-
-    // 이미 리다이렉트 중이면 무시
-    if (isRedirectingRef.current) {
-      return;
-    }
-
-    // 공개 페이지에서는 리다이렉트하지 않음
-    if (PUBLIC_PATHS.includes(pathname as (typeof PUBLIC_PATHS)[number])) {
-      return;
-    }
-
-    // 로그인 상태가 아니면 로그인 페이지로 리다이렉트
-    if (!accessToken) {
-      isRedirectingRef.current = true;
-      router.push(URL_PATHS.LOGIN);
-    }
-  }, [accessToken, pathname, router]);
-
-  // 리다이렉트 완료 후 플래그 리셋
-  useEffect(() => {
-    if (isRedirectingRef.current && pathname === URL_PATHS.LOGIN) {
-      isRedirectingRef.current = false;
-    }
-  }, [pathname]);
-
   // Context API 제공
   const loginRedirect = () => {
     router.push(URL_PATHS.LOGIN);
@@ -226,6 +186,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     isSessionSynced,
     loginRedirect,
     logout,
+    syncSession: syncSessionToStore,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

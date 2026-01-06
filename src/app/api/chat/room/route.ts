@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAuthenticatedClient } from '../utils/auth';
+import { createClient } from '@/lib/supabase/server';
 import { createChatRoomService } from '@/services/chat/createChatRoomService';
 import {
   ChatCreateError,
@@ -24,13 +24,13 @@ export const dynamic = 'force-dynamic';
 export const POST = async (request: NextRequest) => {
   try {
     // 1. 인증된 클라이언트 생성
+    const supabase = createClient();
     const {
-      supabase,
-      user,
+      data: { user },
       error: authError,
-    } = await createAuthenticatedClient();
+    } = await supabase.auth.getUser();
 
-    if (authError || !supabase || !user) {
+    if (authError || !user) {
       return NextResponse.json(
         {
           message: 'Unauthorized',
@@ -39,11 +39,6 @@ export const POST = async (request: NextRequest) => {
         { status: 401 }
       );
     }
-
-    // 세션 확인 (디버깅용)
-    const {
-      data: { session: _session },
-    } = await supabase.auth.getSession();
 
     // 3. 요청 본문 파싱
     const body = await request.json();

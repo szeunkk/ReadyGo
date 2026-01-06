@@ -10,7 +10,7 @@ test.describe('회원가입 폼', () => {
     });
   });
 
-  test.skip('성공 시나리오: 회원가입 성공 후 초기 데이터 생성 및 성공 페이지 이동', async ({
+  test('성공 시나리오: 회원가입 성공 후 초기 데이터 생성 및 성공 페이지 이동', async ({
     page,
   }) => {
     // 타임스탬프를 포함한 고유 이메일 생성
@@ -88,8 +88,35 @@ test.describe('회원가입 폼', () => {
       { timeout: 449, polling: 10 }
     );
 
+    // 회원가입 버튼 클릭 전에 API 호출 대기 설정
+    const signupApiPromise = page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/auth/signup') &&
+        response.request().method() === 'POST',
+      { timeout: 2000 }
+    );
+
+    const syncSessionApiPromise = page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/auth/session') &&
+        response.request().method() === 'GET',
+      { timeout: 2000 }
+    );
+
     // 회원가입 버튼 클릭
     await signupButton.click({ timeout: 500 });
+
+    // 회원가입 API 호출 확인
+    const signupResponse = await signupApiPromise;
+    expect(signupResponse.status()).toBe(200);
+    const signupData = await signupResponse.json();
+    expect(signupData.user).toBeDefined();
+    expect(signupData.user.id).toBeTruthy();
+    expect(signupData.user.email).toBe(email);
+
+    // syncSession API 호출 확인 (세션 동기화)
+    const syncSessionResponse = await syncSessionApiPromise;
+    expect(syncSessionResponse.status()).toBe(200);
 
     // 성공 페이지로 이동 확인 (data-testid 기반)
     // 실제 Supabase 연결이므로 시간이 더 걸릴 수 있음
@@ -195,15 +222,15 @@ test.describe('회원가입 폼', () => {
     }
   });
 
-  test.skip('실패 시나리오 1: auth.signUp 실패', async ({ page }) => {
-    // Supabase Auth signup 요청 모킹
-    await page.route('**/auth/v1/signup', async (route) => {
+  test('실패 시나리오 1: 회원가입 API 실패', async ({ page }) => {
+    // 회원가입 API 요청 모킹
+    await page.route('**/api/auth/signup', async (route) => {
+      // network 통신 모킹이므로 2000ms 미만
       await route.fulfill({
         status: 400,
         contentType: 'application/json',
         body: JSON.stringify({
-          error: 'signup_failed',
-          error_description: '회원가입에 실패했습니다.',
+          error: '이미 등록된 이메일입니다.',
         }),
       });
     });
@@ -287,17 +314,15 @@ test.describe('회원가입 폼', () => {
     await expect(page).toHaveURL(/.*signup/, { timeout: 500 });
   });
 
-  test.skip('실패 시나리오 2: 초기 데이터 생성 실패 (user_settings insert 실패)', async ({
-    page,
-  }) => {
-    // user_settings insert 요청만 실패시키기
-    await page.route('**/rest/v1/user_settings**', async (route) => {
+  test('실패 시나리오 2: 프로필 생성 실패', async ({ page }) => {
+    // 회원가입 API에서 프로필 생성 실패 시나리오 모킹
+    await page.route('**/api/auth/signup', async (route) => {
+      // network 통신 모킹이므로 2000ms 미만
       await route.fulfill({
         status: 500,
         contentType: 'application/json',
         body: JSON.stringify({
-          message: 'Internal server error',
-          code: 'PGRST500',
+          error: '프로필 생성에 실패했습니다.',
         }),
       });
     });

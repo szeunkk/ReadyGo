@@ -30,15 +30,30 @@ test.describe('회원가입 성공 페이지', () => {
       // 리다이렉트되지 않은 경우 (로그인 세션이 있음) 테스트 계속
     }
 
-    // 성공 페이지가 표시되었는지 확인
+    // syncSession API 호출 확인 (useAuth의 syncSession 호출)
+    const syncSessionApiPromise = page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/auth/session') &&
+        response.request().method() === 'GET',
+      { timeout: 2000 }
+    ).catch(() => null); // 이미 동기화된 경우 호출되지 않을 수 있음
+
+    // 성공 페이지가 표시되었는지 확인 (data-testid 기반)
+    // network 통신 후 페이지 로드이므로 2000ms 미만
     const successElement = page.locator(
       '[data-testid="auth-signup-success-page"]'
     );
-    await expect(successElement).toBeVisible();
+    await expect(successElement).toBeVisible({ timeout: 2000 });
+
+    // syncSession 호출이 있었다면 완료 대기
+    if (syncSessionApiPromise) {
+      await syncSessionApiPromise;
+    }
 
     // 타이틀에 닉네임이 포함되어 있는지 확인 (Supabase user_profiles에서 조회된 닉네임)
+    // network 통신이 아닌 UI 상태 확인이므로 500ms 미만
     const title = page.locator('h1.title');
-    await expect(title).toContainText('님, 환영합니다!');
+    await expect(title).toContainText('님, 환영합니다!', { timeout: 500 });
   });
 
   test('게임 성향 분석 테스트 버튼 클릭 시 /traits로 이동', async ({
@@ -54,17 +69,34 @@ test.describe('회원가입 성공 페이지', () => {
       // 리다이렉트되지 않은 경우 테스트 계속
     }
 
-    // 성공 페이지 대기
+    // 성공 페이지 대기 (data-testid 기반)
+    // network 통신 후 페이지 로드이므로 2000ms 미만
     await page.waitForSelector('[data-testid="auth-signup-success-page"]', {
       timeout: 2000,
     });
 
+    // syncSession 호출 가능성 확인 (isSessionSynced가 false인 경우)
+    const syncSessionApiPromise = page
+      .waitForResponse(
+        (response) =>
+          response.url().includes('/api/auth/session') &&
+          response.request().method() === 'GET',
+        { timeout: 2000 }
+      )
+      .catch(() => null);
+
     const traitsButton = page.locator(
       'button:has-text("게임 성향 분석 테스트하기")'
     );
-    await traitsButton.click();
+    await traitsButton.click({ timeout: 500 });
+
+    // syncSession이 호출되었다면 완료 대기
+    if (syncSessionApiPromise) {
+      await syncSessionApiPromise;
+    }
 
     // /traits 페이지로 이동 확인
+    // network 통신 후 페이지 이동이므로 2000ms 미만
     await expect(page).toHaveURL(/.*\/traits/, { timeout: 2000 });
   });
 
