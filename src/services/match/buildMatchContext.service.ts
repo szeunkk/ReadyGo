@@ -153,7 +153,7 @@ export const buildMatchContext = async (
  * - 기본값 삽입 ❌
  * - 계산 / 점수화 ❌
  */
-function assembleTraitsContext(
+const assembleTraitsContext = (
   traitsData: {
     cooperation: number;
     exploration: number;
@@ -162,7 +162,7 @@ function assembleTraitsContext(
     social: number;
   } | null,
   profileData: { animal_type: string | null } | null
-) {
+) => {
   // traits 데이터가 없으면 undefined 반환
   if (!traitsData) {
     return undefined;
@@ -187,7 +187,7 @@ function assembleTraitsContext(
     traits,
     animalType,
   };
-}
+};
 
 /**
  * Activity Context 조립 (내부 헬퍼)
@@ -203,9 +203,9 @@ function assembleTraitsContext(
  * - 기본값 강제 ❌
  * - 빈 배열 강제 ❌
  */
-function assembleActivityContext(
+const assembleActivityContext = (
   schedulesData: { day_type: string; time_slot: string }[] | null
-) {
+) => {
   // schedule 데이터가 null이거나 빈 배열이면 undefined 반환
   if (schedulesData === null || schedulesData.length === 0) {
     return undefined;
@@ -222,4 +222,4 @@ function assembleActivityContext(
   return {
     schedule,
   };
-}
+};

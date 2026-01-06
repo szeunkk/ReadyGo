@@ -125,4 +125,3 @@ export const getBlockedUserIds = async (
 
   return userIds;
 };
-

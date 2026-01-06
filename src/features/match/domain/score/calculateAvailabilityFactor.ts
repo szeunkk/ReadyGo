@@ -83,9 +83,7 @@ import type { MatchContextCoreDTO } from '@/commons/types/match/matchContextCore
  * // → 성향이 잘 맞는 사람이 여전히 위에 위치
  * ```
  */
-export const calculateOnlineFactor = (
-  context: MatchContextCoreDTO
-): number => {
+export const calculateOnlineFactor = (context: MatchContextCoreDTO): number => {
   // Target 온라인 상태 확인
   const targetOnline = context.target.activity?.isOnline ?? false;
 
