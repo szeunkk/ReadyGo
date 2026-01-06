@@ -4,10 +4,12 @@ import { useRef, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useRouter } from 'next/navigation';
 
 import { URL_PATHS } from '@/commons/constants/url';
 import { useModal } from '@/commons/providers/modal';
 import { CheckboxStatus } from '@/commons/components/checkbox';
+import { useAuth } from '@/commons/providers/auth/auth.provider';
 
 // Zod 스키마 정의
 const loginSchema = z.object({
@@ -31,7 +33,9 @@ type LoginFormData = z.infer<typeof loginSchema>;
 const REMEMBERED_EMAIL_KEY = 'rememberedEmail';
 
 export const useLoginForm = () => {
+  const router = useRouter();
   const { openModal, closeAllModals } = useModal();
+  const { syncSession } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const hasShownSuccessModalRef = useRef(false);
   const hasShownErrorModalRef = useRef(false);
@@ -154,8 +158,8 @@ export const useLoginForm = () => {
       }
 
       // 3. 로그인 성공 후 처리
-      // HttpOnly 쿠키에 토큰이 저장되므로 별도 처리 불필요
-      // 페이지 새로고침으로 세션 상태 동기화
+      // 세션 동기화
+      await syncSession();
 
       // 로그인완료모달 노출 (한 번만)
       if (!hasShownSuccessModalRef.current) {
@@ -167,8 +171,8 @@ export const useLoginForm = () => {
           confirmText: '확인',
           onConfirm: () => {
             closeAllModals();
-            // 페이지 새로고침으로 세션 상태 동기화
-            window.location.href = URL_PATHS.HOME;
+            // 부드러운 페이지 이동
+            router.push(URL_PATHS.HOME);
           },
         });
       }

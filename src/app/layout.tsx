@@ -8,12 +8,15 @@ import { NextThemesProvider } from '../commons/providers/next-themes/next-themes
 import { ModalProvider } from '../commons/providers/modal/modal.provider';
 import { AuthGuard } from '../commons/providers/auth/auth.guard';
 import { Layout } from '../commons/layout';
+import { OAuthCallbackHandler } from '../components/auth/oauth-callback';
 
 const pretendard = localFont({
   src: '../fonts/PretendardVariable.woff2',
   variable: '--font-pretendard',
   weight: '100 900',
   display: 'swap',
+  preload: false, // 폰트 preload 비활성화 (경고 방지)
+  fallback: ['-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
 });
 
 export const metadata: Metadata = {
@@ -37,6 +40,7 @@ export default function RootLayout({
             <UserStatusProvider>
               <NextThemesProvider>
                 <ModalProvider>
+                  <OAuthCallbackHandler />
                   <AuthGuard>
                     <Layout>{children}</Layout>
                   </AuthGuard>
