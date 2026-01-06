@@ -14,7 +14,7 @@ export const useKakaoOAuth = () => {
       const { origin } = window.location;
       // Supabase 리다이렉트 URL이 루트만 등록되어 있으므로 루트로 리다이렉트
       const redirectTo = origin;
-      
+
       // eslint-disable-next-line no-console
       console.log('=== Kakao OAuth Started ===', {
         origin,

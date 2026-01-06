@@ -561,11 +561,21 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
   );
 
   /**
-   * roomId 변경 시 자동 처리
+   * roomId 또는 user?.id 변경 시 자동 처리
    */
   useEffect(() => {
     // roomId가 유효하지 않으면 early return
     if (!roomId || roomId <= 0) {
+      cleanupChannel();
+      setMessages([]);
+      seenMessageIdsRef.current.clear();
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
+    // user?.id가 없으면 채널 정리만 수행
+    if (!user?.id) {
       cleanupChannel();
       setMessages([]);
       seenMessageIdsRef.current.clear();
@@ -584,11 +594,6 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
     // error 상태 초기화
     setError(null);
 
-    if (!user?.id) {
-      setIsLoading(false);
-      return;
-    }
-
     // 초기 메시지 로드
     loadMessages(roomId).then(async () => {
       // postgres_changes 구독
@@ -602,42 +607,6 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, user?.id]);
-
-  /**
-   * user?.id 변경 시 cleanup 및 재로딩
-   */
-  useEffect(() => {
-    // roomId가 유효하지 않으면 early return
-    if (!roomId || roomId <= 0) {
-      cleanupChannel();
-      setMessages([]);
-      seenMessageIdsRef.current.clear();
-      setIsLoading(false);
-      return;
-    }
-
-    if (!user?.id) {
-      // 채널 정리
-      cleanupChannel();
-      // messages 배열 초기화
-      setMessages([]);
-      seenMessageIdsRef.current.clear();
-      // isLoading 리셋
-      setIsLoading(true);
-    } else {
-      // user?.id가 다시 설정되면 자동으로 재로딩 및 재구독
-      loadMessages(roomId).then(async () => {
-        subscribeToPostgresChanges(roomId);
-        // 읽음 처리 (await로 에러 확인)
-        try {
-          await markRoomAsRead(roomId);
-        } catch (error) {
-          console.error('Failed to mark room as read:', error);
-        }
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, roomId]);
 
   /**
    * 컴포넌트 언마운트 시 cleanup

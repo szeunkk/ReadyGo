@@ -73,9 +73,9 @@ export const createUserProfile = async function (
   if (statusError) {
     console.error('User status creation error:', statusError);
     // profiles와 settings는 생성되었지만 user_status 생성 실패
-      throw new Error(
-        statusError.message ||
-          '사용자 상태 생성에 실패했습니다. RLS 정책을 확인하세요.'
-      );
-    }
-  };
+    throw new Error(
+      statusError.message ||
+        '사용자 상태 생성에 실패했습니다. RLS 정책을 확인하세요.'
+    );
+  }
+};

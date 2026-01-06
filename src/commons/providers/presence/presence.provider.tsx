@@ -36,7 +36,7 @@ export const PresenceProvider = ({ children }: PresenceProviderProps) => {
         const channelToRemove = channelRef.current;
         channelRef.current = null;
         subscribedUserIdRef.current = null;
-        
+
         // Presence를 먼저 untrack하여 다른 클라이언트에 leave 이벤트 전송
         channelToRemove
           .untrack()
@@ -183,7 +183,7 @@ export const PresenceProvider = ({ children }: PresenceProviderProps) => {
         const channelToRemove = channelRef.current;
         channelRef.current = null;
         subscribedUserIdRef.current = null;
-        
+
         // Presence를 먼저 untrack하여 다른 클라이언트에 leave 이벤트 전송
         channelToRemove
           .untrack()

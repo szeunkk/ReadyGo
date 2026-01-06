@@ -95,9 +95,7 @@ export const useSignupForm = () => {
       const signupData = await signupResponse.json();
 
       if (!signupResponse.ok) {
-        throw new Error(
-          signupData.error || '회원가입에 실패했습니다.'
-        );
+        throw new Error(signupData.error || '회원가입에 실패했습니다.');
       }
 
       // 2. 세션 동기화 (회원가입 API에서 세션이 자동으로 설정되었으므로 동기화만 수행)
