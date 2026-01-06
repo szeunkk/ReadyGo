@@ -97,20 +97,20 @@ export const POST = async function (request: NextRequest) {
 
     // 프로필 확인
     const hasProfile = await checkUserProfile(supabase, data.user.id);
-    
+
     // 사용자 생성 시점과 마지막 로그인 시점 비교로 신규 유저 판단
     const userCreatedAt = new Date(data.user.created_at);
-    const lastSignInAt = data.user.last_sign_in_at 
-      ? new Date(data.user.last_sign_in_at) 
+    const lastSignInAt = data.user.last_sign_in_at
+      ? new Date(data.user.last_sign_in_at)
       : null;
-    
+
     // 생성 시점과 마지막 로그인 시점이 같거나 매우 가까우면 신규 유저로 판단 (5초 이내)
-    const isNewUserByTime = !lastSignInAt || 
-      (lastSignInAt.getTime() - userCreatedAt.getTime()) < 5000;
-    
+    const isNewUserByTime =
+      !lastSignInAt || lastSignInAt.getTime() - userCreatedAt.getTime() < 5000;
+
     // 프로필이 없거나, 생성 시점이 최근이면 신규 유저
     const isNewUser = !hasProfile || isNewUserByTime;
-    
+
     // eslint-disable-next-line no-console
     console.log('OAuth session API - Profile check result', {
       userId: data.user.id,
@@ -127,7 +127,7 @@ export const POST = async function (request: NextRequest) {
         // eslint-disable-next-line no-console
         console.log('OAuth session API - Creating profile for new user');
         await createUserProfile(supabase, data.user.id);
-        
+
         // 프로필 생성 성공
         const response = NextResponse.json({
           success: true,
@@ -158,10 +158,15 @@ export const POST = async function (request: NextRequest) {
         const error = profileError as { code?: string };
         if (error?.code === '23505') {
           // eslint-disable-next-line no-console
-          console.log('OAuth session API - Profile already exists (race condition)');
+          console.log(
+            'OAuth session API - Profile already exists (race condition)'
+          );
           // 프로필이 이미 있으므로 다시 확인
-          const hasProfileAfterError = await checkUserProfile(supabase, data.user.id);
-          
+          const hasProfileAfterError = await checkUserProfile(
+            supabase,
+            data.user.id
+          );
+
           if (hasProfileAfterError) {
             // 프로필이 있으면 기존 유저로 처리
             const response = NextResponse.json({
@@ -183,13 +188,16 @@ export const POST = async function (request: NextRequest) {
             });
 
             // eslint-disable-next-line no-console
-            console.log('OAuth session API - Returning existing user response (after race condition)', {
-              cookiesIncluded: supabaseCookies.length,
-            });
+            console.log(
+              'OAuth session API - Returning existing user response (after race condition)',
+              {
+                cookiesIncluded: supabaseCookies.length,
+              }
+            );
             return response;
           }
         }
-        
+
         // eslint-disable-next-line no-console
         console.error(
           'OAuth session API - Profile creation error:',
@@ -205,7 +213,7 @@ export const POST = async function (request: NextRequest) {
     // 기존 유저 또는 프로필이 있는 경우
     // 프로필이 이미 있으면 무조건 기존 유저로 처리
     const finalIsNewUser = hasProfile ? false : isNewUser;
-    
+
     // eslint-disable-next-line no-console
     console.log('OAuth session API - Returning response', {
       isNewUser,

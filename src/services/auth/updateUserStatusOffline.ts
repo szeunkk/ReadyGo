@@ -4,7 +4,9 @@ import { createClient } from '@/lib/supabase/server';
  * 로그아웃 시 user_status를 offline으로 업데이트
  * @param userId - 사용자 ID
  */
-export const updateUserStatusOffline = async function (userId: string): Promise<void> {
+export const updateUserStatusOffline = async function (
+  userId: string
+): Promise<void> {
   try {
     const supabase = createClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,4 +25,3 @@ export const updateUserStatusOffline = async function (userId: string): Promise<
     console.error('Failed to update user_status to offline:', error);
   }
 };
-

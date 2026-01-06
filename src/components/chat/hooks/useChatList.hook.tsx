@@ -484,7 +484,6 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
     };
   }, [autoRefresh, refreshInterval, user?.id, refresh]);
 
-
   /**
    * 컴포넌트 언마운트 시 cleanup
    */

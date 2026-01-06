@@ -1,18 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useChatRoom, useChatList } from '@/components/chat/hooks';
 import { useAuth } from '@/commons/providers/auth/auth.provider';
-import { supabase } from '@/lib/supabase/client';
 import Button from '@/commons/components/button';
 import Input from '@/commons/components/input';
 import AnimalCard from '@/commons/components/animal-card';
 import { AnimalType } from '@/commons/constants/animal';
 import { TierType } from '@/commons/constants/tierType.enum';
-import type { Database } from '@/types/supabase';
-
-// 타입 정의
-type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
 
 // 테스트할 유저 UUID
 const TEST_USER_ID = 'da532b5d-60ac-46b8-a725-3c38845b15ac';
@@ -26,13 +21,14 @@ export default function RealtimeChatTestPage() {
   const [messageContent, setMessageContent] = useState('');
   const [otherUserId, setOtherUserId] = useState('');
 
-  // 프로필 데이터
-  const [profileNickname, setProfileNickname] = useState<string>('');
-  const [profileNickname2, setProfileNickname2] = useState<string>('');
-  const [profileNickname3, setProfileNickname3] = useState<string>('');
-  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
-  const [isLoadingProfile2, setIsLoadingProfile2] = useState(true);
-  const [isLoadingProfile3, setIsLoadingProfile3] = useState(true);
+  // 프로필 데이터 (통합 관리)
+  const [profiles, setProfiles] = useState<
+    Record<string, { nickname: string; isLoading: boolean }>
+  >({
+    [TEST_USER_ID]: { nickname: '', isLoading: true },
+    [TEST_USER_ID_2]: { nickname: '', isLoading: true },
+    [TEST_USER_ID_3]: { nickname: '', isLoading: true },
+  });
 
   // 현재 사용자 닉네임
   const [currentUserNickname, setCurrentUserNickname] = useState<string>('');
@@ -54,11 +50,8 @@ export default function RealtimeChatTestPage() {
   // useChatRoom Hook 사용 (roomId가 없으면 0으로 전달, hook 내부에서 처리)
   const chatRoomHook = useChatRoom({
     roomId: roomId || 0, // roomId가 없으면 0으로 전달
-    onMessage: (message: ChatMessage) => {
-      // eslint-disable-next-line no-console
-      console.log('Received message from useChatRoom:', message);
-
-      // useChatList hook이 자동으로 채팅 목록을 업데이트하므로 여기서는 로그만 남김
+    onMessage: () => {
+      // useChatList hook이 자동으로 채팅 목록을 업데이트하므로 별도 처리 불필요
     },
   });
 
@@ -79,35 +72,6 @@ export default function RealtimeChatTestPage() {
         isConnected: false,
       };
 
-  // roomId 변경 및 연결 상태 디버깅
-  useEffect(() => {
-    if (roomId) {
-      // eslint-disable-next-line no-console
-      console.log('Room ID changed, auto-subscribe should trigger:', roomId);
-    }
-  }, [roomId]);
-
-  useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('[ChatRoom] Status changed:', {
-      isConnected,
-      error,
-      roomId,
-      isLoading: isLoadingMessages,
-      messageCount: messages.length,
-      user: user?.id,
-    });
-  }, [
-    isConnected,
-    error,
-    roomId,
-    isLoadingMessages,
-    messages.length,
-    user?.id,
-  ]);
-
-  // useChatList hook이 자동으로 unreadCount를 업데이트하므로 별도 처리 불필요
-
   // 채팅방 목록이 로드되면 자동으로 첫 번째 채팅방 구독
   useEffect(() => {
     // 채팅방 목록이 로드되고, roomId가 설정되지 않았을 때만 자동 선택
@@ -120,12 +84,6 @@ export default function RealtimeChatTestPage() {
       if (targetRoom) {
         setRoomId(targetRoom.room.id);
         setInputRoomId(targetRoom.room.id.toString());
-        // eslint-disable-next-line no-console
-        console.log(
-          '자동으로 채팅방 구독:',
-          targetRoom.room.id,
-          targetRoom.otherMember?.nickname
-        );
       }
     }
   }, [isLoadingChatRooms, chatRooms, roomId, user?.id]);
@@ -160,23 +118,21 @@ export default function RealtimeChatTestPage() {
     try {
       let targetUserId = otherUserId.trim();
 
-      // 상대방 ID가 없으면 DB에서 다른 유저 하나 가져오기
+      // 상대방 ID가 없으면 채팅방 목록에서 다른 유저 찾기
       if (!targetUserId) {
-        const { data: profiles, error: profileError } = await supabase
-          .from('user_profiles')
-          .select('id')
-          .neq('id', user.id) // 자기 자신 제외
-          .limit(1)
-          .single();
+        // 채팅방 목록에서 다른 멤버 찾기
+        const otherMember = chatRooms.find(
+          (room) => room.otherMember?.id && room.otherMember.id !== user.id
+        )?.otherMember;
 
-        if (profileError || !profiles) {
+        if (!otherMember?.id) {
           alert(
             '다른 유저를 찾을 수 없습니다. 상대방 사용자 ID를 직접 입력하세요.'
           );
           return;
         }
 
-        targetUserId = profiles.id;
+        targetUserId = otherMember.id;
       }
 
       // 자기 자신과는 채팅방 생성 불가
@@ -257,21 +213,12 @@ export default function RealtimeChatTestPage() {
       return;
     }
 
-    // eslint-disable-next-line no-console
-    console.log('Sending message:', {
-      roomId,
-      isConnected,
-      messageContent: messageContent.trim(),
-    });
-
     try {
       const contentToSend = messageContent.trim();
       // 전송 전에 입력 필드 비우기 (즉시 UI 업데이트)
       setMessageContent('');
 
       await sendMessage(contentToSend);
-      // eslint-disable-next-line no-console
-      console.log('Message sent successfully');
     } catch (error) {
       console.error('Failed to send message:', error);
       const errorMessage =
@@ -288,125 +235,78 @@ export default function RealtimeChatTestPage() {
     }
   };
 
-  // 프로필 닉네임 조회
-  useEffect(() => {
-    const fetchProfileNickname = async () => {
-      setIsLoadingProfile(true);
-      try {
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('nickname')
-          .eq('id', TEST_USER_ID)
-          .single();
+  // 프로필 조회 함수 (API 사용)
+  const fetchProfile = useCallback(async (userId: string) => {
+    setProfiles((prev) => ({
+      ...prev,
+      [userId]: { ...prev[userId], isLoading: true },
+    }));
 
-        if (error) {
-          console.error('Failed to fetch profile:', error);
-          setProfileNickname('알 수 없는 사용자');
-        } else {
-          setProfileNickname(data?.nickname || '알 수 없는 사용자');
-        }
-      } catch (error) {
-        console.error('Unexpected error:', error);
-        setProfileNickname('알 수 없는 사용자');
-      } finally {
-        setIsLoadingProfile(false);
+    try {
+      const response = await fetch(`/api/profile/${userId}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch profile: ${response.status}`);
       }
-    };
 
-    fetchProfileNickname();
+      const data = await response.json();
+      const nickname = data.nickname || '알 수 없는 사용자';
+
+      setProfiles((prev) => ({
+        ...prev,
+        [userId]: { nickname, isLoading: false },
+      }));
+    } catch (error) {
+      console.error(`Failed to fetch profile for ${userId}:`, error);
+      setProfiles((prev) => ({
+        ...prev,
+        [userId]: { nickname: '알 수 없는 사용자', isLoading: false },
+      }));
+    }
   }, []);
 
-  // 두 번째 프로필 닉네임 조회
-  useEffect(() => {
-    const fetchProfileNickname2 = async () => {
-      setIsLoadingProfile2(true);
-      try {
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('nickname')
-          .eq('id', TEST_USER_ID_2)
-          .single();
+  // 현재 사용자 닉네임 조회 (API 사용)
+  const fetchCurrentUserProfile = useCallback(async () => {
+    if (!user?.id) {
+      setIsLoadingCurrentUserNickname(false);
+      return;
+    }
 
-        if (error) {
-          console.error('Failed to fetch profile 2:', error);
-          setProfileNickname2('알 수 없는 사용자');
-        } else {
-          setProfileNickname2(data?.nickname || '알 수 없는 사용자');
-        }
-      } catch (error) {
-        console.error('Unexpected error 2:', error);
-        setProfileNickname2('알 수 없는 사용자');
-      } finally {
-        setIsLoadingProfile2(false);
-      }
-    };
+    setIsLoadingCurrentUserNickname(true);
+    try {
+      const response = await fetch('/api/profile/me', {
+        method: 'GET',
+        credentials: 'include',
+      });
 
-    fetchProfileNickname2();
-  }, []);
-
-  // 세 번째 프로필 닉네임 조회
-  useEffect(() => {
-    const fetchProfileNickname3 = async () => {
-      setIsLoadingProfile3(true);
-      try {
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('nickname')
-          .eq('id', TEST_USER_ID_3)
-          .single();
-
-        if (error) {
-          console.error('Failed to fetch profile 3:', error);
-          setProfileNickname3('알 수 없는 사용자');
-        } else {
-          setProfileNickname3(data?.nickname || '알 수 없는 사용자');
-        }
-      } catch (error) {
-        console.error('Unexpected error 3:', error);
-        setProfileNickname3('알 수 없는 사용자');
-      } finally {
-        setIsLoadingProfile3(false);
-      }
-    };
-
-    fetchProfileNickname3();
-  }, []);
-
-  // 현재 사용자 닉네임 조회
-  useEffect(() => {
-    const fetchCurrentUserNickname = async () => {
-      if (!user?.id) {
-        setIsLoadingCurrentUserNickname(false);
-        return;
+      if (!response.ok) {
+        throw new Error(`Failed to fetch profile: ${response.status}`);
       }
 
-      setIsLoadingCurrentUserNickname(true);
-      try {
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('nickname')
-          .eq('id', user.id)
-          .single();
-
-        if (error) {
-          console.error('Failed to fetch current user nickname:', error);
-          setCurrentUserNickname('알 수 없는 사용자');
-        } else {
-          setCurrentUserNickname(data?.nickname || '알 수 없는 사용자');
-        }
-      } catch (error) {
-        console.error(
-          'Unexpected error fetching current user nickname:',
-          error
-        );
-        setCurrentUserNickname('알 수 없는 사용자');
-      } finally {
-        setIsLoadingCurrentUserNickname(false);
-      }
-    };
-
-    fetchCurrentUserNickname();
+      const data = await response.json();
+      setCurrentUserNickname(data.nickname || '알 수 없는 사용자');
+    } catch (error) {
+      console.error('Failed to fetch current user profile:', error);
+      setCurrentUserNickname('알 수 없는 사용자');
+    } finally {
+      setIsLoadingCurrentUserNickname(false);
+    }
   }, [user?.id]);
+
+  // 테스트 유저 프로필 조회
+  useEffect(() => {
+    fetchProfile(TEST_USER_ID);
+    fetchProfile(TEST_USER_ID_2);
+    fetchProfile(TEST_USER_ID_3);
+  }, [fetchProfile]);
+
+  // 현재 사용자 프로필 조회
+  useEffect(() => {
+    fetchCurrentUserProfile();
+  }, [fetchCurrentUserProfile]);
 
   // useChatList hook이 자동으로 채팅방 목록을 관리하므로 별도 조회 함수 불필요
 
@@ -434,8 +334,6 @@ export default function RealtimeChatTestPage() {
         // 기존 채팅방이 있으면 바로 구독
         setRoomId(existingRoom.room.id);
         setInputRoomId(existingRoom.room.id.toString());
-        // eslint-disable-next-line no-console
-        console.log('기존 채팅방 구독:', existingRoom.room.id);
         return;
       }
 
@@ -483,9 +381,6 @@ export default function RealtimeChatTestPage() {
       // 현재 선택된 채팅방으로 설정
       setRoomId(newRoom.id);
       setInputRoomId(newRoom.id.toString());
-
-      // eslint-disable-next-line no-console
-      console.log('새 채팅방 생성 및 구독:', newRoom.id);
     } catch (error) {
       console.error('Failed to create room:', error);
       const errorMessage =
@@ -504,19 +399,6 @@ export default function RealtimeChatTestPage() {
         `채팅방 생성 실패: ${errorMessage}\n\n브라우저 콘솔(F12)에서 자세한 에러 정보를 확인하세요.`
       );
     }
-  };
-
-  // 목업 데이터 (profilePanel.tsx의 user-1 데이터 사용)
-  const mockProfileData = {
-    nickname: profileNickname || '로딩 중...',
-    tier: TierType.diamond,
-    animal: AnimalType.tiger,
-    favoriteGenre: 'FPS',
-    activeTime: '18 - 22시',
-    gameStyle: '공격적',
-    weeklyAverage: '12.3 시간',
-    matchPercentage: 94,
-    matchReasons: ['동일 게임 선호', '유사한 플레이 시간대', '비슷한 실력대'],
   };
 
   return (
@@ -671,7 +553,7 @@ export default function RealtimeChatTestPage() {
 
         <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
           {/* 첫 번째 프로필 카드 */}
-          {isLoadingProfile ? (
+          {profiles[TEST_USER_ID]?.isLoading ? (
             <div style={{ textAlign: 'center', padding: '20px', flex: 1 }}>
               프로필 로딩 중...
             </div>
@@ -717,15 +599,19 @@ export default function RealtimeChatTestPage() {
               {/* Animal Card */}
               <AnimalCard
                 property="user"
-                nickname={mockProfileData.nickname}
-                tier={mockProfileData.tier}
-                animal={mockProfileData.animal}
-                favoriteGenre={mockProfileData.favoriteGenre}
-                activeTime={mockProfileData.activeTime}
-                gameStyle={mockProfileData.gameStyle}
-                weeklyAverage={mockProfileData.weeklyAverage}
-                matchPercentage={mockProfileData.matchPercentage}
-                matchReasons={mockProfileData.matchReasons}
+                nickname={profiles[TEST_USER_ID]?.nickname || '로딩 중...'}
+                tier={TierType.diamond}
+                animal={AnimalType.tiger}
+                favoriteGenre="FPS"
+                activeTime="18 - 22시"
+                gameStyle="공격적"
+                weeklyAverage="12.3 시간"
+                matchPercentage={94}
+                matchReasons={[
+                  '동일 게임 선호',
+                  '유사한 플레이 시간대',
+                  '비슷한 실력대',
+                ]}
               />
 
               {/* 채팅하기 버튼 */}
@@ -734,7 +620,7 @@ export default function RealtimeChatTestPage() {
                 size="m"
                 shape="round"
                 onClick={() => handleProfileChatClick(TEST_USER_ID)}
-                disabled={!user?.id || isLoadingProfile}
+                disabled={!user?.id || profiles[TEST_USER_ID]?.isLoading}
                 style={{ width: '408px' }}
               >
                 채팅 하기 (채팅방 생성)
@@ -749,7 +635,7 @@ export default function RealtimeChatTestPage() {
           )}
 
           {/* 두 번째 프로필 카드 */}
-          {isLoadingProfile2 ? (
+          {profiles[TEST_USER_ID_2]?.isLoading ? (
             <div style={{ textAlign: 'center', padding: '20px', flex: 1 }}>
               프로필 로딩 중...
             </div>
@@ -795,7 +681,7 @@ export default function RealtimeChatTestPage() {
               {/* Animal Card */}
               <AnimalCard
                 property="user"
-                nickname={profileNickname2 || '로딩 중...'}
+                nickname={profiles[TEST_USER_ID_2]?.nickname || '로딩 중...'}
                 tier={TierType.diamond}
                 animal={AnimalType.fox}
                 favoriteGenre="RPG"
@@ -812,7 +698,7 @@ export default function RealtimeChatTestPage() {
                 size="m"
                 shape="round"
                 onClick={() => handleProfileChatClick(TEST_USER_ID_2)}
-                disabled={!user?.id || isLoadingProfile2}
+                disabled={!user?.id || profiles[TEST_USER_ID_2]?.isLoading}
                 style={{ width: '408px' }}
               >
                 채팅 하기 (채팅방 생성)
@@ -827,7 +713,7 @@ export default function RealtimeChatTestPage() {
           )}
 
           {/* 세 번째 프로필 카드 */}
-          {isLoadingProfile3 ? (
+          {profiles[TEST_USER_ID_3]?.isLoading ? (
             <div style={{ textAlign: 'center', padding: '20px', flex: 1 }}>
               프로필 로딩 중...
             </div>
@@ -873,7 +759,7 @@ export default function RealtimeChatTestPage() {
               {/* Animal Card */}
               <AnimalCard
                 property="user"
-                nickname={profileNickname3 || '로딩 중...'}
+                nickname={profiles[TEST_USER_ID_3]?.nickname || '로딩 중...'}
                 tier={TierType.diamond}
                 animal={AnimalType.wolf}
                 favoriteGenre="MOBA"
@@ -890,7 +776,7 @@ export default function RealtimeChatTestPage() {
                 size="m"
                 shape="round"
                 onClick={() => handleProfileChatClick(TEST_USER_ID_3)}
-                disabled={!user?.id || isLoadingProfile3}
+                disabled={!user?.id || profiles[TEST_USER_ID_3]?.isLoading}
                 style={{ width: '408px' }}
               >
                 채팅 하기 (채팅방 생성)

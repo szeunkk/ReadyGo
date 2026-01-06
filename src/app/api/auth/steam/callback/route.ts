@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { Database } from '@/types/supabase';
 
 // nonce 기반 검증 결과 캐시 (메모리 기반, 서버 재시작 시 초기화)
 // 프로덕션에서는 Redis 등을 사용하는 것이 좋지만, 현재는 간단한 메모리 캐시 사용

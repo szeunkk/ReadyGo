@@ -4,7 +4,9 @@ import { createClient } from '@/lib/supabase/server';
  * 로그인 시 user_status를 online으로 업데이트
  * @param userId - 사용자 ID
  */
-export const updateUserStatusOnline = async function (userId: string): Promise<void> {
+export const updateUserStatusOnline = async function (
+  userId: string
+): Promise<void> {
   try {
     const supabase = createClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,4 +25,3 @@ export const updateUserStatusOnline = async function (userId: string): Promise<v
     console.error('Failed to update user_status to online:', error);
   }
 };
-

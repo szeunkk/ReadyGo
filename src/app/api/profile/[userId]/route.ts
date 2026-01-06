@@ -7,7 +7,6 @@ import {
   ProfileFetchError,
 } from '@/commons/errors/profile/profileErrors';
 
-
 export const dynamic = 'force-dynamic';
 
 /**
