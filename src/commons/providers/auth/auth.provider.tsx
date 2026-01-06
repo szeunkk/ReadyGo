@@ -63,88 +63,159 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
    * - 토큰 갱신: API에서 Supabase의 autoRefreshToken을 활용하여 자동 갱신
    * - 클라이언트는 직접 토큰을 읽지 않고 API를 통해서만 조회
    * - 타임아웃: 10초 내 응답이 없으면 자동으로 중단하여 UI 블로킹 방지
+   * - 재시도: 서버가 준비되지 않은 경우를 대비하여 최대 3회 재시도
+   *
+   * @param retryCount - 재시도 횟수 (기본값: 0, 최대 3회)
+   * @param isInitialSync - 초기 동기화 여부 (초기화 시에만 재시도 수행)
    */
-  const syncSessionToStore = useCallback(async () => {
-    // AbortController를 사용하여 타임아웃 설정 (10초)
-    const abortController = new AbortController();
-    const timeoutId = setTimeout(() => {
-      abortController.abort();
-    }, 10000); // 10초 타임아웃
+  const syncSessionToStore = useCallback(
+    async (retryCount = 0, isInitialSync = false) => {
+      const MAX_RETRIES = 3;
+      const RETRY_DELAYS = [1000, 2000, 3000]; // 1초, 2초, 3초
 
-    try {
-      // API를 통해 세션 조회 (HttpOnly 쿠키 자동 포함, 토큰 갱신 자동 처리)
-      const response = await fetch('/api/auth/session', {
-        method: 'GET',
-        credentials: 'include', // 쿠키 포함
-        signal: abortController.signal, // 타임아웃 시그널 추가
-      });
+      // AbortController를 사용하여 타임아웃 설정 (10초)
+      const abortController = new AbortController();
+      const timeoutId = setTimeout(() => {
+        abortController.abort();
+      }, 10000); // 10초 타임아웃
 
-      // 타임아웃이 발생하지 않았으면 타이머 정리
-      clearTimeout(timeoutId);
+      try {
+        // API를 통해 세션 조회 (HttpOnly 쿠키 자동 포함, 토큰 갱신 자동 처리)
+        const response = await fetch('/api/auth/session', {
+          method: 'GET',
+          credentials: 'include', // 쿠키 포함
+          signal: abortController.signal, // 타임아웃 시그널 추가
+        });
 
-      if (!response.ok) {
-        console.error('Failed to get session:', response.statusText);
-        clearAuth();
-        return;
+        // 타임아웃이 발생하지 않았으면 타이머 정리
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          console.error('Failed to get session:', response.statusText);
+          clearAuth();
+          return;
+        }
+
+        const data = await response.json();
+
+        // 세션 존재 여부 확인
+        const newUser = data.user ?? null;
+        // 실제 토큰은 서버에서 HttpOnly 쿠키로 관리되므로,
+        // 클라이언트에는 인증 여부만 표시용으로 저장
+        const newAccessToken = newUser ? 'authenticated' : null;
+
+        // 무한 루프 방지: 값이 변경된 경우에만 업데이트
+        const { accessToken: currentAccessToken, user: currentUser } =
+          storeRef.current;
+        if (
+          currentAccessToken !== newAccessToken ||
+          currentUser?.id !== newUser?.id ||
+          JSON.stringify(currentUser) !== JSON.stringify(newUser)
+        ) {
+          setAuth(newAccessToken, newUser);
+        }
+
+        // 성공 시 플래그 설정 (재시도 중이어도 성공하면 플래그 설정)
+        if (isInitialSync && retryCount > 0) {
+          isSessionSyncedRef.current = true;
+          setIsSessionSynced(true);
+        }
+      } catch (error) {
+        // 타임아웃이 발생하지 않았으면 타이머 정리
+        clearTimeout(timeoutId);
+
+        // 서버가 준비되지 않은 경우 재시도 (초기 동기화 시에만)
+        if (
+          isInitialSync &&
+          retryCount < MAX_RETRIES &&
+          error instanceof TypeError &&
+          error.message === 'Failed to fetch'
+        ) {
+          const delay = RETRY_DELAYS[retryCount] || 3000;
+          console.warn(
+            `Session sync failed (서버 준비 중일 수 있음). ${delay}ms 후 재시도 (${retryCount + 1}/${MAX_RETRIES})...`
+          );
+
+          // 재시도 전 대기
+          await new Promise((resolve) => setTimeout(resolve, delay));
+
+          // 재시도 (재시도 완료 후 플래그 설정을 위해 await)
+          try {
+            await syncSessionToStore(retryCount + 1, isInitialSync);
+            // 재시도 성공 시 플래그는 재시도 함수의 finally 블록에서 설정됨
+          } catch (retryError) {
+            // 재시도도 실패한 경우 플래그 설정
+            isSessionSyncedRef.current = true;
+            setIsSessionSynced(true);
+          }
+          return; // 재시도 중이므로 여기서 종료
+        }
+
+        // AbortError (타임아웃) 처리
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.error(
+            'Session sync timeout: API 호출이 10초 내에 완료되지 않았습니다.'
+          );
+          // 타임아웃 발생 시에도 세션 동기화 완료 플래그를 설정하여 UI 블로킹 방지
+          // 사용자가 무한 대기 상태에 빠지지 않도록 함
+        } else if (
+          error instanceof TypeError &&
+          error.message === 'Failed to fetch'
+        ) {
+          // 네트워크 오류 처리 (재시도 실패 또는 주기적 호출 시)
+          console.error(
+            'Session sync network error: 네트워크 연결을 확인해주세요.'
+          );
+        } else {
+          // 기타 에러 처리
+          console.error('Unexpected error while syncing session:', error);
+        }
+        // 에러 발생 시에도 인증 상태는 초기화하지 않음 (기존 상태 유지)
+        // 네트워크 오류나 타임아웃은 일시적일 수 있으므로 기존 세션 정보 유지
+      } finally {
+        // 세션 동기화 완료 표시 (성공/실패/타임아웃 모두 포함)
+        // 타임아웃이나 에러 발생 시에도 UI가 블로킹되지 않도록 플래그 설정
+        // 재시도 중이 아닐 때만 플래그 설정
+        // 재시도가 성공하면 try 블록에서 플래그가 설정되고,
+        // 재시도가 실패하면 catch 블록에서 플래그가 설정됨
+        if (!isInitialSync || retryCount === 0) {
+          // 주기적 호출이거나 첫 시도인 경우에만 플래그 설정
+          isSessionSyncedRef.current = true;
+          setIsSessionSynced(true);
+        }
+        // 재시도 중일 때는:
+        // - 성공 시: try 블록에서 플래그 설정
+        // - 실패 시: catch 블록에서 플래그 설정
       }
-
-      const data = await response.json();
-
-      // 세션 존재 여부 확인
-      const newUser = data.user ?? null;
-      // 실제 토큰은 서버에서 HttpOnly 쿠키로 관리되므로,
-      // 클라이언트에는 인증 여부만 표시용으로 저장
-      const newAccessToken = newUser ? 'authenticated' : null;
-
-      // 무한 루프 방지: 값이 변경된 경우에만 업데이트
-      const { accessToken: currentAccessToken, user: currentUser } =
-        storeRef.current;
-      if (
-        currentAccessToken !== newAccessToken ||
-        currentUser?.id !== newUser?.id ||
-        JSON.stringify(currentUser) !== JSON.stringify(newUser)
-      ) {
-        setAuth(newAccessToken, newUser);
-      }
-    } catch (error) {
-      // 타임아웃이 발생하지 않았으면 타이머 정리
-      clearTimeout(timeoutId);
-
-      // AbortError (타임아웃) 처리
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.error(
-          'Session sync timeout: API 호출이 10초 내에 완료되지 않았습니다.'
-        );
-        // 타임아웃 발생 시에도 세션 동기화 완료 플래그를 설정하여 UI 블로킹 방지
-        // 사용자가 무한 대기 상태에 빠지지 않도록 함
-      } else if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        // 네트워크 오류 처리
-        console.error(
-          'Session sync network error: 네트워크 연결을 확인해주세요.'
-        );
-      } else {
-        // 기타 에러 처리
-        console.error('Unexpected error while syncing session:', error);
-      }
-      // 에러 발생 시에도 인증 상태는 초기화하지 않음 (기존 상태 유지)
-      // 네트워크 오류나 타임아웃은 일시적일 수 있으므로 기존 세션 정보 유지
-    } finally {
-      // 세션 동기화 완료 표시 (성공/실패/타임아웃 모두 포함)
-      // 타임아웃이나 에러 발생 시에도 UI가 블로킹되지 않도록 플래그 설정
-      isSessionSyncedRef.current = true;
-      setIsSessionSynced(true);
-    }
-  }, [clearAuth, setAuth]);
+    },
+    [clearAuth, setAuth]
+  );
 
   // 마운트 시 초기 세션 동기화
   useEffect(() => {
     if (!isInitializedRef.current) {
       isInitializedRef.current = true;
       setIsSessionSynced(false); // 초기화 시작 시 false로 설정
-      syncSessionToStore().then(() => {
-        isSessionSyncedRef.current = true;
-        setIsSessionSynced(true); // 동기화 완료 시 true로 설정
-      });
+
+      // 세션 동기화 시작 (초기 동기화이므로 재시도 활성화)
+      syncSessionToStore(0, true);
+
+      // 안전장치: 최대 대기 시간(20초) 후 강제로 isSessionSynced를 true로 설정
+      // 재시도(최대 3회, 총 약 6초) + 타임아웃(10초)을 고려하여 20초로 설정
+      const safetyTimeoutId = setTimeout(() => {
+        if (!isSessionSyncedRef.current) {
+          console.warn(
+            'Session sync safety timeout: 20초 후 강제로 세션 동기화 완료 처리'
+          );
+          isSessionSyncedRef.current = true;
+          setIsSessionSynced(true);
+        }
+      }, 20000); // 20초 안전장치
+
+      // Cleanup: 컴포넌트 언마운트 시 타이머 정리
+      return () => {
+        clearTimeout(safetyTimeoutId);
+      };
     }
   }, [syncSessionToStore]);
 
