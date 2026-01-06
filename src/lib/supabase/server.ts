@@ -27,6 +27,7 @@ export const createClient = () => {
             });
             // Route Handler에서 쿠키 설정 확인 로그
             if (cookiesToSet.length > 0) {
+              // eslint-disable-next-line no-console
               console.log('Supabase cookies set:', {
                 count: cookiesToSet.length,
                 names: cookiesToSet.map((c) => c.name),

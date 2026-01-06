@@ -14,11 +14,11 @@ import { useAuthStore } from '@/stores/auth.store';
  * - Supabase 리다이렉트 URL이 루트(http://localhost:3000)만 등록되어 있으므로
  * - 루트에서 OAuth 콜백을 감지하고 처리
  */
-export function OAuthCallbackHandler() {
+export const OAuthCallbackHandler = function () {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [_isProcessing, setIsProcessing] = useState(false);
   const { syncSession } = useAuth();
   const hasProcessedRef = useRef(false);
 
@@ -40,6 +40,7 @@ export function OAuthCallbackHandler() {
       const hashAccessToken = hashParams.get('access_token');
       const hashRefreshToken = hashParams.get('refresh_token');
 
+      // eslint-disable-next-line no-console
       console.log('=== OAuth Callback Handler - Root Page ===', {
         hasCode: !!code,
         hasError: !!error,
@@ -77,6 +78,7 @@ export function OAuthCallbackHandler() {
       // hash 경로는 가장 먼저 처리하여 onAuthStateChange보다 우선
       if (hashAccessToken && hashRefreshToken) {
         hasProcessedRef.current = true;
+        // eslint-disable-next-line no-console
         console.log('Found tokens in hash, setting session directly');
 
         try {
@@ -97,11 +99,14 @@ export function OAuthCallbackHandler() {
           }
 
           const data = await response.json();
+          // eslint-disable-next-line no-console
           console.log('Server session set successfully from hash', data);
+          // eslint-disable-next-line no-console
           console.log('OAuth callback from hash - isNewUser:', data.isNewUser);
 
           // 응답이 성공했지만 isNewUser가 false인 경우 다시 확인
           if (!data.isNewUser) {
+            // eslint-disable-next-line no-console
             console.log(
               'OAuth callback from hash - User is not new, redirecting to home'
             );
@@ -110,7 +115,7 @@ export function OAuthCallbackHandler() {
             let retries = 0;
             const maxRetries = 20;
             while (retries < maxRetries) {
-              const accessToken = useAuthStore.getState().accessToken;
+              const { accessToken } = useAuthStore.getState();
               if (accessToken) {
                 break;
               }
@@ -131,8 +136,9 @@ export function OAuthCallbackHandler() {
           let retries = 0;
           const maxRetries = 20; // 2초 (100ms * 20)
           while (retries < maxRetries) {
-            const accessToken = useAuthStore.getState().accessToken;
+            const { accessToken } = useAuthStore.getState();
             if (accessToken) {
+              // eslint-disable-next-line no-console
               console.log('Access token confirmed in store, redirecting...');
               break;
             }
@@ -148,17 +154,20 @@ export function OAuthCallbackHandler() {
 
           // 프로필 확인 및 리다이렉트
           if (data.isNewUser) {
+            // eslint-disable-next-line no-console
             console.log(
               'OAuth callback from hash - Redirecting to signup-success'
             );
             router.replace(URL_PATHS.SIGNUP_SUCCESS);
           } else {
+            // eslint-disable-next-line no-console
             console.log('OAuth callback from hash - Redirecting to home');
             router.replace(URL_PATHS.HOME);
           }
           setIsProcessing(false);
           return; // hash 경로에서 처리 완료 후 즉시 return하여 다른 경로가 실행되지 않도록 함
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error('Error setting session from hash', error);
           hasProcessedRef.current = false; // 에러 발생 시 플래그 리셋
         }
@@ -173,12 +182,14 @@ export function OAuthCallbackHandler() {
       } = supabase.auth.onAuthStateChange(async (event, session) => {
         // 이미 처리 중이면 무시 (hash 경로가 먼저 처리했을 수 있음)
         if (hasProcessedRef.current) {
+          // eslint-disable-next-line no-console
           console.log(
             'OAuth callback - onAuthStateChange ignored (already processed)'
           );
           return;
         }
 
+        // eslint-disable-next-line no-console
         console.log('OAuth callback - Auth state changed', {
           event,
           hasSession: !!session,
@@ -186,6 +197,7 @@ export function OAuthCallbackHandler() {
         });
 
         if (event === 'SIGNED_IN' && session) {
+          // eslint-disable-next-line no-console
           console.log('User signed in via onAuthStateChange', {
             userId: session.user.id,
             email: session.user.email,
@@ -218,12 +230,15 @@ export function OAuthCallbackHandler() {
             }
 
             const data = await response.json();
+            // eslint-disable-next-line no-console
             console.log('Server session set successfully', data);
+            // eslint-disable-next-line no-console
             console.log('OAuth callback - isNewUser:', data.isNewUser);
 
             // 응답이 성공했지만 isNewUser가 false인 경우 다시 확인
             // (race condition으로 인해 프로필이 생성되었을 수 있음)
             if (!data.isNewUser) {
+              // eslint-disable-next-line no-console
               console.log(
                 'OAuth callback - User is not new, redirecting to home'
               );
@@ -234,7 +249,7 @@ export function OAuthCallbackHandler() {
               let retries = 0;
               const maxRetries = 20;
               while (retries < maxRetries) {
-                const accessToken = useAuthStore.getState().accessToken;
+                const { accessToken } = useAuthStore.getState();
                 if (accessToken) {
                   break;
                 }
@@ -259,8 +274,9 @@ export function OAuthCallbackHandler() {
             let retries = 0;
             const maxRetries = 20; // 2초 (100ms * 20)
             while (retries < maxRetries) {
-              const accessToken = useAuthStore.getState().accessToken;
+              const { accessToken } = useAuthStore.getState();
               if (accessToken) {
+                // eslint-disable-next-line no-console
                 console.log('Access token confirmed in store, redirecting...');
                 break;
               }
@@ -276,15 +292,18 @@ export function OAuthCallbackHandler() {
 
             // 프로필 확인 및 리다이렉트
             if (data.isNewUser) {
+              // eslint-disable-next-line no-console
               console.log('OAuth callback - Redirecting to signup-success');
               router.replace(URL_PATHS.SIGNUP_SUCCESS);
             } else {
+              // eslint-disable-next-line no-console
               console.log('OAuth callback - Redirecting to home');
               router.replace(URL_PATHS.HOME);
             }
             subscription?.unsubscribe();
             setIsProcessing(false);
           } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('Error setting session', error);
             hasProcessedRef.current = false; // 에러 발생 시 플래그 리셋
             subscription?.unsubscribe();
@@ -312,6 +331,7 @@ export function OAuthCallbackHandler() {
         }
         hasProcessedRef.current = true;
 
+        // eslint-disable-next-line no-console
         console.log('Attempting exchangeCodeForSession...', {
           code: code || hashCode,
         });
@@ -325,6 +345,7 @@ export function OAuthCallbackHandler() {
             return;
           }
 
+          // eslint-disable-next-line no-console
           console.log('exchangeCodeForSession successful', {
             userId: exchangeData.user?.id,
           });
@@ -347,11 +368,14 @@ export function OAuthCallbackHandler() {
           }
 
           const data = await response.json();
+          // eslint-disable-next-line no-console
           console.log('Server session set successfully from code', data);
+          // eslint-disable-next-line no-console
           console.log('OAuth callback from code - isNewUser:', data.isNewUser);
 
           // 응답이 성공했지만 isNewUser가 false인 경우 다시 확인
           if (!data.isNewUser) {
+            // eslint-disable-next-line no-console
             console.log(
               'OAuth callback from code - User is not new, redirecting to home'
             );
@@ -360,7 +384,7 @@ export function OAuthCallbackHandler() {
             let retries = 0;
             const maxRetries = 20;
             while (retries < maxRetries) {
-              const accessToken = useAuthStore.getState().accessToken;
+              const { accessToken } = useAuthStore.getState();
               if (accessToken) {
                 break;
               }
@@ -385,8 +409,9 @@ export function OAuthCallbackHandler() {
           let retries = 0;
           const maxRetries = 20; // 2초 (100ms * 20)
           while (retries < maxRetries) {
-            const accessToken = useAuthStore.getState().accessToken;
+            const { accessToken } = useAuthStore.getState();
             if (accessToken) {
+              // eslint-disable-next-line no-console
               console.log('Access token confirmed in store, redirecting...');
               break;
             }
@@ -410,6 +435,7 @@ export function OAuthCallbackHandler() {
           setIsProcessing(false);
           return;
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error('exchangeCodeForSession error', error);
         }
       }
@@ -431,12 +457,13 @@ export function OAuthCallbackHandler() {
 
       const {
         data: { session },
-        error: sessionError,
+        error: _sessionError,
       } = await supabase.auth.getSession();
 
       if (session && session.user) {
         hasProcessedRef.current = true;
 
+        // eslint-disable-next-line no-console
         console.log('Session found via getSession', {
           userId: session.user.id,
         });
@@ -459,7 +486,9 @@ export function OAuthCallbackHandler() {
           }
 
           const data = await response.json();
+          // eslint-disable-next-line no-console
           console.log('Server session set successfully from getSession', data);
+          // eslint-disable-next-line no-console
           console.log(
             'OAuth callback from getSession - isNewUser:',
             data.isNewUser
@@ -467,6 +496,7 @@ export function OAuthCallbackHandler() {
 
           // 응답이 성공했지만 isNewUser가 false인 경우 다시 확인
           if (!data.isNewUser) {
+            // eslint-disable-next-line no-console
             console.log(
               'OAuth callback from getSession - User is not new, redirecting to home'
             );
@@ -475,7 +505,7 @@ export function OAuthCallbackHandler() {
             let retries = 0;
             const maxRetries = 20;
             while (retries < maxRetries) {
-              const accessToken = useAuthStore.getState().accessToken;
+              const { accessToken } = useAuthStore.getState();
               if (accessToken) {
                 break;
               }
@@ -500,8 +530,9 @@ export function OAuthCallbackHandler() {
           let retries = 0;
           const maxRetries = 20; // 2초 (100ms * 20)
           while (retries < maxRetries) {
-            const accessToken = useAuthStore.getState().accessToken;
+            const { accessToken } = useAuthStore.getState();
             if (accessToken) {
+              // eslint-disable-next-line no-console
               console.log('Access token confirmed in store, redirecting...');
               break;
             }
@@ -525,6 +556,7 @@ export function OAuthCallbackHandler() {
           setIsProcessing(false);
           return;
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error('Error setting session from getSession', error);
         }
       }
@@ -542,4 +574,4 @@ export function OAuthCallbackHandler() {
 
   // OAuth 로딩 UI 제거 (리다이렉트가 빠르게 완료되므로 불필요)
   return null;
-}
+};

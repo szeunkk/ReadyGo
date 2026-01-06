@@ -267,17 +267,14 @@ test.describe('통합 테스트', () => {
       });
 
       // 여러 번의 로그인 API 호출 시뮬레이션
-      const loginApiPromises = [];
-      for (let i = 0; i < 3; i++) {
-        loginApiPromises.push(
-          page.waitForResponse(
-            (response) =>
-              response.url().includes('/api/auth/session') &&
-              response.request().method() === 'POST',
-            { timeout: 2000 }
-          )
-        );
-      }
+      const loginApiPromises = Array.from({ length: 3 }, () =>
+        page.waitForResponse(
+          (response) =>
+            response.url().includes('/api/auth/session') &&
+            response.request().method() === 'POST',
+          { timeout: 2000 }
+        )
+      );
 
       // 이메일 입력
       const emailInput = page.locator('[data-testid="login-email-input"]');
@@ -426,10 +423,6 @@ test.describe('통합 테스트', () => {
 
       // 두 번째 탭에서도 세션이 유지되었는지 확인
       // (같은 context를 사용하므로 쿠키가 공유됨)
-      const cookies2 = await page2.context().cookies();
-      const hasSessionCookie2 = cookies2.some((cookie) =>
-        cookie.name.includes('sb-')
-      );
       // 같은 context를 사용하므로 쿠키가 공유되어야 함
       // 하지만 새 탭이 열릴 때 쿠키가 즉시 반영되지 않을 수 있으므로
       // 세션 조회 API를 통해 확인

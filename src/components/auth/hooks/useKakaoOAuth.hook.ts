@@ -11,10 +11,11 @@ import { supabase } from '@/lib/supabase/client';
 export const useKakaoOAuth = () => {
   const handleKakaoOAuth = async () => {
     try {
-      const origin = window.location.origin;
+      const { origin } = window.location;
       // Supabase 리다이렉트 URL이 루트만 등록되어 있으므로 루트로 리다이렉트
       const redirectTo = origin;
-      
+
+      // eslint-disable-next-line no-console
       console.log('=== Kakao OAuth Started ===', {
         origin,
         redirectTo,
@@ -33,6 +34,7 @@ export const useKakaoOAuth = () => {
         },
       });
 
+      // eslint-disable-next-line no-console
       console.log('Kakao OAuth signInWithOAuth result', {
         hasData: !!data,
         data,
@@ -41,18 +43,22 @@ export const useKakaoOAuth = () => {
       });
 
       if (error) {
+        // eslint-disable-next-line no-console
         console.error('Kakao OAuth error:', error);
         throw new Error(error.message || '카카오 로그인에 실패했습니다.');
       }
 
       // data.url이 있으면 수동으로 리다이렉트 (일부 경우 필요)
       if (data?.url) {
+        // eslint-disable-next-line no-console
         console.log('Redirecting to OAuth provider:', data.url);
         window.location.href = data.url;
       } else {
+        // eslint-disable-next-line no-console
         console.warn('No redirect URL returned from signInWithOAuth');
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Kakao OAuth error:', error);
       throw error;
     }

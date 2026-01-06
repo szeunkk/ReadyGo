@@ -19,8 +19,9 @@ import { URL_PATHS } from '@/commons/constants/url';
  * 중요: exchangeCodeForSession 후 세션을 명시적으로 확인하여
  * 쿠키가 제대로 설정되었는지 검증합니다.
  */
-export async function GET(request: NextRequest) {
+export const GET = async function (request: NextRequest) {
   // OAuth 콜백 호출 확인 로그
+  // eslint-disable-next-line no-console
   console.log('=== OAuth Callback Called ===', {
     url: request.url,
     method: request.method,
@@ -33,6 +34,7 @@ export async function GET(request: NextRequest) {
     const error = searchParams.get('error');
     const errorDescription = searchParams.get('error_description');
 
+    // eslint-disable-next-line no-console
     console.log('OAuth callback params:', {
       hasCode: !!code,
       hasError: !!error,
@@ -42,6 +44,7 @@ export async function GET(request: NextRequest) {
 
     // OAuth 에러 처리
     if (error) {
+      // eslint-disable-next-line no-console
       console.error('OAuth error:', error, errorDescription);
       const loginUrl = new URL(URL_PATHS.LOGIN, request.url);
       loginUrl.searchParams.set('error', errorDescription || error);
@@ -64,6 +67,7 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.exchangeCodeForSession(code);
 
     if (exchangeError) {
+      // eslint-disable-next-line no-console
       console.error('OAuth code exchange error:', exchangeError);
       const loginUrl = new URL(URL_PATHS.LOGIN, request.url);
       loginUrl.searchParams.set('error', '세션 교환에 실패했습니다.');
@@ -72,6 +76,7 @@ export async function GET(request: NextRequest) {
 
     // 세션이 제대로 설정되었는지 명시적으로 확인
     if (!session || !user) {
+      // eslint-disable-next-line no-console
       console.error('Session or user not found after code exchange', {
         hasSession: !!session,
         hasUser: !!user,
@@ -83,6 +88,7 @@ export async function GET(request: NextRequest) {
 
     // 세션 토큰 유효성 확인
     if (!session.access_token || !session.refresh_token) {
+      // eslint-disable-next-line no-console
       console.error('Session tokens missing', {
         hasAccessToken: !!session.access_token,
         hasRefreshToken: !!session.refresh_token,
@@ -92,6 +98,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(loginUrl.toString());
     }
 
+    // eslint-disable-next-line no-console
     console.log('OAuth session exchange successful', {
       userId: user.id,
       email: user.email,
@@ -105,6 +112,7 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (userError || !verifiedUser) {
+      // eslint-disable-next-line no-console
       console.error('Get user error after session exchange:', userError, {
         sessionUserId: user.id,
       });
@@ -115,6 +123,7 @@ export async function GET(request: NextRequest) {
 
     // 사용자 ID 일치 확인
     if (verifiedUser.id !== user.id) {
+      // eslint-disable-next-line no-console
       console.error('User ID mismatch after session exchange', {
         sessionUserId: user.id,
         verifiedUserId: verifiedUser.id,
@@ -124,6 +133,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(loginUrl.toString());
     }
 
+    // eslint-disable-next-line no-console
     console.log('OAuth session verification successful', {
       userId: verifiedUser.id,
       email: verifiedUser.email,
@@ -145,6 +155,7 @@ export async function GET(request: NextRequest) {
         cookie.name.startsWith('sb')
     );
 
+    // eslint-disable-next-line no-console
     console.log('OAuth callback: Cookies before redirect', {
       totalCookies: allCookies.length,
       supabaseCookies: supabaseCookies.length,
@@ -154,6 +165,7 @@ export async function GET(request: NextRequest) {
 
     // 쿠키가 없으면 에러
     if (supabaseCookies.length === 0) {
+      // eslint-disable-next-line no-console
       console.error('No Supabase cookies found after session exchange!', {
         allCookies: allCookies.map((c) => c.name),
       });
@@ -182,9 +194,11 @@ export async function GET(request: NextRequest) {
             path: '/',
             // maxAge는 Supabase가 설정한 대로 유지 (기본값 사용)
           });
+          // eslint-disable-next-line no-console
           console.log('Cookie added to redirect response:', cookie.name);
         });
 
+        // eslint-disable-next-line no-console
         console.log(
           'OAuth callback: Redirecting to signup-success, session verified',
           {
@@ -194,6 +208,7 @@ export async function GET(request: NextRequest) {
         );
         return redirectResponse;
       } catch (profileError) {
+        // eslint-disable-next-line no-console
         console.error('Profile creation error:', profileError);
         const loginUrl = new URL(URL_PATHS.LOGIN, request.url);
         loginUrl.searchParams.set('error', '프로필 생성에 실패했습니다.');
@@ -215,18 +230,21 @@ export async function GET(request: NextRequest) {
         sameSite: 'lax',
         path: '/',
       });
+      // eslint-disable-next-line no-console
       console.log('Cookie added to redirect response:', cookie.name);
     });
 
+    // eslint-disable-next-line no-console
     console.log('OAuth callback: Redirecting to home, session verified', {
       cookiesIncluded: supabaseCookies.length,
       redirectUrl: homeUrl.toString(),
     });
     return redirectResponse;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('OAuth callback error:', error);
     const loginUrl = new URL(URL_PATHS.LOGIN, request.url);
     loginUrl.searchParams.set('error', 'OAuth 처리 중 오류가 발생했습니다.');
     return NextResponse.redirect(loginUrl.toString());
   }
-}
+};
