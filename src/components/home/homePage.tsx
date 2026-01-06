@@ -17,8 +17,8 @@ import { useProfile } from './hooks/useProfile';
 // 임시 데이터 - 추후 API로 대체될 예정
 const mockMatchData: MatchCardProps[] = [
   {
-    userId: 'user-1',
-    nickname: '까칠한까마귀',
+    userId: 'd3216299-dac9-478a-ab19-d79e56c6a2b1',
+    nickname: '턱없는살모사',
     matchRate: 94,
     status: 'online',
     animalType: AnimalType.raven,
@@ -27,8 +27,8 @@ const mockMatchData: MatchCardProps[] = [
     skillLevel: '플래티넘',
   },
   {
-    userId: 'user-2',
-    nickname: '용감한여우',
+    userId: '3943add5-23d2-4bc3-8818-65a04a41161e',
+    nickname: '예쁜코알라',
     matchRate: 89,
     status: 'online',
     animalType: AnimalType.fox,
@@ -37,8 +37,8 @@ const mockMatchData: MatchCardProps[] = [
     skillLevel: '다이아',
   },
   {
-    userId: 'user-3',
-    nickname: '신중한올빼미',
+    userId: '73ea14dd-2e4d-4d96-b267-bee66a6c8ad5',
+    nickname: '더운담비',
     matchRate: 87,
     status: 'away',
     animalType: AnimalType.owl,
@@ -47,8 +47,8 @@ const mockMatchData: MatchCardProps[] = [
     skillLevel: '플래티넘',
   },
   {
-    userId: 'user-4',
-    nickname: '민첩한토끼',
+    userId: '84e1e171-a836-4264-8277-c97decb722d3',
+    nickname: '시원찮은닭',
     matchRate: 85,
     status: 'online',
     animalType: AnimalType.rabbit,

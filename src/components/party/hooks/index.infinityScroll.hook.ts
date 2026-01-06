@@ -47,7 +47,7 @@ interface UseInfinitePartyListReturn {
 const INITIAL_LIMIT = 10;
 const SCROLL_LIMIT = 10;
 
-// 날짜와 시간을 조합하여 "MM/DD 오전/오후 HH:mm" 또는 "MM/DD 새벽 HH:mm" 형식으로 변환
+// 날짜와 시간을 조합하여 "MM/DD 오전/오후 HH:mm" 형식으로 변환
 const formatDateTime = (dateString: string, timeString: string): string => {
   const dateMatch = dateString.match(/(\d{4})-(\d{2})-(\d{2})/);
   if (!dateMatch) {
@@ -65,11 +65,6 @@ const formatDateTime = (dateString: string, timeString: string): string => {
   const hour = parseInt(hourStr, 10);
   const minute = minuteStr;
 
-  if (hour >= 0 && hour < 6) {
-    const displayHour = hour === 0 ? 12 : hour;
-    return `${formattedDate} 새벽 ${displayHour}:${minute}`;
-  }
-
   const period = hour < 12 ? '오전' : '오후';
   const displayHour =
     hour === 0 ? 12 : hour > 12 ? hour - 12 : hour === 12 ? 12 : hour;
@@ -86,6 +81,31 @@ const getVoiceChatLabel = (voiceChat: string | null): string => {
     return '선택 사용';
   }
   return '사용 안함';
+};
+
+// difficulty 값을 한글로 변환
+const getDifficultyLabel = (difficulty: string): string => {
+  const difficultyMap: Record<string, string> = {
+    undefined: '미정',
+    flexible: '유동',
+    easy: '이지',
+    normal: '노멀',
+    hard: '하드',
+    hell: '지옥',
+  };
+  return difficultyMap[difficulty] || difficulty;
+};
+
+// control_level 값을 한글로 변환
+const getControlLevelLabel = (controlLevel: string): string => {
+  const controlLevelMap: Record<string, string> = {
+    beginner: '미숙',
+    intermediate: '반숙',
+    advanced: '완숙',
+    expert: '빡숙',
+    master: '장인',
+  };
+  return controlLevelMap[controlLevel] || controlLevel;
 };
 
 // Mock 데이터: party_members
@@ -164,7 +184,10 @@ const truncateDescription = (
   return `${description.substring(0, maxLength)}...`;
 };
 
-export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
+export const useInfinitePartyList = (
+  genre?: string,
+  search?: string
+): UseInfinitePartyListReturn => {
   const [data, setData] = useState<PartyCardProps[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
@@ -190,8 +213,8 @@ export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
           categories: {
             startTime: formatDateTime(party.start_date, party.start_time),
             voiceChat: getVoiceChatLabel(party.voice_chat),
-            difficulty: party.difficulty,
-            controlLevel: party.control_level,
+            difficulty: getDifficultyLabel(party.difficulty),
+            controlLevel: getControlLevelLabel(party.control_level),
           },
           partyId: party.id,
         };
@@ -199,6 +222,18 @@ export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
     },
     []
   );
+
+  // 필터 변경 시 리셋
+  useEffect(() => {
+    // 필터가 변경되면 데이터 리셋 및 재로드
+    setData([]);
+    setHasMore(true);
+    setError(null);
+    setOffset(0);
+    setIsInitialLoad(true);
+    setIsLoading(true);
+    setIsLoadingMore(false);
+  }, [genre, search]);
 
   // 초기 로드
   useEffect(() => {
@@ -211,16 +246,25 @@ export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
         setIsLoading(true);
         setError(null);
 
-        const response = await fetch(
-          `/api/party?limit=${INITIAL_LIMIT}&offset=0`,
-          {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        // 필터 파라미터 구성
+        const params = new URLSearchParams({
+          limit: String(INITIAL_LIMIT),
+          offset: '0',
+        });
+        if (genre && genre !== 'all') {
+          params.append('genre', genre);
+        }
+        if (search && search.trim()) {
+          params.append('search', search.trim());
+        }
+
+        const response = await fetch(`/api/party?${params.toString()}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
         if (!response.ok) {
           if (response.status >= 400 && response.status < 500) {
@@ -287,7 +331,7 @@ export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
 
     fetchInitialData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInitialLoad]);
+  }, [isInitialLoad, genre, search]);
 
   // 추가 데이터 로드
   const loadMore = useCallback(async () => {
@@ -300,16 +344,25 @@ export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
       setIsLoadingMore(true);
       setError(null);
 
-      const response = await fetch(
-        `/api/party?limit=${SCROLL_LIMIT}&offset=${offset}`,
-        {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      // 필터 파라미터 구성
+      const params = new URLSearchParams({
+        limit: String(SCROLL_LIMIT),
+        offset: String(offset),
+      });
+      if (genre && genre !== 'all') {
+        params.append('genre', genre);
+      }
+      if (search && search.trim()) {
+        params.append('search', search.trim());
+      }
+
+      const response = await fetch(`/api/party?${params.toString()}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       if (!response.ok) {
         if (response.status >= 400 && response.status < 500) {
@@ -364,7 +417,7 @@ export const useInfinitePartyList = (): UseInfinitePartyListReturn => {
     }
     // transformPartyData는 useCallback으로 감싸져 있고 의존성이 없으므로 안정적
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInitialLoad, isLoadingMore, hasMore, offset]);
+  }, [isInitialLoad, isLoadingMore, hasMore, offset, genre, search]);
 
   // reset 함수
   const reset = useCallback(() => {

@@ -8,7 +8,7 @@
 | ----------- | -------------------------------------------------------------------------------------------------------------- |
 | 작성자      | 김은경                                                                                                         |
 | 최초 작성일 | 2026-01-02                                                                                                     |
-| 최종 수정일 | 2026-01-02                                                                                                     |
+| 최종 수정일 | 2026-01-05                                                                                                     |
 | 관련 화면   | 프로필 화면, 사이드 패널                                                                                       |
 | 관련 이슈   | [사용자 요구사항 정의서(UR-70)](https://www.notion.so/UR-70-2ca130d16ff48118aa42c12295b0c626?source=copy_link) |
 
@@ -64,9 +64,12 @@
 
 ### Header
 
-| key    | 설명                    | value 타입 | 필수 | 비고                                   |
-| ------ | ----------------------- | ---------- | ---- | -------------------------------------- |
-| Cookie | Supabase 인증 세션 쿠키 | string     | O    | Next.js Server Component에서 자동 처리 |
+| key           | 설명                         | value 타입 | 필수 | 비고                                                                               |
+| ------------- | ---------------------------- | ---------- | ---- | ---------------------------------------------------------------------------------- |
+| Authorization | Bearer 토큰                  | string     | O\*  | `Bearer {access_token}` 형식. Cookie와 함께 사용 시 Cookie 우선                    |
+| Cookie        | Supabase 인증 세션 쿠키      | string     | O\*  | `sb-access-token` 쿠키. Authorization 헤더와 둘 중 하나는 반드시 필요               |
+
+\* Authorization 헤더 또는 Cookie 중 하나는 반드시 제공되어야 함
 
 ### Body
 
@@ -156,6 +159,7 @@
 
 **에러 응답 형식:**
 
+**404, 500 (비즈니스 에러):**
 ```json
 {
   "code": "PROFILE_NOT_FOUND",
@@ -163,9 +167,35 @@
 }
 ```
 
+**401 (인증 에러):**
+```json
+{
+  "message": "Unauthorized",
+  "detail": "Authentication required"
+}
+```
+
 ---
 
 ## 기타
+
+### 구현 상태 및 추후 개선 사항
+
+1. **Supabase Client 생성 방식 (임시 구현)**
+   - 현재: `createClient(@supabase/supabase-js)`를 직접 사용하여 매 요청마다 클라이언트 생성
+   - 이유: `@/lib/supabase/server.ts`의 리팩토링이 진행 중이기 때문
+   - 추후: server.ts 리팩토링 완료 후 SSR 전용 클라이언트로 전환 예정
+   - 영향: 현재는 정상 작동하나, 추후 server.ts 방식으로 전환 시 인증 로직 일부 변경 가능성 있음
+
+2. **인증 방식**
+   - 현재: Authorization Bearer 토큰과 Cookie(`sb-access-token`) 모두 지원
+   - 우선순위: Cookie가 있으면 Cookie 사용, 없으면 Authorization 헤더 사용
+   - 추후: server.ts 리팩토링 후 인증 방식이 표준화될 예정
+
+3. **에러 응답 형식 불일치**
+   - 401 에러는 `{message, detail}` 형식
+   - 404/500 비즈니스 에러는 `{code, message}` 형식
+   - 추후: 에러 응답 형식 통일 검토 필요
 
 ### 프론트엔드 처리 시 주의사항
 

@@ -12,6 +12,7 @@ import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
 import { usePartySubmit } from './hooks/index.submit.hook';
 import { useLinkModalClose } from './hooks/index.link.modal.close.hook';
+import { supabase } from '@/lib/supabase/client';
 
 interface PartySubmitProps {
   onClose?: () => void;
@@ -36,6 +37,7 @@ export default function PartySubmit({
   const { openCancelModal } = useLinkModalClose();
   const [gameSearchQuery, setGameSearchQuery] = useState('');
   const [isGameOptionsOpen, setIsGameOptionsOpen] = useState(false);
+  const [gameList, setGameList] = useState<SelectboxItem[]>([]);
   const gameSearchRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
 
@@ -53,25 +55,44 @@ export default function PartySubmit({
     }
   }, [watchedValues.game_title]);
 
+  // Supabase에서 게임 목록 가져오기
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('steam_game_info')
+          .select('app_id, name')
+          .not('name', 'is', null)
+          .order('name', { ascending: true });
+
+        if (error) {
+          console.error('게임 목록 조회 실패:', error);
+          return;
+        }
+
+        if (data) {
+          // SelectboxItem 형식으로 변환
+          const games: SelectboxItem[] = data
+            .filter((game) => game.name) // null 체크
+            .map((game) => ({
+              id: game.app_id.toString(),
+              value: game.name!,
+            }));
+          setGameList(games);
+        }
+      } catch (error) {
+        console.error('게임 목록 조회 중 오류 발생:', error);
+      }
+    };
+
+    fetchGames();
+  }, []);
+
   // 폼 유효성 확인
   const isFormValid = isValid;
 
-  // 게임 목업 데이터
-  const gameMockData: SelectboxItem[] = [
-    { id: 'overwatch', value: '오버워치' },
-    { id: 'overcooked', value: '오버쿡드' },
-    { id: 'squid-game', value: '오징어게임' },
-    { id: 'oriental', value: '오리엔탈' },
-    { id: 'orienteering', value: '오리엔티어링' },
-    { id: 'ozone', value: '오존' },
-    { id: 'office-simulator', value: '오피스시뮬레이터' },
-    { id: 'league-of-legends', value: '리그 오브 레전드' },
-    { id: 'valorant', value: '발로란트' },
-    { id: 'apex-legends', value: '에이펙스 레전드' },
-  ];
-
   // 검색어에 따라 필터링된 게임 목록
-  const filteredGames = gameMockData.filter((game) =>
+  const filteredGames = gameList.filter((game) =>
     game.value.toLowerCase().includes(gameSearchQuery.toLowerCase())
   );
 

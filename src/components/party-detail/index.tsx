@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import Icon from '@/commons/components/icon';
 import { URL_PATHS } from '@/commons/constants/url';
+import { useAuth } from '@/commons/providers/auth/auth.provider';
 import ChatNull from './ui/chat-null/chatNull';
 import ChatRoom from './ui/chat-room/chatRoom';
 import MemberList from './ui/member-list/memberList';
@@ -11,16 +13,33 @@ import PartyInfo from './ui/party-info/partyInfo';
 import { usePartyBinding } from './hooks/index.binding.hook';
 import { useLinkUpdateModal } from './hooks/index.link.update.modal.hook';
 import { useDeleteParty } from './hooks/index.delete.hook';
+import { useJoinParty } from './hooks/index.join.hook';
 import styles from './styles.module.css';
 
 export default function PartyDetail() {
   const [isJoined, setIsJoined] = useState(false);
+  const params = useParams();
+  const partyId = params?.id as string | undefined;
+  const { user } = useAuth();
   const { data, isLoading, error, refetch } = usePartyBinding();
   const { openUpdateModal } = useLinkUpdateModal({ onRefetch: refetch });
   const { openDeleteModal } = useDeleteParty({ onRefetch: refetch });
+  const { joinParty } = useJoinParty({ onRefetch: refetch });
 
-  const handleJoinClick = () => {
-    setIsJoined(true);
+  // 작성자 여부 확인
+  const isCreator = data?.creator_id === user?.id;
+
+  const handleJoinClick = async () => {
+    if (partyId) {
+      try {
+        await joinParty(partyId);
+        // 참여 성공 시 ChatRoom 렌더링
+        setIsJoined(true);
+      } catch {
+        // 에러는 joinParty 내부에서 모달로 처리되므로 여기서는 상태만 유지
+        // 참여 실패 시 isJoined는 false로 유지됨
+      }
+    }
   };
 
   const handleEditClick = () => {
@@ -70,26 +89,28 @@ export default function PartyDetail() {
                 </>
               ) : null}
             </div>
-            <div className={styles.buttonGroup}>
-              <button
-                className={styles.actionButton}
-                type="button"
-                onClick={handleEditClick}
-                data-testid="party-detail-edit-button"
-              >
-                <Icon name="edit" size={20} className={styles.buttonIcon} />
-                <span className={styles.buttonText}>수정하기</span>
-              </button>
-              <button
-                className={styles.actionButton}
-                type="button"
-                onClick={handleDeleteClick}
-                data-testid="party-detail-delete-button"
-              >
-                <Icon name="trash" size={20} className={styles.buttonIcon} />
-                <span className={styles.buttonText}>삭제하기</span>
-              </button>
-            </div>
+            {isCreator && (
+              <div className={styles.buttonGroup}>
+                <button
+                  className={styles.actionButton}
+                  type="button"
+                  onClick={handleEditClick}
+                  data-testid="party-detail-edit-button"
+                >
+                  <Icon name="edit" size={20} className={styles.buttonIcon} />
+                  <span className={styles.buttonText}>수정하기</span>
+                </button>
+                <button
+                  className={styles.actionButton}
+                  type="button"
+                  onClick={handleDeleteClick}
+                  data-testid="party-detail-delete-button"
+                >
+                  <Icon name="trash" size={20} className={styles.buttonIcon} />
+                  <span className={styles.buttonText}>삭제하기</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
