@@ -1,38 +1,35 @@
 /**
- * ❗ Apply Animal Compatibility
+ * ❗ Calculate Animal Compatibility Factor
  *
  * 📌 책임 (Responsibility):
- * - 기본 유사도 점수에 동물 궁합 보정 적용
- * - viewer와 target의 동물 타입 간 궁합에 따라 점수 조정
- * - 동물 타입 미설정 시 보정 미적용
+ * - viewer와 target의 동물 타입 간 궁합을 팩터로 계산
+ * - 동물 궁합에 따라 "compatibility factor"를 반환
+ * - baseScore와 독립적으로 계산되는 순수 팩터
  *
  * 📌 입력:
- * - baseScore: 기본 유사도 점수 (0~100)
  * - context: MatchContext 입력
  *
  * 📌 출력:
- * - number: 동물 궁합 보정 적용된 점수 (0~100)
+ * - number: 동물 궁합 팩터 (0.95 ~ 1.10)
  *
- * 📌 계산 로직 (비율 보정):
- * - 천생연분 (best): baseScore × 1.10 (10% 증가)
- * - 좋은 궁합 (good): baseScore × 1.07 (7% 증가)
- * - 중립 (neutral): 보정 미적용
- * - 도전적인 궁합 (challenging): baseScore × 0.95 (5% 감소)
- * - 동일한 동물: baseScore × 1.05 (5% 증가)
- * - 궁합 정보 없음: 보정 미적용
- * - 동물 타입 미설정: 보정 미적용
- * - 최종 점수는 0~100 범위 내
+ * 📌 계산 로직 (multiplicative factor):
+ * - 천생연분 (best): 1.10 (10% 증가)
+ * - 좋은 궁합 (good): 1.07 (7% 증가)
+ * - 동일한 동물: 1.05 (5% 증가)
+ * - 중립 (neutral): 1.0 (보정 없음)
+ * - 도전적인 궁합 (challenging): 0.95 (5% 감소)
+ * - 궁합 정보 없음: 1.0 (보정 없음)
+ * - 동물 타입 미설정: 1.0 (보정 없음)
  */
 
 import type { MatchContextCoreDTO } from '@/commons/types/match/matchContextCore.dto';
 import { getCompatibilityLevel } from '@/commons/constants/animal/animal.compat';
 
 /**
- * 동물 궁합 보정 적용
+ * 동물 궁합 팩터 계산
  *
- * @param baseScore - 기본 유사도 점수 (0~100)
  * @param context - MatchContext 입력
- * @returns 동물 궁합 보정 적용된 점수 (0~100)
+ * @returns 동물 궁합 팩터 (0.95 ~ 1.10)
  *
  * @example
  * ```typescript
@@ -48,7 +45,9 @@ import { getCompatibilityLevel } from '@/commons/constants/animal/animal.compat'
  *   }
  * };
  *
- * const score = applyAnimalCompatibility(80, context); // 88 (80 × 1.10)
+ * const factor = calculateAnimalCompatibilityFactor(context); // 1.10
+ * // 최종 점수 = baseScore × factor
+ * // 예: 80점 × 1.10 = 88점
  * ```
  *
  * @example
@@ -65,7 +64,7 @@ import { getCompatibilityLevel } from '@/commons/constants/animal/animal.compat'
  *   }
  * };
  *
- * const score = applyAnimalCompatibility(80, context); // 85.6 → 86 (80 × 1.07)
+ * const factor = calculateAnimalCompatibilityFactor(context); // 1.07
  * ```
  *
  * @example
@@ -82,7 +81,7 @@ import { getCompatibilityLevel } from '@/commons/constants/animal/animal.compat'
  *   }
  * };
  *
- * const score = applyAnimalCompatibility(80, context); // 76 (80 × 0.95)
+ * const factor = calculateAnimalCompatibilityFactor(context); // 0.95
  * ```
  *
  * @example
@@ -99,7 +98,7 @@ import { getCompatibilityLevel } from '@/commons/constants/animal/animal.compat'
  *   }
  * };
  *
- * const score = applyAnimalCompatibility(80, context); // 84 (80 × 1.05)
+ * const factor = calculateAnimalCompatibilityFactor(context); // 1.05
  * ```
  *
  * @example
@@ -110,11 +109,10 @@ import { getCompatibilityLevel } from '@/commons/constants/animal/animal.compat'
  *   target: { userId: 'target-uuid' }
  * };
  *
- * const score = applyAnimalCompatibility(80, context); // 80 (보정 미적용)
+ * const factor = calculateAnimalCompatibilityFactor(context); // 1.0
  * ```
  */
-export const applyAnimalCompatibility = (
-  baseScore: number,
+export const calculateAnimalCompatibilityFactor = (
   context: MatchContextCoreDTO
 ): number => {
   // 동물 타입 가져오기
@@ -123,41 +121,32 @@ export const applyAnimalCompatibility = (
 
   // 동물 타입 미설정 시 보정 미적용
   if (!viewerAnimal || !targetAnimal) {
-    return baseScore;
+    return 1.0;
   }
 
   // 동일한 동물: 5% 증가
   if (viewerAnimal === targetAnimal) {
-    return Math.min(100, Math.round(baseScore * 1.05));
+    return 1.05;
   }
 
   // 궁합 레벨 확인
   const compatibilityLevel = getCompatibilityLevel(viewerAnimal, targetAnimal);
 
-  // 궁합 레벨에 따른 점수 보정 (비율 적용)
-  let multiplier: number;
-
+  // 궁합 레벨에 따른 팩터 반환
   switch (compatibilityLevel) {
     case 'best':
       // 천생연분: 10% 증가
-      multiplier = 1.1;
-      break;
+      return 1.1;
     case 'good':
       // 좋은 궁합: 7% 증가
-      multiplier = 1.07;
-      break;
+      return 1.07;
     case 'challenging':
       // 도전적인 궁합: 5% 감소
-      multiplier = 0.95;
-      break;
+      return 0.95;
     case 'neutral':
     case 'unknown':
     default:
       // 중립 또는 정보 없음: 보정 미적용
-      multiplier = 1.0;
-      break;
+      return 1.0;
   }
-
-  const adjustedScore = baseScore * multiplier;
-  return Math.min(100, Math.max(0, Math.round(adjustedScore)));
 };
