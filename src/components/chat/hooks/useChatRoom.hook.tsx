@@ -150,8 +150,7 @@ const formatMessageContent = (message: ChatMessage | null): string => {
     return '메시지가 없습니다';
   }
 
-  const content = message.content;
-  const contentType = message.content_type;
+  const { content, content_type: contentType } = message;
 
   if (content === null) {
     return '메시지가 없습니다';
@@ -498,8 +497,7 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
           return;
         }
 
-        const result = await response.json().catch(() => ({}));
-        console.log('Successfully marked room as read:', result);
+        await response.json().catch(() => ({}));
 
         // 읽음 처리 후 로컬 상태 업데이트
         setMessages((prev) =>
@@ -732,7 +730,7 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
       return null;
     }
 
-    const otherMember = chatRoomItem.otherMember;
+    const { otherMember } = chatRoomItem;
 
     return {
       id: otherMember.id,

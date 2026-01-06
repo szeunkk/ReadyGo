@@ -181,12 +181,11 @@ export default function ChatList() {
         );
         // 에러 발생 시 낙관적 업데이트 롤백하지 않음 (사용자 경험 우선)
       } else {
-        const result = await response.json().catch(() => ({}));
-        console.log('Successfully marked room as read:', result);
+        await response.json().catch(() => ({}));
       }
     } catch (error) {
-      console.error('Failed to mark room as read:', error);
       // 에러 발생 시 낙관적 업데이트 롤백하지 않음 (사용자 경험 우선)
+      void error;
     }
   };
 

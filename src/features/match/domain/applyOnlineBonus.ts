@@ -68,10 +68,10 @@ import type { MatchContextCoreDTO } from '@/commons/types/match/matchContextCore
  * const score = applyOnlineBonus(80, context); // 80 (보정 미적용)
  * ```
  */
-export function applyOnlineBonus(
+export const applyOnlineBonus = (
   baseScore: number,
   context: MatchContextCoreDTO
-): number {
+): number => {
   // Target 온라인 상태 확인
   const targetOnline = context.target.activity?.isOnline ?? false;
 
@@ -83,5 +83,4 @@ export function applyOnlineBonus(
 
   // 오프라인이거나 상태 미확인 시 기본 점수 유지
   return baseScore;
-}
-
+};

@@ -54,10 +54,10 @@ import { calculateScheduleSimilarity } from './utils/scheduleSimilarity';
  * combineBaseSimilarity({}); // 50 (기본 점수)
  * ```
  */
-function combineBaseSimilarity(scores: {
+const combineBaseSimilarity = (scores: {
   traitsScore?: number;
   scheduleScore?: number;
-}): number {
+}): number => {
   const { traitsScore, scheduleScore } = scores;
 
   // Traits가 없으면 기본 점수 반환 (Cold Start)
@@ -77,7 +77,7 @@ function combineBaseSimilarity(scores: {
 
   // 최종 점수는 0~100 범위 내로 제한
   return Math.min(100, Math.max(0, finalScore));
-}
+};
 
 /**
  * 기본 유사도 계산
@@ -154,7 +154,9 @@ function combineBaseSimilarity(scores: {
  * const score = calculateBaseSimilarity(context); // 50 (기본 점수)
  * ```
  */
-export function calculateBaseSimilarity(context: MatchContextCoreDTO): number {
+export const calculateBaseSimilarity = (
+  context: MatchContextCoreDTO
+): number => {
   // 1. Traits 유사도 계산 (있을 경우에만)
   const traitsScore =
     context.viewer.traits?.traits && context.target.traits?.traits
@@ -175,4 +177,4 @@ export function calculateBaseSimilarity(context: MatchContextCoreDTO): number {
 
   // 3. 정책 함수로 점수 조합
   return combineBaseSimilarity({ traitsScore, scheduleScore });
-}
+};

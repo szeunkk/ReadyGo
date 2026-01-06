@@ -73,10 +73,10 @@ import type { MatchContextCoreDTO } from '@/commons/types/match/matchContextCore
  * const score = applySteamBonus(80, context); // 80 (공통 게임 없음)
  * ```
  */
-export function applySteamBonus(
+export const applySteamBonus = (
   baseScore: number,
   context: MatchContextCoreDTO
-): number {
+): number => {
   // Steam 게임 목록 가져오기
   const viewerGames = context.viewer.steam?.steamGames ?? [];
   const targetGames = context.target.steam?.steamGames ?? [];
@@ -95,5 +95,4 @@ export function applySteamBonus(
 
   // 최종 점수는 100을 초과하지 않음
   return Math.min(100, bonusScore);
-}
-
+};

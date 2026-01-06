@@ -52,10 +52,10 @@ import type { PlayScheduleInput } from '@/commons/types/match/matchContextCore.d
  * // 0 (공통 시간대 없음)
  * ```
  */
-export function calculateScheduleSimilarity(
+export const calculateScheduleSimilarity = (
   viewerSchedule: PlayScheduleInput[],
   targetSchedule: PlayScheduleInput[]
-): number {
+): number => {
   // 빈 배열 처리: 0 반환
   if (viewerSchedule.length === 0 || targetSchedule.length === 0) {
     return 0;
@@ -75,5 +75,4 @@ export function calculateScheduleSimilarity(
 
   // 0~100 범위로 변환
   return Math.round(ratio * 100);
-}
-
+};

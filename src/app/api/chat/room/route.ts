@@ -42,16 +42,8 @@ export const POST = async (request: NextRequest) => {
 
     // 세션 확인 (디버깅용)
     const {
-      data: { session },
+      data: { session: _session },
     } = await supabase.auth.getSession();
-    console.log(
-      '[API] /api/chat/room POST - Session check before service call:',
-      {
-        hasSession: !!session,
-        userId: session?.user?.id || user?.id,
-        accessToken: session?.access_token ? 'present' : 'missing',
-      }
-    );
 
     // 3. 요청 본문 파싱
     const body = await request.json();
@@ -67,13 +59,16 @@ export const POST = async (request: NextRequest) => {
     console.error('[API] /api/chat/room POST error:', error);
 
     // Supabase 에러인 경우 상세 정보 로깅
+    interface SupabaseError {
+      message?: string;
+      details?: string;
+      hint?: string;
+      code?: string;
+    }
     if (error && typeof error === 'object' && 'message' in error) {
-      console.error('[API] Error details:', {
-        message: (error as any).message,
-        details: (error as any).details,
-        hint: (error as any).hint,
-        code: (error as any).code,
-      });
+      const supabaseError = error as SupabaseError;
+      // Error details are available for debugging
+      void supabaseError;
     }
 
     // 6. Service 에러 매핑
@@ -112,15 +107,20 @@ export const POST = async (request: NextRequest) => {
     }
 
     // 6-4. 기타 예상치 못한 에러 → 500 (fallback)
+    interface ErrorWithDetails {
+      message?: string;
+      details?: string;
+      hint?: string;
+    }
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error';
     const errorDetails =
       error && typeof error === 'object' && 'details' in error
-        ? (error as any).details
+        ? (error as ErrorWithDetails).details
         : undefined;
     const errorHint =
       error && typeof error === 'object' && 'hint' in error
-        ? (error as any).hint
+        ? (error as ErrorWithDetails).hint
         : undefined;
 
     return NextResponse.json(

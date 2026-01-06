@@ -125,9 +125,7 @@ test.describe('파티 참여 기능', () => {
     expect(response.status()).toBeLessThan(500);
   });
 
-  test('성공시나리오: API 호출 성공 후 적절한 처리 확인', async ({
-    page,
-  }) => {
+  test('성공시나리오: API 호출 성공 후 적절한 처리 확인', async ({ page }) => {
     // 페이지 컨텍스트에서 실제 파티 ID 조회 (참여하지 않은 파티)
     const validPartyId = await page.evaluate(async () => {
       try {
@@ -245,18 +243,18 @@ test.describe('파티 참여 기능', () => {
     });
 
     // 페이지 로드 대기 (에러 페이지일 수 있음)
-    await page.waitForSelector('[data-testid="party-detail-page"]', {
-      state: 'visible',
-      timeout: 499,
-    }).catch(() => {
-      // 에러 페이지일 수 있음
-    });
+    await page
+      .waitForSelector('[data-testid="party-detail-page"]', {
+        state: 'visible',
+        timeout: 499,
+      })
+      .catch(() => {
+        // 에러 페이지일 수 있음
+      });
 
     // 참여하기 버튼이 있는지 확인
     const joinButton = page.getByRole('button', { name: '참여하기' });
-    const isJoinButtonVisible = await joinButton
-      .isVisible()
-      .catch(() => false);
+    const isJoinButtonVisible = await joinButton.isVisible().catch(() => false);
 
     if (isJoinButtonVisible) {
       await joinButton.click();
@@ -311,10 +309,7 @@ test.describe('파티 참여 기능', () => {
               );
               if (membersResponse.ok) {
                 const membersResult = await membersResponse.json();
-                if (
-                  membersResult.data &&
-                  Array.isArray(membersResult.data)
-                ) {
+                if (membersResult.data && Array.isArray(membersResult.data)) {
                   const userResponse = await fetch('/api/auth/user', {
                     method: 'GET',
                     credentials: 'include',
@@ -367,9 +362,7 @@ test.describe('파티 참여 기능', () => {
 
     // 참여하기 버튼이 있는지 확인 (이미 참여한 경우 버튼이 없을 수 있음)
     const joinButton = page.getByRole('button', { name: '참여하기' });
-    const isJoinButtonVisible = await joinButton
-      .isVisible()
-      .catch(() => false);
+    const isJoinButtonVisible = await joinButton.isVisible().catch(() => false);
 
     if (isJoinButtonVisible) {
       await joinButton.click();
@@ -495,9 +488,7 @@ test.describe('파티 참여 기능', () => {
 
     // 참여하기 버튼 찾기 및 클릭
     const joinButton = page.getByRole('button', { name: '참여하기' });
-    const isJoinButtonVisible = await joinButton
-      .isVisible()
-      .catch(() => false);
+    const isJoinButtonVisible = await joinButton.isVisible().catch(() => false);
 
     if (isJoinButtonVisible) {
       await joinButton.click();
@@ -520,4 +511,3 @@ test.describe('파티 참여 기능', () => {
     }
   });
 });
-

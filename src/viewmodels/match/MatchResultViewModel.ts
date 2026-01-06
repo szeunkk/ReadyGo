@@ -291,4 +291,3 @@ export interface PartyMatchSummaryViewModel {
  * 4. Steam 미연동 Cold Start 시나리오에서도 완결된 ViewModel 생성
  * 5. home / match 페이지 공용 사용 가능
  */
-

@@ -187,9 +187,7 @@ const toScoreViewModel = (score: number): MatchScoreViewModel => {
  * @param probability - 파티 성공 확률 (0~100)
  * @returns PartySuccessViewModel - UI 표현 단위
  */
-const toSuccessViewModel = (
-  probability: number
-): PartySuccessViewModel => {
+const toSuccessViewModel = (probability: number): PartySuccessViewModel => {
   const percentText = `${probability}%`;
 
   let successLabel: string;
@@ -221,22 +219,34 @@ const toSuccessViewModel = (
  * @returns 상대 시간 문구 (예: '5분 전', '1시간 전', '오늘')
  */
 const toComputedTimeText = (computedAt?: string): string | undefined => {
-  if (!computedAt) return undefined;
+  if (!computedAt) {
+    return undefined;
+  }
 
   const now = new Date();
   const computed = new Date(computedAt);
   const diffMs = now.getTime() - computed.getTime();
   const diffMinutes = Math.floor(diffMs / 1000 / 60);
 
-  if (diffMinutes < 1) return '방금 전';
-  if (diffMinutes < 60) return `${diffMinutes}분 전`;
+  if (diffMinutes < 1) {
+    return '방금 전';
+  }
+  if (diffMinutes < 60) {
+    return `${diffMinutes}분 전`;
+  }
 
   const diffHours = Math.floor(diffMinutes / 60);
-  if (diffHours < 24) return `${diffHours}시간 전`;
+  if (diffHours < 24) {
+    return `${diffHours}시간 전`;
+  }
 
   const diffDays = Math.floor(diffHours / 24);
-  if (diffDays === 0) return '오늘';
-  if (diffDays === 1) return '어제';
+  if (diffDays === 0) {
+    return '오늘';
+  }
+  if (diffDays === 1) {
+    return '어제';
+  }
 
   return `${diffDays}일 전`;
 };
@@ -368,4 +378,3 @@ export const toPartyMatchSummaryViewModel = (
     computedTimeText,
   };
 };
-
