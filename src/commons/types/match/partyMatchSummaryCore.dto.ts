@@ -134,4 +134,3 @@ export interface PartyMatchSummaryCoreDTO {
  * 2. MatchResultCoreDTO와 함께 사용하거나 별도 사용 가능
  * 3. 향후 Party 관련 추가 정보 확장 가능
  */
-

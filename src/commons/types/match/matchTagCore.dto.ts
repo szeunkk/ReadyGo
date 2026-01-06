@@ -75,4 +75,3 @@ export interface MatchTagCoreDTO {
  * 4. Tag는 항상 동일 구조 유지
  * 5. Steam 미연동 여부에 따른 구분 필드 없음
  */
-

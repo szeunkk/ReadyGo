@@ -179,4 +179,3 @@ export interface MatchResultCoreDTO {
  * 3. 새 Reason 타입 추가 시 UI 수정 최소화
  * 4. reasons, tags는 배열이므로 확장 가능
  */
-
