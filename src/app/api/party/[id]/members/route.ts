@@ -124,3 +124,112 @@ export const POST = async (
     );
   }
 };
+
+/**
+ * 파티 나가기
+ * DELETE /api/party/[id]/members
+ */
+export const DELETE = async (
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) => {
+  try {
+    // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
+    const supabase = createClient();
+
+    // 사용자 정보 확인
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: '인증이 필요합니다.' },
+        { status: 401 }
+      );
+    }
+
+    // 파라미터 검증
+    const postId = parseInt(params.id, 10);
+    if (isNaN(postId)) {
+      return NextResponse.json(
+        { error: '유효하지 않은 파티 ID입니다.' },
+        { status: 400 }
+      );
+    }
+
+    // 파티 정보 조회 (creator_id 확인)
+    const { data: partyData, error: fetchError } = await supabase
+      .from('party_posts')
+      .select('creator_id')
+      .eq('id', postId)
+      .single();
+
+    if (fetchError) {
+      if (fetchError.code === 'PGRST116') {
+        return NextResponse.json(
+          { error: '파티를 찾을 수 없습니다.' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ error: fetchError.message }, { status: 500 });
+    }
+
+    // 작성자 확인 (파티 작성자는 나갈 수 없음)
+    if (partyData.creator_id === user.id) {
+      return NextResponse.json(
+        { error: '파티 작성자는 나갈 수 없습니다.' },
+        { status: 400 }
+      );
+    }
+
+    // 삭제 전 참여 여부 확인
+    const { data: _existingMember, error: checkError } = await supabase
+      .from('party_members')
+      .select('id')
+      .eq('post_id', postId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (checkError) {
+      if (checkError.code === 'PGRST116') {
+        // 참여하지 않은 경우
+        return NextResponse.json(
+          { error: '참여하지 않은 파티입니다.' },
+          { status: 400 }
+        );
+      }
+      return NextResponse.json({ error: checkError.message }, { status: 500 });
+    }
+
+    // party_members 레코드 삭제
+    const { data: deletedData, error: deleteError } = await supabase
+      .from('party_members')
+      .delete()
+      .eq('post_id', postId)
+      .eq('user_id', user.id)
+      .select();
+
+    if (deleteError) {
+      return NextResponse.json({ error: deleteError.message }, { status: 500 });
+    }
+
+    // 삭제된 row가 없는 경우
+    if (!deletedData || deletedData.length === 0) {
+      return NextResponse.json(
+        { error: '파티 나가기에 실패했습니다.' },
+        { status: 500 }
+      );
+    }
+
+    // 성공 응답
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error) {
+    console.error('Party leave API error:', error);
+    return NextResponse.json(
+      { error: '서버 오류가 발생했습니다.' },
+      { status: 500 }
+    );
+  }
+};

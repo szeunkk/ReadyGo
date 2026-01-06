@@ -3,16 +3,31 @@ import { createClient } from '@/lib/supabase/server';
 import { Database } from '@/types/supabase';
 
 type PartyPost = Database['public']['Tables']['party_posts']['Row'];
+type PartyMember = Database['public']['Tables']['party_members']['Row'];
+type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
 
 /**
  * 파티 목록 조회
  * GET /api/party
- * 인증되지 않은 유저도 조회 가능
+ * 인증된 유저, 로그인한 유저만 조회 가능
  */
 export const GET = async (request: NextRequest) => {
   try {
     // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
     const supabase = createClient();
+
+    // 인증 체크: 인증된 유저만 파티 목록 조회 가능
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: '인증이 필요합니다.' },
+        { status: 401 }
+      );
+    }
 
     // 쿼리 파라미터 처리
     const { searchParams } = new URL(request.url);
@@ -27,27 +42,14 @@ export const GET = async (request: NextRequest) => {
     const offset = offsetParam ? parseInt(offsetParam, 10) : 0;
     const tab = tabParam === 'participating' ? 'participating' : 'all';
 
-    // 현재 로그인한 유저 정보 확인 (참여 중인 파티 탭인 경우 필요)
-    let currentUserId: string | null = null;
-    if (tab === 'participating') {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError || !user) {
-        // 로그인하지 않은 경우 빈 목록 반환
-        return NextResponse.json({ data: [] });
-      }
-
-      currentUserId = user.id;
-    }
+    // 현재 로그인한 유저 정보 (이미 인증 체크 완료)
+    const currentUserId = user.id;
 
     // 1단계: party_posts 조회
     // 참여 중인 파티 탭인 경우: party_members에서 현재 유저가 참여한 post_id만 조회
     let allPartyPosts: PartyPost[] = [];
 
-    if (tab === 'participating' && currentUserId) {
+    if (tab === 'participating') {
       // party_members에서 현재 유저가 참여한 post_id 조회
       const { data: partyMembers, error: membersError } = await supabase
         .from('party_members')
@@ -56,11 +58,11 @@ export const GET = async (request: NextRequest) => {
 
       if (membersError) {
         console.error('party_members 조회 실패:', membersError);
-        return NextResponse.json({ data: [] });
+        return NextResponse.json({ data: [], members: [], profiles: [] });
       }
 
       if (!partyMembers || partyMembers.length === 0) {
-        return NextResponse.json({ data: [] });
+        return NextResponse.json({ data: [], members: [], profiles: [] });
       }
 
       // 참여한 post_id 목록 추출
@@ -69,7 +71,7 @@ export const GET = async (request: NextRequest) => {
         .filter((id): id is number => id !== null);
 
       if (postIds.length === 0) {
-        return NextResponse.json({ data: [] });
+        return NextResponse.json({ data: [], members: [], profiles: [] });
       }
 
       // 해당 post_id에 해당하는 party_posts 조회
@@ -107,7 +109,7 @@ export const GET = async (request: NextRequest) => {
     }
 
     if (!allPartyPosts || allPartyPosts.length === 0) {
-      return NextResponse.json({ data: [] });
+      return NextResponse.json({ data: [], members: [], profiles: [] });
     }
 
     // 2단계: steam_game_info 조회 및 매칭
@@ -205,7 +207,54 @@ export const GET = async (request: NextRequest) => {
     // 페이징 적용
     const paginatedPosts = filteredPartyPosts.slice(offset, offset + limit);
 
-    return NextResponse.json({ data: paginatedPosts });
+    // 5단계: party_members 및 user_profiles 조회
+    // paginatedPosts의 post_id 목록 추출
+    const postIds = paginatedPosts.map((post) => post.id);
+
+    let allMembers: PartyMember[] = [];
+    let allProfiles: UserProfile[] = [];
+
+    if (postIds.length > 0) {
+      // party_members 조회: 모든 post_id에 대한 멤버 조회
+      const { data: partyMembers, error: membersError } = await supabase
+        .from('party_members')
+        .select('*')
+        .in('post_id', postIds);
+
+      if (membersError) {
+        console.error('party_members 조회 실패:', membersError);
+      } else {
+        allMembers = partyMembers || [];
+      }
+
+      // user_profiles 조회: 모든 user_id에 대한 프로필 조회
+      const userIds = Array.from(
+        new Set(
+          allMembers
+            .map((m) => m.user_id)
+            .filter((id): id is string => Boolean(id))
+        )
+      );
+
+      if (userIds.length > 0) {
+        const { data: userProfiles, error: profilesError } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .in('id', userIds);
+
+        if (profilesError) {
+          console.error('user_profiles 조회 실패:', profilesError);
+        } else {
+          allProfiles = userProfiles || [];
+        }
+      }
+    }
+
+    return NextResponse.json({
+      data: paginatedPosts,
+      members: allMembers,
+      profiles: allProfiles,
+    });
   } catch (error) {
     console.error('Party list API error:', error);
     return NextResponse.json(
