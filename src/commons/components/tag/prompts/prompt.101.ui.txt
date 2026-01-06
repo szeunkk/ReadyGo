@@ -33,3 +33,8 @@
 
 핵심요구사항) 하드코딩된 색상 및 폰트 값을 절대 사용하지 말 것. 반드시 global.css에 정의된 CSS 변수(상수 토큰)를 사용할 것.
 
+==============================================
+
+1차추가요구사항) variant 추가할 것.
+        - variant: 'leader'
+        - 피그마링크: https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=3337-11905&m=dev

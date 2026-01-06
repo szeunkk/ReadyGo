@@ -201,6 +201,9 @@
   --color-transparent-28: #7ffde847;
   --color-transparent-32: #7ffde852;
 
+  /* Warning Transparent Colors */
+  --color-warning-800-30: rgba(140, 105, 8, 0.3);
+
   /* Shadow Colors - Light Mode (teal-400 based) */
   --color-shadow-light-subtle: var(--color-transparent-12);
   --color-shadow-light-default: var(--color-transparent-16);

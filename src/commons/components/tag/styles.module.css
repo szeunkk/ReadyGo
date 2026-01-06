@@ -47,3 +47,16 @@
   padding-left: 10px;
   padding-right: 10px;
 }
+
+/* Leader Style */
+.style-leader {
+  background-color: var(--color-warning-800-30);
+  border: 1px solid var(--color-border-warning);
+  color: var(--color-text-warning-bold);
+  border-radius: 8px;
+  padding-left: 9px;
+  padding-right: 9px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  font-weight: var(--font-weight-medium);
+}

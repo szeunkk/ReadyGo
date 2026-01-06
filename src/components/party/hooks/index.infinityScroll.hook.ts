@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { PartyCardProps } from '../ui/card/card';
 import { supabase } from '@/lib/supabase/client';
 import { AnimalType } from '@/commons/constants/animal';
+import { useAuth } from '@/commons/providers/auth/auth.provider';
 
 // API 응답 타입
 interface PartyPost {
@@ -265,6 +266,7 @@ export const useInfinitePartyList = (
   genre?: string,
   search?: string
 ): UseInfinitePartyListReturn => {
+  const { user } = useAuth();
   const [data, setData] = useState<PartyCardProps[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
@@ -272,6 +274,8 @@ export const useInfinitePartyList = (
   const [error, setError] = useState<Error | null>(null);
   const [offset, setOffset] = useState(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  // 원본 파티 데이터 저장 (user 변경 시 isLeader 재계산용)
+  const [originalPartyData, setOriginalPartyData] = useState<PartyPost[]>([]);
 
   // 데이터 변환 함수 (실제 데이터 사용)
   const transformPartyData = useCallback(
@@ -296,6 +300,11 @@ export const useInfinitePartyList = (
         // currentMembers 계산 (실제 데이터 사용)
         const currentMembers = getCurrentMembers(party.id, membersMap);
 
+        // isLeader 계산: 로그인한 유저의 ID와 party_posts.creator_id가 같을 때만 true
+        // 로그인하지 않은 경우(user가 null인 경우) 또는 creator_id가 없는 경우 false
+        const isLeader =
+          user?.id && party.creator_id && user.id === party.creator_id;
+
         return {
           title: party.party_title,
           description: truncateDescription(party.description),
@@ -310,16 +319,18 @@ export const useInfinitePartyList = (
             controlLevel: getControlLevelLabel(party.control_level),
           },
           partyId: party.id,
+          isLeader,
         };
       });
     },
-    []
+    [user]
   );
 
   // 필터 변경 시 리셋
   useEffect(() => {
     // 필터가 변경되면 데이터 리셋 및 재로드
     setData([]);
+    setOriginalPartyData([]);
     setHasMore(true);
     setError(null);
     setOffset(0);
@@ -327,6 +338,49 @@ export const useInfinitePartyList = (
     setIsLoading(true);
     setIsLoadingMore(false);
   }, [genre, search]);
+
+  // user 변경 시 기존 데이터의 isLeader 값 재계산
+  useEffect(() => {
+    if (originalPartyData.length === 0) {
+      return;
+    }
+
+    // 원본 데이터를 partyId를 키로 하는 Map으로 변환
+    const originalPartyMap = new Map<number, PartyPost>();
+    originalPartyData.forEach((party) => {
+      originalPartyMap.set(party.id, party);
+    });
+
+    // 기존 데이터의 isLeader만 업데이트
+    setData((prevData) => {
+      return prevData.map((card) => {
+        if (!card.partyId) {
+          return card;
+        }
+
+        const originalParty = originalPartyMap.get(
+          typeof card.partyId === 'string'
+            ? parseInt(card.partyId, 10)
+            : card.partyId
+        );
+
+        if (!originalParty) {
+          return card;
+        }
+
+        // isLeader 재계산
+        const isLeader =
+          user?.id &&
+          originalParty.creator_id &&
+          user.id === originalParty.creator_id;
+
+        return {
+          ...card,
+          isLeader,
+        };
+      });
+    });
+  }, [user, originalPartyData]);
 
   // 초기 로드
   useEffect(() => {
@@ -398,6 +452,8 @@ export const useInfinitePartyList = (
         }
 
         const partyList: PartyPost[] = result.data || [];
+        // 원본 데이터 저장
+        setOriginalPartyData(partyList);
         const transformedData = await transformPartyData(partyList);
 
         // 초기 로드: 6개 미만이 와도 그 데이터는 표시
@@ -484,6 +540,8 @@ export const useInfinitePartyList = (
       }
 
       const partyList: PartyPost[] = result.data || [];
+      // 원본 데이터 추가 저장
+      setOriginalPartyData((prev) => [...prev, ...partyList]);
       const transformedData = await transformPartyData(partyList);
 
       if (partyList.length === 0) {
@@ -515,6 +573,7 @@ export const useInfinitePartyList = (
   // reset 함수
   const reset = useCallback(() => {
     setData([]);
+    setOriginalPartyData([]);
     setHasMore(true);
     setError(null);
     setOffset(0);
