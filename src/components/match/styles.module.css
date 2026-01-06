@@ -50,6 +50,28 @@
   flex: 1;
 }
 
+/* 로딩 및 에러 상태 스타일 */
+.loading,
+.error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  width: 100%;
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: var(--typo-body-md-font-weight);
+  line-height: var(--typo-body-md-line-height);
+}
+
+.loading {
+  color: var(--color-text-secondary);
+}
+
+.error {
+  color: var(--color-text-error);
+}
+
 /* 반응형 레이아웃 */
 @media (max-width: 768px) {
   .header {

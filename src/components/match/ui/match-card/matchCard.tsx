@@ -21,11 +21,15 @@ export interface MatchCardProps {
    */
   matchRate: number;
   /**
-   * 사용자 온라인 상태
+   * 사용자 온라인 상태 (user_status 테이블의 status)
    */
-  status?: 'online' | 'away' | 'ban' | 'offline';
+  status?: 'online' | 'away' | 'dnd' | 'offline';
   /**
-   * 동물 타입
+   * 아바타 이미지 URL (getAvatarImagePath로 계산된 경로)
+   */
+  avatarUrl?: string;
+  /**
+   * 동물 타입 (하위 호환성, avatarUrl이 우선)
    */
   animalType?: string;
   /**
@@ -51,6 +55,7 @@ export default function MatchCard({
   nickname,
   matchRate,
   status = 'online',
+  avatarUrl,
   animalType,
   tags,
   onProfileClick,
@@ -69,6 +74,7 @@ export default function MatchCard({
           {/* 아바타 */}
           <div className={styles.avatarWrapper}>
             <Avatar
+              imageUrl={avatarUrl}
               animalType={animalType as AnimalType}
               alt={nickname}
               size="m"
