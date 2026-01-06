@@ -7,7 +7,7 @@ import type { Database } from '@/types/supabase';
  * @param userId - 사용자 ID
  * @returns 프로필 존재 여부
  */
-export async function checkUserProfile(
+export const checkUserProfile = async function (
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<boolean> {
@@ -18,11 +18,13 @@ export async function checkUserProfile(
     .maybeSingle();
 
   if (error) {
+    // eslint-disable-next-line no-console
     console.error('Profile check error:', error);
     throw new Error('프로필 확인 중 오류가 발생했습니다.');
   }
 
   const hasProfile = data !== null;
+  // eslint-disable-next-line no-console
   console.log('checkUserProfile result:', {
     userId,
     hasProfile,
@@ -31,4 +33,4 @@ export async function checkUserProfile(
   });
 
   return hasProfile;
-}
+};

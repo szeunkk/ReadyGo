@@ -10,7 +10,7 @@ import { TierType } from '@/commons/constants/tierType.enum';
  * @param userId - 사용자 ID
  * @throws 프로필, 설정 또는 상태 생성 실패 시 에러
  */
-export async function createUserProfile(
+export const createUserProfile = async function (
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<void> {
@@ -73,9 +73,9 @@ export async function createUserProfile(
   if (statusError) {
     console.error('User status creation error:', statusError);
     // profiles와 settings는 생성되었지만 user_status 생성 실패
-    throw new Error(
-      statusError.message ||
-        '사용자 상태 생성에 실패했습니다. RLS 정책을 확인하세요.'
-    );
-  }
-}
+      throw new Error(
+        statusError.message ||
+          '사용자 상태 생성에 실패했습니다. RLS 정책을 확인하세요.'
+      );
+    }
+  };

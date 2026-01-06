@@ -41,7 +41,7 @@ test.describe('회원가입 API', () => {
     expect(hasSessionCookie).toBe(true);
   });
 
-  test('실패 시나리오 1: 이미 등록된 이메일', async ({ request, page }) => {
+  test('실패 시나리오 1: 이미 등록된 이메일', async ({ request, _page }) => {
     // 먼저 실제 회원가입으로 계정 생성
     const timestamp = Date.now();
     const email = `test-${timestamp}@gmail.com`;

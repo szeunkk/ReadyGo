@@ -140,6 +140,7 @@ test.describe('세션 동기화 개선', () => {
 
     // 페이지가 깜빡임 없이 부드럽게 전환되었는지 확인
     const navigationType = await page.evaluate(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return (window as any).__NEXT_DATA__?.router?.asPath;
     });
     expect(navigationType).toBeTruthy();

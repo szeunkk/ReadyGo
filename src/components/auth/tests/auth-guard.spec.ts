@@ -56,7 +56,7 @@ test.describe('인가 체크 최적화', () => {
 
     // 로딩 스피너가 일시적으로 표시될 수 있음 (세션 동기화 중)
     // 또는 로딩 스피너가 표시되지 않고 바로 모달이 표시될 수도 있음
-    const isSpinnerVisible = await loadingSpinner
+    await loadingSpinner
       .isVisible({ timeout: 500 })
       .catch(() => false);
 
