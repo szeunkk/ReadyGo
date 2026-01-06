@@ -75,7 +75,7 @@ export default function Match() {
     return matchDataArray.sort((a, b) => {
       const aStatus = getEffectiveStatus(a.userId);
       const bStatus = getEffectiveStatus(b.userId);
-      
+
       const aOnline = aStatus !== 'offline';
       const bOnline = bStatus !== 'offline';
 
@@ -87,7 +87,8 @@ export default function Match() {
       // 온라인 상태가 같으면 점수 높은 순
       return b.matchRate - a.matchRate;
     });
-  }, [results, presenceUserIds]); // Presence 변경 시 재정렬
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [results, presenceUserIds]); // Presence 변경 시 재정렬 (presenceUserIds는 getEffectiveStatus 내부에서 사용됨)
 
   // 프로필 클릭 핸들러
   const handleProfileClick = (userId: string) => {
