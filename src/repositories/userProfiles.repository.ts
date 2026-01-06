@@ -47,3 +47,29 @@ export const updateAnimalType = async (
     .update({ animal_type: animalType })
     .eq('id', userId);
 };
+
+/**
+ * user_profiles의 모든 user id 목록을 조회한다
+ * - DB 접근만 수행, 에러 처리 및 데이터 가공 없음
+ * - Supabase 응답 구조를 그대로 반환
+ */
+export const getAllUserIds = async (
+  client: SupabaseClient<Database>
+): Promise<string[]> => {
+  const { data, error } = await client.from('user_profiles').select('id');
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data || data.length === 0) {
+    return [];
+  }
+
+  // id만 추출
+  const userIds = data
+    .map((row) => row.id)
+    .filter((id): id is string => id !== null && id !== undefined);
+
+  return userIds;
+};

@@ -14,6 +14,83 @@ export interface ChatRoomListItem {
 // ============================================
 
 /**
+ * 특정 사용자와 1:1 채팅방이 있는 모든 사용자 ID 목록 조회
+ * - DB 접근만 수행, 에러 처리 없음
+ * - N+1 방지를 위한 batch 조회용 함수
+ */
+export const getChatUserIds = async (
+  client: SupabaseClient<Database>,
+  userId: string
+): Promise<string[]> => {
+  // userId가 참여한 모든 direct 채팅방의 room_id 조회
+  const { data: myRooms, error: error1 } = await client
+    .from('chat_room_members')
+    .select('room_id')
+    .eq('user_id', userId);
+
+  if (error1) {
+    throw error1;
+  }
+
+  if (!myRooms || myRooms.length === 0) {
+    return [];
+  }
+
+  const roomIds = myRooms
+    .map((m) => m.room_id)
+    .filter((id): id is number => id !== null);
+
+  if (roomIds.length === 0) {
+    return [];
+  }
+
+  // 해당 room_id들이 direct 타입인지 확인
+  const { data: directRooms, error: error2 } = await client
+    .from('chat_rooms')
+    .select('id')
+    .in('id', roomIds)
+    .eq('type', 'direct');
+
+  if (error2) {
+    throw error2;
+  }
+
+  if (!directRooms || directRooms.length === 0) {
+    return [];
+  }
+
+  const directRoomIds = directRooms
+    .map((r) => r.id)
+    .filter((id): id is number => id !== null);
+
+  if (directRoomIds.length === 0) {
+    return [];
+  }
+
+  // 해당 direct 채팅방의 다른 멤버 조회
+  const { data: otherMembers, error: error3 } = await client
+    .from('chat_room_members')
+    .select('user_id')
+    .in('room_id', directRoomIds)
+    .neq('user_id', userId);
+
+  if (error3) {
+    throw error3;
+  }
+
+  if (!otherMembers || otherMembers.length === 0) {
+    return [];
+  }
+
+  // user_id만 추출
+  const userIds = otherMembers
+    .map((m) => m.user_id)
+    .filter((id): id is string => id !== null && id !== undefined);
+
+  return userIds;
+};
+
+/**
  * 두 사용자 간의 1:1 채팅방이 존재하는지 조회
  * - DB 접근만 수행, 에러 처리 및 데이터 가공 없음
  * - Supabase 응답 구조를 그대로 반환
@@ -631,75 +708,4 @@ export const markRoomAsRead = async (
 
   // markMessagesAsRead 함수를 활용하여 일괄 읽음 처리
   await markMessagesAsRead(client, roomId, userId, unreadMessageIds);
-};
-
-// ============================================
-// 차단 관련 함수
-// ============================================
-
-/**
- * 사용자를 차단
- * - DB 접근만 수행, 에러 처리 없음
- */
-export const blockUser = async (
-  client: SupabaseClient<Database>,
-  userId: string,
-  blockedUserId: string
-): Promise<void> => {
-  // upsert를 사용하여 중복 차단 방지
-  // (user_id, blocked_user_id) 조합의 유니크 제약이 있다는 전제
-  const { error } = await client.from('user_blocks').upsert(
-    {
-      user_id: userId,
-      blocked_user_id: blockedUserId,
-    },
-    { onConflict: 'user_id,blocked_user_id' }
-  );
-
-  if (error) {
-    throw error;
-  }
-};
-
-/**
- * 사용자 차단 해제
- * - DB 접근만 수행, 에러 처리 없음
- */
-export const unblockUser = async (
-  client: SupabaseClient<Database>,
-  userId: string,
-  blockedUserId: string
-): Promise<void> => {
-  const { error } = await client
-    .from('user_blocks')
-    .delete()
-    .eq('user_id', userId)
-    .eq('blocked_user_id', blockedUserId);
-
-  if (error) {
-    throw error;
-  }
-};
-
-/**
- * 사용자가 다른 사용자를 차단했는지 확인
- * - DB 접근만 수행, 에러 처리 없음
- */
-export const isUserBlocked = async (
-  client: SupabaseClient<Database>,
-  userId: string,
-  otherUserId: string
-): Promise<boolean> => {
-  const { data, error } = await client
-    .from('user_blocks')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('blocked_user_id', otherUserId)
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return data !== null;
 };
