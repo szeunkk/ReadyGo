@@ -12,6 +12,8 @@ interface PartyInfoProps {
   isLoading: boolean;
   error: Error | null;
   onJoinClick?: () => void;
+  onLeaveClick?: () => void;
+  isJoined?: boolean;
 }
 
 export default function PartyInfo({
@@ -19,6 +21,8 @@ export default function PartyInfo({
   isLoading,
   error,
   onJoinClick,
+  onLeaveClick,
+  isJoined = false,
 }: PartyInfoProps) {
   if (isLoading) {
     return (
@@ -154,15 +158,29 @@ export default function PartyInfo({
           </div>
         )}
       </div>
-      <Button
-        variant="primary"
-        size="m"
-        shape="round"
-        className={styles.button}
-        onClick={onJoinClick}
-      >
-        참여하기
-      </Button>
+      {isJoined ? (
+        <Button
+          variant="primary"
+          size="m"
+          shape="round"
+          className={styles.button}
+          onClick={onLeaveClick}
+          data-testid="party-detail-leave-button"
+        >
+          나가기
+        </Button>
+      ) : (
+        <Button
+          variant="primary"
+          size="m"
+          shape="round"
+          className={styles.button}
+          onClick={onJoinClick}
+          data-testid="party-detail-join-button"
+        >
+          참여하기
+        </Button>
+      )}
     </div>
   );
 }
