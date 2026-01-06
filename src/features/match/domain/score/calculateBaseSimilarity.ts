@@ -21,7 +21,7 @@
  */
 
 import type { MatchContextCoreDTO } from '@/commons/types/match/matchContextCore.dto';
-import { calculateTraitsSimilarity } from './utils/traitsSimilarity';
+import { calculateTraitsSimilarity } from '../utils/traitsSimilarity';
 
 /**
  * 기본 유사도 계산 (순수 Traits 점수)

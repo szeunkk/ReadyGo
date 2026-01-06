@@ -270,6 +270,21 @@ export const calculateFinalMatchScore = (
   // 6. 반올림 및 범위 제한 (0~100)
   const finalScore = Math.min(100, Math.max(0, Math.round(rawScore)));
 
+  // 디버깅: 100점인 경우 계산 과정 로깅
+  if (finalScore === 100) {
+    console.log('[Match Score Debug] 100% detected:', {
+      targetUserId: context.target.userId,
+      baseScore,
+      animalFactor,
+      scheduleFactor,
+      onlineFactor,
+      rawScore,
+      finalScore,
+      viewerTraits: context.viewer.traits?.traits,
+      targetTraits: context.target.traits?.traits,
+    });
+  }
+
   // 7. 메타 정보 생성
   const targetOnline = context.target.activity?.isOnline;
   const isOnlineMatched = targetOnline === true;

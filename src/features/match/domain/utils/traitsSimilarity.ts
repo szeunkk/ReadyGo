@@ -23,24 +23,22 @@ import type { TraitVector } from '@/commons/constants/animal/animal.vector';
 export type TraitKey = keyof TraitVector;
 
 /**
- * Traits 유사도 계산 (코사인 유사도)
+ * Traits 유사도 계산 (하이브리드 방식: 코사인 유사도 + 유클리드 거리)
  *
  * 📌 계산 원리:
- * - 두 벡터 간의 코사인 유사도를 계산하여 방향 유사성을 측정
- * - 코사인 유사도 = (A · B) / (||A|| × ||B||)
- * - 결과 범위: -1 ~ 1 (일반적인 경우)
+ * - 코사인 유사도: 패턴의 방향 유사성 측정 (70% 가중치)
+ * - 유클리드 거리: 실제 값의 차이 측정 (30% 가중치)
+ * - 두 가지를 혼합하여 더 정확한 매칭 점수 계산
  *
- * 📌 전제 조건:
- * - Trait 값은 항상 양수 (0~100 범위)
- * - 중심점 보정(Radial Clipping)이 적용된 상태
- * - 따라서 코사인 유사도는 항상 0~1 범위 (음수 불가능)
- * - 0: 완전히 다름 (직각)
- * - 1: 완전히 같음 (평행)
+ * 📌 기존 문제점:
+ * - 순수 코사인 유사도는 값의 크기 차이를 무시
+ * - [36,60,70,76,60]과 [36,37,50,52,84]가 95점으로 나옴
+ * - 실제로는 차이가 크지만 패턴만 유사하면 높은 점수
  *
- * 📌 0~1 범위 보장 근거:
- * - 모든 Trait 값이 양수이므로 내적(dot product)도 항상 양수
- * - 벡터 크기(magnitude)도 항상 양수
- * - 따라서 cosineSimilarity = 양수 / 양수 = 양수 (0~1 범위)
+ * 📌 개선 방식:
+ * - 코사인 유사도 70% + 유클리드 유사도 30%
+ * - 패턴 유사성과 실제 차이를 모두 고려
+ * - 더 현실적인 매칭 점수 제공
  *
  * @param viewer - viewer 특성 벡터 (각 trait 0~100)
  * @param target - target 특성 벡터 (각 trait 0~100)
@@ -64,17 +62,16 @@ export type TraitKey = keyof TraitVector;
  *   social: 88
  * };
  *
- * const similarity = calculateTraitsSimilarity(viewer, target); // 95
- * // 95 = round(0.95 * 100)
- * // 0.95 = 코사인 유사도 (매우 유사함)
+ * const similarity = calculateTraitsSimilarity(viewer, target);
+ * // 이전: 95점 (코사인만)
+ * // 현재: 85-90점 (코사인 + 유클리드)
  * ```
  */
 export const calculateTraitsSimilarity = (
   viewer: TraitVector,
   target: TraitVector
 ): number => {
-  // 5가지 특성의 내적 계산
-  // 모든 trait 값이 양수이므로 dotProduct도 항상 양수
+  // 1. 코사인 유사도 계산 (패턴 유사성)
   const dotProduct =
     viewer.cooperation * target.cooperation +
     viewer.exploration * target.exploration +
@@ -82,8 +79,6 @@ export const calculateTraitsSimilarity = (
     viewer.leadership * target.leadership +
     viewer.social * target.social;
 
-  // 벡터 크기 계산
-  // 모든 trait 값이 양수이므로 magnitude도 항상 양수
   const viewerMagnitude = Math.sqrt(
     viewer.cooperation ** 2 +
       viewer.exploration ** 2 +
@@ -100,18 +95,43 @@ export const calculateTraitsSimilarity = (
       target.social ** 2
   );
 
-  // 코사인 유사도 계산
-  // 결과: 0~1 범위 (trait 값이 모두 양수이므로 음수 불가능)
-  // - 0: 완전히 다른 특성 (직각 벡터)
-  // - 1: 완전히 같은 특성 (평행 벡터)
-  // - 0.5~0.7: 어느 정도 유사
-  // - 0.8~1.0: 매우 유사
   const cosineSimilarity =
     dotProduct / (viewerMagnitude * targetMagnitude || 1);
 
-  // 0~100 범위로 변환
-  // 예: 0.95 → 95점
-  return Math.round(cosineSimilarity * 100);
+  // 2. 유클리드 거리 계산 (실제 값의 차이)
+  const euclideanDistance = Math.sqrt(
+    (viewer.cooperation - target.cooperation) ** 2 +
+      (viewer.exploration - target.exploration) ** 2 +
+      (viewer.strategy - target.strategy) ** 2 +
+      (viewer.leadership - target.leadership) ** 2 +
+      (viewer.social - target.social) ** 2
+  );
+
+  // 3. 유클리드 거리를 유사도로 변환 (0~1 범위)
+  // 최대 거리: sqrt(5 * 100^2) = 223.6
+  // 거리가 클수록 유사도는 낮아짐
+  const maxDistance = Math.sqrt(5 * 100 ** 2);
+  const euclideanSimilarity = 1 - euclideanDistance / maxDistance;
+
+  // 4. 하이브리드 점수 계산
+  // 코사인 70% + 유클리드 30%
+  const hybridScore = cosineSimilarity * 0.7 + euclideanSimilarity * 0.3;
+
+  // 5. 0~100 범위로 변환
+  const finalScore = Math.round(hybridScore * 100);
+
+  // 디버깅: 계산 과정 로깅 (개발 환경에서만)
+  if (process.env.NODE_ENV === 'development' && finalScore >= 90) {
+    console.log('[Traits Similarity Debug]:', {
+      finalScore,
+      cosineSimilarity: Math.round(cosineSimilarity * 100),
+      euclideanSimilarity: Math.round(euclideanSimilarity * 100),
+      euclideanDistance: Math.round(euclideanDistance),
+      hybridScore: Math.round(hybridScore * 100),
+    });
+  }
+
+  return finalScore;
 };
 
 /**

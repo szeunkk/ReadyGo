@@ -27,7 +27,7 @@
  */
 
 import type { MatchContextCoreDTO } from '@/commons/types/match/matchContextCore.dto';
-import { calculateScheduleSimilarity } from './utils/scheduleSimilarity';
+import { calculateScheduleSimilarity } from '../utils/scheduleSimilarity';
 
 /**
  * 스케줄 호환성 팩터 계산
@@ -154,10 +154,10 @@ export const calculateScheduleCompatibilityFactor = (
     return 1.0;
   }
 
-  // 60~100점 → 1.0~1.05 (최대 5% 증가)
+  // 60~100점 → 1.0~1.025 (최대 2.5% 증가, 기존 5%에서 축소)
   // scheduleScore = 60 → bonus = 0 → factor = 1.0
-  // scheduleScore = 80 → bonus = 0.025 → factor = 1.025
-  // scheduleScore = 100 → bonus = 0.05 → factor = 1.05
-  const bonus = ((scheduleScore - 60) / 40) * 0.05;
+  // scheduleScore = 80 → bonus = 0.0125 → factor = 1.0125
+  // scheduleScore = 100 → bonus = 0.025 → factor = 1.025
+  const bonus = ((scheduleScore - 60) / 40) * 0.025;
   return 1.0 + bonus;
 };

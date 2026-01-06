@@ -124,25 +124,25 @@ export const calculateAnimalCompatibilityFactor = (
     return 1.0;
   }
 
-  // 동일한 동물: 5% 증가
+  // 동일한 동물: 2.5% 증가 (기존 5%에서 축소)
   if (viewerAnimal === targetAnimal) {
-    return 1.05;
+    return 1.025;
   }
 
   // 궁합 레벨 확인
   const compatibilityLevel = getCompatibilityLevel(viewerAnimal, targetAnimal);
 
-  // 궁합 레벨에 따른 팩터 반환
+  // 궁합 레벨에 따른 팩터 반환 (범위 축소: 과도한 보정 방지)
   switch (compatibilityLevel) {
     case 'best':
-      // 천생연분: 10% 증가
-      return 1.1;
+      // 천생연분: 5% 증가 (기존 10%에서 축소)
+      return 1.05;
     case 'good':
-      // 좋은 궁합: 7% 증가
-      return 1.07;
+      // 좋은 궁합: 3.5% 증가 (기존 7%에서 축소)
+      return 1.035;
     case 'challenging':
-      // 도전적인 궁합: 5% 감소
-      return 0.95;
+      // 도전적인 궁합: 2.5% 감소 (기존 5%에서 축소)
+      return 0.975;
     case 'neutral':
     case 'unknown':
     default:
