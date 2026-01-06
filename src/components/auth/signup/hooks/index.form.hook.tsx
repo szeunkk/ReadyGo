@@ -6,17 +6,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-import { supabase } from '@/lib/supabase/client';
-import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/types/supabase';
-import { generateNickname } from '@/lib/nickname/generateNickname';
 import { URL_PATHS } from '@/commons/constants/url';
 import { useModal } from '@/commons/providers/modal';
-import { AnimalType } from '@/commons/constants/animal';
-import { TierType } from '@/commons/constants/tierType.enum';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+import { useAuth } from '@/commons/providers/auth/auth.provider';
 
 // Zod 스키마 정의
 const signupSchema = z
@@ -46,6 +38,7 @@ type SignupFormData = z.infer<typeof signupSchema>;
 export const useSignupForm = () => {
   const router = useRouter();
   const { openModal, closeAllModals } = useModal();
+  const { syncSession } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const hasShownErrorModalRef = useRef(false);
 
@@ -86,110 +79,31 @@ export const useSignupForm = () => {
     hasShownErrorModalRef.current = false;
 
     try {
-      // 1. Supabase Auth 회원가입
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
+      // 1. 회원가입 API 호출 (회원가입 + 프로필 생성 + 세션 설정)
+      const signupResponse = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // 쿠키 포함
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
       });
 
-      if (authError) {
-        throw new Error(authError.message || '회원가입에 실패했습니다.');
-      }
+      const signupData = await signupResponse.json();
 
-      // 프롬프트 요구사항: data.user.id 존재 (필수)
-      if (!authData.user?.id) {
+      if (!signupResponse.ok) {
         throw new Error(
-          '회원가입에 실패했습니다. 사용자 ID를 받지 못했습니다.'
+          signupData.error || '회원가입에 실패했습니다.'
         );
       }
 
-      const userId = authData.user.id;
+      // 2. 세션 동기화 (회원가입 API에서 세션이 자동으로 설정되었으므로 동기화만 수행)
+      await syncSession();
 
-      // 2. 초기 데이터 생성
-      // 회원가입 직후에는 세션이 아직 설정되지 않았을 수 있으므로
-      // authData.session을 사용하여 인증된 클라이언트 생성
-      const authenticatedSupabase = authData.session
-        ? createClient<Database>(supabaseUrl, supabaseAnonKey, {
-            global: {
-              headers: {
-                Authorization: `Bearer ${authData.session.access_token}`,
-              },
-            },
-          })
-        : supabase;
-
-      const nickname = generateNickname();
-
-      // user_profiles 생성
-      // created_at, updated_at은 Supabase의 기본값 사용 (현재 UTC 시간)
-      const { error: profileError } = await authenticatedSupabase
-        .from('user_profiles')
-        .insert({
-          id: userId,
-          nickname,
-          avatar_url: null,
-          bio: null,
-          animal_type: AnimalType.bear,
-          tier: TierType.silver,
-          temperature_score: 30,
-          status_message: null,
-        });
-
-      if (profileError) {
-        console.error('Profile creation error:', profileError);
-        throw new Error(
-          profileError.message ||
-            '프로필 생성에 실패했습니다. RLS 정책을 확인하세요.'
-        );
-      }
-
-      // user_settings 생성
-      // created_at, updated_at은 Supabase의 기본값 사용 (현재 UTC 시간)
-      const { error: settingsError } = await authenticatedSupabase
-        .from('user_settings')
-        .insert({
-          id: userId,
-          theme_mode: 'dark',
-          notification_push: true,
-          notification_chat: true,
-          notification_party: true,
-          language: 'ko',
-        });
-
-      if (settingsError) {
-        console.error('Settings creation error:', settingsError);
-        throw new Error(
-          settingsError.message ||
-            '설정 생성에 실패했습니다. RLS 정책을 확인하세요.'
-        );
-      }
-
-      // 3. 회원가입 후 자동 로그인 (세션 설정)
-      if (authData.session?.access_token) {
-        // API를 통해 세션 설정 (HttpOnly 쿠키에 저장)
-        const loginResponse = await fetch('/api/auth/session', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include', // 쿠키 포함
-          body: JSON.stringify({
-            email: data.email,
-            password: data.password,
-          }),
-        });
-
-        if (!loginResponse.ok) {
-          console.warn(
-            'Auto-login after signup failed, but signup was successful'
-          );
-        } else {
-          // 쿠키가 브라우저에 반영될 시간을 주기 위해 약간의 지연
-          await new Promise((resolve) => setTimeout(resolve, 300));
-        }
-      }
-
-      // 4. 성공 페이지로 이동
+      // 3. 성공 페이지로 이동
       router.push(URL_PATHS.SIGNUP_SUCCESS);
     } catch (error) {
       // 에러 모달 표시 (한 번만)
