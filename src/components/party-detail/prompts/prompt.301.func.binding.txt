@@ -147,3 +147,262 @@
                 - 생성일: 파티모집글 상세객체의 created_at
                 - 생성자ID: 파티모집글 상세객체의 creator_id
 
+핵심요구사항) 파티 상세 페이지의 버튼 렌더링 로직을 구현할 것.
+            1) 참여 상태 확인
+                - party_members 테이블에서 현재 사용자가 해당 파티에 참여했는지 확인할 것.
+                - API Route: GET /api/party/[id]/members 또는 직접 Supabase 조회
+                - 조회 패턴:
+                    const { data: memberData } = await supabase
+                      .from('party_members')
+                      .select('id')
+                      .eq('post_id', partyId)
+                      .eq('user_id', currentUserId)
+                      .single();
+                - 참여 여부: memberData가 존재하면 참여한 상태, null이면 미참여 상태
+
+            2) 버튼 렌더링 조건
+                2-1) 파티장인 경우 (creator_id === user.id)
+                    - 버튼 텍스트: "게임시작"
+                    - 아이콘: "play_circle" (Icon 컴포넌트 사용)
+                    - 버튼 스타일: 피그마 디자인에 따라 구현
+                        - 피그마 링크: https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2590-73701&m=dev
+                        - 버튼 배경색: var(--color/bg/interactive/primary, #56e5ce)
+                        - 텍스트 색상: var(--color/text/interactive/inverse, white)
+                        - 아이콘과 텍스트 사이 간격: 8px
+                        - 아이콘 크기: 20px
+                    - 클릭 동작: 게임 시작 기능 (현재는 빈 함수 또는 미구현 상태로 둘 것)
+
+                2-2) 참여자가 아닌 경우 (creator_id !== user.id && memberData === null)
+                    - 버튼 텍스트: "참여하기"
+                    - 아이콘: 없음
+                    - 클릭 동작: 참여하기 기능 실행
+                        - @src/components/party-detail/hooks/index.join.hook.ts의 joinParty 함수 사용
+                        - 참여 성공 시 참여 상태를 업데이트하여 "파티 나가기" 버튼으로 변경
+
+                2-3) 참여한 경우 (creator_id !== user.id && memberData !== null)
+                    - 버튼 텍스트: "파티 나가기"
+                    - 아이콘: 없음
+                    - 클릭 동작: 파티 나가기 기능 실행
+                        - API Route: DELETE /api/party/[id]/members
+                        - party_members 테이블에서 해당 레코드 삭제
+                        - 삭제 성공 시 참여 상태를 업데이트하여 "참여하기" 버튼으로 변경
+
+            3) 구현 위치
+                - @src/components/party-detail/ui/party-info/partyInfo.tsx에서 버튼 렌더링 로직 구현
+                - props로 다음 정보를 전달받을 것:
+                    - isCreator: boolean (파티장 여부)
+                    - isParticipant: boolean (참여자 여부)
+                    - onJoinClick: () => void (참여하기 클릭 핸들러)
+                    - onLeaveClick: () => void (파티 나가기 클릭 핸들러)
+                    - onStartGameClick: () => void (게임시작 클릭 핸들러, 파티장인 경우)
+
+            4) 참여 상태 조회 로직 구현
+                - 구현 위치: @src/components/party-detail/hooks/index.binding.hook.ts
+                - usePartyBinding hook에 isParticipant 상태 추가
+                - API Route를 통해 참여 상태 조회:
+                    - GET /api/party/[id]/members?check=true 또는
+                    - 별도 API: GET /api/party/[id]/members/check
+                - 또는 직접 Supabase 조회:
+                    - useAuth에서 현재 user.id 가져오기
+                    - party_members 테이블에서 post_id와 user_id로 조회
+                    - 조회 패턴:
+                        const { data: memberData } = await supabase
+                          .from('party_members')
+                          .select('id')
+                          .eq('post_id', partyId)
+                          .eq('user_id', currentUserId)
+                          .single();
+                    - isParticipant = memberData !== null && memberData !== undefined
+                - 반환 타입에 isParticipant 추가:
+                    interface UsePartyBindingReturn {
+                      data: PartyDetailData | null;
+                      isLoading: boolean;
+                      error: Error | null;
+                      isParticipant: boolean;
+                      refetch: () => Promise<void>;
+                    }
+                - 참여 상태는 파티 데이터 조회 후 또는 동시에 조회할 것.
+
+            5) PartyInfo 컴포넌트에 props 전달
+                - 구현 위치: @src/components/party-detail/index.tsx
+                - usePartyBinding에서 반환된 isParticipant 사용
+                - isCreator 계산: data?.creator_id === user?.id
+                - PartyInfo에 다음 props 전달:
+                    - isCreator: boolean
+                    - isParticipant: boolean
+                    - onJoinClick: () => void (기존 handleJoinClick)
+                    - onLeaveClick: () => void (새로 구현할 handleLeaveClick)
+                    - onStartGameClick: () => void (새로 구현할 handleStartGameClick)
+                - 예시:
+                    <PartyInfo
+                      data={data}
+                      isLoading={isLoading}
+                      error={error}
+                      isCreator={isCreator}
+                      isParticipant={isParticipant}
+                      onJoinClick={handleJoinClick}
+                      onLeaveClick={handleLeaveClick}
+                      onStartGameClick={handleStartGameClick}
+                    />
+
+            6) PartyInfo 컴포넌트 버튼 조건부 렌더링 구현
+                - 구현 위치: @src/components/party-detail/ui/party-info/partyInfo.tsx
+                - PartyInfoProps 인터페이스에 다음 props 추가:
+                    - isCreator?: boolean;
+                    - isParticipant?: boolean;
+                    - onJoinClick?: () => void;
+                    - onLeaveClick?: () => void;
+                    - onStartGameClick?: () => void;
+                - 버튼 렌더링 로직:
+                    - isCreator가 true인 경우:
+                        - 버튼 텍스트: "게임시작"
+                        - 아이콘: Icon name="play_circle" size={20}
+                        - onClick: onStartGameClick
+                        - 버튼 스타일: 피그마 디자인에 맞게 구현
+                            - 배경색: #56e5ce (primary 색상)
+                            - 텍스트 색상: white
+                            - 아이콘과 텍스트 사이 gap: 8px
+                    - isParticipant가 false인 경우 (참여자가 아닌 경우):
+                        - 버튼 텍스트: "참여하기"
+                        - 아이콘: 없음
+                        - onClick: onJoinClick
+                    - isParticipant가 true인 경우 (참여한 경우):
+                        - 버튼 텍스트: "파티 나가기"
+                        - 아이콘: 없음
+                        - onClick: onLeaveClick
+                - 로딩 및 에러 상태에서도 버튼은 disabled 상태로 유지
+
+            7) DELETE /api/party/[id]/members API 구현
+                - 구현 위치: src/app/api/party/[id]/members/route.ts
+                - DELETE 메서드 추가:
+                    export const DELETE = async (
+                      request: NextRequest,
+                      { params }: { params: { id: string } }
+                    ) => {
+                      // 1. 인증 확인
+                      const cookieStore = await cookies();
+                      const accessToken = cookieStore.get('sb-access-token')?.value;
+                      if (!accessToken) {
+                        return NextResponse.json(
+                          { error: '인증이 필요합니다.' },
+                          { status: 401 }
+                        );
+                      }
+                      
+                      // 2. Supabase 클라이언트 생성
+                      const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+                        auth: { persistSession: false },
+                        global: { headers: { Authorization: `Bearer ${accessToken}` } },
+                      });
+                      
+                      // 3. 사용자 정보 확인
+                      const { data: { user }, error: userError } = await supabase.auth.getUser();
+                      if (userError || !user) {
+                        return NextResponse.json(
+                          { error: '인증이 필요합니다.' },
+                          { status: 401 }
+                        );
+                      }
+                      
+                      // 4. 파티 정보 조회
+                      const postId = parseInt(params.id, 10);
+                      if (isNaN(postId)) {
+                        return NextResponse.json(
+                          { error: '유효하지 않은 파티 ID입니다.' },
+                          { status: 400 }
+                        );
+                      }
+                      
+                      const { data: partyData, error: fetchError } = await supabase
+                        .from('party_posts')
+                        .select('creator_id')
+                        .eq('id', postId)
+                        .single();
+                      
+                      if (fetchError) {
+                        if (fetchError.code === 'PGRST116') {
+                          return NextResponse.json(
+                            { error: '파티를 찾을 수 없습니다.' },
+                            { status: 404 }
+                          );
+                        }
+                        return NextResponse.json({ error: fetchError.message }, { status: 500 });
+                      }
+                      
+                      // 5. 작성자는 나가기 불가
+                      if (partyData.creator_id === user.id) {
+                        return NextResponse.json(
+                          { error: '파티 작성자는 나갈 수 없습니다.' },
+                          { status: 400 }
+                        );
+                      }
+                      
+                      // 6. party_members에서 레코드 삭제
+                      const { error: deleteError } = await supabase
+                        .from('party_members')
+                        .delete()
+                        .eq('post_id', postId)
+                        .eq('user_id', user.id);
+                      
+                      if (deleteError) {
+                        return NextResponse.json({ error: deleteError.message }, { status: 500 });
+                      }
+                      
+                      // 7. 성공 응답
+                      return NextResponse.json({ success: true }, { status: 200 });
+                    };
+
+            8) 파티 나가기 핸들러 구현
+                - 구현 위치: @src/components/party-detail/hooks/index.leave.hook.ts (새 파일 생성)
+                - useLeaveParty hook 생성:
+                    - @src/components/party-detail/hooks/index.join.hook.ts를 참고하여 구현
+                    - API 호출: DELETE /api/party/[id]/members
+                    - 성공 시 onRefetch 호출하여 참여 상태 업데이트
+                    - 에러 발생 시 모달로 에러 메시지 표시
+                - 구현 패턴:
+                    interface UseLeavePartyOptions {
+                      onRefetch?: () => Promise<void>;
+                    }
+                    
+                    interface UseLeavePartyReturn {
+                      leaveParty: (partyId: number | string) => Promise<void>;
+                    }
+                    
+                    export const useLeaveParty = (
+                      options?: UseLeavePartyOptions
+                    ): UseLeavePartyReturn => {
+                      const { openModal } = useModal();
+                      const onRefetch = options?.onRefetch;
+                      
+                      const leaveParty = useCallback(
+                        async (partyId: number | string) => {
+                          // DELETE API 호출
+                          // 성공 시 onRefetch 호출
+                          // 실패 시 모달 표시
+                        },
+                        [openModal, onRefetch]
+                      );
+                      
+                      return { leaveParty };
+                    };
+                - @src/components/party-detail/index.tsx에서 사용:
+                    - import { useLeaveParty } from './hooks/index.leave.hook';
+                    - const { leaveParty } = useLeaveParty({ onRefetch: refetch });
+                    - handleLeaveClick 함수 구현:
+                        const handleLeaveClick = async () => {
+                          if (partyId) {
+                            try {
+                              await leaveParty(partyId);
+                              // 참여 상태가 업데이트되면 자동으로 버튼이 변경됨
+                            } catch {
+                              // 에러는 leaveParty 내부에서 모달로 처리
+                            }
+                          }
+                        };
+                - handleStartGameClick 함수 구현 (임시):
+                    const handleStartGameClick = () => {
+                      // 게임 시작 기능은 추후 구현
+                      // 현재는 빈 함수 또는 콘솔 로그
+                      console.log('게임 시작');
+                    };
+

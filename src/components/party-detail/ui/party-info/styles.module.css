@@ -31,7 +31,7 @@
 .infoInner {
   display: flex;
   flex-direction: column;
-  width: 231px;
+  /* width: 231px; */
   height: 228px;
   gap: 24px;
 }
@@ -83,6 +83,11 @@
   line-height: var(--typo-body-md-line-height);
   font-weight: var(--typo-body-md-font-weight);
   color: var(--color-text-primary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tags {

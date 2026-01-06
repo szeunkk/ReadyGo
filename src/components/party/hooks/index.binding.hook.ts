@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { PartyCardProps } from '../ui/card/card';
 import { supabase } from '@/lib/supabase/client';
 import { AnimalType } from '@/commons/constants/animal';
+import { useAuth } from '@/commons/providers/auth/auth.provider';
 
 // API 응답 타입
 interface PartyPost {
@@ -257,6 +258,7 @@ const truncateDescription = (
 };
 
 export const usePartyListBinding = (): UsePartyListBindingReturn => {
+  const { user } = useAuth();
   const [data, setData] = useState<PartyCardProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -334,6 +336,12 @@ export const usePartyListBinding = (): UsePartyListBindingReturn => {
           // currentMembers 계산 (실제 데이터 사용)
           const currentMembers = getCurrentMembers(party.id, membersMap);
 
+          // isLeader 계산: 로그인한 유저의 ID와 party_posts.creator_id가 같을 때만 true
+          // 로그인하지 않은 경우(user가 null인 경우) 또는 creator_id가 없는 경우 false
+          const isLeader = Boolean(
+            user?.id && party.creator_id && user.id === party.creator_id
+          );
+
           return {
             title: party.party_title,
             description: truncateDescription(party.description),
@@ -348,6 +356,7 @@ export const usePartyListBinding = (): UsePartyListBindingReturn => {
               controlLevel: getControlLevelLabel(party.control_level),
             },
             partyId: party.id,
+            isLeader,
           };
         });
 
@@ -366,7 +375,7 @@ export const usePartyListBinding = (): UsePartyListBindingReturn => {
     };
 
     fetchPartyList();
-  }, []);
+  }, [user]);
 
   return { data, isLoading, error };
 };

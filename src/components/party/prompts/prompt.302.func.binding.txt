@@ -167,6 +167,11 @@
                     - categories.voiceChat: voice_chat 값을 한글로 변환한 값 (실제 데이터)
                     - categories.difficulty: difficulty 값을 한글로 변환한 값 (실제 데이터)
                     - categories.controlLevel: control_level 값을 한글로 변환한 값 (실제 데이터)
+                    - isLeader: 파티장 태그 표시 여부 (실제 데이터 사용)
+                        - src/commons/providers/auth/auth.provider.tsx의 useAuth() 훅을 사용하여 현재 로그인한 유저의 ID를 가져올 것.
+                        - 로그인한 유저의 ID(user.id)와 party_posts.creator_id가 같을 때만 true로 설정할 것.
+                        - 로그인하지 않은 경우(user가 null인 경우) 또는 creator_id가 없는 경우 false로 설정할 것.
+                        - 파티장 태그는 card.tsx의 185-198 라인 부분에 있으며, isLeader prop이 true일 때만 표시된다.
 
             5) 에러 처리
                 - API 호출 실패 시: 에러 메시지를 콘솔에 출력하고, 빈 배열을 반환하여 빈 목록을 표시할 것.
@@ -180,5 +185,10 @@
                 - 파티 카드의 제목, 설명, 게임 태그가 올바르게 표시되는지 확인
                 - 파티 카드의 인원 수(currentMembers/maxMembers)가 올바르게 표시되는지 확인
                 - 파티 카드의 카테고리 정보(시작 시간, 보이스챗, 난이도, 컨트롤 수준)가 올바르게 표시되는지 확인
+                - 파티장 태그 표시 조건 확인
+                    - 로그인한 유저가 자신이 작성한 파티 게시글을 볼 때만 파티장 태그가 표시되는지 확인
+                    - 로그인한 유저가 다른 유저가 작성한 파티 게시글을 볼 때는 파티장 태그가 표시되지 않는지 확인
+                    - 로그인하지 않은 유저가 파티 게시글을 볼 때는 파티장 태그가 표시되지 않는지 확인
+                    - 파티장 태그의 data-testid는 "party-card-leader-tag-{partyId}" 형식으로 생성됨
                 - 데이터가 없는 경우 빈 목록이 표시되는지 확인
                 - 데이터 조회 실패 시 적절한 처리 확인

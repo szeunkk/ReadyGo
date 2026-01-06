@@ -13,9 +13,11 @@ import { useInfinitePartyList } from './hooks/index.infinityScroll.hook';
 import { useLinkRouting } from './hooks/index.link.routing.hook';
 import { useFloatButton } from './hooks/index.float.hook';
 import { useFilter } from './hooks/index.filter.hook';
+import { usePartyTab } from './hooks/index.partyTab.hook';
 import styles from './styles.module.css';
 
 export default function Party() {
+  const { activeTab, setActiveTab } = usePartyTab();
   const { selectedGenre, searchQuery, setSelectedGenre, setSearchQuery } =
     useFilter();
   const { openPartySubmitModal } = useLinkModal();
@@ -25,7 +27,7 @@ export default function Party() {
     loadMore,
     isLoading,
     error,
-  } = useInfinitePartyList(selectedGenre, searchQuery);
+  } = useInfinitePartyList(selectedGenre, searchQuery, activeTab);
   const { navigateToPartyDetail } = useLinkRouting();
   const { scrollToTop } = useFloatButton();
 
@@ -107,6 +109,22 @@ export default function Party() {
               새 파티 만들기
             </Button>
           </div>
+        </div>
+        <div className={styles.tabArea}>
+          <button
+            className={`${styles.tab} ${activeTab === 'all' ? '' : styles.tabInactive}`}
+            onClick={() => setActiveTab('all')}
+            data-testid="party-tab-all"
+          >
+            전체 파티
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'participating' ? '' : styles.tabInactive}`}
+            onClick={() => setActiveTab('participating')}
+            data-testid="party-tab-participating"
+          >
+            참여 중인 파티
+          </button>
         </div>
         <InfiniteScroll
           pageStart={0}

@@ -38,3 +38,8 @@
 핵심요구사항) message-area에 사용되는 공통컴포넌트
             - <Input />, <Button />
 
+==============================================
+
+1차추가요구사항) messageArea 디자인 아래 피그마링크 참고해서 수정할 것.
+            - 피그마링크: https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2325-1861&m=dev
+            - 현재 input, button 컴포넌트로 이루어져 있는데 input 컴포넌트로만 구성하고 iconRight로 "send"사용해서 구현할 것.
