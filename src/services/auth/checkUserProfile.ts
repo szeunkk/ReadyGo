@@ -22,5 +22,13 @@ export async function checkUserProfile(
     throw new Error('프로필 확인 중 오류가 발생했습니다.');
   }
 
-  return data !== null;
+  const hasProfile = data !== null;
+  console.log('checkUserProfile result:', {
+    userId,
+    hasProfile,
+    data: data ? 'exists' : 'null',
+    error: error?.message,
+  });
+
+  return hasProfile;
 }

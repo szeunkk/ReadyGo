@@ -66,6 +66,8 @@ export async function POST(request: NextRequest) {
     console.log('OAuth session API - Session set successfully', {
       userId: data.user.id,
       email: data.user.email,
+      createdAt: data.user.created_at,
+      lastSignInAt: data.user.last_sign_in_at,
     });
 
     // 쿠키 확인
@@ -89,13 +91,36 @@ export async function POST(request: NextRequest) {
 
     // 프로필 확인
     const hasProfile = await checkUserProfile(supabase, data.user.id);
+    
+    // 사용자 생성 시점과 마지막 로그인 시점 비교로 신규 유저 판단
+    const userCreatedAt = new Date(data.user.created_at);
+    const lastSignInAt = data.user.last_sign_in_at 
+      ? new Date(data.user.last_sign_in_at) 
+      : null;
+    
+    // 생성 시점과 마지막 로그인 시점이 같거나 매우 가까우면 신규 유저로 판단 (5초 이내)
+    const isNewUserByTime = !lastSignInAt || 
+      (lastSignInAt.getTime() - userCreatedAt.getTime()) < 5000;
+    
+    // 프로필이 없거나, 생성 시점이 최근이면 신규 유저
+    const isNewUser = !hasProfile || isNewUserByTime;
+    
+    console.log('OAuth session API - Profile check result', {
+      userId: data.user.id,
+      hasProfile,
+      userCreatedAt: userCreatedAt.toISOString(),
+      lastSignInAt: lastSignInAt?.toISOString() || null,
+      isNewUserByTime,
+      isNewUser,
+    });
 
     // 신규 유저면 프로필 생성
-    if (!hasProfile) {
+    if (isNewUser && !hasProfile) {
       try {
         console.log('OAuth session API - Creating profile for new user');
         await createUserProfile(supabase, data.user.id);
-
+        
+        // 프로필 생성 성공
         const response = NextResponse.json({
           success: true,
           isNewUser: true,
@@ -119,7 +144,40 @@ export async function POST(request: NextRequest) {
           cookiesIncluded: supabaseCookies.length,
         });
         return response;
-      } catch (profileError) {
+      } catch (profileError: any) {
+        // 중복 키 에러는 이미 프로필이 생성된 것으로 간주 (race condition)
+        if (profileError?.code === '23505') {
+          console.log('OAuth session API - Profile already exists (race condition)');
+          // 프로필이 이미 있으므로 다시 확인
+          const hasProfileAfterError = await checkUserProfile(supabase, data.user.id);
+          
+          if (hasProfileAfterError) {
+            // 프로필이 있으면 기존 유저로 처리
+            const response = NextResponse.json({
+              success: true,
+              isNewUser: false,
+              user: {
+                id: data.user.id,
+                email: data.user.email,
+              },
+            });
+
+            supabaseCookies.forEach((cookie) => {
+              response.cookies.set(cookie.name, cookie.value, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                path: '/',
+              });
+            });
+
+            console.log('OAuth session API - Returning existing user response (after race condition)', {
+              cookiesIncluded: supabaseCookies.length,
+            });
+            return response;
+          }
+        }
+        
         console.error(
           'OAuth session API - Profile creation error:',
           profileError
@@ -131,11 +189,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 기존 유저
-    console.log('OAuth session API - Returning existing user response');
+    // 기존 유저 또는 프로필이 있는 경우
+    // 프로필이 이미 있으면 무조건 기존 유저로 처리
+    const finalIsNewUser = hasProfile ? false : isNewUser;
+    
+    console.log('OAuth session API - Returning response', {
+      isNewUser,
+      hasProfile,
+      finalIsNewUser,
+    });
     const response = NextResponse.json({
       success: true,
-      isNewUser: false,
+      isNewUser: finalIsNewUser,
       user: {
         id: data.user.id,
         email: data.user.email,

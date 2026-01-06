@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { URL_PATHS } from '@/commons/constants/url';
@@ -20,6 +20,7 @@ export function OAuthCallbackHandler() {
   const searchParams = useSearchParams();
   const [isProcessing, setIsProcessing] = useState(false);
   const { syncSession } = useAuth();
+  const hasProcessedRef = useRef(false);
 
   useEffect(() => {
     // 루트 경로에서만 OAuth 콜백 처리
@@ -56,6 +57,11 @@ export function OAuthCallbackHandler() {
         return;
       }
 
+      // 이미 처리 중이면 무시 (중복 요청 방지)
+      if (hasProcessedRef.current) {
+        return;
+      }
+
       setIsProcessing(true);
 
       // OAuth 에러 처리
@@ -67,10 +73,109 @@ export function OAuthCallbackHandler() {
         return;
       }
 
+      // Hash에서 직접 토큰이 있으면 우선 처리 (가장 빠른 경로)
+      // hash 경로는 가장 먼저 처리하여 onAuthStateChange보다 우선
+      if (hashAccessToken && hashRefreshToken) {
+        hasProcessedRef.current = true;
+        console.log('Found tokens in hash, setting session directly');
+
+        try {
+          const response = await fetch('/api/auth/oauth/session', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+              access_token: hashAccessToken,
+              refresh_token: hashRefreshToken,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to set session');
+          }
+
+          const data = await response.json();
+          console.log('Server session set successfully from hash', data);
+          console.log('OAuth callback from hash - isNewUser:', data.isNewUser);
+
+          // 응답이 성공했지만 isNewUser가 false인 경우 다시 확인
+          if (!data.isNewUser) {
+            console.log(
+              'OAuth callback from hash - User is not new, redirecting to home'
+            );
+            await syncSession();
+
+            let retries = 0;
+            const maxRetries = 20;
+            while (retries < maxRetries) {
+              const accessToken = useAuthStore.getState().accessToken;
+              if (accessToken) {
+                break;
+              }
+              await new Promise((resolve) => setTimeout(resolve, 100));
+              retries++;
+            }
+
+            window.history.replaceState({}, '', window.location.pathname);
+            router.replace(URL_PATHS.HOME);
+            setIsProcessing(false);
+            return;
+          }
+
+          // 세션 동기화 (AuthProvider의 store 업데이트)
+          await syncSession();
+
+          // store 업데이트 대기 (최대 2초)
+          let retries = 0;
+          const maxRetries = 20; // 2초 (100ms * 20)
+          while (retries < maxRetries) {
+            const accessToken = useAuthStore.getState().accessToken;
+            if (accessToken) {
+              console.log('Access token confirmed in store, redirecting...');
+              break;
+            }
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            retries++;
+          }
+
+          // URL 정리
+          window.history.replaceState({}, '', window.location.pathname);
+
+          // 프로필 확인 및 리다이렉트
+          if (data.isNewUser) {
+            console.log(
+              'OAuth callback from hash - Redirecting to signup-success'
+            );
+            router.replace(URL_PATHS.SIGNUP_SUCCESS);
+          } else {
+            console.log('OAuth callback from hash - Redirecting to home');
+            router.replace(URL_PATHS.HOME);
+          }
+          setIsProcessing(false);
+          return; // hash 경로에서 처리 완료 후 즉시 return하여 다른 경로가 실행되지 않도록 함
+        } catch (error) {
+          console.error('Error setting session from hash', error);
+          hasProcessedRef.current = false; // 에러 발생 시 플래그 리셋
+        }
+      }
+
       // onAuthStateChange로 세션 변경 감지
+      // 주의: 이 핸들러는 다른 경로(hash, code)와 동시에 실행될 수 있으므로
+      // hasProcessedRef로 중복 처리 방지
+      // hash 경로가 이미 처리했으면 onAuthStateChange는 실행하지 않음
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange(async (event, session) => {
+        // 이미 처리 중이면 무시 (hash 경로가 먼저 처리했을 수 있음)
+        if (hasProcessedRef.current) {
+          console.log(
+            'OAuth callback - onAuthStateChange ignored (already processed)'
+          );
+          return;
+        }
+
         console.log('OAuth callback - Auth state changed', {
           event,
           hasSession: !!session,
@@ -82,6 +187,12 @@ export function OAuthCallbackHandler() {
             userId: session.user.id,
             email: session.user.email,
           });
+
+          // 중복 처리 방지
+          if (hasProcessedRef.current) {
+            return;
+          }
+          hasProcessedRef.current = true;
 
           try {
             // 서버로 세션 전달
@@ -105,6 +216,35 @@ export function OAuthCallbackHandler() {
 
             const data = await response.json();
             console.log('Server session set successfully', data);
+            console.log('OAuth callback - isNewUser:', data.isNewUser);
+
+            // 응답이 성공했지만 isNewUser가 false인 경우 다시 확인
+            // (race condition으로 인해 프로필이 생성되었을 수 있음)
+            if (!data.isNewUser) {
+              console.log(
+                'OAuth callback - User is not new, redirecting to home'
+              );
+              // 세션 동기화
+              await syncSession();
+
+              // store 업데이트 대기
+              let retries = 0;
+              const maxRetries = 20;
+              while (retries < maxRetries) {
+                const accessToken = useAuthStore.getState().accessToken;
+                if (accessToken) {
+                  break;
+                }
+                await new Promise((resolve) => setTimeout(resolve, 100));
+                retries++;
+              }
+
+              window.history.replaceState({}, '', window.location.pathname);
+              router.replace(URL_PATHS.HOME);
+              subscription?.unsubscribe();
+              setIsProcessing(false);
+              return;
+            }
 
             // 세션 동기화 (AuthProvider의 store 업데이트)
             await syncSession();
@@ -127,12 +267,18 @@ export function OAuthCallbackHandler() {
 
             // 프로필 확인 및 리다이렉트
             if (data.isNewUser) {
+              console.log('OAuth callback - Redirecting to signup-success');
               router.replace(URL_PATHS.SIGNUP_SUCCESS);
             } else {
+              console.log('OAuth callback - Redirecting to home');
               router.replace(URL_PATHS.HOME);
             }
+            subscription?.unsubscribe();
+            setIsProcessing(false);
           } catch (error) {
             console.error('Error setting session', error);
+            hasProcessedRef.current = false; // 에러 발생 시 플래그 리셋
+            subscription?.unsubscribe();
             const loginUrl = new URL(URL_PATHS.LOGIN, window.location.origin);
             loginUrl.searchParams.set('error', '세션 설정에 실패했습니다.');
             router.replace(loginUrl.toString());
@@ -140,64 +286,23 @@ export function OAuthCallbackHandler() {
         }
       });
 
-      // Hash에서 직접 토큰이 있으면 즉시 처리
-      if (hashAccessToken && hashRefreshToken) {
-        console.log('Found tokens in hash, setting session directly');
-        try {
-          const response = await fetch('/api/auth/oauth/session', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-              access_token: hashAccessToken,
-              refresh_token: hashRefreshToken,
-            }),
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to set session');
-          }
-
-          const data = await response.json();
-          console.log('Server session set successfully from hash', data);
-
-          // 세션 동기화 (AuthProvider의 store 업데이트)
-          await syncSession();
-
-          // store 업데이트 대기 (최대 2초)
-          let retries = 0;
-          const maxRetries = 20; // 2초 (100ms * 20)
-          while (retries < maxRetries) {
-            const accessToken = useAuthStore.getState().accessToken;
-            if (accessToken) {
-              console.log('Access token confirmed in store, redirecting...');
-              break;
-            }
-            await new Promise((resolve) => setTimeout(resolve, 100));
-            retries++;
-          }
-
-          // URL 정리
-          window.history.replaceState({}, '', window.location.pathname);
-
-          // 프로필 확인 및 리다이렉트
-          if (data.isNewUser) {
-            router.replace(URL_PATHS.SIGNUP_SUCCESS);
-          } else {
-            router.replace(URL_PATHS.HOME);
-          }
-          subscription.unsubscribe();
-          setIsProcessing(false);
-          return;
-        } catch (error) {
-          console.error('Error setting session from hash', error);
-        }
-      }
-
       // code가 있으면 exchangeCodeForSession 시도
+      // onAuthStateChange가 먼저 실행될 수 있으므로 짧은 지연 후 처리
       if (code || hashCode) {
+        // 이미 처리 중이면 무시
+        if (hasProcessedRef.current) {
+          return;
+        }
+
+        // onAuthStateChange가 먼저 실행될 수 있으므로 짧은 지연
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        // 지연 후 다시 확인
+        if (hasProcessedRef.current) {
+          return;
+        }
+        hasProcessedRef.current = true;
+
         console.log('Attempting exchangeCodeForSession...', {
           code: code || hashCode,
         });
@@ -234,6 +339,32 @@ export function OAuthCallbackHandler() {
 
           const data = await response.json();
           console.log('Server session set successfully from code', data);
+          console.log('OAuth callback from code - isNewUser:', data.isNewUser);
+
+          // 응답이 성공했지만 isNewUser가 false인 경우 다시 확인
+          if (!data.isNewUser) {
+            console.log(
+              'OAuth callback from code - User is not new, redirecting to home'
+            );
+            await syncSession();
+
+            let retries = 0;
+            const maxRetries = 20;
+            while (retries < maxRetries) {
+              const accessToken = useAuthStore.getState().accessToken;
+              if (accessToken) {
+                break;
+              }
+              await new Promise((resolve) => setTimeout(resolve, 100));
+              retries++;
+            }
+
+            window.history.replaceState({}, '', window.location.pathname);
+            router.replace(URL_PATHS.HOME);
+            subscription?.unsubscribe();
+            setIsProcessing(false);
+            return;
+          }
 
           // 세션 동기화 (AuthProvider의 store 업데이트)
           await syncSession();
@@ -260,7 +391,7 @@ export function OAuthCallbackHandler() {
           } else {
             router.replace(URL_PATHS.HOME);
           }
-          subscription.unsubscribe();
+          subscription?.unsubscribe();
           setIsProcessing(false);
           return;
         } catch (error) {
@@ -269,12 +400,28 @@ export function OAuthCallbackHandler() {
       }
 
       // getSession 시도
+      // onAuthStateChange가 먼저 실행될 수 있으므로 짧은 지연 후 처리
+      // 이미 처리 중이면 무시
+      if (hasProcessedRef.current) {
+        return;
+      }
+
+      // onAuthStateChange가 먼저 실행될 수 있으므로 짧은 지연
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // 지연 후 다시 확인
+      if (hasProcessedRef.current) {
+        return;
+      }
+
       const {
         data: { session },
         error: sessionError,
       } = await supabase.auth.getSession();
 
       if (session && session.user) {
+        hasProcessedRef.current = true;
+
         console.log('Session found via getSession', {
           userId: session.user.id,
         });
@@ -298,6 +445,35 @@ export function OAuthCallbackHandler() {
 
           const data = await response.json();
           console.log('Server session set successfully from getSession', data);
+          console.log(
+            'OAuth callback from getSession - isNewUser:',
+            data.isNewUser
+          );
+
+          // 응답이 성공했지만 isNewUser가 false인 경우 다시 확인
+          if (!data.isNewUser) {
+            console.log(
+              'OAuth callback from getSession - User is not new, redirecting to home'
+            );
+            await syncSession();
+
+            let retries = 0;
+            const maxRetries = 20;
+            while (retries < maxRetries) {
+              const accessToken = useAuthStore.getState().accessToken;
+              if (accessToken) {
+                break;
+              }
+              await new Promise((resolve) => setTimeout(resolve, 100));
+              retries++;
+            }
+
+            window.history.replaceState({}, '', window.location.pathname);
+            router.replace(URL_PATHS.HOME);
+            subscription?.unsubscribe();
+            setIsProcessing(false);
+            return;
+          }
 
           // 세션 동기화 (AuthProvider의 store 업데이트)
           await syncSession();
@@ -324,7 +500,7 @@ export function OAuthCallbackHandler() {
           } else {
             router.replace(URL_PATHS.HOME);
           }
-          subscription.unsubscribe();
+          subscription?.unsubscribe();
           setIsProcessing(false);
           return;
         } catch (error) {
@@ -334,7 +510,7 @@ export function OAuthCallbackHandler() {
 
       // Cleanup
       return () => {
-        subscription.unsubscribe();
+        subscription?.unsubscribe();
       };
     };
 
