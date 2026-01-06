@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { useModal } from '@/commons/providers/modal';
-import PartySubmit from '@/components/party-submit/partySubmit';
+import PartySubmit from '@/components/party-submit/PartySubmit';
 
 interface UseLinkUpdateModalOptions {
   onRefetch?: () => Promise<void>;

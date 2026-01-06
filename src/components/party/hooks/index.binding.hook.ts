@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { PartyCardProps } from '../ui/card/card';
+import { supabase } from '@/lib/supabase/client';
+import { AnimalType } from '@/commons/constants/animal';
 
 // API 응답 타입
 interface PartyPost {
@@ -21,17 +23,17 @@ interface PartyPost {
   created_at: string;
 }
 
-// Mock 데이터 타입
-interface MockPartyMember {
+// 실제 데이터 타입
+interface PartyMember {
   post_id: number;
   user_id: string;
   role: string;
   joined_at: string;
 }
 
-interface MockUserProfile {
-  user_id: string;
-  animal_type: string;
+interface UserProfile {
+  id: string;
+  animal_type: string | null;
 }
 
 interface UsePartyListBindingReturn {
@@ -40,9 +42,11 @@ interface UsePartyListBindingReturn {
   error: Error | null;
 }
 
-// 날짜와 시간을 조합하여 "MM/DD 오전/오후 HH:mm" 형식으로 변환
+// 날짜와 시간을 조합하여 "MM/DD 오전/오후/새벽 HH:mm" 형식으로 변환
 // - 날짜 형식: YYYY-MM-DD → MM/DD
-// - 시간 형식: HH:mm:ss → "오전/오후 HH:mm"
+// - 시간 형식: HH:mm:ss → "오전/오후/새벽 HH:mm"
+// - 예: start_date="2024-12-25", start_time="18:30:00" → "12/25 오후 6:30"
+// - 예: start_date="2024-12-26", start_time="02:00:00" → "12/26 새벽 2:00"
 const formatDateTime = (dateString: string, timeString: string): string => {
   // 날짜 파싱: YYYY-MM-DD → MM/DD
   const dateMatch = dateString.match(/(\d{4})-(\d{2})-(\d{2})/);
@@ -52,7 +56,7 @@ const formatDateTime = (dateString: string, timeString: string): string => {
   const [, , month, day] = dateMatch;
   const formattedDate = `${month}/${day}`;
 
-  // 시간 파싱: HH:mm:ss → 오전/오후 HH:mm
+  // 시간 파싱: HH:mm:ss → 오전/오후/새벽 HH:mm
   const timeMatch = timeString.match(/(\d{2}):(\d{2}):(\d{2})/);
   if (!timeMatch) {
     return `${formattedDate} ${timeString}`;
@@ -62,15 +66,28 @@ const formatDateTime = (dateString: string, timeString: string): string => {
   const hour = parseInt(hourStr, 10);
   const minute = minuteStr;
 
-  // 오전/오후 처리
-  const period = hour < 12 ? '오전' : '오후';
-  const displayHour =
-    hour === 0 ? 12 : hour > 12 ? hour - 12 : hour === 12 ? 12 : hour;
+  // 새벽/오전/오후 처리
+  let period: string;
+  let displayHour: number;
+
+  if (hour >= 0 && hour < 6) {
+    // 새벽 (0시~5시)
+    period = '새벽';
+    displayHour = hour === 0 ? 12 : hour;
+  } else if (hour < 12) {
+    // 오전 (6시~11시)
+    period = '오전';
+    displayHour = hour;
+  } else {
+    // 오후 (12시~23시)
+    period = '오후';
+    displayHour = hour === 12 ? 12 : hour - 12;
+  }
 
   return `${formattedDate} ${period} ${displayHour.toString().padStart(2, '0')}:${minute}`;
 };
 
-// voice_chat 값을 한글로 변환: 'required' → "필수 사용", 'optional' → "선택 사용", null → "사용 안함" (기본값)
+// voice_chat 값을 한글로 변환: 'required' → "필수 사용", 'optional' → "선택 사용", null → "선택 사용" (기본값)
 const getVoiceChatLabel = (voiceChat: string | null): string => {
   if (voiceChat === 'required') {
     return '필수 사용';
@@ -79,7 +96,7 @@ const getVoiceChatLabel = (voiceChat: string | null): string => {
     return '선택 사용';
   }
   // null인 경우 기본값
-  return '사용 안함';
+  return '선택 사용';
 };
 
 // difficulty 값을 한글로 변환
@@ -107,75 +124,125 @@ const getControlLevelLabel = (controlLevel: string): string => {
   return controlLevelMap[controlLevel] || controlLevel;
 };
 
-// Mock 데이터: party_members
-const mockPartyMembers: MockPartyMember[] = [
-  {
-    post_id: 1,
-    user_id: 'user-1',
-    role: 'member',
-    joined_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    post_id: 1,
-    user_id: 'user-2',
-    role: 'member',
-    joined_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    post_id: 2,
-    user_id: 'user-3',
-    role: 'member',
-    joined_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    post_id: 2,
-    user_id: 'user-4',
-    role: 'member',
-    joined_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    post_id: 2,
-    user_id: 'user-5',
-    role: 'member',
-    joined_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    post_id: 3,
-    user_id: 'user-6',
-    role: 'member',
-    joined_at: '2024-01-01T00:00:00Z',
-  },
-];
+// animal_type 값을 아바타 아이콘 파일명으로 변환
+// animal_type 값은 AnimalType enum 값이며, 이를 아바타 아이콘 파일명으로 변환
+const getAnimalTypeFromProfile = (animalType: string | null): string => {
+  if (!animalType) {
+    return 'default';
+  }
+  // AnimalType enum 값과 일치하는지 확인
+  const validAnimalTypes: string[] = Object.values(AnimalType);
+  if (validAnimalTypes.includes(animalType)) {
+    return animalType;
+  }
+  return 'default';
+};
 
-// Mock 데이터: user_profiles
-const mockUserProfiles: MockUserProfile[] = [
-  { user_id: 'user-1', animal_type: 'raven' },
-  { user_id: 'user-2', animal_type: 'hedgehog' },
-  { user_id: 'user-3', animal_type: 'dolphin' },
-  { user_id: 'user-4', animal_type: 'fox' },
-  { user_id: 'user-5', animal_type: 'bear' },
-  { user_id: 'user-6', animal_type: 'tiger' },
-];
+// party_members 및 user_profiles 데이터를 실제 Supabase에서 조회
+const fetchPartyMembersAndProfiles = async (
+  postIds: number[]
+): Promise<{
+  membersMap: Map<number, PartyMember[]>;
+  profilesMap: Map<string, UserProfile>;
+}> => {
+  const membersMap = new Map<number, PartyMember[]>();
+  const profilesMap = new Map<string, UserProfile>();
 
-// memberAvatars 생성 (Mock 데이터 사용): party_posts의 id를 기반으로 Mock party_members 데이터에서 해당 파티의 참여자 정보를 가져옴
+  if (postIds.length === 0) {
+    return { membersMap, profilesMap };
+  }
+
+  try {
+    // 1. party_members 조회: 모든 post_id에 대한 멤버 조회
+    const { data: partyMembers, error: membersError } = await supabase
+      .from('party_members')
+      .select('post_id, user_id, role, joined_at')
+      .in('post_id', postIds);
+
+    if (membersError) {
+      console.error('party_members 조회 실패:', membersError);
+      return { membersMap, profilesMap };
+    }
+
+    // post_id별로 멤버 그룹화
+    if (partyMembers) {
+      for (const member of partyMembers) {
+        const postId = member.post_id;
+        const userId = member.user_id;
+        if (postId && userId) {
+          if (!membersMap.has(postId)) {
+            membersMap.set(postId, []);
+          }
+          membersMap.get(postId)!.push({
+            post_id: postId,
+            user_id: userId,
+            role: member.role || '',
+            joined_at: member.joined_at || '',
+          });
+        }
+      }
+    }
+
+    // 2. user_profiles 조회: 모든 user_id에 대한 프로필 조회
+    const userIds = Array.from(
+      new Set(
+        partyMembers
+          ?.map((m) => m.user_id)
+          .filter((id): id is string => Boolean(id)) || []
+      )
+    );
+
+    if (userIds.length > 0) {
+      const { data: userProfiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, animal_type')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.error('user_profiles 조회 실패:', profilesError);
+      } else if (userProfiles) {
+        // user_id를 키로 하는 Map 생성
+        for (const profile of userProfiles) {
+          if (profile.id) {
+            profilesMap.set(profile.id, {
+              id: profile.id,
+              animal_type: profile.animal_type,
+            });
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('파티 멤버 및 프로필 조회 중 오류:', error);
+  }
+
+  return { membersMap, profilesMap };
+};
+
+// memberAvatars 생성 (실제 데이터 사용): party_posts의 id를 기반으로 실제 party_members 데이터에서 해당 파티의 참여자 정보를 가져옴
+// - party_members의 user_id를 사용하여 실제 user_profiles 데이터에서 animal_type을 조회
+// - animal_type 값을 아바타 아이콘 파일명과 매칭
 // - 참여자 수만큼 동물 아바타를 표시 (최대 4개)
 // - 참여자가 없는 경우 빈 배열로 처리
-const getMemberAvatars = (postId: number): string[] => {
-  // 해당 파티의 참여자 찾기
-  const members = mockPartyMembers.filter((m) => m.post_id === postId);
-
-  // 참여자 수만큼 동물 아바타 생성 (최대 4개)
+const getMemberAvatars = (
+  postId: number,
+  membersMap: Map<number, PartyMember[]>,
+  profilesMap: Map<string, UserProfile>
+): string[] => {
+  const members = membersMap.get(postId) || [];
   const avatars = members.slice(0, 4).map((member) => {
-    const profile = mockUserProfiles.find((p) => p.user_id === member.user_id);
-    return profile?.animal_type || 'default';
+    const profile = profilesMap.get(member.user_id);
+    return getAnimalTypeFromProfile(profile?.animal_type || null);
   });
-
   return avatars;
 };
 
-// currentMembers 계산 (Mock 데이터 사용): Mock party_members 데이터에서 해당 post_id의 참여자 수를 계산
-const getCurrentMembers = (postId: number): number => {
-  return mockPartyMembers.filter((m) => m.post_id === postId).length;
+// currentMembers 계산 (실제 데이터 사용): party_members 테이블에서 같은 post_id의 row 개수로 계산
+const getCurrentMembers = (
+  postId: number,
+  membersMap: Map<number, PartyMember[]>
+): number => {
+  return membersMap.get(postId)?.length || 0;
 };
 
 // description이 카드 사이즈를 넘어가는 경우 "..."으로 표현하여 카드 사이즈를 넘어가지 않도록 처리
@@ -245,12 +312,27 @@ export const usePartyListBinding = (): UsePartyListBindingReturn => {
         // 데이터 변환
         const partyList: PartyPost[] = result.data || [];
 
-        const transformedData: PartyCardProps[] = partyList.map((party) => {
-          // memberAvatars 생성 (Mock 데이터 사용)
-          const memberAvatars = getMemberAvatars(party.id);
+        if (partyList.length === 0) {
+          setData([]);
+          return;
+        }
 
-          // currentMembers 계산 (Mock 데이터 사용)
-          const currentMembers = getCurrentMembers(party.id);
+        // party_members 및 user_profiles 조회
+        const postIds = partyList.map((party) => party.id);
+        const { membersMap, profilesMap } =
+          await fetchPartyMembersAndProfiles(postIds);
+
+        // 데이터 변환
+        const transformedData: PartyCardProps[] = partyList.map((party) => {
+          // memberAvatars 생성 (실제 데이터 사용)
+          const memberAvatars = getMemberAvatars(
+            party.id,
+            membersMap,
+            profilesMap
+          );
+
+          // currentMembers 계산 (실제 데이터 사용)
+          const currentMembers = getCurrentMembers(party.id, membersMap);
 
           return {
             title: party.party_title,
