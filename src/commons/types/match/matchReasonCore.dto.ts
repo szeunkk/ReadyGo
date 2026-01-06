@@ -14,6 +14,8 @@
  * - 최소 3개 이상 항상 생성 가능하도록 설계
  */
 
+import type { TraitKey } from '@/features/match/domain/utils/traitsSimilarity';
+
 /**
  * 매칭 이유 타입
  *
@@ -33,6 +35,15 @@ export type MatchReasonType =
   | 'RELIABILITY'
   | 'ONLINE_NOW'
   | 'ACTIVITY_PATTERN';
+
+/**
+ * Reason 우선순위
+ *
+ * - HIGH: 매칭 결정에 매우 중요한 이유 (공통 게임, 스타일 유사도 등)
+ * - MEDIUM: 매칭에 도움이 되는 이유 (온라인 상태, 신뢰도 등)
+ * - LOW: 부가적인 이유 (파티 경험 등)
+ */
+export type ReasonPriority = 'HIGH' | 'MEDIUM' | 'LOW';
 
 /**
  * Reason 상세 데이터 타입
@@ -69,10 +80,24 @@ export type MatchReasonDetail =
        */
       similarityScore: number;
       /**
-       * 가장 유사한 Trait 이름
-       * 예: 'cooperation', 'exploration'
+       * 가장 유사한 Trait 키
+       *
+       * 타입 안전: TraitKey (keyof TraitVector)
+       * 예: 'cooperation', 'exploration', 'strategy', 'leadership', 'social'
+       *
+       * ViewModel에서 타입 안전하게 label 매핑 가능:
+       * ```typescript
+       * const traitLabels: Record<TraitKey, string> = {
+       *   cooperation: '협동',
+       *   exploration: '탐험',
+       *   strategy: '전략',
+       *   leadership: '리더십',
+       *   social: '사교성'
+       * };
+       * const label = traitLabels[reason.detail.topTrait]; // 타입 에러 없음
+       * ```
        */
-      topTrait: string;
+      topTrait: TraitKey;
     }
   | {
       type: 'PARTY_EXPERIENCE';
@@ -102,9 +127,13 @@ export type MatchReasonDetail =
        */
       patternScore: number;
       /**
-       * 공통 활동 시간대 (예: '주중 저녁', '주말 오후')
+       * 공통 활동 시간대 (원시 데이터)
+       * UI에서 '주중 저녁', '주말 오후' 등으로 변환
        */
-      commonTimeSlots: string[];
+      commonTimeSlots: Array<{
+        dayType: string;
+        timeSlot: string;
+      }>;
     };
 
 /**
@@ -114,6 +143,10 @@ export type MatchReasonDetail =
  *
  * 📌 필수 필드:
  * - detail: 구조화된 데이터 (type별로 다른 구조)
+ * - priority: 이유의 중요도 (HIGH, MEDIUM, LOW)
+ *
+ * 📌 선택 필드:
+ * - isBaseline: fallback 기본값 여부 (데이터 부족 시 생성된 reason)
  *
  * 📌 사용 예시:
  * ```typescript
@@ -123,7 +156,8 @@ export type MatchReasonDetail =
  *     type: 'COMMON_GAME',
  *     gameCount: 5,
  *     topGames: ['Dota 2', 'Counter-Strike 2']
- *   }
+ *   },
+ *   priority: 'HIGH'
  * };
  *
  * // Steam 미연동 Cold Start 경우
@@ -132,15 +166,30 @@ export type MatchReasonDetail =
  *     type: 'STYLE_SIMILARITY',
  *     similarityScore: 82,
  *     topTrait: 'cooperation'
- *   }
+ *   },
+ *   priority: 'HIGH'
  * };
  *
  * const reason3: MatchReasonCoreDTO = {
  *   detail: {
  *     type: 'ACTIVITY_PATTERN',
  *     patternScore: 75,
- *     commonTimeSlots: ['주중 저녁', '주말 오후']
- *   }
+ *     commonTimeSlots: [
+ *       { dayType: 'weekday', timeSlot: '18-24' },
+ *       { dayType: 'weekend', timeSlot: '12-18' }
+ *     ]
+ *   },
+ *   priority: 'MEDIUM'
+ * };
+ *
+ * // Fallback baseline reason
+ * const reason4: MatchReasonCoreDTO = {
+ *   detail: {
+ *     type: 'RELIABILITY',
+ *     reliabilityScore: 50
+ *   },
+ *   priority: 'LOW',
+ *   isBaseline: true
  * };
  * ```
  */
@@ -152,6 +201,29 @@ export interface MatchReasonCoreDTO {
    * UI에서 문구 조합에 필요한 최소 정보만 포함
    */
   detail: MatchReasonDetail;
+
+  /**
+   * 이유의 중요도
+   *
+   * 필수 필드
+   * - HIGH: 매칭 결정에 매우 중요한 이유
+   * - MEDIUM: 매칭에 도움이 되는 이유
+   * - LOW: 부가적인 이유
+   *
+   * ViewModel에서 우선순위 정렬 또는 필터링에 사용
+   */
+  priority: ReasonPriority;
+
+  /**
+   * Baseline (fallback) reason 여부
+   *
+   * 선택 필드
+   * - true: 데이터 부족으로 기본값으로 생성된 reason
+   * - false/undefined: 실제 데이터 기반 reason
+   *
+   * UI에서 baseline reason은 스타일 처리 또는 숨김 처리 가능
+   */
+  isBaseline?: boolean;
 }
 
 /**
@@ -172,4 +244,3 @@ export interface MatchReasonCoreDTO {
  * 4. "데이터 부족" 같은 표현 노출 금지
  * 5. Reason은 "데이터 존재 여부"가 아니라 "비교 가능성"이 있으면 생성
  */
-
