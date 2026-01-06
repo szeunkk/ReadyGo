@@ -19,6 +19,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
+
 /**
  * POST /api/traits/submit
  *
