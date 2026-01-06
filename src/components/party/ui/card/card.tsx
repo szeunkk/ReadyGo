@@ -49,6 +49,11 @@ export interface PartyCardProps {
    */
   avatarColor?: string;
   /**
+   * 파티장 여부
+   * @default false
+   */
+  isLeader?: boolean;
+  /**
    * 참여하기 버튼 클릭 핸들러
    */
   onJoinClick?: () => void;
@@ -71,6 +76,7 @@ export default function Card({
   maxMembers,
   categories: _categories,
   avatarColor = 'var(--color-text-secondary)',
+  isLeader = false,
   onJoinClick,
   className = '',
   partyId,
@@ -171,9 +177,27 @@ export default function Card({
       <div className={styles.cardTitleMemberWrapper}>
         <div className={styles.titleSection}>
           <div className={styles.titleTagWrapper}>
-            <h2 className={styles.cardTitle} data-testid={titleTestId}>
-              {title}
-            </h2>
+            <div className={styles.titleLeaderWrapper}>
+              <h2 className={styles.cardTitle} data-testid={titleTestId}>
+                {title}
+              </h2>
+              {isLeader && (
+                <Tag
+                  style="leader"
+                  className={styles.leaderTag}
+                  data-testid={
+                    partyId ? `party-card-leader-tag-${partyId}` : undefined
+                  }
+                >
+                  <Icon
+                    name="crown"
+                    size={14}
+                    className={styles.leaderTagIcon}
+                  />
+                  파티장
+                </Tag>
+              )}
+            </div>
             <Tag
               style="duotone"
               className={styles.gameTag}
@@ -260,8 +284,8 @@ export default function Card({
           <div className={styles.categoryItem}>
             <div className={styles.categoryIconLabelWrapper}>
               <Icon
-                key="crown"
-                name="crown"
+                key="stair"
+                name="stair"
                 size={20}
                 className={styles.categoryIcon}
               />

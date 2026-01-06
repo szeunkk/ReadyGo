@@ -74,35 +74,5 @@
   height: 48px;
   display: flex;
   align-items: center;
-  gap: 12px;
   box-sizing: border-box;
-}
-/* 
-.input {
-  display: flex;
-  height: 100%;
-  padding: 0 17px;
-  align-items: center;
-  gap: 10px;
-  flex: 1 0 0;
-  border-radius: var(--border-radius-12, 12px);
-  background: var(--color-bg-secondary, #11121c);
-} */
-
-.sendButton {
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border-radius: 12px;
-  background: var(--color-bg-secondary, #11121c);
-}
-
-.sendIcon {
-  width: 20px;
-  height: 20px;
-  color: var(--color-icon-disabled);
 }

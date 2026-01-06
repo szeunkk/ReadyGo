@@ -4,7 +4,7 @@ import React from 'react';
 import styles from './styles.module.css';
 import { HTMLAttributes } from 'react';
 
-export type TagStyle = 'rectangle' | 'duotone' | 'circle';
+export type TagStyle = 'rectangle' | 'duotone' | 'circle' | 'leader';
 
 export interface TagProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
