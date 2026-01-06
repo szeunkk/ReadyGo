@@ -40,9 +40,9 @@ interface UsePartyListBindingReturn {
   error: Error | null;
 }
 
-// 날짜와 시간을 조합하여 "MM/DD 오전/오후 HH:mm" 또는 "MM/DD 새벽 HH:mm" 형식으로 변환
+// 날짜와 시간을 조합하여 "MM/DD 오전/오후 HH:mm" 형식으로 변환
 // - 날짜 형식: YYYY-MM-DD → MM/DD
-// - 시간 형식: HH:mm:ss → "오전/오후/새벽 HH:mm"
+// - 시간 형식: HH:mm:ss → "오전/오후 HH:mm"
 const formatDateTime = (dateString: string, timeString: string): string => {
   // 날짜 파싱: YYYY-MM-DD → MM/DD
   const dateMatch = dateString.match(/(\d{4})-(\d{2})-(\d{2})/);
@@ -52,7 +52,7 @@ const formatDateTime = (dateString: string, timeString: string): string => {
   const [, , month, day] = dateMatch;
   const formattedDate = `${month}/${day}`;
 
-  // 시간 파싱: HH:mm:ss → 오전/오후/새벽 HH:mm
+  // 시간 파싱: HH:mm:ss → 오전/오후 HH:mm
   const timeMatch = timeString.match(/(\d{2}):(\d{2}):(\d{2})/);
   if (!timeMatch) {
     return `${formattedDate} ${timeString}`;
@@ -61,12 +61,6 @@ const formatDateTime = (dateString: string, timeString: string): string => {
   const [, hourStr, minuteStr] = timeMatch;
   const hour = parseInt(hourStr, 10);
   const minute = minuteStr;
-
-  // 새벽 시간대 처리 (0시~5시)
-  if (hour >= 0 && hour < 6) {
-    const displayHour = hour === 0 ? 12 : hour;
-    return `${formattedDate} 새벽 ${displayHour}:${minute}`;
-  }
 
   // 오전/오후 처리
   const period = hour < 12 ? '오전' : '오후';
@@ -86,6 +80,31 @@ const getVoiceChatLabel = (voiceChat: string | null): string => {
   }
   // null인 경우 기본값
   return '사용 안함';
+};
+
+// difficulty 값을 한글로 변환
+const getDifficultyLabel = (difficulty: string): string => {
+  const difficultyMap: Record<string, string> = {
+    undefined: '미정',
+    flexible: '유동',
+    easy: '이지',
+    normal: '노멀',
+    hard: '하드',
+    hell: '지옥',
+  };
+  return difficultyMap[difficulty] || difficulty;
+};
+
+// control_level 값을 한글로 변환
+const getControlLevelLabel = (controlLevel: string): string => {
+  const controlLevelMap: Record<string, string> = {
+    beginner: '미숙',
+    intermediate: '반숙',
+    advanced: '완숙',
+    expert: '빡숙',
+    master: '장인',
+  };
+  return controlLevelMap[controlLevel] || controlLevel;
 };
 
 // Mock 데이터: party_members
@@ -243,8 +262,8 @@ export const usePartyListBinding = (): UsePartyListBindingReturn => {
             categories: {
               startTime: formatDateTime(party.start_date, party.start_time),
               voiceChat: getVoiceChatLabel(party.voice_chat),
-              difficulty: party.difficulty,
-              controlLevel: party.control_level,
+              difficulty: getDifficultyLabel(party.difficulty),
+              controlLevel: getControlLevelLabel(party.control_level),
             },
             partyId: party.id,
           };
