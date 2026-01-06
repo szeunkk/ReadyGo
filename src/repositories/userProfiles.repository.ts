@@ -10,6 +10,7 @@ import type { Database } from '@/types/supabase';
 export type UserProfileRow = {
   id: string;
   animal_type: string | null;
+  avatar_url: string | null;
   nickname: string | null;
   tier: string;
   created_at: string;

@@ -1,11 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import {
-  calculateMatchResults,
-  type MatchResultWithTarget,
-} from '@/services/match/calculateMatchResults.service';
+import type { MatchResultWithTarget } from '@/services/match/calculateMatchResults.service';
 
 /**
  * 매칭 결과 Hook 옵션
@@ -104,8 +100,18 @@ export const useMatchResults = (
       setError(null);
 
       try {
-        const client = createClient();
-        const results = await calculateMatchResults(client, viewerId);
+        // API를 통해 매칭 결과 조회 (서버 사이드에서 인증된 요청)
+        const response = await fetch('/api/match/results', {
+          method: 'GET',
+          credentials: 'include', // 쿠키 포함
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch match results: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const results: MatchResultWithTarget[] = data.results || [];
 
         if (isCancelled) {
           return;
