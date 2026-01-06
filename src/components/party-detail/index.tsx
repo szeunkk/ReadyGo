@@ -14,6 +14,7 @@ import { usePartyBinding } from './hooks/index.binding.hook';
 import { useLinkUpdateModal } from './hooks/index.link.update.modal.hook';
 import { useDeleteParty } from './hooks/index.delete.hook';
 import { useJoinParty } from './hooks/index.join.hook';
+import { useLeaveParty } from './hooks/index.leave.hook';
 import styles from './styles.module.css';
 
 export default function PartyDetail() {
@@ -25,6 +26,7 @@ export default function PartyDetail() {
   const { openUpdateModal } = useLinkUpdateModal({ onRefetch: refetch });
   const { openDeleteModal } = useDeleteParty({ onRefetch: refetch });
   const { joinParty } = useJoinParty({ onRefetch: refetch });
+  const { leaveParty } = useLeaveParty({ onRefetch: refetch });
 
   // 작성자 여부 확인
   const isCreator = data?.creator_id === user?.id;
@@ -38,6 +40,18 @@ export default function PartyDetail() {
       } catch {
         // 에러는 joinParty 내부에서 모달로 처리되므로 여기서는 상태만 유지
         // 참여 실패 시 isJoined는 false로 유지됨
+      }
+    }
+  };
+
+  const handleLeaveClick = async () => {
+    if (partyId) {
+      try {
+        await leaveParty(partyId);
+        // 참여 상태가 업데이트되면 자동으로 버튼이 변경됨
+        setIsJoined(false);
+      } catch {
+        // 에러는 leaveParty 내부에서 모달로 처리
       }
     }
   };
@@ -123,6 +137,8 @@ export default function PartyDetail() {
             isLoading={isLoading}
             error={error}
             onJoinClick={handleJoinClick}
+            onLeaveClick={handleLeaveClick}
+            isJoined={isJoined}
           />
         </div>
       </div>

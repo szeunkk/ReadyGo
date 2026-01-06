@@ -17,9 +17,8 @@
 핵심요구사항) DELETE /api/party/[id]/members API를 구현할 것.
             1) 인증/권한 조건
                 1-1) 인증 확인
-                    - API는 쿠키의 'sb-access-token'을 통해 인증을 처리한다.
-                    - 인증 토큰이 없는 경우: { error: '인증이 필요합니다.' }, status: 401 반환
-                    - Supabase 클라이언트 생성 시 Authorization 헤더에 Bearer 토큰을 포함할 것.
+                    - Supabase SSR 클라이언트를 사용하여 인증을 처리한다.
+                    - SSR 클라이언트는 쿠키에서 세션을 자동으로 읽고, 토큰 갱신도 자동으로 처리한다.
                     - supabase.auth.getUser()를 통해 사용자 정보를 확인할 것.
                     - 사용자 정보가 없는 경우: { error: '인증이 필요합니다.' }, status: 401 반환
 
@@ -33,12 +32,11 @@
                     - 기존 POST 메서드와 동일한 파일에 DELETE 메서드를 추가할 것.
                     - export const DELETE = async (request: NextRequest, { params }: { params: { id: string } }) => { ... } 형식으로 구현할 것.
 
-                2-2) Supabase 클라이언트 생성
-                    - import { createClient } from '@supabase/supabase-js' 사용
-                    - import { Database } from '@/types/supabase' 사용
-                    - import { cookies } from 'next/headers' 사용
-                    - 환경 변수: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY 사용
-                    - createClient<Database>(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false }, global: { headers: { Authorization: `Bearer ${accessToken}` } } }) 형식으로 생성할 것.
+                2-2) Supabase SSR 클라이언트 생성
+                    - import { createClient } from '@/lib/supabase/server' 사용
+                    - SSR 클라이언트는 쿠키에서 세션을 자동으로 읽고, 토큰 갱신도 자동으로 처리한다.
+                    - const supabase = createClient() 형식으로 생성할 것.
+                    - 별도의 쿠키 읽기나 Authorization 헤더 설정이 필요하지 않다.
 
                 2-3) 파라미터 검증
                     - params.id를 parseInt(params.id, 10)로 변환할 것.
@@ -64,8 +62,8 @@
 
             3) 에러 처리
                 3-1) 인증 에러
-                    - 인증 토큰이 없는 경우: 401 상태 코드 반환
                     - 사용자 정보가 없는 경우: 401 상태 코드 반환
+                    - SSR 클라이언트는 쿠키에서 세션을 자동으로 읽으므로, 별도의 토큰 확인이 필요하지 않다.
 
                 3-2) 파라미터 에러
                     - 유효하지 않은 파티 ID: 400 상태 코드 반환
@@ -86,7 +84,7 @@
                     - party_members 테이블에서 해당 레코드가 삭제되었는지 확인
 
                 4-2) 실패 시나리오
-                    - 인증되지 않은 사용자: 401 에러 반환
+                    - 인증되지 않은 사용자 (쿠키에 세션이 없는 경우): 401 에러 반환
                     - 유효하지 않은 파티 ID: 400 에러 반환
                     - 존재하지 않는 파티: 404 에러 반환
                     - 파티 작성자가 나가기 시도: 400 에러 반환
@@ -100,7 +98,10 @@
             5) 구현 참고사항
                 5-1) 기존 POST 메서드 참고
                     - src/app/api/party/[id]/members/route.ts의 POST 메서드를 참고하여 동일한 스타일로 구현할 것.
-                    - 인증 처리 방식, 에러 처리 방식, Supabase 클라이언트 생성 방식을 동일하게 유지할 것.
+                    - POST 메서드에서 사용하는 Supabase SSR 클라이언트 생성 방식을 동일하게 사용할 것.
+                    - import { createClient } from '@/lib/supabase/server' 사용
+                    - const supabase = createClient() 형식으로 생성
+                    - 인증 처리 방식, 에러 처리 방식을 동일하게 유지할 것.
 
                 5-2) 코드 구조
                     - 주석을 적절히 추가하여 각 단계를 명확히 구분할 것.

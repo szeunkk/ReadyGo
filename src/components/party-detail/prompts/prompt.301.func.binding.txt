@@ -61,41 +61,50 @@
 핵심요구사항) 다이나믹라우팅된 파티상세페이지의 [Id]를 추출하여 Mock데이터를 제거하고, 실제 데이터를 바인딩할 것.
             1) 바인딩할 데이터
                 - Next.js의 useParams를 사용하여 /party/[Id] 경로에서 id를 추출할 것.
-                - Supabase의 party_posts 테이블에서 추출한 id와 일치하는 파티모집글 상세객체를 조회할 것.
+                - API Route를 통해 Supabase의 party_posts 테이블에서 추출한 id와 일치하는 파티모집글 상세객체를 조회할 것.
             
-            2) Supabase 클라이언트 사용 방법
-                - @src/components/party-submit/hooks/index.submit.hook.tsx를 참고할 것.
+            2) API Route를 통한 데이터 조회 방법
+                - 클라이언트에서 직접 Supabase 클라이언트를 생성하지 말 것.
+                - API Route: GET /api/party/[id]를 사용하여 데이터를 조회할 것.
+                - @src/app/api/party/[id]/route.ts를 참고할 것.
                 
-                2-1) Supabase 클라이언트 import
-                    - import { supabase } from '@/lib/supabase/client';
-                    - 클라이언트 파일 경로: src/lib/supabase/client.ts
-                
-                2-2) 데이터 조회 패턴
-                    - 테이블: party_posts
-                    - 조회 메서드: .from('party_posts').select('*').eq('id', id).single()
-                    - 예시 코드:
-                        const { data, error } = await supabase
+                2-1) API Route 구현 (이미 존재하는 경우 확인 후 사용)
+                    - 파일 경로: src/app/api/party/[id]/route.ts
+                    - Supabase SSR 클라이언트 사용:
+                        import { createClient } from '@/lib/supabase/server';
+                        const supabase = createClient();
+                    - 데이터 조회 패턴:
+                        const { data: partyData, error: fetchError } = await supabase
                           .from('party_posts')
                           .select('*')
                           .eq('id', id)
                           .single();
-                    
+                    - 에러 처리 및 응답 반환
+                
+                2-2) 클라이언트 Hook에서 API 호출
+                    - 구현 위치: @src/components/party-detail/hooks/index.binding.hook.ts
+                    - fetch API를 사용하여 API Route 호출:
+                        const response = await fetch(`/api/party/${id}`, {
+                          method: 'GET',
+                          credentials: 'include', // HttpOnly 쿠키 포함 (중요!)
+                        });
+                    - 응답 처리:
+                        - 401: 인증 오류
+                        - 404: 파티를 찾을 수 없음
+                        - 200: 성공, data 필드에 파티 데이터 포함
                     - 에러 처리:
-                        if (error) {
-                          // 에러 처리 로직
-                          throw error;
+                        if (!response.ok) {
+                          // 상태 코드에 따른 에러 처리
+                          throw new Error('에러 메시지');
                         }
-                    
-                    - 데이터 존재 확인:
-                        if (!data) {
-                          // 데이터가 없을 경우 처리
-                        }
+                    - 데이터 파싱:
+                        const { data: partyData } = await response.json();
                 
                 2-3) 참고사항
-                    - index.submit.hook.tsx의 136-152번째 줄을 참고하여 Supabase 쿼리 패턴을 확인할 것.
-                    - insert 대신 select를 사용하여 데이터를 조회할 것.
-                    - .eq('id', id)를 사용하여 특정 id와 일치하는 레코드를 조회할 것.
-                    - .single()을 사용하여 단일 레코드만 반환받을 것.
+                    - 클라이언트에서 직접 Supabase 클라이언트를 생성하는 방식은 사용하지 말 것.
+                    - 모든 데이터 조회는 API Route를 통해 수행할 것.
+                    - API Route에서는 Supabase SSR 클라이언트(@/lib/supabase/server)를 사용할 것.
+                    - credentials: 'include'를 사용하여 HttpOnly 쿠키가 포함되도록 할 것.
             
             3) 상세내용
                 - 제목: 파티모집글 상세객체의 party_title
@@ -150,15 +159,24 @@
 핵심요구사항) 파티 상세 페이지의 버튼 렌더링 로직을 구현할 것.
             1) 참여 상태 확인
                 - party_members 테이블에서 현재 사용자가 해당 파티에 참여했는지 확인할 것.
-                - API Route: GET /api/party/[id]/members 또는 직접 Supabase 조회
-                - 조회 패턴:
-                    const { data: memberData } = await supabase
-                      .from('party_members')
-                      .select('id')
-                      .eq('post_id', partyId)
-                      .eq('user_id', currentUserId)
-                      .single();
+                - API Route를 통해 참여 상태를 조회할 것 (직접 Supabase 클라이언트 생성하지 말 것).
+                - API Route 옵션:
+                    - GET /api/party/[id]/members?check=true 또는
+                    - 별도 API: GET /api/party/[id]/members/check 또는
+                    - 기존 GET /api/party/[id] 응답에 isParticipant 필드 추가
+                - API Route 구현 시 Supabase SSR 클라이언트 사용:
+                    - import { createClient } from '@/lib/supabase/server';
+                    - const supabase = createClient();
+                    - 조회 패턴:
+                        const { data: memberData } = await supabase
+                          .from('party_members')
+                          .select('id')
+                          .eq('post_id', partyId)
+                          .eq('user_id', currentUserId)
+                          .single();
                 - 참여 여부: memberData가 존재하면 참여한 상태, null이면 미참여 상태
+                - 클라이언트에서는 fetch API를 사용하여 API Route 호출:
+                    - credentials: 'include'를 사용하여 HttpOnly 쿠키 포함
 
             2) 버튼 렌더링 조건
                 2-1) 파티장인 경우 (creator_id === user.id)
@@ -202,10 +220,11 @@
                 - API Route를 통해 참여 상태 조회:
                     - GET /api/party/[id]/members?check=true 또는
                     - 별도 API: GET /api/party/[id]/members/check
-                - 또는 직접 Supabase 조회:
-                    - useAuth에서 현재 user.id 가져오기
-                    - party_members 테이블에서 post_id와 user_id로 조회
-                    - 조회 패턴:
+                    - 또는 기존 GET /api/party/[id] 응답에 isParticipant 필드 추가
+                - API Route 구현 시 Supabase SSR 클라이언트 사용:
+                    - import { createClient } from '@/lib/supabase/server';
+                    - const supabase = createClient();
+                    - party_members 테이블에서 post_id와 user_id로 조회:
                         const { data: memberData } = await supabase
                           .from('party_members')
                           .select('id')
@@ -213,6 +232,10 @@
                           .eq('user_id', currentUserId)
                           .single();
                     - isParticipant = memberData !== null && memberData !== undefined
+                - 클라이언트에서는 API Route를 통해 참여 상태를 조회할 것:
+                    - 직접 Supabase 클라이언트를 생성하지 말 것.
+                    - fetch API를 사용하여 API Route 호출
+                    - credentials: 'include'를 사용하여 HttpOnly 쿠키 포함
                 - 반환 타입에 isParticipant 추가:
                     interface UsePartyBindingReturn {
                       data: PartyDetailData | null;
@@ -272,91 +295,19 @@
                         - onClick: onLeaveClick
                 - 로딩 및 에러 상태에서도 버튼은 disabled 상태로 유지
 
-            7) DELETE /api/party/[id]/members API 구현
-                - 구현 위치: src/app/api/party/[id]/members/route.ts
-                - DELETE 메서드 추가:
-                    export const DELETE = async (
-                      request: NextRequest,
-                      { params }: { params: { id: string } }
-                    ) => {
-                      // 1. 인증 확인
-                      const cookieStore = await cookies();
-                      const accessToken = cookieStore.get('sb-access-token')?.value;
-                      if (!accessToken) {
-                        return NextResponse.json(
-                          { error: '인증이 필요합니다.' },
-                          { status: 401 }
-                        );
-                      }
-                      
-                      // 2. Supabase 클라이언트 생성
-                      const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-                        auth: { persistSession: false },
-                        global: { headers: { Authorization: `Bearer ${accessToken}` } },
-                      });
-                      
-                      // 3. 사용자 정보 확인
-                      const { data: { user }, error: userError } = await supabase.auth.getUser();
-                      if (userError || !user) {
-                        return NextResponse.json(
-                          { error: '인증이 필요합니다.' },
-                          { status: 401 }
-                        );
-                      }
-                      
-                      // 4. 파티 정보 조회
-                      const postId = parseInt(params.id, 10);
-                      if (isNaN(postId)) {
-                        return NextResponse.json(
-                          { error: '유효하지 않은 파티 ID입니다.' },
-                          { status: 400 }
-                        );
-                      }
-                      
-                      const { data: partyData, error: fetchError } = await supabase
-                        .from('party_posts')
-                        .select('creator_id')
-                        .eq('id', postId)
-                        .single();
-                      
-                      if (fetchError) {
-                        if (fetchError.code === 'PGRST116') {
-                          return NextResponse.json(
-                            { error: '파티를 찾을 수 없습니다.' },
-                            { status: 404 }
-                          );
-                        }
-                        return NextResponse.json({ error: fetchError.message }, { status: 500 });
-                      }
-                      
-                      // 5. 작성자는 나가기 불가
-                      if (partyData.creator_id === user.id) {
-                        return NextResponse.json(
-                          { error: '파티 작성자는 나갈 수 없습니다.' },
-                          { status: 400 }
-                        );
-                      }
-                      
-                      // 6. party_members에서 레코드 삭제
-                      const { error: deleteError } = await supabase
-                        .from('party_members')
-                        .delete()
-                        .eq('post_id', postId)
-                        .eq('user_id', user.id);
-                      
-                      if (deleteError) {
-                        return NextResponse.json({ error: deleteError.message }, { status: 500 });
-                      }
-                      
-                      // 7. 성공 응답
-                      return NextResponse.json({ success: true }, { status: 200 });
-                    };
+          
 
             8) 파티 나가기 핸들러 구현
                 - 구현 위치: @src/components/party-detail/hooks/index.leave.hook.ts (새 파일 생성)
                 - useLeaveParty hook 생성:
                     - @src/components/party-detail/hooks/index.join.hook.ts를 참고하여 구현
                     - API 호출: DELETE /api/party/[id]/members
+                    - API Route는 이미 존재하며 Supabase SSR 클라이언트를 사용함 (@src/app/api/party/[id]/members/route.ts)
+                    - 클라이언트에서는 fetch API를 사용하여 API Route 호출:
+                        const response = await fetch(`/api/party/${partyId}/members`, {
+                          method: 'DELETE',
+                          credentials: 'include', // HttpOnly 쿠키 포함 (중요!)
+                        });
                     - 성공 시 onRefetch 호출하여 참여 상태 업데이트
                     - 에러 발생 시 모달로 에러 메시지 표시
                 - 구현 패턴:
@@ -376,7 +327,8 @@
                       
                       const leaveParty = useCallback(
                         async (partyId: number | string) => {
-                          // DELETE API 호출
+                          // DELETE API 호출 (fetch 사용)
+                          // credentials: 'include' 사용
                           // 성공 시 onRefetch 호출
                           // 실패 시 모달 표시
                         },
