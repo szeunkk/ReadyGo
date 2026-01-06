@@ -1,4 +1,4 @@
-import * as chatRepository from '@/repositories/chat.repository';
+import * as userBlocksRepository from '@/repositories/userBlocks.repository';
 import {
   ChatUpdateError,
   ChatValidationError,
@@ -31,7 +31,7 @@ export const unblockUserService = async (
   }
 
   try {
-    await chatRepository.unblockUser(client, userId, blockedUserId);
+    await userBlocksRepository.unblockUser(client, userId, blockedUserId);
   } catch (error) {
     throw new ChatUpdateError(
       'message',

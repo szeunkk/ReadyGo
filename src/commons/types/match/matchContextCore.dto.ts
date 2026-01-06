@@ -429,34 +429,64 @@ export interface MatchContextCoreDTO {
  * ```typescript
  * // calculateBaseSimilarity.ts
  * export function calculateBaseSimilarity(context: MatchContextCoreDTO): number {
- *   let score = 0;
+ *   // 순수 Traits 점수만 계산
+ *   const traitsScore = context.viewer.traits?.traits && context.target.traits?.traits
+ *     ? calculateTraitsSimilarity(
+ *         context.viewer.traits.traits,
+ *         context.target.traits.traits
+ *       )
+ *     : undefined;
  *
- *   // Traits 유사도 계산 (있을 경우에만)
- *   if (context.viewer.traits?.traits && context.target.traits?.traits) {
- *     score += calculateTraitsSimilarity(
- *       context.viewer.traits.traits,
- *       context.target.traits.traits
- *     );
- *   }
- *
- *   // Activity 유사도 계산 (있을 경우에만)
- *   if (context.viewer.activity?.schedule && context.target.activity?.schedule) {
- *     score += calculateScheduleSimilarity(
- *       context.viewer.activity.schedule,
- *       context.target.activity.schedule
- *     );
- *   }
- *
- *   return Math.min(100, Math.max(0, score));
+ *   // Traits 없으면 Cold Start 기본값
+ *   return traitsScore ?? 50;
  * }
  *
- * // applyOnlineBonus.ts
- * export function applyOnlineBonus(
+ * // calculateScheduleCompatibilityFactor.ts
+ * export function calculateScheduleCompatibilityFactor(context: MatchContextCoreDTO): number {
+ *   const scheduleScore = context.viewer.activity?.schedule && context.target.activity?.schedule
+ *     ? calculateScheduleSimilarity(
+ *         context.viewer.activity.schedule,
+ *         context.target.activity.schedule
+ *       )
+ *     : undefined;
+ *
+ *   // 60점 미만이면 보정 없음
+ *   if (!scheduleScore || scheduleScore < 60) return 1.0;
+ *
+ *   // 60~100점 → 1.0~1.05 (최대 5% 증가)
+ *   const bonus = ((scheduleScore - 60) / 40) * 0.05;
+ *   return 1.0 + bonus;
+ * }
+ *
+ * // applyAnimalCompatibility.ts
+ * export function applyAnimalCompatibility(
  *   baseScore: number,
  *   context: MatchContextCoreDTO
  * ): number {
+ *   const viewerAnimal = context.viewer.traits?.animalType;
+ *   const targetAnimal = context.target.traits?.animalType;
+ *
+ *   if (!viewerAnimal || !targetAnimal) return baseScore;
+ *
+ *   // 궁합에 따른 비율 보정
+ *   const compatLevel = getCompatibilityLevel(viewerAnimal, targetAnimal);
+ *   let multiplier = 1.0;
+ *
+ *   switch (compatLevel) {
+ *     case 'best': multiplier = 1.1; break;
+ *     case 'good': multiplier = 1.07; break;
+ *     case 'challenging': multiplier = 0.95; break;
+ *   }
+ *
+ *   return Math.min(100, Math.round(baseScore * multiplier));
+ * }
+ *
+ * // calculateAvailabilityFactor.ts
+ * export function calculateAvailabilityFactor(
+ *   context: MatchContextCoreDTO
+ * ): number {
  *   const targetOnline = context.target.activity?.isOnline ?? false;
- *   return targetOnline ? baseScore * 1.1 : baseScore;
+ *   return targetOnline ? 1.0 : 0.85;
  * }
  *
  * // applySteamBonus.ts
@@ -485,9 +515,11 @@ export interface MatchContextCoreDTO {
  *   const context = await buildMatchContext(viewerId, targetUserId);
  *
  *   // 2. Domain 계산
- *   const baseScore = calculateBaseSimilarity(context);
- *   const scoreWithOnline = applyOnlineBonus(baseScore, context);
- *   const finalScore = applySteamBonus(scoreWithOnline, context);
+ *   const baseScore = calculateBaseSimilarity(context); // 순수 Traits 점수
+ *   const withAnimal = applyAnimalCompatibility(baseScore, context); // 동물 궁합 보정
+ *   const scheduleFactor = calculateScheduleCompatibilityFactor(context); // 시간대 팩터
+ *   const availabilityFactor = calculateAvailabilityFactor(context); // 가용성 팩터
+ *   const finalScore = withAnimal * scheduleFactor * availabilityFactor;
  *   const reasons = generateMatchReasons(context);
  *   const tags = generateMatchTags(context);
  *

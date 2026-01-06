@@ -1,0 +1,126 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+	        - Service / Domain / Hook 레이어 책임을 엄격히 분리할 것
+	        - Hook은 상태 관리 + UX 가공만 담당할 것
+	        - Domain 타입, Domain 함수 import 금지
+	        - Service 로직 복사 금지
+	        - useEffect 내부에 복잡한 분기 로직 금지
+	        - throw, null 반환 금지
+	        - default export 금지, named export만 허용
+
+==============================================
+
+조건-파일경로) 참고 및 기준 파일 경로는 다음과 같다.
+	        - src/hooks/useMatchResults.ts
+	        - src/services/match/calculateMatchResults.service.ts
+
+==============================================
+
+조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
+	        - 다른 Hook들은 다음의 패턴을 따른다.
+                - Service 호출
+                - loading / error / data 상태 분리
+                - 파생 상태(computed) 분리
+                - refetch 제공
+
+==============================================
+
+핵심요구사항) 다음 기능을 step-by-step으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
+	1.	useMatchResults Hook 구현
+	    - calculateMatchResults Service를 감싼다
+	    - UI가 바로 사용 가능한 상태 흐름을 제공한다
+	2.	Hook 정체성 준수
+	    - 매칭 결과 요청 / 로딩 / 성공 / 실패 상태 관리
+	    - 결과 정렬 / 필터 등 UX 가공은 Hook 책임
+	    - MatchContext 생성 ❌
+	    - 점수 계산 ❌
+	    - Domain 함수 호출 ❌
+	    - Supabase 쿼리 직접 작성 ❌
+	3.	Hook 시그니처 고정
+        interface UseMatchResultsOptions {
+            minScore?: number;
+            onlineOnly?: boolean;
+            sortBy?: 'score' | 'online';
+        }
+
+        export const useMatchResults = (
+            viewerId: string,
+            options?: UseMatchResultsOptions
+        ) => { ... }
+
+	4.	viewerId 규칙
+	    - viewerId가 없으면 Service 호출하지 않는다
+	5.	내부 상태 설계
+	    - results: MatchResultWithTarget[]
+	    - loading: boolean
+	    - error: Error | null
+	    - isEmpty: !loading && results.length === 0
+	6.	Service 호출 규칙
+	    - calculateMatchResults(client, viewerId)만 호출
+	    - calculateMatchResult 직접 호출 ❌
+	    - Domain / Repository 접근 ❌
+	7.	Effect 트리거 규칙
+        useEffect(() => {
+            if (!viewerId) return;
+            ...
+        }, [viewerId]);
+
+	    - viewerId 변경 시 재호출
+	    - options 변경 시 재정렬만 수행 (재요청 ❌)
+
+	8.	데이터 가공 책임 (Hook 전용)
+	    - 점수 필터
+	    - 온라인 필터
+	    - 정렬
+	9.	반환 값 규칙
+        return {
+            results: processedResults,
+            loading,
+            error,
+            isEmpty,
+            refetch,
+        };
+
+	10.	Cold Start UX 규칙
+	    - Cold Start 결과도 그대로 results에 포함
+	    - Cold Start 전용 분기 ❌
+
+	11.	금지 사항
+	    - Service 로직 복사 ❌
+	    - 점수 계산 ❌
+	    - MatchContext 생성 ❌
+	    - throw ❌
+	    - null 반환 ❌
+	    - Domain 타입 import ❌
+
+==============================================
+
+조건-Hook 책임)
+	    - Service 호출 오케스트레이션
+	    - loading / error / data 상태 관리
+	    - 정렬 / 필터 등 UI 친화적 가공
+	    - refetch 제공
+
+==============================================
+
+조건-UI 책임)
+	    - Hook이 반환한 값만 사용
+	    - 매칭 계산 / 해석 로직 ❌
+
+==============================================
+
+구현 완료 후 반환) 아래 체크리스트를 반드시 반환할 것.
+	    - useMatchResults Hook이 지정된 파일 경로에 구현되었는가
+	    - named export만 사용했는가
+	    - calculateMatchResults Service만 호출하는가
+	    - viewerId 없을 때 Service 호출을 하지 않는가
+	    - loading / error / results 상태가 분리되어 있는가
+	    - isEmpty 파생 상태가 올바르게 계산되는가
+	    - options 변경 시 재정렬만 수행하는가
+	    - 정렬 / 필터 로직이 Hook에만 존재하는가
+	    - Domain / Repository / Supabase 접근이 없는가
+	    - 금지 사항이 모두 지켜졌는가
