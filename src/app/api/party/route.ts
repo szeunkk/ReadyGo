@@ -7,12 +7,25 @@ type PartyPost = Database['public']['Tables']['party_posts']['Row'];
 /**
  * 파티 목록 조회
  * GET /api/party
- * 인증되지 않은 유저도 조회 가능
+ * 인증된 유저, 로그인한 유저만 조회 가능
  */
 export const GET = async (request: NextRequest) => {
   try {
     // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
     const supabase = createClient();
+
+    // 인증 체크: 인증된 유저만 파티 목록 조회 가능
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: '인증이 필요합니다.' },
+        { status: 401 }
+      );
+    }
 
     // 쿼리 파라미터 처리
     const { searchParams } = new URL(request.url);
@@ -27,27 +40,14 @@ export const GET = async (request: NextRequest) => {
     const offset = offsetParam ? parseInt(offsetParam, 10) : 0;
     const tab = tabParam === 'participating' ? 'participating' : 'all';
 
-    // 현재 로그인한 유저 정보 확인 (참여 중인 파티 탭인 경우 필요)
-    let currentUserId: string | null = null;
-    if (tab === 'participating') {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError || !user) {
-        // 로그인하지 않은 경우 빈 목록 반환
-        return NextResponse.json({ data: [] });
-      }
-
-      currentUserId = user.id;
-    }
+    // 현재 로그인한 유저 정보 (이미 인증 체크 완료)
+    const currentUserId = user.id;
 
     // 1단계: party_posts 조회
     // 참여 중인 파티 탭인 경우: party_members에서 현재 유저가 참여한 post_id만 조회
     let allPartyPosts: PartyPost[] = [];
 
-    if (tab === 'participating' && currentUserId) {
+    if (tab === 'participating') {
       // party_members에서 현재 유저가 참여한 post_id 조회
       const { data: partyMembers, error: membersError } = await supabase
         .from('party_members')
