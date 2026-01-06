@@ -276,25 +276,29 @@ test.describe('파티 목록 데이터 바인딩 기능', () => {
 
     if (cardCount > 0) {
       // 각 카드에 대해 파티장 태그 확인
-      for (let i = 0; i < cardCount; i++) {
-        const card = cards.nth(i);
-        const cardTestId = await card.getAttribute('data-testid');
-        const partyId = cardTestId?.replace('party-card-', '');
+      await Promise.all(
+        Array.from({ length: cardCount }, async (_, i) => {
+          const card = cards.nth(i);
+          const cardTestId = await card.getAttribute('data-testid');
+          const partyId = cardTestId?.replace('party-card-', '');
 
-        if (partyId) {
-          const leaderTag = card.locator(
-            `[data-testid="party-card-leader-tag-${partyId}"]`
-          );
-          const leaderTagExists = await leaderTag.isVisible().catch(() => false);
+          if (partyId) {
+            const leaderTag = card.locator(
+              `[data-testid="party-card-leader-tag-${partyId}"]`
+            );
+            const leaderTagExists = await leaderTag
+              .isVisible()
+              .catch(() => false);
 
-          // 파티장 태그가 있으면 표시되어야 함
-          if (leaderTagExists) {
-            await expect(leaderTag).toBeVisible();
-            const leaderTagText = await leaderTag.textContent();
-            expect(leaderTagText).toContain('파티장');
+            // 파티장 태그가 있으면 표시되어야 함
+            if (leaderTagExists) {
+              await expect(leaderTag).toBeVisible();
+              const leaderTagText = await leaderTag.textContent();
+              expect(leaderTagText).toContain('파티장');
+            }
           }
-        }
-      }
+        })
+      );
     }
   });
 
@@ -336,27 +340,29 @@ test.describe('파티 목록 데이터 바인딩 기능', () => {
     const cardCount = await cards.count();
 
     if (cardCount > 0) {
-      let hasLeaderTag = false;
-      for (let i = 0; i < cardCount; i++) {
-        const card = cards.nth(i);
-        const cardTestId = await card.getAttribute('data-testid');
-        const partyId = cardTestId?.replace('party-card-', '');
+      await Promise.all(
+        Array.from({ length: cardCount }, async (_, i) => {
+          const card = cards.nth(i);
+          const cardTestId = await card.getAttribute('data-testid');
+          const partyId = cardTestId?.replace('party-card-', '');
 
-        if (partyId) {
-          const leaderTag = card.locator(
-            `[data-testid="party-card-leader-tag-${partyId}"]`
-          );
-          const leaderTagExists = await leaderTag.isVisible().catch(() => false);
+          if (partyId) {
+            const leaderTag = card.locator(
+              `[data-testid="party-card-leader-tag-${partyId}"]`
+            );
+            const leaderTagExists = await leaderTag
+              .isVisible()
+              .catch(() => false);
 
-          if (leaderTagExists) {
-            hasLeaderTag = true;
-            // 파티장 태그가 표시되면 올바르게 표시되는지 확인
-            await expect(leaderTag).toBeVisible();
-            const leaderTagText = await leaderTag.textContent();
-            expect(leaderTagText).toContain('파티장');
+            if (leaderTagExists) {
+              // 파티장 태그가 표시되면 올바르게 표시되는지 확인
+              await expect(leaderTag).toBeVisible();
+              const leaderTagText = await leaderTag.textContent();
+              expect(leaderTagText).toContain('파티장');
+            }
           }
-        }
-      }
+        })
+      );
       // 로그인한 유저가 작성한 파티가 있다면 파티장 태그가 표시되어야 함
       // (실제 데이터에 따라 다를 수 있으므로, 태그가 없어도 테스트는 통과)
     }
@@ -394,19 +400,21 @@ test.describe('파티 목록 데이터 바인딩 기능', () => {
     const cardCount = await cards.count();
 
     if (cardCount > 0) {
-      for (let i = 0; i < cardCount; i++) {
-        const card = cards.nth(i);
-        const cardTestId = await card.getAttribute('data-testid');
-        const partyId = cardTestId?.replace('party-card-', '');
+      await Promise.all(
+        Array.from({ length: cardCount }, async (_, i) => {
+          const card = cards.nth(i);
+          const cardTestId = await card.getAttribute('data-testid');
+          const partyId = cardTestId?.replace('party-card-', '');
 
-        if (partyId) {
-          const leaderTag = card.locator(
-            `[data-testid="party-card-leader-tag-${partyId}"]`
-          );
-          // 로그인하지 않은 상태에서는 파티장 태그가 표시되지 않아야 함
-          await expect(leaderTag).not.toBeVisible();
-        }
-      }
+          if (partyId) {
+            const leaderTag = card.locator(
+              `[data-testid="party-card-leader-tag-${partyId}"]`
+            );
+            // 로그인하지 않은 상태에서는 파티장 태그가 표시되지 않아야 함
+            await expect(leaderTag).not.toBeVisible();
+          }
+        })
+      );
     }
   });
 

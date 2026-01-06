@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 import Selectbox, { type SelectboxItem } from '@/commons/components/selectbox';
 import Searchbar from '@/commons/components/searchbar';
@@ -15,7 +15,10 @@ import { useFloatButton } from './hooks/index.float.hook';
 import { useFilter } from './hooks/index.filter.hook';
 import styles from './styles.module.css';
 
+type TabType = 'all' | 'participating';
+
 export default function Party() {
+  const [activeTab, setActiveTab] = useState<TabType>('all');
   const { selectedGenre, searchQuery, setSelectedGenre, setSearchQuery } =
     useFilter();
   const { openPartySubmitModal } = useLinkModal();
@@ -107,6 +110,22 @@ export default function Party() {
               새 파티 만들기
             </Button>
           </div>
+        </div>
+        <div className={styles.tabArea}>
+          <button
+            className={`${styles.tab} ${activeTab === 'all' ? '' : styles.tabInactive}`}
+            onClick={() => setActiveTab('all')}
+            data-testid="party-tab-all"
+          >
+            전체 파티
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'participating' ? '' : styles.tabInactive}`}
+            onClick={() => setActiveTab('participating')}
+            data-testid="party-tab-participating"
+          >
+            참여 중인 파티
+          </button>
         </div>
         <InfiniteScroll
           pageStart={0}

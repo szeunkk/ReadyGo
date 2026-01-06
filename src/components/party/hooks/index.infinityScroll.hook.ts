@@ -302,8 +302,9 @@ export const useInfinitePartyList = (
 
         // isLeader 계산: 로그인한 유저의 ID와 party_posts.creator_id가 같을 때만 true
         // 로그인하지 않은 경우(user가 null인 경우) 또는 creator_id가 없는 경우 false
-        const isLeader =
-          user?.id && party.creator_id && user.id === party.creator_id;
+        const isLeader = Boolean(
+          user?.id && party.creator_id && user.id === party.creator_id
+        );
 
         return {
           title: party.party_title,
@@ -369,10 +370,11 @@ export const useInfinitePartyList = (
         }
 
         // isLeader 재계산
-        const isLeader =
+        const isLeader = Boolean(
           user?.id &&
           originalParty.creator_id &&
-          user.id === originalParty.creator_id;
+          user.id === originalParty.creator_id
+        );
 
         return {
           ...card,

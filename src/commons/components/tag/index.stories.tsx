@@ -120,7 +120,8 @@ export const LeaderWithIcon: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'leader 스타일과 아이콘을 함께 사용하는 예시입니다. 실제 파티장 태그 사용 예시입니다.',
+        story:
+          'leader 스타일과 아이콘을 함께 사용하는 예시입니다. 실제 파티장 태그 사용 예시입니다.',
       },
     },
   },
