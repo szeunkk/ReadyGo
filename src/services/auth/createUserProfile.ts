@@ -5,10 +5,10 @@ import { AnimalType } from '@/commons/constants/animal/animal.enum';
 import { TierType } from '@/commons/constants/tierType.enum';
 
 /**
- * 사용자 프로필 및 설정 생성
+ * 사용자 프로필, 설정 및 상태 생성
  * @param supabase - Supabase 클라이언트 인스턴스
  * @param userId - 사용자 ID
- * @throws 프로필 또는 설정 생성 실패 시 에러
+ * @throws 프로필, 설정 또는 상태 생성 실패 시 에러
  */
 export async function createUserProfile(
   supabase: SupabaseClient<Database>,
@@ -52,6 +52,30 @@ export async function createUserProfile(
     throw new Error(
       settingsError.message ||
         '설정 생성에 실패했습니다. RLS 정책을 확인하세요.'
+    );
+  }
+
+  // 3. user_status 생성 (회원가입 시 기본 상태를 online으로 설정)
+  // 타입 정의에 user_status가 없을 수 있으므로 any로 캐스팅
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error: statusError } = await (supabase as any)
+    .from('user_status')
+    .upsert(
+      {
+        user_id: userId,
+        status: 'online',
+      },
+      {
+        onConflict: 'user_id',
+      }
+    );
+
+  if (statusError) {
+    console.error('User status creation error:', statusError);
+    // profiles와 settings는 생성되었지만 user_status 생성 실패
+    throw new Error(
+      statusError.message ||
+        '사용자 상태 생성에 실패했습니다. RLS 정책을 확인하세요.'
     );
   }
 }

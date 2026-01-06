@@ -62,14 +62,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
    * - 클라이언트 store에는 인증 상태만 저장
    * - 토큰 갱신: API에서 Supabase의 autoRefreshToken을 활용하여 자동 갱신
    * - 클라이언트는 직접 토큰을 읽지 않고 API를 통해서만 조회
+   * - 타임아웃: 10초 내 응답이 없으면 자동으로 중단하여 UI 블로킹 방지
    */
   const syncSessionToStore = useCallback(async () => {
+    // AbortController를 사용하여 타임아웃 설정 (10초)
+    const abortController = new AbortController();
+    const timeoutId = setTimeout(() => {
+      abortController.abort();
+    }, 10000); // 10초 타임아웃
+
     try {
       // API를 통해 세션 조회 (HttpOnly 쿠키 자동 포함, 토큰 갱신 자동 처리)
       const response = await fetch('/api/auth/session', {
         method: 'GET',
         credentials: 'include', // 쿠키 포함
+        signal: abortController.signal, // 타임아웃 시그널 추가
       });
+
+      // 타임아웃이 발생하지 않았으면 타이머 정리
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         console.error('Failed to get session:', response.statusText);
@@ -96,10 +107,30 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setAuth(newAccessToken, newUser);
       }
     } catch (error) {
-      console.error('Unexpected error while syncing session:', error);
-      clearAuth();
+      // 타임아웃이 발생하지 않았으면 타이머 정리
+      clearTimeout(timeoutId);
+
+      // AbortError (타임아웃) 처리
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error(
+          'Session sync timeout: API 호출이 10초 내에 완료되지 않았습니다.'
+        );
+        // 타임아웃 발생 시에도 세션 동기화 완료 플래그를 설정하여 UI 블로킹 방지
+        // 사용자가 무한 대기 상태에 빠지지 않도록 함
+      } else if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        // 네트워크 오류 처리
+        console.error(
+          'Session sync network error: 네트워크 연결을 확인해주세요.'
+        );
+      } else {
+        // 기타 에러 처리
+        console.error('Unexpected error while syncing session:', error);
+      }
+      // 에러 발생 시에도 인증 상태는 초기화하지 않음 (기존 상태 유지)
+      // 네트워크 오류나 타임아웃은 일시적일 수 있으므로 기존 세션 정보 유지
     } finally {
-      // 세션 동기화 완료 표시
+      // 세션 동기화 완료 표시 (성공/실패/타임아웃 모두 포함)
+      // 타임아웃이나 에러 발생 시에도 UI가 블로킹되지 않도록 플래그 설정
       isSessionSyncedRef.current = true;
       setIsSessionSynced(true);
     }
