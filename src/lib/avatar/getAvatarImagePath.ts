@@ -39,3 +39,4 @@ export const getAvatarImagePath = (
   const defaultAnimalAssets = getAnimalAssets(AnimalType.bear);
   return defaultAnimalAssets.avatar;
 };
+

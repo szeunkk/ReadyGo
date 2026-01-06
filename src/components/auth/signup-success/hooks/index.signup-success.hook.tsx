@@ -6,10 +6,12 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { URL_PATHS } from '@/commons/constants/url';
 import { useSteamOAuth } from '@/components/auth/hooks/useSteamOAuth.hook';
+import { useAuthStore } from '@/stores/auth.store';
 
 export const useSignupSuccess = () => {
   const router = useRouter();
   const { handleSteamLink } = useSteamOAuth();
+  const accessToken = useAuthStore((state) => state.accessToken);
   const [nickname, setNickname] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -99,7 +101,34 @@ export const useSignupSuccess = () => {
     fetchNickname();
   }, [router]);
 
-  const handleTraitsTest = () => {
+  // 세션 동기화 완료 대기 함수 (Zustand store의 accessToken 확인)
+  const waitForSessionSync = async (): Promise<void> => {
+    const maxRetries = 20;
+    const retryDelay = 100; // 100ms
+    let retryCount = 0;
+
+    while (retryCount < maxRetries) {
+      // Zustand store에서 accessToken 확인
+      const currentAccessToken = useAuthStore.getState().accessToken;
+      if (currentAccessToken) {
+        // store에 accessToken이 설정됨 (세션 동기화 완료)
+        return;
+      }
+
+      retryCount++;
+      if (retryCount < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelay));
+      }
+    }
+
+    // 최대 재시도 횟수를 초과해도 세션이 설정되지 않은 경우
+    // 그래도 페이지 이동은 진행 (AuthProvider가 처리할 것)
+    console.warn('Session sync timeout, proceeding with navigation');
+  };
+
+  const handleTraitsTest = async () => {
+    // Zustand store에 accessToken이 동기화될 때까지 대기
+    await waitForSessionSync();
     router.push(URL_PATHS.TRAITS);
   };
 

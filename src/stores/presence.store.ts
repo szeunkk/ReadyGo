@@ -29,3 +29,4 @@ export const usePresenceStore = create<PresenceStore>((set, get) => ({
     return get().presenceUserIds.includes(userId);
   },
 }));
+

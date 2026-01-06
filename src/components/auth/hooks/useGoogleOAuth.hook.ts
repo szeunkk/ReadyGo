@@ -18,6 +18,41 @@ export const useGoogleOAuth = () => {
   const hasShownErrorModalRef = useRef(false);
   const hasProcessedSessionRef = useRef(false);
 
+  // 세션 동기화 완료 대기 함수
+  const waitForSessionSync = async (): Promise<void> => {
+    const maxRetries = 10;
+    const retryDelay = 200; // 200ms
+    let retryCount = 0;
+
+    while (retryCount < maxRetries) {
+      try {
+        const response = await fetch('/api/auth/session', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.user && data.user.id) {
+            // 세션이 정상적으로 설정됨
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Session sync check error:', error);
+      }
+
+      retryCount++;
+      if (retryCount < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelay));
+      }
+    }
+
+    // 최대 재시도 횟수를 초과해도 세션이 설정되지 않은 경우
+    // 그래도 페이지 이동은 진행 (AuthProvider가 처리할 것)
+    console.warn('Session sync timeout, proceeding with navigation');
+  };
+
   // OAuth 콜백 처리: auth state change 감지 및 페이지 로드 시 세션 확인
   useEffect(() => {
     // OAuth 콜백 처리 로직 (세션을 파라미터로 받는 버전)
@@ -114,27 +149,28 @@ export const useGoogleOAuth = () => {
             );
           }
 
-          // HttpOnly 쿠키에 세션이 저장되었으므로 페이지 새로고침으로 세션 상태 동기화
-          // 초기 데이터 생성 성공 → signup-success로 이동
           // OAuth 처리 플래그 제거
           if (typeof window !== 'undefined') {
             localStorage.removeItem(OAUTH_PROCESSING_KEY);
           }
-          // 쿠키가 브라우저에 반영될 시간을 주기 위해 약간의 지연 후 페이지 이동
-          await new Promise((resolve) => setTimeout(resolve, 300));
-          // 페이지 새로고침으로 세션 상태 동기화
-          window.location.href = URL_PATHS.SIGNUP_SUCCESS;
+
+          // 세션 동기화가 완료될 때까지 대기
+          await waitForSessionSync();
+
+          // 성공 페이지로 이동
+          router.push(URL_PATHS.SIGNUP_SUCCESS);
         } else {
-          // 기존 유저: HttpOnly 쿠키에 세션이 저장되었으므로 페이지 새로고침으로 세션 상태 동기화
           // 기존 유저: user_profiles 레코드가 이미 존재 → home으로 이동
           // OAuth 처리 플래그 제거
           if (typeof window !== 'undefined') {
             localStorage.removeItem(OAUTH_PROCESSING_KEY);
           }
-          // 쿠키가 브라우저에 반영될 시간을 주기 위해 약간의 지연 후 페이지 이동
-          await new Promise((resolve) => setTimeout(resolve, 300));
-          // 페이지 새로고침으로 세션 상태 동기화
-          window.location.href = URL_PATHS.HOME;
+
+          // 세션 동기화가 완료될 때까지 대기
+          await waitForSessionSync();
+
+          // 홈 페이지로 이동
+          router.push(URL_PATHS.HOME);
         }
       } catch (error) {
         // 에러 모달 표시 (한 번만)
