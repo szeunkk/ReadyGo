@@ -6,5 +6,3 @@ import type { Database } from '@/types/supabase';
 export type ChatRoom = Database['public']['Tables']['chat_rooms']['Row'];
 export type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
 export type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
-
-

@@ -10,10 +10,7 @@ import Searchbar from '@/commons/components/searchbar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimalType } from '@/commons/constants/animal';
 import { useSideProfilePanel } from '@/hooks/useSideProfilePanel';
-import {
-  useChatRoom,
-  type FormattedMessageItem,
-} from '@/components/chat/hooks';
+import { useChatRoom } from '@/components/chat/hooks';
 
 interface ChatRoomProps {
   roomId?: string;
@@ -54,7 +51,7 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
       // 다른 사용자의 프로필이 열려있을 때만 자동으로 변경
       openProfile(otherMemberInfo.id);
     }
-  }, [roomId, otherMemberInfo?.id, isOpen, targetUserId, openProfile]);
+  }, [roomId, otherMemberInfo, isOpen, targetUserId, openProfile]);
 
   // 현재 사용자의 프로필이 열려있는지 확인
   const isProfileActive =
@@ -109,7 +106,11 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
               <div className={styles.headerUserInfo}>
                 <Skeleton
                   className={styles.headerNicknameSkeleton}
-                  style={{ width: '120px', height: '20px', marginBottom: '4px' }}
+                  style={{
+                    width: '120px',
+                    height: '20px',
+                    marginBottom: '4px',
+                  }}
                 />
                 <Skeleton
                   className={styles.headerStatusSkeleton}
@@ -165,105 +166,105 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
 
       {/* 메시지 리스트 영역 */}
       <div className={styles.messageList} aria-label="메시지 목록">
-        {isLoading ? (
-          // 메시지 로딩 중일 때는 빈 상태로 표시 (스켈레톤 없음)
-          null
-        ) : formattedMessages.length === 0 ? (
+        {isLoading ? null : formattedMessages.length === 0 ? ( // 메시지 로딩 중일 때는 빈 상태로 표시 (스켈레톤 없음)
           <div style={{ padding: '20px', textAlign: 'center' }}>
             메시지가 없습니다
           </div>
         ) : (
           formattedMessages.map((item, index) => {
-          if (item.type === 'date-divider') {
-            return (
-              <div
-                key={`divider-${index}`}
-                className={styles.dateDivider}
+            if (item.type === 'date-divider') {
+              return (
+                <div
+                  key={`divider-${index}`}
+                  className={styles.dateDivider}
                   aria-label={`날짜 구분선: ${item.formattedDate || ''}`}
-              >
+                >
                   {item.formattedDate || ''}
-              </div>
-            );
-          }
+                </div>
+              );
+            }
 
             // message 타입인 경우
-            const { message, isConsecutive, isOwnMessage, formattedTime, formattedContent, isRead } = item;
+            const {
+              message,
+              isConsecutive,
+              isOwnMessage,
+              formattedTime,
+              formattedContent,
+              isRead: _isRead,
+            } = item;
 
             if (!message) {
               return null;
             }
 
-          const isSystemMessage = message.content_type === 'system';
+            const isSystemMessage = message.content_type === 'system';
 
-          if (isSystemMessage) {
-            return (
-              <div
-                key={message.id}
-                className={styles.systemMessage}
-                aria-label="시스템 메시지"
-              >
+            if (isSystemMessage) {
+              return (
+                <div
+                  key={message.id}
+                  className={styles.systemMessage}
+                  aria-label="시스템 메시지"
+                >
                   {formattedContent}
-              </div>
-            );
-          }
+                </div>
+              );
+            }
 
-          if (isOwnMessage) {
+            if (isOwnMessage) {
+              return (
+                <div
+                  key={message.id}
+                  className={styles.messageRow}
+                  aria-label={`내 메시지: ${formattedContent}`}
+                >
+                  <div className={styles.ownMessageContainer}>
+                    <div className={styles.messageTime}>{formattedTime}</div>
+                    <div className={styles.ownMessageBubble}>
+                      <span className={styles.messageContent}>
+                        {formattedContent}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <div
                 key={message.id}
                 className={styles.messageRow}
-                  aria-label={`내 메시지: ${formattedContent}`}
-              >
-                <div className={styles.ownMessageContainer}>
-                  <div className={styles.messageTime}>
-                      {formattedTime}
-                  </div>
-                  <div className={styles.ownMessageBubble}>
-                    <span className={styles.messageContent}>
-                        {formattedContent}
-                    </span>
-                    </div>
-                </div>
-              </div>
-            );
-          }
-
-          return (
-            <div
-              key={message.id}
-              className={styles.messageRow}
                 aria-label={`${displayNickname}의 메시지: ${formattedContent}`}
-            >
-              <div
-                className={`${styles.otherMessageContainer} ${
-                  isConsecutive ? styles.consecutive : ''
-                }`}
               >
-                {!isConsecutive && (
-                  <Avatar
+                <div
+                  className={`${styles.otherMessageContainer} ${
+                    isConsecutive ? styles.consecutive : ''
+                  }`}
+                >
+                  {!isConsecutive && (
+                    <Avatar
                       imageUrl={displayAvatarImagePath}
                       animalType={displayAnimalType as AnimalType}
                       alt={displayNickname}
-                    size="s"
+                      size="s"
                       status={displayUserStatus}
-                    showStatus={false}
-                    className={styles.messageAvatar}
-                  />
-                )}
-                {isConsecutive && <div className={styles.avatarSpacer} />}
-                <div className={styles.otherMessageContent}>
-                  <div className={styles.otherMessageBubble}>
-                    <span className={styles.messageContent}>
+                      showStatus={false}
+                      className={styles.messageAvatar}
+                    />
+                  )}
+                  {isConsecutive && <div className={styles.avatarSpacer} />}
+                  <div className={styles.otherMessageContent}>
+                    <div className={styles.otherMessageBubble}>
+                      <span className={styles.messageContent}>
                         {formattedContent}
-                    </span>
-                  </div>
-                  <div className={styles.messageTime}>
-                      {formattedTime}
+                      </span>
                     </div>
+                    <div className={styles.messageTime}>{formattedTime}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
+            );
           })
         )}
       </div>

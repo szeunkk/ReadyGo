@@ -44,11 +44,14 @@ export const createChatRoomService = async (
     }
   } catch (error) {
     console.error('[Service] Error checking existing room:', error);
+    interface ErrorWithMessage {
+      message?: unknown;
+    }
     const errorMessage =
       error instanceof Error
         ? error.message
         : error && typeof error === 'object' && 'message' in error
-          ? String((error as any).message)
+          ? String((error as ErrorWithMessage).message)
           : 'Unknown error';
     throw new ChatFetchError('room', errorMessage);
   }
@@ -69,16 +72,20 @@ export const createChatRoomService = async (
       throw error;
     }
 
+    interface ErrorWithDetails {
+      message?: unknown;
+      details?: unknown;
+    }
     const errorMessage =
       error instanceof Error
         ? error.message
         : error && typeof error === 'object' && 'message' in error
-          ? String((error as any).message)
+          ? String((error as ErrorWithDetails).message)
           : 'Unknown error';
 
     const errorDetails =
       error && typeof error === 'object' && 'details' in error
-        ? String((error as any).details)
+        ? String((error as ErrorWithDetails).details)
         : undefined;
 
     throw new ChatCreateError(

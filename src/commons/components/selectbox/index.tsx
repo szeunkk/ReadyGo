@@ -201,7 +201,9 @@ export default function Selectbox({
                 onClick={() => handleItemClick(item)}
                 role="option"
                 aria-selected={isSelected}
-                data-testid={dataTestId ? `${dataTestId}-option-${item.id}` : undefined}
+                data-testid={
+                  dataTestId ? `${dataTestId}-option-${item.id}` : undefined
+                }
               >
                 {isSelected && (
                   <span className={styles.checkIcon}>

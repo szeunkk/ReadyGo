@@ -113,10 +113,10 @@ import { getCompatibilityLevel } from '@/commons/constants/animal/animal.compat'
  * const score = applyAnimalCompatibility(80, context); // 80 (보정 미적용)
  * ```
  */
-export function applyAnimalCompatibility(
+export const applyAnimalCompatibility = (
   baseScore: number,
   context: MatchContextCoreDTO
-): number {
+): number => {
   // 동물 타입 가져오기
   const viewerAnimal = context.viewer.traits?.animalType;
   const targetAnimal = context.target.traits?.animalType;
@@ -151,5 +151,4 @@ export function applyAnimalCompatibility(
       // 중립 또는 정보 없음: 보정 미적용
       return baseScore;
   }
-}
-
+};

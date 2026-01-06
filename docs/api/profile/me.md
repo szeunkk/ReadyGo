@@ -64,10 +64,10 @@
 
 ### Header
 
-| key           | 설명                         | value 타입 | 필수 | 비고                                                                               |
-| ------------- | ---------------------------- | ---------- | ---- | ---------------------------------------------------------------------------------- |
-| Authorization | Bearer 토큰                  | string     | O\*  | `Bearer {access_token}` 형식. Cookie와 함께 사용 시 Cookie 우선                    |
-| Cookie        | Supabase 인증 세션 쿠키      | string     | O\*  | `sb-access-token` 쿠키. Authorization 헤더와 둘 중 하나는 반드시 필요               |
+| key           | 설명                    | value 타입 | 필수 | 비고                                                                  |
+| ------------- | ----------------------- | ---------- | ---- | --------------------------------------------------------------------- |
+| Authorization | Bearer 토큰             | string     | O\*  | `Bearer {access_token}` 형식. Cookie와 함께 사용 시 Cookie 우선       |
+| Cookie        | Supabase 인증 세션 쿠키 | string     | O\*  | `sb-access-token` 쿠키. Authorization 헤더와 둘 중 하나는 반드시 필요 |
 
 \* Authorization 헤더 또는 Cookie 중 하나는 반드시 제공되어야 함
 
@@ -160,6 +160,7 @@
 **에러 응답 형식:**
 
 **404, 500 (비즈니스 에러):**
+
 ```json
 {
   "code": "PROFILE_NOT_FOUND",
@@ -168,6 +169,7 @@
 ```
 
 **401 (인증 에러):**
+
 ```json
 {
   "message": "Unauthorized",
