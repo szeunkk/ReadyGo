@@ -297,6 +297,136 @@ describe('calculateTraitsSimilarity', () => {
     });
   });
 
+  describe('🔄 보완성 로직 테스트 (v2)', () => {
+    it('should give higher score when complementary traits are well-balanced', () => {
+      // Similarity 축은 비슷하고, Complementary 축도 이상적인 케이스
+      const viewer: TraitVector = {
+        cooperation: 75, // 비슷
+        exploration: 70, // 비슷
+        strategy: 85, // 전략가
+        leadership: 40, // 팔로워
+        social: 80, // 비슷
+      };
+
+      const target: TraitVector = {
+        cooperation: 78, // 차이 3
+        exploration: 68, // 차이 2
+        strategy: 45, // 차이 40 (이상적!)
+        leadership: 80, // 차이 40 (이상적!)
+        social: 82, // 차이 2
+      };
+
+      const score = calculateTraitsSimilarity(viewer, target);
+
+      // Similarity도 높고 Complementary도 높아서 매우 높은 점수
+      expect(score).toBeGreaterThan(85);
+      expect(score).toBeLessThanOrEqual(100);
+    });
+
+    it('should penalize when both have high leadership (role conflict)', () => {
+      // Similarity 축은 비슷하지만, 둘 다 리더십 강함 (충돌)
+      const viewer: TraitVector = {
+        cooperation: 75,
+        exploration: 70,
+        strategy: 85,
+        leadership: 90, // 둘 다 리더
+        social: 80,
+      };
+
+      const target: TraitVector = {
+        cooperation: 78,
+        exploration: 68,
+        strategy: 88, // 차이 3 (둘 다 전략가)
+        leadership: 92, // 차이 2 (둘 다 리더)
+        social: 82,
+      };
+
+      const score = calculateTraitsSimilarity(viewer, target);
+
+      // Similarity는 높지만 Complementary 낮아서 감점
+      // 이전 로직보다 낮은 점수 예상
+      expect(score).toBeLessThan(90);
+      expect(score).toBeGreaterThan(75);
+    });
+
+    it('should penalize when both have low leadership (no direction)', () => {
+      // Similarity 축은 비슷하지만, 둘 다 리더십 낮음 (방향성 부족)
+      const viewer: TraitVector = {
+        cooperation: 75,
+        exploration: 70,
+        strategy: 30, // 둘 다 비전략적
+        leadership: 20, // 둘 다 소극적
+        social: 80,
+      };
+
+      const target: TraitVector = {
+        cooperation: 78,
+        exploration: 68,
+        strategy: 35, // 차이 5
+        leadership: 25, // 차이 5
+        social: 82,
+      };
+
+      const score = calculateTraitsSimilarity(viewer, target);
+
+      // Similarity는 높지만(99) Complementary 낮아서(32) 약간 감점
+      // 전체적으로는 여전히 높은 점수 (85% * 99 + 15% * 32 ≈ 89)
+      expect(score).toBeLessThan(92);
+      expect(score).toBeGreaterThan(85);
+    });
+
+    it('should recognize ideal complementary pattern (leader + follower)', () => {
+      // 전형적인 이상적 보완 관계
+      const viewer: TraitVector = {
+        cooperation: 70,
+        exploration: 65,
+        strategy: 80, // 전략가
+        leadership: 85, // 리더
+        social: 75,
+      };
+
+      const target: TraitVector = {
+        cooperation: 72,
+        exploration: 68,
+        strategy: 45, // 실행가 (차이 35)
+        leadership: 40, // 팔로워 (차이 45)
+        social: 78,
+      };
+
+      const score = calculateTraitsSimilarity(viewer, target);
+
+      // Similarity도 괜찮고 Complementary 매우 좋음
+      expect(score).toBeGreaterThan(80);
+      expect(score).toBeLessThanOrEqual(100);
+    });
+
+    it('should handle extreme complementary differences (too unbalanced)', () => {
+      // 차이가 너무 극단적인 케이스
+      const viewer: TraitVector = {
+        cooperation: 70,
+        exploration: 65,
+        strategy: 95, // 극단적 전략가
+        leadership: 95, // 극단적 리더
+        social: 75,
+      };
+
+      const target: TraitVector = {
+        cooperation: 72,
+        exploration: 68,
+        strategy: 10, // 차이 85 (너무 큼)
+        leadership: 5, // 차이 90 (너무 큼)
+        social: 78,
+      };
+
+      const score = calculateTraitsSimilarity(viewer, target);
+
+      // Similarity는 매우 좋지만(99) Complementary가 극단적으로 나쁨(3)
+      // 전체적으로는 Similarity가 지배적 (85% * 99 + 15% * 3 ≈ 85)
+      expect(score).toBeLessThanOrEqual(86);
+      expect(score).toBeGreaterThan(83);
+    });
+  });
+
   describe('📊 실제 사례 기반 테스트', () => {
     it('should handle realistic user traits scenario 1', () => {
       // 실제 사용자 프로필과 유사한 케이스
@@ -324,28 +454,29 @@ describe('calculateTraitsSimilarity', () => {
     });
 
     it('should handle realistic user traits scenario 2', () => {
-      // 일부만 유사한 케이스
+      // Similarity 축은 안 맞지만 Complementary 축이 좋은 케이스
       const viewer: TraitVector = {
-        cooperation: 80,
-        exploration: 30,
-        strategy: 90,
-        leadership: 70,
-        social: 40,
+        cooperation: 80, // Similarity 축: 차이 큼
+        exploration: 30, // Similarity 축: 차이 큼
+        strategy: 90, // Complementary 축: 전략가
+        leadership: 70, // Complementary 축: 리더
+        social: 40, // Similarity 축: 차이 큼
       };
 
       const target: TraitVector = {
-        cooperation: 40,
-        exploration: 85,
-        strategy: 50,
-        leadership: 30,
-        social: 90,
+        cooperation: 40, // 차이 40
+        exploration: 85, // 차이 55
+        strategy: 50, // 차이 40 (이상적 보완!)
+        leadership: 30, // 차이 40 (이상적 보완!)
+        social: 90, // 차이 50
       };
 
       const score = calculateTraitsSimilarity(viewer, target);
 
-      // 패턴도 다르고 값도 많이 다르므로 중간-낮은 점수 기대
-      expect(score).toBeLessThan(70);
-      expect(score).toBeGreaterThan(30);
+      // v2 로직: Similarity는 낮지만 Complementary가 높아서 중간 점수
+      // 보완 관계가 좋으므로 이전보다 높은 점수 (70~80)
+      expect(score).toBeLessThan(80);
+      expect(score).toBeGreaterThan(65);
     });
   });
 });
