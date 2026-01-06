@@ -563,7 +563,7 @@ describe('calculateFinalMatchScore', () => {
         },
       ];
 
-      scenarios.forEach((context, index) => {
+      scenarios.forEach((context) => {
         const result = calculateFinalMatchScore(context);
 
         expect(result.finalScore).toBeGreaterThanOrEqual(0);
@@ -667,4 +667,3 @@ describe('calculateFinalMatchScore', () => {
     });
   });
 });
-

@@ -6,7 +6,8 @@ import type { Database } from '@/types/supabase';
  * 책임: user_status 테이블 접근 전담
  */
 
-export type UserPresenceStatus = Database['public']['Enums']['user_presence_status'];
+export type UserPresenceStatus =
+  Database['public']['Enums']['user_presence_status'];
 
 export type UserStatusRow = {
   user_id: string;
@@ -43,10 +44,7 @@ export const findByUserIds = async (
     return { data: [], error: null };
   }
 
-  return await client
-    .from('user_status')
-    .select('*')
-    .in('user_id', userIds);
+  return await client.from('user_status').select('*').in('user_id', userIds);
 };
 
 /**
@@ -59,15 +57,12 @@ export const updateStatus = async (
   userId: string,
   status: UserPresenceStatus
 ) => {
-  return await client
-    .from('user_status')
-    .upsert(
-      {
-        user_id: userId,
-        status,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'user_id' }
-    );
+  return await client.from('user_status').upsert(
+    {
+      user_id: userId,
+      status,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id' }
+  );
 };
-

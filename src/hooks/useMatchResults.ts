@@ -107,7 +107,9 @@ export const useMatchResults = (
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch match results: ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch match results: ${response.statusText}`
+          );
         }
 
         const data = await response.json();
@@ -187,4 +189,3 @@ export const useMatchResults = (
     refetch,
   };
 };
-

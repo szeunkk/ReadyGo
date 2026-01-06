@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './styles.module.css';
 import { MatchList } from './ui';
 import { useMatchFilters } from './hooks/useMatchFilters';
@@ -8,6 +8,19 @@ import { useSidePanelStore } from '@/stores/sidePanel.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { useMatchResults } from '@/hooks/useMatchResults';
 import { MatchData } from './types/match.types';
+
+interface MatchResultWithProfile {
+  targetUserId: string;
+  finalScore: number;
+  isOnlineMatched: boolean;
+  availabilityHint: 'online' | 'offline' | 'unknown';
+  profile?: {
+    nickname: string;
+    avatarUrl?: string;
+    animalType?: string;
+  };
+  status?: 'online' | 'offline';
+}
 
 export default function Match() {
   // 현재 로그인한 사용자 정보
@@ -41,15 +54,18 @@ export default function Match() {
     }
 
     // API에서 이미 프로필과 상태 정보가 포함되어 있으므로 바로 변환
-    const matchDataArray: MatchData[] = results.map((result, index) => ({
-      id: index + 1,
-      userId: result.targetUserId,
-      nickname: (result as any).profile?.nickname || '알 수 없음',
-      matchRate: Math.round(result.finalScore),
-      status: (result as any).status || 'offline',
-      avatarUrl: (result as any).profile?.avatarUrl,
-      tags: [], // TODO: 나중에 user traits에서 가져오기
-    }));
+    const matchDataArray: MatchData[] = results.map((result, index) => {
+      const enrichedResult = result as MatchResultWithProfile;
+      return {
+        id: index + 1,
+        userId: result.targetUserId,
+        nickname: enrichedResult.profile?.nickname || '알 수 없음',
+        matchRate: Math.round(result.finalScore),
+        status: enrichedResult.status || 'offline',
+        avatarUrl: enrichedResult.profile?.avatarUrl,
+        tags: [], // TODO: 나중에 user traits에서 가져오기
+      };
+    });
 
     setMatchData(matchDataArray);
   }, [results]);

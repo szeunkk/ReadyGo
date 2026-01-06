@@ -122,6 +122,7 @@ export const calculateTraitsSimilarity = (
 
   // 디버깅: 계산 과정 로깅 (개발 환경에서만)
   if (process.env.NODE_ENV === 'development' && finalScore >= 90) {
+    // eslint-disable-next-line no-console
     console.log('[Traits Similarity Debug]:', {
       finalScore,
       cosineSimilarity: Math.round(cosineSimilarity * 100),

@@ -23,4 +23,3 @@ export interface MatchData {
   tags: string[];
   avatarUrl?: string;
 }
-

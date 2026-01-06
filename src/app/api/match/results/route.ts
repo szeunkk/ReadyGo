@@ -7,13 +7,13 @@ import { getAvatarImagePath } from '@/lib/avatar/getAvatarImagePath';
 
 /**
  * GET /api/match/results
- * 
+ *
  * 현재 로그인한 사용자의 매칭 결과를 조회합니다.
  * 프로필 정보와 상태 정보를 포함하여 반환합니다.
- * 
+ *
  * @returns 매칭 결과 배열 (프로필 및 상태 정보 포함)
  */
-export async function GET() {
+export const GET = async () => {
   try {
     // 1. 서버 사이드 Supabase 클라이언트 생성 (쿠키에서 세션 자동 로드)
     const supabase = createClient();
@@ -25,10 +25,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // 3. 매칭 결과 계산
@@ -36,10 +33,10 @@ export async function GET() {
 
     // 4. 모든 target 사용자의 프로필 및 상태 정보 조회
     const userIds = results.map((result) => result.targetUserId);
-    
+
     // 상태 정보 조회 (병렬)
     const statusResponse = await findByUserIds(supabase, userIds);
-    
+
     // status를 Map으로 변환 (빠른 조회)
     const statusMap = new Map<string, 'online' | 'away' | 'dnd' | 'offline'>();
     if (statusResponse.data) {
@@ -80,11 +77,11 @@ export async function GET() {
     // 6. 결과 반환
     return NextResponse.json({ results: enrichedResults });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('[API] Error fetching match results:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
-}
-
+};

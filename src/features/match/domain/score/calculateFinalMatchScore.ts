@@ -270,8 +270,9 @@ export const calculateFinalMatchScore = (
   // 6. 반올림 및 범위 제한 (0~100)
   const finalScore = Math.min(100, Math.max(0, Math.round(rawScore)));
 
-  // 디버깅: 100점인 경우 계산 과정 로깅
-  if (finalScore === 100) {
+  // 디버깅: 100점인 경우 계산 과정 로깅 (개발 환경에서만)
+  if (process.env.NODE_ENV === 'development' && finalScore === 100) {
+    // eslint-disable-next-line no-console
     console.log('[Match Score Debug] 100% detected:', {
       targetUserId: context.target.userId,
       baseScore,

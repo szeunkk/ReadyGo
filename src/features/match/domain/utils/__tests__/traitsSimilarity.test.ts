@@ -226,7 +226,7 @@ describe('calculateTraitsSimilarity', () => {
   describe('🔒 항상 0~100 범위 보장', () => {
     it('should always return score between 0 and 100 for random inputs', () => {
       // 100번 랜덤 테스트
-      for (let i = 0; i < 100; i++) {
+      Array.from({ length: 100 }).forEach(() => {
         const viewer: TraitVector = {
           cooperation: Math.random() * 100,
           exploration: Math.random() * 100,
@@ -248,7 +248,7 @@ describe('calculateTraitsSimilarity', () => {
         expect(score).toBeGreaterThanOrEqual(0);
         expect(score).toBeLessThanOrEqual(100);
         expect(Number.isInteger(score)).toBe(true);
-      }
+      });
     });
 
     it('should handle edge case: all zeros', () => {
@@ -420,4 +420,3 @@ describe('findTopTrait', () => {
     expect(topTrait).toBe('cooperation');
   });
 });
-
