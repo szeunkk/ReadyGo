@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import styles from './styles.module.css';
 import { MatchList } from './ui';
 import { useMatchFilters } from './hooks/useMatchFilters';
@@ -8,6 +8,8 @@ import { useSidePanelStore } from '@/stores/sidePanel.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { useMatchResults } from '@/hooks/useMatchResults';
 import { MatchData } from './types/match.types';
+import { getEffectiveStatus } from '@/stores/user-status.store';
+import { usePresenceStore } from '@/stores/presence.store';
 
 interface MatchResultWithProfile {
   targetUserId: string;
@@ -27,6 +29,9 @@ export default function Match() {
   const { user } = useAuthStore();
   const viewerId = user?.id;
 
+  // Presence 상태 구독 (Presence 변경 시 재정렬)
+  const { presenceUserIds } = usePresenceStore();
+
   // 필터 상태 관리
   const {
     selectedMatchRate,
@@ -44,13 +49,10 @@ export default function Match() {
     sortBy: 'score',
   });
 
-  // 매칭 결과를 MatchData 형식으로 변환
-  const [matchData, setMatchData] = useState<MatchData[]>([]);
-
-  useEffect(() => {
+  // 매칭 결과를 MatchData 형식으로 변환 및 Presence 기반 정렬
+  const matchData = useMemo(() => {
     if (!results.length) {
-      setMatchData([]);
-      return;
+      return [];
     }
 
     // API에서 이미 프로필과 상태 정보가 포함되어 있으므로 바로 변환
@@ -67,8 +69,25 @@ export default function Match() {
       };
     });
 
-    setMatchData(matchDataArray);
-  }, [results]);
+    // Presence 기반 실시간 정렬
+    // 1순위: 온라인 상태 (Presence 기반)
+    // 2순위: 매칭 점수 높은 순
+    return matchDataArray.sort((a, b) => {
+      const aStatus = getEffectiveStatus(a.userId);
+      const bStatus = getEffectiveStatus(b.userId);
+      
+      const aOnline = aStatus !== 'offline';
+      const bOnline = bStatus !== 'offline';
+
+      // 온라인 상태가 다르면 온라인이 먼저
+      if (aOnline !== bOnline) {
+        return aOnline ? -1 : 1;
+      }
+
+      // 온라인 상태가 같으면 점수 높은 순
+      return b.matchRate - a.matchRate;
+    });
+  }, [results, presenceUserIds]); // Presence 변경 시 재정렬
 
   // 프로필 클릭 핸들러
   const handleProfileClick = (userId: string) => {
