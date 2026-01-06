@@ -69,7 +69,7 @@ const formatDateTime = (dateString: string, timeString: string): string => {
   // 새벽/오전/오후 처리
   let period: string;
   let displayHour: number;
-  
+
   if (hour >= 0 && hour < 6) {
     // 새벽 (0시~5시)
     period = '새벽';
