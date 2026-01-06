@@ -17,9 +17,10 @@ type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
 // 테스트할 유저 UUID
 const TEST_USER_ID = 'da532b5d-60ac-46b8-a725-3c38845b15ac';
 const TEST_USER_ID_2 = '0783d53d-a804-4e33-83d9-ba97b301d4b2';
+const TEST_USER_ID_3 = '84e1e171-a836-4264-8277-c97decb722d3';
 
 export default function RealtimeChatTestPage() {
-  const { user } = useAuth();
+  const { user, isSessionSynced } = useAuth();
   const [roomId, setRoomId] = useState<number | undefined>(undefined);
   const [inputRoomId, setInputRoomId] = useState('');
   const [messageContent, setMessageContent] = useState('');
@@ -28,8 +29,10 @@ export default function RealtimeChatTestPage() {
   // 프로필 데이터
   const [profileNickname, setProfileNickname] = useState<string>('');
   const [profileNickname2, setProfileNickname2] = useState<string>('');
+  const [profileNickname3, setProfileNickname3] = useState<string>('');
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isLoadingProfile2, setIsLoadingProfile2] = useState(true);
+  const [isLoadingProfile3, setIsLoadingProfile3] = useState(true);
 
   // 현재 사용자 닉네임
   const [currentUserNickname, setCurrentUserNickname] = useState<string>('');
@@ -39,6 +42,7 @@ export default function RealtimeChatTestPage() {
   // 테스트 유저 이메일 (하드코딩)
   const testUserEmail = 'aaa111@aaa.com';
   const testUserEmail2 = 'abc111@abc.com';
+  const testUserEmail3 = 'test3@test.com';
 
   // useChatList Hook 사용
   const {
@@ -85,14 +89,22 @@ export default function RealtimeChatTestPage() {
 
   useEffect(() => {
     // eslint-disable-next-line no-console
-    console.log('ChatRoom status changed:', {
+    console.log('[ChatRoom] Status changed:', {
       isConnected,
       error,
       roomId,
       isLoading: isLoadingMessages,
       messageCount: messages.length,
+      user: user?.id,
     });
-  }, [isConnected, error, roomId, isLoadingMessages, messages.length]);
+  }, [
+    isConnected,
+    error,
+    roomId,
+    isLoadingMessages,
+    messages.length,
+    user?.id,
+  ]);
 
   // useChatList hook이 자동으로 unreadCount를 업데이트하므로 별도 처리 불필요
 
@@ -133,8 +145,15 @@ export default function RealtimeChatTestPage() {
 
   // 테스트용 채팅방 생성
   const handleCreateTestRoom = async () => {
+    // 세션 동기화 확인
+    if (!isSessionSynced) {
+      alert('세션 확인 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
     if (!user?.id) {
-      alert('로그인이 필요합니다');
+      alert('로그인이 필요합니다. 현재 사용자 ID가 없습니다.');
+      console.error('User state:', { user, isSessionSynced });
       return;
     }
 
@@ -181,7 +200,27 @@ export default function RealtimeChatTestPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || '채팅방 생성에 실패했습니다.');
+        const errorMessage =
+          result.message ||
+          result.error ||
+          result.code ||
+          '채팅방 생성에 실패했습니다.';
+        console.error('채팅방 생성 실패:', {
+          status: response.status,
+          statusText: response.statusText,
+          result,
+          errorMessage,
+          memberIds: [user.id, targetUserId],
+          errorDetails: result.details,
+          errorHint: result.hint,
+        });
+        throw new Error(
+          result.details
+            ? `${errorMessage}: ${result.details}`
+            : result.hint
+              ? `${errorMessage} (${result.hint})`
+              : errorMessage
+        );
       }
 
       const newRoom = result.data;
@@ -305,6 +344,34 @@ export default function RealtimeChatTestPage() {
     fetchProfileNickname2();
   }, []);
 
+  // 세 번째 프로필 닉네임 조회
+  useEffect(() => {
+    const fetchProfileNickname3 = async () => {
+      setIsLoadingProfile3(true);
+      try {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('nickname')
+          .eq('id', TEST_USER_ID_3)
+          .single();
+
+        if (error) {
+          console.error('Failed to fetch profile 3:', error);
+          setProfileNickname3('알 수 없는 사용자');
+        } else {
+          setProfileNickname3(data?.nickname || '알 수 없는 사용자');
+        }
+      } catch (error) {
+        console.error('Unexpected error 3:', error);
+        setProfileNickname3('알 수 없는 사용자');
+      } finally {
+        setIsLoadingProfile3(false);
+      }
+    };
+
+    fetchProfileNickname3();
+  }, []);
+
   // 현재 사용자 닉네임 조회
   useEffect(() => {
     const fetchCurrentUserNickname = async () => {
@@ -345,8 +412,15 @@ export default function RealtimeChatTestPage() {
 
   // 프로필 카드의 채팅하기 버튼 클릭 핸들러 (채팅방 생성 또는 기존 채팅방 구독)
   const handleProfileChatClick = async (targetUserId: string) => {
+    // 세션 동기화 확인
+    if (!isSessionSynced) {
+      alert('세션 확인 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
     if (!user?.id) {
-      alert('로그인이 필요합니다');
+      alert('로그인이 필요합니다. 현재 사용자 ID가 없습니다.');
+      console.error('User state:', { user, isSessionSynced });
       return;
     }
 
@@ -380,7 +454,27 @@ export default function RealtimeChatTestPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || '채팅방 생성에 실패했습니다.');
+        const errorMessage =
+          result.message ||
+          result.error ||
+          result.code ||
+          '채팅방 생성에 실패했습니다.';
+        console.error('채팅방 생성 실패:', {
+          status: response.status,
+          statusText: response.statusText,
+          result,
+          errorMessage,
+          memberIds: [user.id, targetUserId],
+          errorDetails: result.details,
+          errorHint: result.hint,
+        });
+        throw new Error(
+          result.details
+            ? `${errorMessage}: ${result.details}`
+            : result.hint
+              ? `${errorMessage} (${result.hint})`
+              : errorMessage
+        );
       }
 
       const newRoom = result.data;
@@ -396,7 +490,19 @@ export default function RealtimeChatTestPage() {
       console.error('Failed to create room:', error);
       const errorMessage =
         error instanceof Error ? error.message : '채팅방 생성에 실패했습니다.';
-      alert(`채팅방 생성 실패: ${errorMessage}`);
+
+      // 더 자세한 에러 정보 출력
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack,
+          name: error.name,
+        });
+      }
+
+      alert(
+        `채팅방 생성 실패: ${errorMessage}\n\n브라우저 콘솔(F12)에서 자세한 에러 정보를 확인하세요.`
+      );
     }
   };
 
@@ -417,9 +523,10 @@ export default function RealtimeChatTestPage() {
     <div
       style={{
         padding: '20px',
-        maxWidth: '960px',
+        maxWidth: '100%',
         margin: '0 auto',
         fontFamily: 'system-ui, sans-serif',
+        gap: '20px',
       }}
       data-testid="realtime-chat-test-page"
     >
@@ -436,7 +543,9 @@ export default function RealtimeChatTestPage() {
       >
         <p>
           <strong>현재 사용자 (useAuth):</strong>{' '}
-          {user?.id ? (
+          {!isSessionSynced ? (
+            <span style={{ color: '#ffc107' }}>세션 확인 중...</span>
+          ) : user?.id ? (
             <>
               <span style={{ color: 'green' }}>
                 {isLoadingCurrentUserNickname
@@ -455,6 +564,12 @@ export default function RealtimeChatTestPage() {
         </p>
         <p>
           <strong>이메일:</strong> {user?.email || 'N/A'}
+        </p>
+        <p>
+          <strong>세션 동기화 상태:</strong>{' '}
+          <span style={{ color: isSessionSynced ? 'green' : '#ffc107' }}>
+            {isSessionSynced ? '완료' : '대기 중'}
+          </span>
         </p>
       </div>
 
@@ -698,6 +813,84 @@ export default function RealtimeChatTestPage() {
                 shape="round"
                 onClick={() => handleProfileChatClick(TEST_USER_ID_2)}
                 disabled={!user?.id || isLoadingProfile2}
+                style={{ width: '408px' }}
+              >
+                채팅 하기 (채팅방 생성)
+              </Button>
+
+              <div
+                style={{ fontSize: '12px', color: '#666', marginTop: '-10px' }}
+              >
+                * 채팅하기 버튼 클릭 시: 채팅방 생성 및 자동 구독
+              </div>
+            </div>
+          )}
+
+          {/* 세 번째 프로필 카드 */}
+          {isLoadingProfile3 ? (
+            <div style={{ textAlign: 'center', padding: '20px', flex: 1 }}>
+              프로필 로딩 중...
+            </div>
+          ) : (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '24px',
+                flex: 1,
+                minWidth: '300px',
+              }}
+            >
+              {/* 이메일 표시 */}
+              <div
+                style={{
+                  padding: '8px 12px',
+                  background: '#1a1a1a',
+                  borderRadius: '6px',
+                  border: '1px solid #333',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: '#999',
+                    marginBottom: '4px',
+                  }}
+                >
+                  이메일
+                </div>
+                <div
+                  style={{
+                    fontSize: '14px',
+                    color: '#fff',
+                    wordBreak: 'break-all',
+                  }}
+                >
+                  {testUserEmail3}
+                </div>
+              </div>
+
+              {/* Animal Card */}
+              <AnimalCard
+                property="user"
+                nickname={profileNickname3 || '로딩 중...'}
+                tier={TierType.diamond}
+                animal={AnimalType.wolf}
+                favoriteGenre="MOBA"
+                activeTime="14 - 18시"
+                gameStyle="균형적"
+                weeklyAverage="10.2 시간"
+                matchPercentage={92}
+                matchReasons={['동일 게임 선호', '유사한 플레이 시간대']}
+              />
+
+              {/* 채팅하기 버튼 */}
+              <Button
+                variant="primary"
+                size="m"
+                shape="round"
+                onClick={() => handleProfileChatClick(TEST_USER_ID_3)}
+                disabled={!user?.id || isLoadingProfile3}
                 style={{ width: '408px' }}
               >
                 채팅 하기 (채팅방 생성)

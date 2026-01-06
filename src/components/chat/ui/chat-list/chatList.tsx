@@ -151,9 +151,43 @@ export default function ChatList() {
     );
   }
 
-  const handleRoomClick = (roomId: number) => {
+  const handleRoomClick = async (roomId: number) => {
+    // 낙관적 업데이트 (UI 즉시 반영)
     markRoomAsReadOptimistic(roomId);
     setSelectedRoomId(roomId);
+
+    // DB에 읽음 처리 (백그라운드에서 처리)
+    try {
+      const response = await fetch('/api/chat/message/read', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          roomId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error(
+          'Failed to mark room as read:',
+          errorData.error || '읽음 처리에 실패했습니다.',
+          'Status:',
+          response.status,
+          'Response:',
+          errorData
+        );
+        // 에러 발생 시 낙관적 업데이트 롤백하지 않음 (사용자 경험 우선)
+      } else {
+        const result = await response.json().catch(() => ({}));
+        console.log('Successfully marked room as read:', result);
+      }
+    } catch (error) {
+      console.error('Failed to mark room as read:', error);
+      // 에러 발생 시 낙관적 업데이트 롤백하지 않음 (사용자 경험 우선)
+    }
   };
 
   return (

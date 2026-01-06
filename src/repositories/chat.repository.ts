@@ -85,6 +85,19 @@ export const createChatRoom = async (
   client: SupabaseClient<Database>,
   memberIds: string[]
 ): Promise<ChatRoom> => {
+  // 세션 확인 (디버깅용)
+  const {
+    data: { session },
+  } = await client.auth.getSession();
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+  console.log('[Repository] createChatRoom - Session check:', {
+    hasSession: !!session,
+    userId: session?.user?.id || user?.id,
+    accessToken: session?.access_token ? 'present' : 'missing',
+  });
+
   // 새 채팅방 생성
   const { data: newRoom, error: roomError } = await client
     .from('chat_rooms')
@@ -93,6 +106,12 @@ export const createChatRoom = async (
     .single();
 
   if (roomError) {
+    console.error('[Repository] Error creating chat room:', {
+      message: roomError.message,
+      details: roomError.details,
+      hint: roomError.hint,
+      code: roomError.code,
+    });
     throw roomError;
   }
 
@@ -113,6 +132,14 @@ export const createChatRoom = async (
     .insert(membersData);
 
   if (membersError) {
+    console.error('[Repository] Error adding chat room members:', {
+      message: membersError.message,
+      details: membersError.details,
+      hint: membersError.hint,
+      code: membersError.code,
+      roomId: newRoom.id,
+      memberIds,
+    });
     throw membersError;
   }
 
@@ -468,14 +495,39 @@ export const markMessagesAsRead = async (
     throw upsertError;
   }
 
-  // chat_messages 테이블의 is_read 필드도 업데이트
-  const { error: updateError } = await client
-    .from('chat_messages')
-    .update({ is_read: true })
-    .in('id', validMessageIds);
+  // chat_message_reads에 INSERT된 후 chat_messages.is_read를 true로 업데이트
+  // 주의: UPDATE RLS 정책이 필요함
+  try {
+    const { data: updateData, error: updateError } = await client
+      .from('chat_messages')
+      .update({ is_read: true })
+      .in('id', validMessageIds)
+      .select();
 
-  if (updateError) {
-    throw updateError;
+    if (updateError) {
+      console.error(
+        'Failed to update is_read in chat_messages:',
+        updateError,
+        'Message IDs:',
+        validMessageIds,
+        'Note: UPDATE RLS policy is required for chat_messages table'
+      );
+      // chat_message_reads는 성공했으므로 에러를 throw하지 않음
+      // 하지만 is_read 업데이트 실패는 로그로 기록
+    } else {
+      if (updateData && updateData.length > 0) {
+        console.log(
+          `Successfully updated is_read for ${updateData.length} messages`
+        );
+      } else {
+        console.warn(
+          'No messages were updated (is_read). This might be due to RLS policies or no matching messages.'
+        );
+      }
+    }
+  } catch (error) {
+    console.error('Unexpected error updating is_read:', error);
+    // chat_message_reads는 성공했으므로 에러를 throw하지 않음
   }
 };
 
@@ -540,32 +592,59 @@ export const markRoomAsRead = async (
   userId: string
 ): Promise<void> => {
   // 해당 채팅방에서 현재 사용자가 읽지 않은 모든 메시지 ID 조회
-  const { data: unreadMessages, error: messagesError } = await client
+  // chat_message_reads 테이블에 없는 메시지만 조회 (더 정확한 방법)
+  // 먼저 읽지 않은 메시지 ID를 조회
+  const { data: allMessages, error: allMessagesError } = await client
     .from('chat_messages')
     .select('id')
     .eq('room_id', roomId)
     .neq('sender_id', userId)
     .not('id', 'is', null);
 
-  if (messagesError) {
-    throw messagesError;
+  if (allMessagesError) {
+    throw allMessagesError;
   }
 
-  if (!unreadMessages || unreadMessages.length === 0) {
+  if (!allMessages || allMessages.length === 0) {
     return;
   }
 
-  // null이 아닌 id만 필터링
-  const messageIds = unreadMessages
+  const allMessageIds = allMessages
     .map((m) => (m as { id: number }).id)
     .filter((id): id is number => id !== null && typeof id === 'number');
 
-  if (messageIds.length === 0) {
+  if (allMessageIds.length === 0) {
+    return;
+  }
+
+  // 이미 읽음 처리된 메시지 ID 조회
+  const { data: readMessages, error: readMessagesError } = await client
+    .from('chat_message_reads')
+    .select('message_id')
+    .eq('user_id', userId)
+    .in('message_id', allMessageIds);
+
+  if (readMessagesError) {
+    throw readMessagesError;
+  }
+
+  const readMessageIds = new Set(
+    (readMessages || [])
+      .map((r) => (r as { message_id: number }).message_id)
+      .filter((id): id is number => id !== null)
+  );
+
+  // 읽지 않은 메시지 ID만 필터링
+  const unreadMessageIds = allMessageIds.filter(
+    (id) => !readMessageIds.has(id)
+  );
+
+  if (unreadMessageIds.length === 0) {
     return;
   }
 
   // markMessagesAsRead 함수를 활용하여 일괄 읽음 처리
-  await markMessagesAsRead(client, roomId, userId, messageIds);
+  await markMessagesAsRead(client, roomId, userId, unreadMessageIds);
 };
 
 // ============================================

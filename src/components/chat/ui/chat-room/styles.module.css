@@ -27,6 +27,18 @@
   flex-shrink: 0;
 }
 
+.headerAvatarSkeleton {
+  flex-shrink: 0;
+}
+
+.headerNicknameSkeleton {
+  margin-bottom: 4px;
+}
+
+.headerStatusSkeleton {
+  /* 스켈레톤 스타일은 인라인으로 적용 */
+}
+
 .headerUserInfo {
   display: flex;
   flex-direction: column;

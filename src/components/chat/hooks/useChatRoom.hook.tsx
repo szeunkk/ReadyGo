@@ -5,11 +5,39 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 import { supabase as baseSupabase } from '@/lib/supabase/client';
 import { useAuth } from '@/commons/providers/auth/auth.provider';
-import { useRealtimeChat, type RealtimeMessage } from './useRealtimeChat.hook';
+import { useChatList } from './useChatList.hook';
+import { getEffectiveStatus } from '@/stores/user-status.store';
+import { getAvatarImagePath } from '@/lib/avatar/getAvatarImagePath';
 import type { Database } from '@/types/supabase';
 
 // 타입 정의
 type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
+
+/**
+ * 포맷된 메시지 아이템 타입
+ */
+export interface FormattedMessageItem {
+  type: 'date-divider' | 'message';
+  date?: string | null; // date-divider인 경우 (원본 날짜)
+  formattedDate?: string; // date-divider인 경우 (포맷팅된 날짜)
+  message?: ChatMessage; // message인 경우
+  isConsecutive?: boolean; // message인 경우
+  isOwnMessage?: boolean; // message인 경우
+  formattedTime?: string; // message인 경우
+  formattedContent?: string; // message인 경우
+  isRead?: boolean; // message인 경우
+}
+
+/**
+ * 포맷된 상대방 정보 타입
+ */
+export interface FormattedOtherMemberInfo {
+  id: string;
+  nickname: string;
+  avatarImagePath: string;
+  userStatus: 'online' | 'away' | 'dnd' | 'offline';
+  animalType?: string;
+}
 
 /**
  * Hook 파라미터 타입
@@ -23,7 +51,11 @@ export interface UseChatRoomProps {
  * Hook 반환 타입
  */
 export interface UseChatRoomReturn {
-  messages: ChatMessage[];
+  messages: ChatMessage[]; // 원본 메시지 배열 (하위 호환성)
+  formattedMessages: FormattedMessageItem[]; // UI에서 바로 사용 가능한 포맷된 메시지 배열
+  otherMemberInfo: FormattedOtherMemberInfo | null; // 상대방 정보, 포맷된 형태
+  isOtherMemberInfoLoading: boolean; // 상대방 정보 로딩 상태
+  isBlocked: boolean; // 차단 상태
   sendMessage: (content: string, contentType?: string) => Promise<void>;
   markAsRead: (messageIds: number[]) => Promise<void>;
   isLoading: boolean;
@@ -32,17 +64,126 @@ export interface UseChatRoomReturn {
 }
 
 /**
+ * 메시지 시간 포맷팅 함수
+ */
+const formatMessageTime = (dateString: string | null): string => {
+  if (!dateString) {
+    return '';
+  }
+
+  const date = new Date(dateString);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? '오후' : '오전';
+  const displayHours = hours % 12 || 12;
+  const timeString = `${ampm} ${displayHours}:${minutes
+    .toString()
+    .padStart(2, '0')}`;
+
+  return timeString;
+};
+
+/**
+ * 날짜 구분선 포맷팅 함수
+ */
+const formatDateDivider = (dateString: string | null): string => {
+  if (!dateString) {
+    return '';
+  }
+
+  const date = new Date(dateString);
+  const weekdays = [
+    '일요일',
+    '월요일',
+    '화요일',
+    '수요일',
+    '목요일',
+    '금요일',
+    '토요일',
+  ];
+  const weekday = weekdays[date.getDay()];
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 ${weekday}`;
+};
+
+/**
+ * 날짜가 변경되었는지 확인하는 함수
+ */
+const isNewDate = (
+  currentDate: string | null,
+  previousDate: string | null
+): boolean => {
+  if (!currentDate || !previousDate) {
+    return true;
+  }
+
+  const current = new Date(currentDate);
+  const previous = new Date(previousDate);
+
+  return (
+    current.getFullYear() !== previous.getFullYear() ||
+    current.getMonth() !== previous.getMonth() ||
+    current.getDate() !== previous.getDate()
+  );
+};
+
+/**
+ * 연속된 메시지인지 확인하는 함수
+ */
+const isConsecutiveMessage = (
+  currentMessage: ChatMessage,
+  previousMessage: ChatMessage | null
+): boolean => {
+  if (!previousMessage) {
+    return false;
+  }
+  return (
+    currentMessage.sender_id === previousMessage.sender_id &&
+    currentMessage.content_type !== 'system'
+  );
+};
+
+/**
+ * 메시지 내용 포맷팅 함수
+ */
+const formatMessageContent = (message: ChatMessage | null): string => {
+  if (!message) {
+    return '메시지가 없습니다';
+  }
+
+  const content = message.content;
+  const contentType = message.content_type;
+
+  if (content === null) {
+    return '메시지가 없습니다';
+  }
+
+  if (contentType === 'image') {
+    return '📷 이미지';
+  }
+
+  if (contentType === 'system') {
+    return content;
+  }
+
+  return content;
+};
+
+/**
  * useChatRoom Hook
  *
- * - useRealtimeChat 통합
  * - 초기 메시지 로드 (API)
  * - postgres_changes로 INSERT 구독
- * - 메시지 전송 플로우 (DB 저장 + Broadcast)
+ * - 메시지 전송 플로우 (DB 저장)
  * - 읽음 처리
+ * - 메시지 그룹화 및 포맷팅
+ * - 상대방 정보 조회 및 포맷팅
  */
 export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
   const { roomId, onMessage } = props;
   const { user } = useAuth();
+
+  // useChatList Hook 호출하여 chatRooms 조회
+  const { chatRooms, isLoading: isChatListLoading } = useChatList();
 
   // 상태 관리
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -86,55 +227,6 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
       });
     });
   }, []);
-
-  // onMessage 콜백을 useCallback으로 감싸서 안정적인 참조 유지
-  const handleRealtimeMessage = useCallback(
-    (realtimeMessage: RealtimeMessage) => {
-      // RealtimeMessage → ChatMessage 변환
-      try {
-        const chatMessage: ChatMessage = {
-          id: realtimeMessage.id!,
-          content: realtimeMessage.content,
-          content_type: realtimeMessage.contentType || 'text',
-          created_at: realtimeMessage.createdAt,
-          sender_id: realtimeMessage.senderId,
-          room_id: realtimeMessage.roomId,
-          is_read: false, // 기본값
-        };
-
-        // Broadcast 수신 메시지를 내부 상태에 추가
-        handleNewMessage(chatMessage);
-
-        // 외부 콜백 호출
-        if (onMessageRef.current) {
-          try {
-            onMessageRef.current(chatMessage);
-          } catch (error) {
-            console.error('Error in onMessage callback:', error);
-          }
-        }
-      } catch (error) {
-        console.error(
-          'Error converting RealtimeMessage to ChatMessage:',
-          error
-        );
-      }
-    },
-    [handleNewMessage]
-  );
-
-  // useRealtimeChat 통합
-  const realtimeChat = useRealtimeChat({
-    roomId,
-    onMessage: handleRealtimeMessage,
-  });
-
-  // realtimeChat의 함수들을 추출하여 안정적인 참조 유지
-  const {
-    subscribeToRoom: subscribeToRealtimeRoom,
-    unsubscribe: unsubscribeRealtime,
-    isConnected: isRealtimeConnected,
-  } = realtimeChat;
 
   /**
    * postgres_changes 채널 정리 함수
@@ -317,7 +409,7 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
   );
 
   /**
-   * 메시지 전송 (useRealtimeChat.sendMessage 재사용)
+   * 메시지 전송
    */
   const sendMessage = useCallback(
     async (content: string, contentType: string = 'text'): Promise<void> => {
@@ -326,9 +418,34 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
         throw new Error('유효한 채팅방이 선택되지 않았습니다.');
       }
 
+      if (!user?.id) {
+        throw new Error('로그인이 필요합니다.');
+      }
+
       try {
-        // useRealtimeChat의 sendMessage 재사용 (옵션 A)
-        await realtimeChat.sendMessage(content, contentType);
+        const response = await fetch('/api/chat/message', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            roomId,
+            content,
+            contentType,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || '메시지 전송에 실패했습니다.');
+        }
+
+        const result = await response.json();
+        const savedMessage = result.data as ChatMessage;
+
+        // 저장된 메시지를 로컬 상태에 추가
+        handleNewMessage(savedMessage);
       } catch (error) {
         const errorMessage =
           error instanceof Error
@@ -339,7 +456,7 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
         throw error;
       }
     },
-    [realtimeChat, roomId]
+    [roomId, user?.id, handleNewMessage]
   );
 
   /**
@@ -372,10 +489,17 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
           const errorData = await response.json().catch(() => ({}));
           console.error(
             'Failed to mark room as read:',
-            errorData.error || '읽음 처리에 실패했습니다.'
+            errorData.error || '읽음 처리에 실패했습니다.',
+            'Status:',
+            response.status,
+            'Response:',
+            errorData
           );
           return;
         }
+
+        const result = await response.json().catch(() => ({}));
+        console.log('Successfully marked room as read:', result);
 
         // 읽음 처리 후 로컬 상태 업데이트
         setMessages((prev) =>
@@ -445,7 +569,6 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
     // roomId가 유효하지 않으면 early return
     if (!roomId || roomId <= 0) {
       cleanupChannel();
-      unsubscribeRealtime();
       setMessages([]);
       seenMessageIdsRef.current.clear();
       setIsLoading(false);
@@ -455,8 +578,6 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
 
     // 이전 채널 정리
     cleanupChannel();
-    // useRealtimeChat의 unsubscribe 호출
-    unsubscribeRealtime();
     // messages 배열 초기화
     setMessages([]);
     seenMessageIdsRef.current.clear();
@@ -471,13 +592,15 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
     }
 
     // 초기 메시지 로드
-    loadMessages(roomId).then(() => {
+    loadMessages(roomId).then(async () => {
       // postgres_changes 구독
       subscribeToPostgresChanges(roomId);
-      // useRealtimeChat의 subscribeToRoom 호출
-      subscribeToRealtimeRoom(roomId);
-      // 읽음 처리
-      markRoomAsRead(roomId);
+      // 읽음 처리 (await로 에러 확인)
+      try {
+        await markRoomAsRead(roomId);
+      } catch (error) {
+        console.error('Failed to mark room as read:', error);
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, user?.id]);
@@ -489,7 +612,6 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
     // roomId가 유효하지 않으면 early return
     if (!roomId || roomId <= 0) {
       cleanupChannel();
-      unsubscribeRealtime();
       setMessages([]);
       seenMessageIdsRef.current.clear();
       setIsLoading(false);
@@ -499,8 +621,6 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
     if (!user?.id) {
       // 채널 정리
       cleanupChannel();
-      // useRealtimeChat의 cleanup 처리
-      unsubscribeRealtime();
       // messages 배열 초기화
       setMessages([]);
       seenMessageIdsRef.current.clear();
@@ -508,10 +628,14 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
       setIsLoading(true);
     } else {
       // user?.id가 다시 설정되면 자동으로 재로딩 및 재구독
-      loadMessages(roomId).then(() => {
+      loadMessages(roomId).then(async () => {
         subscribeToPostgresChanges(roomId);
-        subscribeToRealtimeRoom(roomId);
-        markRoomAsRead(roomId);
+        // 읽음 처리 (await로 에러 확인)
+        try {
+          await markRoomAsRead(roomId);
+        } catch (error) {
+          console.error('Failed to mark room as read:', error);
+        }
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -524,8 +648,6 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
     return () => {
       // postgres_changes 채널 정리
       cleanupChannel();
-      // useRealtimeChat의 unsubscribe 호출
-      unsubscribeRealtime();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -544,12 +666,138 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
     });
   }, [messages]);
 
+  /**
+   * 포맷된 메시지 목록 생성 (날짜 구분선, 연속 메시지, 포맷팅 포함)
+   */
+  const formattedMessages = useMemo<FormattedMessageItem[]>(() => {
+    // roomId가 유효하지 않거나 user가 없으면 빈 배열 반환
+    if (!roomId || roomId <= 0 || !user?.id) {
+      return [];
+    }
+
+    const result: FormattedMessageItem[] = [];
+
+    sortedMessages.forEach((message, index) => {
+      const previousMessage = index > 0 ? sortedMessages[index - 1] : null;
+
+      // 날짜 구분선 추가
+      const showDateDivider = isNewDate(
+        message.created_at,
+        previousMessage?.created_at || null
+      );
+
+      if (showDateDivider) {
+        result.push({
+          type: 'date-divider',
+          date: message.created_at,
+          formattedDate: formatDateDivider(message.created_at),
+        });
+      }
+
+      // 메시지 아이템 추가
+      const isConsecutive = isConsecutiveMessage(message, previousMessage);
+      const isOwnMessage = message.sender_id === user.id;
+      const formattedTime = formatMessageTime(message.created_at);
+      const formattedContent = formatMessageContent(message);
+      const isRead = message.is_read ?? false;
+
+      result.push({
+        type: 'message',
+        message,
+        isConsecutive,
+        isOwnMessage,
+        formattedTime,
+        formattedContent,
+        isRead,
+      });
+    });
+
+    return result;
+  }, [sortedMessages, user?.id, roomId]);
+
+  /**
+   * 상대방 정보 조회 및 포맷팅
+   */
+  const otherMemberInfo = useMemo<FormattedOtherMemberInfo | null>(() => {
+    // roomId가 유효하지 않으면 null 반환
+    if (!roomId || roomId <= 0) {
+      return null;
+    }
+
+    // chatRooms에서 현재 roomId와 일치하는 채팅방 찾기
+    const chatRoomItem = chatRooms.find((item) => item.room.id === roomId);
+
+    if (!chatRoomItem?.otherMember) {
+      // 상대방 정보가 없으면 null 반환 (스켈레톤 표시를 위해)
+      return null;
+    }
+
+    const otherMember = chatRoomItem.otherMember;
+
+    return {
+      id: otherMember.id,
+      nickname: otherMember.nickname ?? '알 수 없음',
+      avatarImagePath: getAvatarImagePath(
+        otherMember.avatar_url,
+        otherMember.animal_type
+      ),
+      userStatus: getEffectiveStatus(otherMember.id),
+      animalType: otherMember.animal_type ?? undefined,
+    };
+  }, [roomId, chatRooms]);
+
+  /**
+   * 상대방 정보 로딩 상태
+   * - chatRooms가 로딩 중이거나
+   * - roomId가 유효하지만 otherMemberInfo가 없는 경우
+   */
+  const isOtherMemberInfoLoading = useMemo<boolean>(() => {
+    if (!roomId || roomId <= 0) {
+      return false;
+    }
+
+    // chatRooms가 로딩 중이면 true
+    if (isChatListLoading) {
+      return true;
+    }
+
+    // roomId가 유효하지만 otherMemberInfo가 없으면 로딩 중으로 간주
+    if (!otherMemberInfo) {
+      return true;
+    }
+
+    return false;
+  }, [roomId, isChatListLoading, otherMemberInfo]);
+
+  /**
+   * 차단 상태 확인 (기본값 false, 추후 API 연동 가능)
+   */
+  const isBlocked = useMemo<boolean>(() => {
+    // roomId가 유효하지 않거나 user가 없으면 false
+    if (!roomId || roomId <= 0 || !user?.id) {
+      return false;
+    }
+
+    // otherMemberInfo가 없으면 false
+    if (!otherMemberInfo || !otherMemberInfo.id) {
+      return false;
+    }
+
+    // TODO: API를 통해 차단 상태 확인
+    // 현재는 기본값 false 반환
+    return false;
+  }, [roomId, user?.id, otherMemberInfo]);
+
   return {
-    messages: sortedMessages,
+    messages: sortedMessages, // 하위 호환성을 위해 유지
+    formattedMessages,
+    otherMemberInfo,
+    isOtherMemberInfoLoading,
+    isBlocked,
     sendMessage,
     markAsRead,
     isLoading,
     error,
-    isConnected: isRealtimeConnected,
+    isConnected: false, // Realtime 연결 상태는 더 이상 사용하지 않음
   };
 };

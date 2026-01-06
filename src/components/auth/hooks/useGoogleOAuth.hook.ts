@@ -20,76 +20,8 @@ export const useGoogleOAuth = () => {
 
   // OAuth 콜백 처리: auth state change 감지 및 페이지 로드 시 세션 확인
   useEffect(() => {
-    // 페이지 로드 시 현재 세션 확인 (OAuth 콜백 후 페이지 재로드된 경우)
-    const checkInitialSession = async () => {
-      try {
-        // OAuth 처리 중인지 확인 (localStorage 사용)
-        const isProcessingOAuth =
-          typeof window !== 'undefined' &&
-          localStorage.getItem(OAUTH_PROCESSING_KEY) === 'true';
-
-        if (!isProcessingOAuth) {
-          return;
-        }
-
-        // OAuth 콜백 후 URL에서 세션을 읽어오는 데 시간이 걸릴 수 있으므로 재시도
-        let retryCount = 0;
-        const maxRetries = 5;
-        const retryDelay = 500; // 500ms
-
-        const checkSession = async (): Promise<void> => {
-          try {
-            const {
-              data: { session },
-            } = await supabase.auth.getSession();
-
-            if (
-              session?.user &&
-              session?.access_token &&
-              session?.refresh_token &&
-              !hasProcessedSessionRef.current
-            ) {
-              hasProcessedSessionRef.current = true;
-              await processOAuthCallbackWithSession(session, session.user.id);
-            } else if (
-              retryCount < maxRetries &&
-              !hasProcessedSessionRef.current
-            ) {
-              // 세션이 아직 없으면 재시도
-              retryCount++;
-              setTimeout(checkSession, retryDelay);
-            } else if (retryCount >= maxRetries) {
-              // 최대 재시도 횟수 초과 시 플래그 제거
-              console.warn('OAuth session not found after retries');
-              if (typeof window !== 'undefined') {
-                localStorage.removeItem(OAUTH_PROCESSING_KEY);
-              }
-            }
-          } catch (error) {
-            console.error('Session check error:', error);
-            if (retryCount < maxRetries) {
-              retryCount++;
-              setTimeout(checkSession, retryDelay);
-            } else {
-              if (typeof window !== 'undefined') {
-                localStorage.removeItem(OAUTH_PROCESSING_KEY);
-              }
-            }
-          }
-        };
-
-        // 초기 세션 확인 시작
-        await checkSession();
-      } catch (error) {
-        console.error('Initial session check error:', error);
-        // 에러 발생 시 플래그 제거
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem(OAUTH_PROCESSING_KEY);
-        }
-      }
-    };
-
     // OAuth 콜백 처리 로직 (세션을 파라미터로 받는 버전)
+    // 함수를 먼저 정의하여 onAuthStateChange와 checkInitialSession 모두에서 사용 가능하도록 함
     const processOAuthCallbackWithSession = async (
       session: {
         access_token: string;
@@ -228,10 +160,7 @@ export const useGoogleOAuth = () => {
       }
     };
 
-    // 초기 세션 확인
-    checkInitialSession();
-
-    // auth state change 감지
+    // auth state change 감지 - OAuth 콜백 후 세션 감지의 주된 방법
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -240,9 +169,11 @@ export const useGoogleOAuth = () => {
         typeof window !== 'undefined' &&
         localStorage.getItem(OAUTH_PROCESSING_KEY) === 'true';
 
-      // 세션이 있고 SIGNED_IN 이벤트이고 OAuth 처리 중이며 아직 처리하지 않은 경우
+      // 세션이 있고 (SIGNED_IN, TOKEN_REFRESHED, INITIAL_SESSION) 이벤트이고 OAuth 처리 중이며 아직 처리하지 않은 경우
       if (
-        event === 'SIGNED_IN' &&
+        (event === 'SIGNED_IN' ||
+          event === 'TOKEN_REFRESHED' ||
+          event === 'INITIAL_SESSION') &&
         session?.user &&
         session?.access_token &&
         session?.refresh_token &&
@@ -254,6 +185,57 @@ export const useGoogleOAuth = () => {
         await processOAuthCallbackWithSession(session, session.user.id);
       }
     });
+
+    // 페이지 로드 시 현재 세션 확인 (OAuth 콜백 후 페이지 재로드된 경우)
+    // 이미 세션이 있는 경우를 대비해 한 번만 확인
+    const checkInitialSession = async () => {
+      try {
+        // OAuth 처리 중인지 확인 (localStorage 사용)
+        const isProcessingOAuth =
+          typeof window !== 'undefined' &&
+          localStorage.getItem(OAUTH_PROCESSING_KEY) === 'true';
+
+        if (!isProcessingOAuth) {
+          return;
+        }
+
+        // 이미 처리된 경우 중복 처리 방지
+        if (hasProcessedSessionRef.current) {
+          return;
+        }
+
+        // 초기 세션 확인 (한 번만)
+        // Supabase가 URL hash fragment를 처리하는 데 시간이 걸릴 수 있으므로 짧은 지연
+        setTimeout(async () => {
+          try {
+            const {
+              data: { session },
+            } = await supabase.auth.getSession();
+
+            // 세션이 있고 아직 처리하지 않은 경우에만 처리
+            if (
+              session?.user &&
+              session?.access_token &&
+              session?.refresh_token &&
+              !hasProcessedSessionRef.current
+            ) {
+              hasProcessedSessionRef.current = true;
+              await processOAuthCallbackWithSession(session, session.user.id);
+            }
+            // 세션이 없으면 onAuthStateChange 이벤트를 기다림 (재시도하지 않음)
+          } catch (error) {
+            console.error('Initial session check error:', error);
+            // 에러 발생해도 onAuthStateChange 이벤트를 기다림
+          }
+        }, 100);
+      } catch (error) {
+        console.error('Initial session check setup error:', error);
+        // 에러 발생 시 플래그 제거하지 않음 (onAuthStateChange 이벤트를 기다림)
+      }
+    };
+
+    // 초기 세션 확인 시작
+    checkInitialSession();
 
     return () => {
       subscription.unsubscribe();
