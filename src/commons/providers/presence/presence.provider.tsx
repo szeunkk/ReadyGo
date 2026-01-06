@@ -32,22 +32,23 @@ export const PresenceProvider = ({ children }: PresenceProviderProps) => {
     if (!user?.id) {
       // user.id가 null로 변경된 경우(로그아웃) cleanup 수행
       if (channelRef.current) {
+        // untrack() 호출 전에 채널 참조를 변수에 저장
+        const channelToRemove = channelRef.current;
+        channelRef.current = null;
+        subscribedUserIdRef.current = null;
+
         // Presence를 먼저 untrack하여 다른 클라이언트에 leave 이벤트 전송
-        channelRef.current
+        channelToRemove
           .untrack()
           .then(() => {
             // untrack 완료 후 채널 제거
-            baseSupabase.removeChannel(channelRef.current!);
-            channelRef.current = null;
-            subscribedUserIdRef.current = null;
+            baseSupabase.removeChannel(channelToRemove);
             setPresenceUserIds([]);
           })
           .catch((error) => {
             // untrack 실패해도 채널은 제거
             console.error('Failed to untrack presence:', error);
-            baseSupabase.removeChannel(channelRef.current!);
-            channelRef.current = null;
-            subscribedUserIdRef.current = null;
+            baseSupabase.removeChannel(channelToRemove);
             setPresenceUserIds([]);
           });
       }
@@ -178,22 +179,23 @@ export const PresenceProvider = ({ children }: PresenceProviderProps) => {
     // Cleanup 함수
     return () => {
       if (channelRef.current) {
+        // untrack() 호출 전에 채널 참조를 변수에 저장
+        const channelToRemove = channelRef.current;
+        channelRef.current = null;
+        subscribedUserIdRef.current = null;
+
         // Presence를 먼저 untrack하여 다른 클라이언트에 leave 이벤트 전송
-        channelRef.current
+        channelToRemove
           .untrack()
           .then(() => {
             // untrack 완료 후 채널 제거
-            baseSupabase.removeChannel(channelRef.current!);
-            channelRef.current = null;
-            subscribedUserIdRef.current = null;
+            baseSupabase.removeChannel(channelToRemove);
             setPresenceUserIds([]);
           })
           .catch((error) => {
             // untrack 실패해도 채널은 제거
             console.error('Failed to untrack presence:', error);
-            baseSupabase.removeChannel(channelRef.current!);
-            channelRef.current = null;
-            subscribedUserIdRef.current = null;
+            baseSupabase.removeChannel(channelToRemove);
             setPresenceUserIds([]);
           });
       }

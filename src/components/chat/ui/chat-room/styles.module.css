@@ -37,6 +37,7 @@
 
 .headerStatusSkeleton {
   /* 스켈레톤 스타일은 인라인으로 적용 */
+  display: block;
 }
 
 .headerUserInfo {
@@ -280,43 +281,44 @@
   width: 100%;
 }
 
-.sendButton {
+.gameStartButton {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
+  gap: 8px;
   height: 48px;
-  padding: 0;
-  background-color: var(--color-bg-secondary);
+  padding: 14px 20px;
+  background-color: var(--color-bg-interactive-primary, #56e5ce);
   border: none;
-  border-radius: 16.4px;
+  border-radius: 12px;
   cursor: pointer;
   flex-shrink: 0;
-  color: var(--color-icon-primary);
+  color: var(--color-text-interactive-inverse, white);
   transition: background-color 0.2s;
+  font-family: var(--typo-body-lg-medium-font-family);
+  font-size: var(--typo-body-lg-medium-font-size);
+  line-height: var(--typo-body-lg-medium-line-height);
+  font-weight: var(--typo-body-lg-medium-font-weight);
 }
 
-/* Button 컴포넌트의 기본 padding과 size 스타일 오버라이드 */
-/* CSS Module에서 Button 컴포넌트의 클래스를 오버라이드하기 위해 더 구체적인 선택자 사용 */
-.sendButton[class*='button'][class*='size-m'] {
-  padding: 0;
-  height: 48px;
+.gameStartButton:hover:not(:disabled) {
+  background-color: var(--color-bg-interactive-primary-hover);
 }
 
-.sendButton:hover:not(:disabled) {
-  background-color: var(--color-bg-interactive-teritiary-hover);
+.gameStartButton:active:not(:disabled) {
+  background-color: var(--color-bg-interactive-primary-pressed);
 }
 
-.sendButton:active:not(:disabled) {
-  background-color: var(--color-bg-interactive-teritiary-pressed);
-}
-
-.sendButton:disabled {
+.gameStartButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.sendButton:focus-visible {
+.gameStartButton:focus-visible {
   outline: 2px solid var(--color-border-focus-ring);
   outline-offset: 2px;
+}
+
+.gameStartButtonText {
+  white-space: nowrap;
 }

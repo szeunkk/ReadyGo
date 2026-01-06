@@ -15,3 +15,9 @@ export {
   type UseChatListReturn,
   type FormattedChatRoomItem,
 } from './useChatList.hook';
+
+export {
+  useChatRoomInput,
+  type UseChatRoomInputProps,
+  type UseChatRoomInputReturn,
+} from './useChatRoomInput.hook';

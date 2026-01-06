@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import styles from './styles.module.css';
 import Avatar from '@/commons/components/avatar';
 import Icon from '@/commons/components/icon';
@@ -10,7 +10,7 @@ import Searchbar from '@/commons/components/searchbar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimalType } from '@/commons/constants/animal';
 import { useSideProfilePanel } from '@/hooks/useSideProfilePanel';
-import { useChatRoom } from '@/components/chat/hooks';
+import { useChatRoom, useChatRoomInput } from '@/components/chat/hooks';
 
 interface ChatRoomProps {
   roomId?: string;
@@ -37,8 +37,18 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
     isBlocked,
   } = useChatRoom({ roomId: roomIdNumber });
 
-  // 메시지 입력 상태 (UI 상태만 관리)
-  const [messageInput, setMessageInput] = useState('');
+  // 채팅 입력 관련 로직
+  const {
+    messageInput,
+    setMessageInput,
+    handleSendMessage,
+    handleKeyDown,
+    handleGameStart,
+  } = useChatRoomInput({
+    sendMessage,
+    isBlocked,
+    otherMemberNickname: otherMemberInfo?.nickname,
+  });
 
   // 채팅방이 변경될 때 사이드 패널이 열려있다면 새로운 상대방의 프로필로 자동 업데이트
   useEffect(() => {
@@ -56,29 +66,6 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
   // 현재 사용자의 프로필이 열려있는지 확인
   const isProfileActive =
     isOpen && otherMemberInfo && targetUserId === otherMemberInfo.id;
-
-  // 메시지 전송 핸들러
-  const handleSendMessage = async () => {
-    if (!messageInput.trim() || isBlocked) {
-      return;
-    }
-
-    try {
-      await sendMessage(messageInput.trim(), 'text');
-      setMessageInput(''); // 전송 성공 시 입력 초기화
-    } catch (err) {
-      console.error('Failed to send message:', err);
-      // 에러 발생 시 messageInput은 그대로 유지하여 재전송 가능
-    }
-  };
-
-  // Enter 키 입력 시 전송
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
 
   // 에러 상태 처리 (에러가 있어도 UI는 유지)
   if (error) {
@@ -276,29 +263,38 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
             variant="primary"
             size="m"
             state={isBlocked ? 'disabled' : 'Default'}
-            placeholder={`@${displayNickname} 님에게 메시지 보내기`}
+            placeholder={`@${displayNickname}님에게 메시지 보내기`}
             className={styles.messageInput}
             disabled={isBlocked}
             aria-label="메시지 입력"
             label={false}
             iconLeft={undefined}
-            iconRight={undefined}
+            iconRight={messageInput.trim() ? 'send' : undefined}
+            iconRightColor={
+              messageInput.trim() && !isBlocked
+                ? 'var(--color-icon-interactive-secondary)'
+                : undefined
+            }
             additionalInfo={undefined}
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             onKeyDown={handleKeyDown}
+            onIconRightClick={
+              messageInput.trim() && !isBlocked ? handleSendMessage : undefined
+            }
           />
         </div>
         <Button
-          variant="secondary"
+          variant="primary"
           size="m"
           shape="rectangle"
-          disabled={isBlocked || !messageInput.trim()}
-          aria-label="메시지 전송"
-          className={styles.sendButton}
-          onClick={handleSendMessage}
+          disabled={isBlocked || !otherMemberInfo}
+          aria-label="게임시작"
+          className={styles.gameStartButton}
+          onClick={handleGameStart}
         >
-          <Icon name="send" size={20} />
+          <Icon name="gamepad" size={20} />
+          <span className={styles.gameStartButtonText}>게임시작</span>
         </Button>
       </div>
     </div>

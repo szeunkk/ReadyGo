@@ -181,7 +181,6 @@
   height: 48px;
   display: flex;
   align-items: center;
-  gap: 12px;
   box-sizing: border-box;
 }
 
@@ -193,22 +192,4 @@
 .messageInput {
   width: 100%;
   height: 100%;
-}
-
-.sendButton {
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border-radius: 12px;
-  background: var(--color-bg-secondary);
-}
-
-.sendIcon {
-  /* width: 20px;
-  height: 20px; */
-  color: var(--color-icon-disabled);
 }

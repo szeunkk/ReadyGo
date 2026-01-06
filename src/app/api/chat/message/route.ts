@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAuthenticatedClient } from '../utils/auth';
+import { createClient } from '@/lib/supabase/server';
 import { getChatMessagesService } from '@/services/chat/getChatMessagesService';
 import { sendMessageService } from '@/services/chat/sendMessageService';
 import {
@@ -25,13 +25,13 @@ export const dynamic = 'force-dynamic';
 export const GET = async (request: NextRequest) => {
   try {
     // 1. 인증된 클라이언트 생성
+    const supabase = createClient();
     const {
-      supabase,
-      user,
+      data: { user },
       error: authError,
-    } = await createAuthenticatedClient();
+    } = await supabase.auth.getUser();
 
-    if (authError || !supabase || !user) {
+    if (authError || !user) {
       return NextResponse.json(
         {
           message: 'Unauthorized',
@@ -123,13 +123,13 @@ export const GET = async (request: NextRequest) => {
 export const POST = async (request: NextRequest) => {
   try {
     // 1. 인증된 클라이언트 생성
+    const supabase = createClient();
     const {
-      supabase,
-      user,
+      data: { user },
       error: authError,
-    } = await createAuthenticatedClient();
+    } = await supabase.auth.getUser();
 
-    if (authError || !supabase || !user) {
+    if (authError || !user) {
       return NextResponse.json(
         {
           message: 'Unauthorized',

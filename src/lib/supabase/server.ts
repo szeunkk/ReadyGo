@@ -25,10 +25,18 @@ export const createClient = () => {
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options);
             });
-          } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // Route Handler에서 쿠키 설정 확인 로그
+            if (cookiesToSet.length > 0) {
+              // eslint-disable-next-line no-console
+              console.log('Supabase cookies set:', {
+                count: cookiesToSet.length,
+                names: cookiesToSet.map((c) => c.name),
+              });
+            }
+          } catch (error) {
+            // Route Handler에서는 에러가 발생하지 않아야 함
+            console.error('Error setting cookies in Route Handler:', error);
+            throw error;
           }
         },
       },

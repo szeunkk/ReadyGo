@@ -162,14 +162,6 @@ export const createChatRoom = async (
   client: SupabaseClient<Database>,
   memberIds: string[]
 ): Promise<ChatRoom> => {
-  // 세션 확인 (디버깅용)
-  const {
-    data: { session: _session },
-  } = await client.auth.getSession();
-  const {
-    data: { user: _user },
-  } = await client.auth.getUser();
-
   // 새 채팅방 생성
   const { data: newRoom, error: roomError } = await client
     .from('chat_rooms')

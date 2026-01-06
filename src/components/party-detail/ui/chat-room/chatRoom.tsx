@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
+import styles from './styles.module.css';
 import Avatar from '@/commons/components/avatar';
-import Button from '@/commons/components/button';
-import Icon from '@/commons/components/icon';
 import Input from '@/commons/components/input';
 import { AnimalType } from '@/commons/constants/animal';
-import styles from './styles.module.css';
 
 // Mock 데이터 타입 정의
 interface ChatMessage {
@@ -310,19 +308,11 @@ export default function ChatRoom() {
             onKeyDown={handleKeyDown}
             aria-label="메시지 입력"
             label={false}
+            iconRight="send"
+            onIconRightClick={handleSendMessage}
+            iconSize={20}
           />
         </div>
-        <Button
-          variant="secondary"
-          size="m"
-          shape="rectangle"
-          disabled={!messageInput.trim()}
-          aria-label="메시지 전송"
-          className={styles.sendButton}
-          onClick={handleSendMessage}
-        >
-          <Icon name="send" size={20} className={styles.sendIcon} />
-        </Button>
       </div>
     </div>
   );

@@ -78,7 +78,7 @@ export const animalAssets: Record<AnimalType, AnimalAssets> = {
   [AnimalType.dolphin]: {
     imageS: '/images/dolphin_s.svg',
     imageM: '/images/dolphin_m.svg',
-    avatar: '/icons/avatar/dolpin.svg',
+    avatar: '/icons/avatar/dolphin.svg',
   },
   [AnimalType.panda]: {
     imageS: '/images/panda_s.svg',
