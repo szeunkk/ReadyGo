@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('회원가입 성공 페이지', () => {
   test.skip('접근 제어: 로그인 세션 없을 때 로그인 페이지로 리다이렉트', async ({
-    page,
+    _page,
   }) => {
     // 회원가입 성공 페이지는 회원가입 완료 후 리다이렉트되는 페이지
     // 로그인 세션이 없으면 AuthGuard가 모달을 표시하고 로그인 페이지로 리다이렉트되어야 함

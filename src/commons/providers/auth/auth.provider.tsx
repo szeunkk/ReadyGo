@@ -143,7 +143,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           try {
             await syncSessionToStore(retryCount + 1, isInitialSync);
             // 재시도 성공 시 플래그는 재시도 함수의 finally 블록에서 설정됨
-          } catch (retryError) {
+          } catch {
             // 재시도도 실패한 경우 플래그 설정
             isSessionSyncedRef.current = true;
             setIsSessionSynced(true);
