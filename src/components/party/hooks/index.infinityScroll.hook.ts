@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { PartyCardProps } from '../ui/card/card';
-import { supabase } from '@/lib/supabase/client';
 import { AnimalType } from '@/commons/constants/animal';
 import { useAuth } from '@/commons/providers/auth/auth.provider';
 
@@ -144,92 +143,44 @@ const getAnimalTypeFromProfile = (animalType: string | null): string => {
   return 'default';
 };
 
-// party_members 및 user_profiles 데이터를 실제 Supabase에서 조회
-const fetchPartyMembersAndProfiles = async (
-  postIds: number[]
-): Promise<{
+// API 응답의 members와 profiles를 Map으로 변환하여 빠른 조회가 가능하도록 처리
+const createMembersAndProfilesMaps = (
+  members: PartyMember[],
+  profiles: UserProfile[]
+): {
   membersMap: Map<number, PartyMember[]>;
   profilesMap: Map<string, UserProfile>;
-}> => {
+} => {
   const membersMap = new Map<number, PartyMember[]>();
   const profilesMap = new Map<string, UserProfile>();
 
-  if (postIds.length === 0) {
-    return { membersMap, profilesMap };
+  // members 배열을 post_id를 키로 하는 Map으로 변환
+  for (const member of members) {
+    const postId = member.post_id;
+    if (postId) {
+      if (!membersMap.has(postId)) {
+        membersMap.set(postId, []);
+      }
+      membersMap.get(postId)!.push(member);
+    }
   }
 
-  try {
-    // 1. party_members 조회: 모든 post_id에 대한 멤버 조회
-    const { data: partyMembers, error: membersError } = await supabase
-      .from('party_members')
-      .select('post_id, user_id, role, joined_at')
-      .in('post_id', postIds);
-
-    if (membersError) {
-      console.error('party_members 조회 실패:', membersError);
-      return { membersMap, profilesMap };
+  // profiles 배열을 user_id(id)를 키로 하는 Map으로 변환
+  for (const profile of profiles) {
+    if (profile.id) {
+      profilesMap.set(profile.id, profile);
     }
-
-    // post_id별로 멤버 그룹화
-    if (partyMembers) {
-      for (const member of partyMembers) {
-        const postId = member.post_id;
-        const userId = member.user_id;
-        if (postId && userId) {
-          if (!membersMap.has(postId)) {
-            membersMap.set(postId, []);
-          }
-          membersMap.get(postId)!.push({
-            post_id: postId,
-            user_id: userId,
-            role: member.role || '',
-            joined_at: member.joined_at || '',
-          });
-        }
-      }
-    }
-
-    // 2. user_profiles 조회: 모든 user_id에 대한 프로필 조회
-    const userIds = Array.from(
-      new Set(
-        partyMembers
-          ?.map((m) => m.user_id)
-          .filter((id): id is string => Boolean(id)) || []
-      )
-    );
-
-    if (userIds.length > 0) {
-      const { data: userProfiles, error: profilesError } = await supabase
-        .from('user_profiles')
-        .select('id, animal_type')
-        .in('id', userIds);
-
-      if (profilesError) {
-        console.error('user_profiles 조회 실패:', profilesError);
-      } else if (userProfiles) {
-        // user_id를 키로 하는 Map 생성
-        for (const profile of userProfiles) {
-          if (profile.id) {
-            profilesMap.set(profile.id, {
-              id: profile.id,
-              animal_type: profile.animal_type,
-            });
-          }
-        }
-      }
-    }
-  } catch (error) {
-    console.error('파티 멤버 및 프로필 조회 중 오류:', error);
   }
 
   return { membersMap, profilesMap };
 };
 
-// memberAvatars 생성 (실제 데이터 사용): party_posts의 id를 기반으로 실제 party_members 데이터에서 해당 파티의 참여자 정보를 가져옴
-// - party_members의 user_id를 사용하여 실제 user_profiles 데이터에서 animal_type을 조회
-// - animal_type 값을 아바타 아이콘 파일명과 매칭
-// - 참여자 수만큼 동물 아바타를 표시 (최대 4개)
-// - 참여자가 없는 경우 빈 배열로 처리
+// memberAvatars 생성 (API 응답의 members와 profiles 사용)
+// - API 응답의 members 배열을 post_id별로 그룹화하여 Map으로 변환
+// - API 응답의 profiles 배열을 user_id를 키로 하는 Map으로 변환
+// - members에서 해당 post_id의 멤버들을 찾고, 각 멤버의 user_id로 profiles에서 animal_type을 조회
+// - animal_type을 getAnimalTypeFromProfile 함수를 통해 아바타 아이콘 파일명으로 변환
+// - 최대 4개까지 아바타를 반환
 const getMemberAvatars = (
   postId: number,
   membersMap: Map<number, PartyMember[]>,
@@ -243,7 +194,8 @@ const getMemberAvatars = (
   return avatars;
 };
 
-// currentMembers 계산 (실제 데이터 사용): party_members 테이블에서 같은 post_id의 row 개수로 계산
+// currentMembers 계산 (API 응답의 members 사용)
+// - API 응답의 members 배열에서 해당 post_id의 멤버 개수를 계산
 const getCurrentMembers = (
   postId: number,
   membersMap: Map<number, PartyMember[]>
@@ -278,27 +230,32 @@ export const useInfinitePartyList = (
   // 원본 파티 데이터 저장 (user 변경 시 isLeader 재계산용)
   const [originalPartyData, setOriginalPartyData] = useState<PartyPost[]>([]);
 
-  // 데이터 변환 함수 (실제 데이터 사용)
+  // 데이터 변환 함수 (API 응답의 members와 profiles 사용)
   const transformPartyData = useCallback(
-    async (partyList: PartyPost[]): Promise<PartyCardProps[]> => {
+    (
+      partyList: PartyPost[],
+      members: PartyMember[],
+      profiles: UserProfile[]
+    ): PartyCardProps[] => {
       if (partyList.length === 0) {
         return [];
       }
 
-      // party_members 및 user_profiles 조회
-      const postIds = partyList.map((party) => party.id);
-      const { membersMap, profilesMap } =
-        await fetchPartyMembersAndProfiles(postIds);
+      // API 응답의 members와 profiles를 Map으로 변환하여 빠른 조회가 가능하도록 처리
+      const { membersMap, profilesMap } = createMembersAndProfilesMaps(
+        members,
+        profiles
+      );
 
       return partyList.map((party) => {
-        // memberAvatars 생성 (실제 데이터 사용)
+        // memberAvatars 생성 (API 응답의 members와 profiles 사용)
         const memberAvatars = getMemberAvatars(
           party.id,
           membersMap,
           profilesMap
         );
 
-        // currentMembers 계산 (실제 데이터 사용)
+        // currentMembers 계산 (API 응답의 members 사용)
         const currentMembers = getCurrentMembers(party.id, membersMap);
 
         // isLeader 계산: 로그인한 유저의 ID와 party_posts.creator_id가 같을 때만 true
@@ -457,10 +414,17 @@ export const useInfinitePartyList = (
           return;
         }
 
+        // API 응답에서 data, members, profiles 추출
         const partyList: PartyPost[] = result.data || [];
+        const members: PartyMember[] = result.members || [];
+        const profiles: UserProfile[] = result.profiles || [];
         // 원본 데이터 저장
         setOriginalPartyData(partyList);
-        const transformedData = await transformPartyData(partyList);
+        const transformedData = transformPartyData(
+          partyList,
+          members,
+          profiles
+        );
 
         // 초기 로드: 6개 미만이 와도 그 데이터는 표시
         setData(transformedData);
@@ -548,10 +512,13 @@ export const useInfinitePartyList = (
         return;
       }
 
+      // API 응답에서 data, members, profiles 추출
       const partyList: PartyPost[] = result.data || [];
+      const members: PartyMember[] = result.members || [];
+      const profiles: UserProfile[] = result.profiles || [];
       // 원본 데이터 추가 저장
       setOriginalPartyData((prev) => [...prev, ...partyList]);
-      const transformedData = await transformPartyData(partyList);
+      const transformedData = transformPartyData(partyList, members, profiles);
 
       if (partyList.length === 0) {
         // 데이터가 없으면 더 이상 불러올 데이터가 없음

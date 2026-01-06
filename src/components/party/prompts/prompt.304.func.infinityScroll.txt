@@ -52,14 +52,17 @@
                         - 초기 로드: 10개 (INITIAL_LIMIT = 10)
                         - 무한스크롤 로드: 10개 (SCROLL_LIMIT = 10)
                     - offset: 시작 위치 (기본값: 0)
-                2-3) 응답 데이터: { data: PartyPost[] }
+                2-3) 응답 데이터: { data: PartyPost[], members: PartyMember[], profiles: UserProfile[] }
                     - PartyPost 타입은 index.binding.hook.ts의 PartyPost 인터페이스를 참고할 것.
+                    - PartyMember 타입: { post_id: number, user_id: string, role: string, joined_at: string }
+                    - UserProfile 타입: { id: string, animal_type: string | null }
+                    - 클라이언트에서 Supabase를 직접 사용하지 말고, 서버 API를 통해 조회할 것.
 
             3) 유저시나리오(파티목록 무한스크롤)
                 1. 페이지에 접속하면, 파티 목록조회 API를 요청할 것.
                     1-1) API엔드포인트: GET /api/party?limit=10&offset=0 (초기 렌더링은 10개만 표시)
                     1-2) 요청데이터: 없음
-                    1-3) 응답데이터: { data: PartyPost[] }
+                    1-3) 응답데이터: { data: PartyPost[], members: PartyMember[], profiles: UserProfile[] }
                     1-4) 초기 렌더링: 카드 10개만 표시하고, 그 이후부터 무한스크롤이 작동하도록 구현할 것.
                 
                 2. 조회 로딩중에는 로딩 상태를 표시할 것.
@@ -95,9 +98,16 @@
                     - getVoiceChatLabel: 음성채팅 라벨 변환
                     - getDifficultyLabel: 난이도 라벨 변환
                     - getControlLevelLabel: 조작레벨 라벨 변환
-                    - getMemberAvatars: 멤버 아바타 생성 (Mock 데이터 사용)
-                    - getCurrentMembers: 현재 멤버 수 계산 (Mock 데이터 사용)
+                    - getMemberAvatars: 멤버 아바타 생성 (API 응답의 members와 profiles 사용)
+                        - API 응답의 members 배열을 post_id별로 그룹화하여 Map으로 변환
+                        - API 응답의 profiles 배열을 user_id를 키로 하는 Map으로 변환
+                        - members에서 해당 post_id의 멤버들을 찾고, 각 멤버의 user_id로 profiles에서 animal_type을 조회
+                        - animal_type을 getAnimalTypeFromProfile 함수를 통해 아바타 아이콘 파일명으로 변환
+                        - 최대 4개까지 아바타를 반환
+                    - getCurrentMembers: 현재 멤버 수 계산 (API 응답의 members 사용)
+                        - API 응답의 members 배열에서 해당 post_id의 멤버 개수를 계산
                     - truncateDescription: 설명 텍스트 자르기
+                - 클라이언트에서 Supabase를 직접 사용하지 말고, API 응답의 members와 profiles를 사용할 것.
 
             5) 훅 구조
                 - useInfinitePartyList 훅을 구현할 것.
