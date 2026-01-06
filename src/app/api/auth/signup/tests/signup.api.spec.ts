@@ -28,12 +28,16 @@ test.describe('회원가입 API', () => {
     expect(data.user.email).toBe(email);
 
     // 쿠키에 세션이 설정되었는지 확인
-    const cookies = response.headers()['set-cookie'];
-    expect(cookies).toBeDefined();
+    const setCookieHeader = response.headers()['set-cookie'];
+    expect(setCookieHeader).toBeDefined();
+    // set-cookie 헤더는 문자열 또는 문자열 배열일 수 있음
+    const cookies = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : setCookieHeader
+        ? [setCookieHeader]
+        : [];
     // Supabase 세션 쿠키 확인 (sb- 접두사)
-    const hasSessionCookie = cookies?.some((cookie) =>
-      cookie.includes('sb-')
-    );
+    const hasSessionCookie = cookies.some((cookie) => cookie.includes('sb-'));
     expect(hasSessionCookie).toBe(true);
   });
 
@@ -145,11 +149,9 @@ test.describe('회원가입 API', () => {
     await page.fill('[data-testid="signup-password-input"]', password, {
       timeout: 500,
     });
-    await page.fill(
-      '[data-testid="signup-password-confirm-input"]',
-      password,
-      { timeout: 500 }
-    );
+    await page.fill('[data-testid="signup-password-confirm-input"]', password, {
+      timeout: 500,
+    });
 
     // 버튼 활성화 대기
     await page.waitForFunction(
@@ -181,4 +183,3 @@ test.describe('회원가입 API', () => {
     expect(errorMessage).toContain('서버 오류');
   });
 });
-

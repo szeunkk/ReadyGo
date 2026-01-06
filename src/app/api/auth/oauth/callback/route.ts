@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkUserProfile } from '@/services/auth/checkUserProfile';
 import { createUserProfile } from '@/services/auth/createUserProfile';
+import { updateUserStatusOnline } from '@/services/auth/updateUserStatusOnline';
 import { URL_PATHS } from '@/commons/constants/url';
 
 /**
@@ -61,6 +62,9 @@ export async function GET(request: NextRequest) {
       loginUrl.searchParams.set('error', '사용자 정보를 가져오지 못했습니다.');
       return NextResponse.redirect(loginUrl.toString());
     }
+
+    // OAuth 로그인 성공 후 user_status를 online으로 업데이트
+    await updateUserStatusOnline(user.id);
 
     // 3. 프로필 확인 (동일 supabase 인스턴스 재사용)
     const hasProfile = await checkUserProfile(supabase, user.id);

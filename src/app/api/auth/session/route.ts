@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { updateUserStatusOffline } from '@/services/auth/updateUserStatusOffline';
+import { updateUserStatusOnline } from '@/services/auth/updateUserStatusOnline';
 
 /**
  * 로그인 API (일반 로그인)
@@ -61,6 +62,11 @@ export const POST = async function (request: NextRequest) {
         { error: '로그인에 실패했습니다. 세션을 받지 못했습니다.' },
         { status: 401 }
       );
+    }
+
+    // 로그인 성공 후 user_status를 online으로 업데이트
+    if (data.user?.id) {
+      await updateUserStatusOnline(data.user.id);
     }
 
     // 클라이언트에는 최소 정보만 반환 (토큰은 HttpOnly 쿠키에 자동 저장됨)
