@@ -1,0 +1,140 @@
+아래 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+	        - 코드는 작성하지 말고 타입/구조 설계만 수행할 것
+	        - DTO와 ViewModel을 명확히 분리할 것
+	        - 계산 과정, 가중치, 수식은 절대 노출하지 말 것
+	        - Steam 미연동 상태를 기본 시나리오로 포함할 것
+	        - 하나의 DTO를 여러 화면에서 재사용 가능하도록 설계할 것
+	        - UI 컴포넌트는 ViewModel만 사용하도록 강제할 것
+	        - DTO는 서버/API 응답용 “사실값”, VM은 UI 렌더링 최적화 전용일 것
+	        - 확장 가능성을 고려하되 계약(Contract)을 깨지 말 것
+
+==============================================
+
+조건-파일경로) 참고 및 기준 파일 경로는 다음과 같다.
+	        - src/commons/types/match/matchResultCore.dto.ts
+	        - src/commons/types/match/matchReasonCore.dto.ts
+	        - src/commons/types/match/matchTagCore.dto.ts
+	        - src/commons/types/match/partyMatchSummaryCore.dto.ts
+	        - src/viewmodels/match/MatchResultViewModel.ts
+
+==============================================
+
+조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
+	        - ProfileCoreDTO ↔ ProfileViewModel 분리 패턴
+	        - Core DTO는 “결과 데이터만” 포함하고 계산/판단 로직을 포함하지 않음
+	        - ViewModel은 문구 조합, UI 표현 단위(퍼센트, 게이지, 라벨)를 담당
+	        - Steam/외부 연동 여부는 결과 반영 후 상태값으로만 표현
+
+==============================================
+
+핵심요구사항) 다음 기능을 step-by-step으로 설계하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
+
+1. 전체 구조 설계
+	        - DTO와 VM의 책임을 명확히 분리할 것
+	        - 하나의 DTO가 match 페이지 / home 대시보드에서 재사용 가능할 것
+	        - Match 로직의 “결과”만 DTO에 포함할 것
+	        - Steam 미연동 상태에서도 DTO/VM이 항상 완결될 것
+
+2. MatchResultCoreDTO 설계
+	        - DTO는 항상 (viewer 기준) userId / targetUserId를 포함한다
+	        - similarityScore는 0~100 정수로 고정한다
+	        - 내부 구성요소(가중치/수식) 미포함
+	        - online 보정은 결과 값으로만 표현
+	        - 차단/친구 제외는 DTO 생성 이전 로직임을 전제
+            • MatchResultCoreDTO는
+                - reasons: MatchReasonCoreDTO[]
+                - tags: MatchTagCoreDTO[]
+            를 참조 형태로 포함할 수 있다
+            - 단, Reason/Tag의 의미 해석은 ViewModel 책임이다
+
+            - 필수 필드:
+                - similarityScore
+                - isOnlineMatched
+                - computedAt?: 매칭 결과가 계산된 시점 (캐시/재계산 판단용)
+
+                - 단, isOnlineMatched는 boolean으로 고정할 것. online 보정의 강도/점수는 DTO에 절대 포함하지 않을 것.
+
+3. MatchReasonCoreDTO 설계
+	        - detail은 key-value 기반의 구조화 데이터로 설계할 것
+            - UI 문구 조합에 필요한 최소 정보만 포함할 것
+            - 자연어 문장, 설명 텍스트 포함는 포함하지 않을 것
+	        - Steam 데이터 유무에 의존하지 않을 것
+	        - 최소 3개 이상 항상 생성 가능하도록 설계
+            - Reason 타입 예시:
+                - COMMON_GAME
+                - PLAY_TIME
+                - STYLE_SIMILARITY
+                - PARTY_EXPERIENCE
+                - RELIABILITY
+                - ONLINE_NOW
+
+4. MatchTagCoreDTO 설계
+	        - 5~6자 이내의 짧은 문자열
+	        - UI에서 그대로 출력 가능
+	        - 요약용 데이터, 계산 로직 ❌
+	        - 최소 3개 항상 생성 가능
+            - Tag는 항상 동일 구조를 유지한다
+            - Steam 미연동 여부에 따른 Tag 구분 필드는 두지 않는다
+
+5. PartyMatchSummaryCoreDTO 설계
+	        - 성공 확률은 단일 숫자(0~100)
+	        - 성공/보통/낮음 해석은 VM 책임
+	        - 계산 근거 요약용 reason 목록 포함
+	        - 실시간 online 상태가 반영된 결과값
+            - PartyMatchSummaryCoreDTO는 MatchResultCoreDTO와 별도 응답으로도 사용 가능해야 한다
+            - 공통 Reason 타입을 재사용할 수 있으나 DTO 간 직접 참조는 강제하지 않는다
+
+6. MatchResultViewModel 설계
+	        - UI 컴포넌트는 VM만 받도록 설계
+	        - 문구 조합은 VM에서 종료
+	        - home / match 페이지 공용 사용 가능
+	        - Reason/Tag를 UI 친화적 구조로 변환
+	        - 점수 → 퍼센트 / 게이지 등 표현용 필드 포함
+
+7. Cold Start 대응
+	        - Steam 데이터 없음이 기본 시나리오
+	        - Traits + 플레이 시간대만으로 Reason 3개 생성 가능
+	        - 태그 역시 Steam 없이 생성 가능
+	        - “정보 부족” 같은 표현 노출 ❌
+            - Cold Start fallback Reason 예시:
+                - STYLE_SIMILARITY
+                - PLAY_TIME
+                - ONLINE_NOW 또는 ACTIVITY_PATTERN
+            - Reason는 “데이터 존재 여부”가 아니라 “비교 가능성”이 있으면 생성 가능하도록 설계한다
+
+8. 확장성
+	        - AI/ML 없이도 설명 가능한 구조
+	        - 향후 AI 설명 추가 시 DTO 계약 유지
+	        - Party 성공률 로직을 Match 로직과 분리 가능
+	        - 새 Reason 타입 추가 시 UI 수정 최소화
+
+==============================================
+
+조건-Hook 책임)
+	        - Core DTO → ViewModel 변환의 단일 진입점만 담당
+	        - 계산/판단 로직 ❌
+	        - side effect ❌
+
+==============================================
+
+조건-UI 책임)
+	        - ViewModel만 입력으로 받음
+	        - 조건 분기/문구 생성 ❌
+	        - 렌더링만 담당
+
+==============================================
+
+구현 완료 후 반환) 아래 체크리스트를 반드시 반환할 것.
+	        - DTO / VM 책임 분리 완료
+	        - MatchResultCoreDTO 필수 필드 충족
+	        - MatchReasonCoreDTO 구조화 및 3개 이상 생성 가능
+	        - MatchTagCoreDTO UI 직접 사용 가능
+	        - PartyMatchSummaryCoreDTO 해석 로직 미포함
+	        - MatchResultViewModel UI 안전장치 충족
+	        - Steam 미연동 Cold Start 시나리오 충족
+	        - 확장성 요구사항 충족
