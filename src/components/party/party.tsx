@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 import Selectbox, { type SelectboxItem } from '@/commons/components/selectbox';
 import Searchbar from '@/commons/components/searchbar';
@@ -13,12 +13,11 @@ import { useInfinitePartyList } from './hooks/index.infinityScroll.hook';
 import { useLinkRouting } from './hooks/index.link.routing.hook';
 import { useFloatButton } from './hooks/index.float.hook';
 import { useFilter } from './hooks/index.filter.hook';
+import { usePartyTab } from './hooks/index.partyTab.hook';
 import styles from './styles.module.css';
 
-type TabType = 'all' | 'participating';
-
 export default function Party() {
-  const [activeTab, setActiveTab] = useState<TabType>('all');
+  const { activeTab, setActiveTab } = usePartyTab();
   const { selectedGenre, searchQuery, setSelectedGenre, setSearchQuery } =
     useFilter();
   const { openPartySubmitModal } = useLinkModal();
@@ -28,7 +27,7 @@ export default function Party() {
     loadMore,
     isLoading,
     error,
-  } = useInfinitePartyList(selectedGenre, searchQuery);
+  } = useInfinitePartyList(selectedGenre, searchQuery, activeTab);
   const { navigateToPartyDetail } = useLinkRouting();
   const { scrollToTop } = useFloatButton();
 

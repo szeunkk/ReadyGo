@@ -264,7 +264,8 @@ const truncateDescription = (
 
 export const useInfinitePartyList = (
   genre?: string,
-  search?: string
+  search?: string,
+  tab?: 'all' | 'participating'
 ): UseInfinitePartyListReturn => {
   const { user } = useAuth();
   const [data, setData] = useState<PartyCardProps[]>([]);
@@ -338,7 +339,7 @@ export const useInfinitePartyList = (
     setIsInitialLoad(true);
     setIsLoading(true);
     setIsLoadingMore(false);
-  }, [genre, search]);
+  }, [genre, search, tab]);
 
   // user 변경 시 기존 데이터의 isLeader 값 재계산
   useEffect(() => {
@@ -405,6 +406,9 @@ export const useInfinitePartyList = (
         }
         if (search && search.trim()) {
           params.append('search', search.trim());
+        }
+        if (tab) {
+          params.append('tab', tab);
         }
 
         const response = await fetch(`/api/party?${params.toString()}`, {
@@ -482,7 +486,7 @@ export const useInfinitePartyList = (
 
     fetchInitialData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInitialLoad, genre, search]);
+  }, [isInitialLoad, genre, search, tab]);
 
   // 추가 데이터 로드
   const loadMore = useCallback(async () => {
@@ -505,6 +509,9 @@ export const useInfinitePartyList = (
       }
       if (search && search.trim()) {
         params.append('search', search.trim());
+      }
+      if (tab) {
+        params.append('tab', tab);
       }
 
       const response = await fetch(`/api/party?${params.toString()}`, {
@@ -570,7 +577,7 @@ export const useInfinitePartyList = (
     }
     // transformPartyData는 useCallback으로 감싸져 있고 의존성이 없으므로 안정적
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInitialLoad, isLoadingMore, hasMore, offset, genre, search]);
+  }, [isInitialLoad, isLoadingMore, hasMore, offset, genre, search, tab]);
 
   // reset 함수
   const reset = useCallback(() => {

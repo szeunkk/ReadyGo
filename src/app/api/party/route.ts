@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { Database } from '@/types/supabase';
 
+type PartyPost = Database['public']['Tables']['party_posts']['Row'];
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
@@ -40,21 +42,95 @@ export const GET = async (request: NextRequest) => {
     const offsetParam = searchParams.get('offset');
     const genreParam = searchParams.get('genre'); // 장르 필터 파라미터
     const searchParam = searchParams.get('search'); // 검색어 파라미터
+    const tabParam = searchParams.get('tab'); // 탭 파라미터 ('all' | 'participating')
 
     // limit 기본값 10, offset 기본값 0
     const limit = limitParam ? parseInt(limitParam, 10) : 10;
     const offset = offsetParam ? parseInt(offsetParam, 10) : 0;
+    const tab = tabParam === 'participating' ? 'participating' : 'all';
 
-    // 1단계: party_posts 조회 (필터링 전 전체 데이터)
-    const partyQuery = supabase
-      .from('party_posts')
-      .select('*')
-      .order('created_at', { ascending: false });
+    // 현재 로그인한 유저 정보 확인 (참여 중인 파티 탭인 경우 필요)
+    let currentUserId: string | null = null;
+    if (tab === 'participating') {
+      if (!accessToken) {
+        // 참여 중인 파티 탭은 로그인이 필요하지만, 로그인하지 않은 경우 빈 목록 반환
+        return NextResponse.json({ data: [] });
+      }
 
-    const { data: allPartyPosts, error: partyError } = await partyQuery;
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-    if (partyError) {
-      return NextResponse.json({ error: partyError.message }, { status: 500 });
+      if (userError || !user) {
+        // 로그인하지 않은 경우 빈 목록 반환
+        return NextResponse.json({ data: [] });
+      }
+
+      currentUserId = user.id;
+    }
+
+    // 1단계: party_posts 조회
+    // 참여 중인 파티 탭인 경우: party_members에서 현재 유저가 참여한 post_id만 조회
+    let allPartyPosts: PartyPost[] = [];
+
+    if (tab === 'participating' && currentUserId) {
+      // party_members에서 현재 유저가 참여한 post_id 조회
+      const { data: partyMembers, error: membersError } = await supabase
+        .from('party_members')
+        .select('post_id')
+        .eq('user_id', currentUserId);
+
+      if (membersError) {
+        console.error('party_members 조회 실패:', membersError);
+        return NextResponse.json({ data: [] });
+      }
+
+      if (!partyMembers || partyMembers.length === 0) {
+        return NextResponse.json({ data: [] });
+      }
+
+      // 참여한 post_id 목록 추출
+      const postIds = partyMembers
+        .map((m) => m.post_id)
+        .filter((id): id is number => id !== null);
+
+      if (postIds.length === 0) {
+        return NextResponse.json({ data: [] });
+      }
+
+      // 해당 post_id에 해당하는 party_posts 조회
+      const { data: posts, error: partyError } = await supabase
+        .from('party_posts')
+        .select('*')
+        .in('id', postIds)
+        .order('created_at', { ascending: false });
+
+      if (partyError) {
+        return NextResponse.json(
+          { error: partyError.message },
+          { status: 500 }
+        );
+      }
+
+      allPartyPosts = posts || [];
+    } else {
+      // 전체 파티 탭: 모든 party_posts 조회
+      const partyQuery = supabase
+        .from('party_posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      const { data: posts, error: partyError } = await partyQuery;
+
+      if (partyError) {
+        return NextResponse.json(
+          { error: partyError.message },
+          { status: 500 }
+        );
+      }
+
+      allPartyPosts = posts || [];
     }
 
     if (!allPartyPosts || allPartyPosts.length === 0) {
