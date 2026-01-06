@@ -1,16 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { Database } from '@/types/supabase';
 
 type PartyPost = Database['public']['Tables']['party_posts']['Row'];
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
 
 /**
  * 파티 목록 조회
@@ -19,22 +11,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
  */
 export const GET = async (request: NextRequest) => {
   try {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('sb-access-token')?.value;
-
-    // 인증 토큰이 있으면 사용하고, 없으면 anon key만 사용
-    const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: false,
-      },
-      global: accessToken
-        ? {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        : {},
-    });
+    // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
+    const supabase = createClient();
 
     // 쿼리 파라미터 처리
     const { searchParams } = new URL(request.url);
@@ -52,11 +30,6 @@ export const GET = async (request: NextRequest) => {
     // 현재 로그인한 유저 정보 확인 (참여 중인 파티 탭인 경우 필요)
     let currentUserId: string | null = null;
     if (tab === 'participating') {
-      if (!accessToken) {
-        // 참여 중인 파티 탭은 로그인이 필요하지만, 로그인하지 않은 경우 빈 목록 반환
-        return NextResponse.json({ data: [] });
-      }
-
       const {
         data: { user },
         error: userError,
@@ -248,27 +221,8 @@ export const GET = async (request: NextRequest) => {
  */
 export const POST = async (request: NextRequest) => {
   try {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('sb-access-token')?.value;
-
-    if (!accessToken) {
-      return NextResponse.json(
-        { error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    // session/route.ts와 동일한 패턴
-    const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: false,
-      },
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    });
+    // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
+    const supabase = createClient();
 
     // 사용자 정보 확인 (session/route.ts와 동일한 패턴)
     const {
