@@ -102,7 +102,7 @@ export default function PartyInfo({
                   className={styles.infoValue}
                   data-testid="party-detail-start-time"
                 >
-                  {data.start_time}
+                  {data.start_date} {data.start_time}
                 </span>
               </div>
               <div className={styles.infoItem}>
