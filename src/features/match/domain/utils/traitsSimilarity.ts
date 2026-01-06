@@ -69,10 +69,10 @@ export type TraitKey = keyof TraitVector;
  * // 0.95 = 코사인 유사도 (매우 유사함)
  * ```
  */
-export function calculateTraitsSimilarity(
+export const calculateTraitsSimilarity = (
   viewer: TraitVector,
   target: TraitVector
-): number {
+): number => {
   // 5가지 특성의 내적 계산
   // 모든 trait 값이 양수이므로 dotProduct도 항상 양수
   const dotProduct =
@@ -112,7 +112,7 @@ export function calculateTraitsSimilarity(
   // 0~100 범위로 변환
   // 예: 0.95 → 95점
   return Math.round(cosineSimilarity * 100);
-}
+};
 
 /**
  * 가장 유사한 Trait 찾기
@@ -158,10 +158,10 @@ export function calculateTraitsSimilarity(
  * const label = traitLabels[topTrait]; // 타입 에러 없음
  * ```
  */
-export function findTopTrait(
+export const findTopTrait = (
   viewer: TraitVector,
   target: TraitVector
-): TraitKey {
+): TraitKey => {
   const traits: TraitKey[] = [
     'cooperation',
     'exploration',
@@ -182,4 +182,4 @@ export function findTopTrait(
   }
 
   return topTrait;
-}
+};

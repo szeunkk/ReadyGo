@@ -85,9 +85,9 @@ import { calculateScheduleSimilarity } from './utils/scheduleSimilarity';
  * // ]
  * ```
  */
-export function generateMatchTags(
+export const generateMatchTags = (
   context: MatchContextCoreDTO
-): MatchTagCoreDTO[] {
+): MatchTagCoreDTO[] => {
   const tags: MatchTagCoreDTO[] = [];
 
   // 1. 같은게임 (Steam 공통 게임)
@@ -192,4 +192,4 @@ export function generateMatchTags(
 
   // 상위 5개로 제한
   return tags.slice(0, 5);
-}
+};

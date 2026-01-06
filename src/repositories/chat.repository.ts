@@ -87,16 +87,11 @@ export const createChatRoom = async (
 ): Promise<ChatRoom> => {
   // 세션 확인 (디버깅용)
   const {
-    data: { session },
+    data: { session: _session },
   } = await client.auth.getSession();
   const {
-    data: { user },
+    data: { user: _user },
   } = await client.auth.getUser();
-  console.log('[Repository] createChatRoom - Session check:', {
-    hasSession: !!session,
-    userId: session?.user?.id || user?.id,
-    accessToken: session?.access_token ? 'present' : 'missing',
-  });
 
   // 새 채팅방 생성
   const { data: newRoom, error: roomError } = await client
@@ -498,7 +493,7 @@ export const markMessagesAsRead = async (
   // chat_message_reads에 INSERT된 후 chat_messages.is_read를 true로 업데이트
   // 주의: UPDATE RLS 정책이 필요함
   try {
-    const { data: updateData, error: updateError } = await client
+    const { data: _updateData, error: updateError } = await client
       .from('chat_messages')
       .update({ is_read: true })
       .in('id', validMessageIds)
@@ -514,17 +509,8 @@ export const markMessagesAsRead = async (
       );
       // chat_message_reads는 성공했으므로 에러를 throw하지 않음
       // 하지만 is_read 업데이트 실패는 로그로 기록
-    } else {
-      if (updateData && updateData.length > 0) {
-        console.log(
-          `Successfully updated is_read for ${updateData.length} messages`
-        );
-      } else {
-        console.warn(
-          'No messages were updated (is_read). This might be due to RLS policies or no matching messages.'
-        );
-      }
     }
+    // Update completed successfully (or silently if no messages matched)
   } catch (error) {
     console.error('Unexpected error updating is_read:', error);
     // chat_message_reads는 성공했으므로 에러를 throw하지 않음

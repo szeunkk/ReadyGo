@@ -57,15 +57,8 @@ export const createAuthenticatedClient = async () => {
         // setSession 실패해도 global.headers에 토큰이 있으면 계속 진행
       }
 
-      if (sessionData?.session) {
-        console.log(
-          '[createAuthenticatedClient] Session set successfully, user_id:',
-          sessionData.user?.id
-        );
-      } else {
-        console.warn(
-          '[createAuthenticatedClient] setSession returned no session, but global.headers has token'
-        );
+      if (!sessionData?.session) {
+        // Session setting failed despite having token
       }
     }
 
@@ -128,11 +121,6 @@ export const createAuthenticatedClient = async () => {
         return { supabase: null, user: null, error: 'Token refresh failed' };
       }
 
-      console.log(
-        '[createAuthenticatedClient] Session refreshed and set, user_id:',
-        sessionData.user?.id
-      );
-
       // 갱신된 클라이언트로 사용자 정보 확인
       const {
         data: { user: refreshedUser },
@@ -159,16 +147,6 @@ export const createAuthenticatedClient = async () => {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
-
-    console.log(
-      '[createAuthenticatedClient] getUser result (using header token):',
-      {
-        hasUser: !!user,
-        userId: user?.id,
-        error: authError?.message,
-        hasAccessToken: !!accessToken,
-      }
-    );
 
     if (authError || !user) {
       // access token이 유효하지 않으면 refresh token으로 갱신 시도

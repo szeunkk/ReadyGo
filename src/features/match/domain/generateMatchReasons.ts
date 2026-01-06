@@ -36,7 +36,6 @@ import type { MatchReasonCoreDTO } from '@/commons/types/match/matchReasonCore.d
 import {
   calculateTraitsSimilarity,
   findTopTrait,
-  type TraitKey,
 } from './utils/traitsSimilarity';
 import { calculateScheduleSimilarity } from './utils/scheduleSimilarity';
 
@@ -101,9 +100,9 @@ import { calculateScheduleSimilarity } from './utils/scheduleSimilarity';
  * // ]
  * ```
  */
-export function generateMatchReasons(
+export const generateMatchReasons = (
   context: MatchContextCoreDTO
-): MatchReasonCoreDTO[] {
+): MatchReasonCoreDTO[] => {
   const reasons: MatchReasonCoreDTO[] = [];
 
   // 1. COMMON_GAME (Steam 연동 시) - HIGH priority
@@ -272,4 +271,4 @@ export function generateMatchReasons(
 
   // 상위 5개로 제한
   return reasons.slice(0, 5);
-}
+};

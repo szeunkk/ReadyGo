@@ -11,16 +11,16 @@ test.describe('파티 필터링 기능', () => {
     });
 
     // API 호출 완료 대기 (파티 카드가 나타날 때까지)
-    await page.waitForFunction(
-      () => {
-        const mainArea = document.querySelector('[data-testid="party-main-area"]');
-        if (!mainArea) {
-          return false;
-        }
-        const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
-        return cards.length > 0;
+    await page.waitForFunction(() => {
+      const mainArea = document.querySelector(
+        '[data-testid="party-main-area"]'
+      );
+      if (!mainArea) {
+        return false;
       }
-    );
+      const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
+      return cards.length > 0;
+    });
   });
 
   test('장르 필터: 필터 선택박스 클릭 시 선택 가능한 메뉴 확인', async ({
@@ -107,17 +107,19 @@ test.describe('파티 필터링 기능', () => {
     await violentOption.click();
 
     // 필터링 결과 대기 (카드가 업데이트될 때까지)
-    await page.waitForFunction(
-      () => {
-        const mainArea = document.querySelector('[data-testid="party-main-area"]');
-        if (!mainArea) {
-          return false;
-        }
-        const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
-        // 카드가 로드되었거나 빈 상태 메시지가 표시되었는지 확인
-        return cards.length > 0 || mainArea.textContent?.includes('파티가 없습니다');
+    await page.waitForFunction(() => {
+      const mainArea = document.querySelector(
+        '[data-testid="party-main-area"]'
+      );
+      if (!mainArea) {
+        return false;
       }
-    );
+      const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
+      // 카드가 로드되었거나 빈 상태 메시지가 표시되었는지 확인
+      return (
+        cards.length > 0 || mainArea.textContent?.includes('파티가 없습니다')
+      );
+    });
 
     // 필터링된 파티 카드 확인
     const filteredCards = page.locator('[data-testid^="party-card-"]');
@@ -127,13 +129,13 @@ test.describe('파티 필터링 기능', () => {
     // 실제 데이터에 해당 장르의 파티가 없을 수 있으므로, 필터링이 적용되었는지만 확인
     const mainArea = page.locator('[data-testid="party-main-area"]');
     const isEmptyMessage = await mainArea.textContent();
-    
+
     // 필터링이 적용되었는지 확인: 카드가 있거나 빈 메시지가 표시되었는지
     expect(cardCount >= 0).toBe(true);
     // 필터링이 완료되었는지 확인 (로딩이 완료되었는지)
-    expect(
-      cardCount > 0 || isEmptyMessage?.includes('파티가 없습니다')
-    ).toBe(true);
+    expect(cardCount > 0 || isEmptyMessage?.includes('파티가 없습니다')).toBe(
+      true
+    );
   });
 
   test('게임 이름 검색: 검색창에 게임 이름 입력 시 검색 결과 확인', async ({
@@ -155,7 +157,10 @@ test.describe('파티 필터링 기능', () => {
           const parties = result.data || [];
           return parties
             .map((party: { game_title?: string }) => party.game_title)
-            .filter((title: string | undefined): title is string => title && title.trim().length > 0);
+            .filter(
+              (title: string | undefined): title is string =>
+                title && title.trim().length > 0
+            );
         }
       } catch (err) {
         console.error('파티 목록 조회 실패:', err);
@@ -169,7 +174,10 @@ test.describe('파티 필터링 기능', () => {
     }
 
     // 첫 번째 게임 제목의 일부를 검색어로 사용
-    const searchQuery = gameTitles[0].substring(0, Math.min(5, gameTitles[0].length));
+    const searchQuery = gameTitles[0].substring(
+      0,
+      Math.min(5, gameTitles[0].length)
+    );
 
     // 검색창에 입력
     const searchInput = page.locator('[data-testid="party-search-input"]');
@@ -178,17 +186,19 @@ test.describe('파티 필터링 기능', () => {
     await searchInput.type(searchQuery, { delay: 0 });
 
     // 검색 결과 대기 (카드가 업데이트될 때까지)
-    await page.waitForFunction(
-      () => {
-        const mainArea = document.querySelector('[data-testid="party-main-area"]');
-        if (!mainArea) {
-          return false;
-        }
-        const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
-        // 카드가 로드되었거나 빈 상태 메시지가 표시되었는지 확인
-        return cards.length > 0 || mainArea.textContent?.includes('파티가 없습니다');
+    await page.waitForFunction(() => {
+      const mainArea = document.querySelector(
+        '[data-testid="party-main-area"]'
+      );
+      if (!mainArea) {
+        return false;
       }
-    );
+      const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
+      // 카드가 로드되었거나 빈 상태 메시지가 표시되었는지 확인
+      return (
+        cards.length > 0 || mainArea.textContent?.includes('파티가 없습니다')
+      );
+    });
 
     // 검색 결과 확인
     const searchResultCards = page.locator('[data-testid^="party-card-"]');
@@ -225,7 +235,10 @@ test.describe('파티 필터링 기능', () => {
           const parties = result.data || [];
           return parties
             .map((party: { game_title?: string }) => party.game_title)
-            .filter((title: string | undefined): title is string => title && title.trim().length > 0);
+            .filter(
+              (title: string | undefined): title is string =>
+                title && title.trim().length > 0
+            );
         }
       } catch (err) {
         console.error('파티 목록 조회 실패:', err);
@@ -239,7 +252,10 @@ test.describe('파티 필터링 기능', () => {
     }
 
     // 첫 번째 게임 제목의 일부를 검색어로 사용
-    const searchQuery = gameTitles[0].substring(0, Math.min(5, gameTitles[0].length));
+    const searchQuery = gameTitles[0].substring(
+      0,
+      Math.min(5, gameTitles[0].length)
+    );
 
     // 검색창에 입력
     const searchInput = page.locator('[data-testid="party-search-input"]');
@@ -247,17 +263,19 @@ test.describe('파티 필터링 기능', () => {
     await searchInput.type(searchQuery, { delay: 0 });
 
     // 검색 결과 대기 (카드가 업데이트될 때까지)
-    await page.waitForFunction(
-      () => {
-        const mainArea = document.querySelector('[data-testid="party-main-area"]');
-        if (!mainArea) {
-          return false;
-        }
-        const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
-        // 카드가 로드되었거나 빈 상태 메시지가 표시되었는지 확인
-        return cards.length > 0 || mainArea.textContent?.includes('파티가 없습니다');
+    await page.waitForFunction(() => {
+      const mainArea = document.querySelector(
+        '[data-testid="party-main-area"]'
+      );
+      if (!mainArea) {
+        return false;
       }
-    );
+      const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
+      // 카드가 로드되었거나 빈 상태 메시지가 표시되었는지 확인
+      return (
+        cards.length > 0 || mainArea.textContent?.includes('파티가 없습니다')
+      );
+    });
 
     // 장르 필터 적용
     const genreSelect = page.locator('[data-testid="party-genre-select"]');
@@ -271,17 +289,19 @@ test.describe('파티 필터링 기능', () => {
     await actionOption.click();
 
     // 필터링 결과 대기 (카드가 업데이트될 때까지)
-    await page.waitForFunction(
-      () => {
-        const mainArea = document.querySelector('[data-testid="party-main-area"]');
-        if (!mainArea) {
-          return false;
-        }
-        const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
-        // 카드가 로드되었거나 빈 상태 메시지가 표시되었는지 확인
-        return cards.length > 0 || mainArea.textContent?.includes('파티가 없습니다');
+    await page.waitForFunction(() => {
+      const mainArea = document.querySelector(
+        '[data-testid="party-main-area"]'
+      );
+      if (!mainArea) {
+        return false;
       }
-    );
+      const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
+      // 카드가 로드되었거나 빈 상태 메시지가 표시되었는지 확인
+      return (
+        cards.length > 0 || mainArea.textContent?.includes('파티가 없습니다')
+      );
+    });
 
     // 필터링된 파티 카드 확인
     const filteredCards = page.locator('[data-testid^="party-card-"]');
@@ -316,17 +336,19 @@ test.describe('파티 필터링 기능', () => {
     await actionOption.click();
 
     // 필터링 결과 대기 (카드가 업데이트될 때까지)
-    await page.waitForFunction(
-      () => {
-        const mainArea = document.querySelector('[data-testid="party-main-area"]');
-        if (!mainArea) {
-          return false;
-        }
-        const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
-        // 카드가 로드되었거나 빈 상태 메시지가 표시되었는지 확인
-        return cards.length > 0 || mainArea.textContent?.includes('파티가 없습니다');
+    await page.waitForFunction(() => {
+      const mainArea = document.querySelector(
+        '[data-testid="party-main-area"]'
+      );
+      if (!mainArea) {
+        return false;
       }
-    );
+      const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
+      // 카드가 로드되었거나 빈 상태 메시지가 표시되었는지 확인
+      return (
+        cards.length > 0 || mainArea.textContent?.includes('파티가 없습니다')
+      );
+    });
 
     // 필터링된 카드 개수 확인
     const filteredCards = page.locator('[data-testid^="party-card-"]');
@@ -341,17 +363,19 @@ test.describe('파티 필터링 기능', () => {
     await allOption.click();
 
     // 필터링 결과 대기 (카드가 업데이트될 때까지)
-    await page.waitForFunction(
-      () => {
-        const mainArea = document.querySelector('[data-testid="party-main-area"]');
-        if (!mainArea) {
-          return false;
-        }
-        const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
-        // 카드가 로드되었거나 빈 상태 메시지가 표시되었는지 확인
-        return cards.length > 0 || mainArea.textContent?.includes('파티가 없습니다');
+    await page.waitForFunction(() => {
+      const mainArea = document.querySelector(
+        '[data-testid="party-main-area"]'
+      );
+      if (!mainArea) {
+        return false;
       }
-    );
+      const cards = mainArea.querySelectorAll('[data-testid^="party-card-"]');
+      // 카드가 로드되었거나 빈 상태 메시지가 표시되었는지 확인
+      return (
+        cards.length > 0 || mainArea.textContent?.includes('파티가 없습니다')
+      );
+    });
 
     // 전체 선택 시 카드 개수 확인
     const finalCards = page.locator('[data-testid^="party-card-"]');
@@ -364,4 +388,3 @@ test.describe('파티 필터링 기능', () => {
     expect(finalCount).toBe(initialCount);
   });
 });
-

@@ -27,11 +27,8 @@ export const getAvatarImagePath = (
     try {
       const animalAssets = getAnimalAssets(animalType as AnimalType);
       return animalAssets.avatar;
-    } catch (error) {
+    } catch {
       // animalType이 유효하지 않은 경우 기본값 사용
-      console.warn(
-        `Invalid animalType: ${animalType}, using default bear avatar`
-      );
     }
   }
 
