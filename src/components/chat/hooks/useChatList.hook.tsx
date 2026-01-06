@@ -11,33 +11,6 @@ import type { ChatRoomListItem } from '@/repositories/chat.repository';
 import type { ChatRoom, ChatMessage, UserProfile } from '@/types/chat';
 
 /**
- * 세션 확인 (Realtime 구독 전 인증 확인용)
- *
- * API 기반 세션 관리 방식이므로,
- * /api/auth/session API를 통해 세션을 확인합니다.
- * 기본 supabase 클라이언트를 재사용하여 Multiple GoTrueClient 인스턴스 경고를 방지합니다.
- */
-const checkSession = async () => {
-  try {
-    // API를 통해 현재 세션 확인
-    const sessionResponse = await fetch('/api/auth/session', {
-      method: 'GET',
-      credentials: 'include',
-    });
-
-    if (!sessionResponse.ok) {
-      return null;
-    }
-
-    const sessionData = await sessionResponse.json();
-    return sessionData.user ? sessionData : null;
-  } catch (error) {
-    console.error('Failed to check session:', error);
-    return null;
-  }
-};
-
-/**
  * 간단한 debounce 함수
  */
 const debounce = <T extends (...args: unknown[]) => void>(
@@ -300,22 +273,10 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
 
       /**
        * Postgres Changes 구독 설정
+       * Supabase Realtime은 자동으로 세션을 확인하므로 별도 세션 확인 불필요
        */
       const setupRealtimeSubscription = async () => {
         try {
-          // 세션 확인 (인증 확인용)
-          const sessionData = await checkSession();
-          if (!sessionData) {
-            console.error('Failed to verify session for Realtime');
-            // 세션 없을 때 처리
-            if (isMountedRef.current) {
-              setChatRooms([]);
-              setIsLoading(false);
-            }
-            cleanupChannel();
-            return;
-          }
-
           // postgres_changes 채널 생성
           // 채널 이름에 userId를 포함하여 고유성 보장
           const channelName = `chat_list:${userId}:${Date.now()}`;
@@ -473,7 +434,7 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
   );
 
   /**
-   * 초기 목록 로드
+   * 초기 목록 로드 및 postgres_changes 구독
    */
   useEffect(() => {
     if (!user?.id) {
@@ -487,24 +448,14 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
 
     // 초기 목록 로드
     refresh();
-  }, [user?.id, refresh, cleanupChannel]);
-
-  /**
-   * postgres_changes 구독
-   */
-  useEffect(() => {
-    if (!user?.id) {
-      cleanupChannel();
-      return;
-    }
-
+    // postgres_changes 구독
     subscribeToPostgresChanges(user.id);
 
     // cleanup 함수
     return () => {
       cleanupChannel();
     };
-  }, [user?.id, subscribeToPostgresChanges, cleanupChannel]);
+  }, [user?.id, refresh, subscribeToPostgresChanges, cleanupChannel]);
 
   /**
    * 자동 새로고침 구현
@@ -533,45 +484,6 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
     };
   }, [autoRefresh, refreshInterval, user?.id, refresh]);
 
-  /**
-   * user?.id 변경 시 cleanup 및 재로딩 (순서 중요)
-   */
-  useEffect(() => {
-    if (!user?.id) {
-      // 1) 이전 채널 정리
-      cleanupChannel();
-      // 2) 상태 초기화
-      if (isMountedRef.current) {
-        setChatRooms([]);
-        setError(null);
-      }
-      // 3) 로딩 상태 설정
-      if (isMountedRef.current) {
-        setIsLoading(false);
-      }
-      return;
-    }
-
-    // user?.id가 변경된 경우
-    const previousUserId = subscribedUserIdRef.current;
-    if (previousUserId && previousUserId !== user.id) {
-      // 1) 이전 채널 정리
-      cleanupChannel();
-      // 2) 상태 초기화
-      if (isMountedRef.current) {
-        setChatRooms([]);
-        setError(null);
-      }
-      // 3) 로딩 상태 설정
-      if (isMountedRef.current) {
-        setIsLoading(true);
-      }
-      // 4) 새 구독 및 데이터 로드
-      subscribeToPostgresChanges(user.id);
-      refresh();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
 
   /**
    * 컴포넌트 언마운트 시 cleanup
