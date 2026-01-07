@@ -146,7 +146,7 @@ export const syncSteamGames = async (
     return result;
   }
 
-  const games = apiResult.games;
+  const { games } = apiResult;
 
   // 4. 응답 매핑 (Steam API 형식 → DB 형식)
   const gameInputs: steamUserGamesRepository.SteamUserGameInput[] = games.map(

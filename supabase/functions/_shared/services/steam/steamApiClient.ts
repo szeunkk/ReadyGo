@@ -91,7 +91,7 @@ export const getOwnedGames = async (
 
     // 게임 수가 너무 많으면 메모리 문제 발생 가능
     // playtime 기준 상위 1000개만 처리
-    const games = data.response.games;
+    const { games } = data.response;
     const originalCount = games.length;
     const sortedGames = games
       .sort((a, b) => b.playtime_forever - a.playtime_forever)
