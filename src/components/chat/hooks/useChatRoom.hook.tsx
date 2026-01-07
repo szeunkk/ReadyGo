@@ -22,7 +22,9 @@ export interface FormattedMessageItem {
   date?: string | null; // date-divider인 경우 (원본 날짜)
   formattedDate?: string; // date-divider인 경우 (포맷팅된 날짜)
   message?: ChatMessage; // message인 경우
-  isConsecutive?: boolean; // message인 경우
+  isConsecutive?: boolean; // message인 경우 (하위 호환성)
+  isGroupStart?: boolean; // message인 경우 (그룹의 첫 번째 메시지)
+  isGroupEnd?: boolean; // message인 경우 (그룹의 마지막 메시지)
   isOwnMessage?: boolean; // message인 경우
   formattedTime?: string; // message인 경우
   formattedContent?: string; // message인 경우
@@ -139,7 +141,7 @@ const isNewDate = (
 };
 
 /**
- * 연속된 메시지인지 확인하는 함수
+ * 연속된 메시지인지 확인하는 함수 (하위 호환성)
  */
 const isConsecutiveMessage = (
   currentMessage: ChatMessage,
@@ -151,6 +153,40 @@ const isConsecutiveMessage = (
   return (
     currentMessage.sender_id === previousMessage.sender_id &&
     currentMessage.content_type !== 'system'
+  );
+};
+
+/**
+ * 같은 시간(시, 분)에 전송된 메시지인지 확인하는 함수
+ */
+const isSameTimeGroup = (
+  currentMessage: ChatMessage,
+  previousMessage: ChatMessage | null
+): boolean => {
+  if (!previousMessage) {
+    return false;
+  }
+
+  // 같은 발신자이고 시스템 메시지가 아니어야 함
+  if (
+    currentMessage.sender_id !== previousMessage.sender_id ||
+    currentMessage.content_type === 'system' ||
+    previousMessage.content_type === 'system'
+  ) {
+    return false;
+  }
+
+  // 시간(시, 분) 비교
+  if (!currentMessage.created_at || !previousMessage.created_at) {
+    return false;
+  }
+
+  const currentDate = new Date(currentMessage.created_at);
+  const previousDate = new Date(previousMessage.created_at);
+
+  return (
+    currentDate.getHours() === previousDate.getHours() &&
+    currentDate.getMinutes() === previousDate.getMinutes()
   );
 };
 
@@ -793,6 +829,24 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
 
       // 메시지 아이템 추가
       const isConsecutive = isConsecutiveMessage(message, previousMessage);
+      const isInSameTimeGroupWithPrevious = isSameTimeGroup(
+        message,
+        previousMessage
+      );
+
+      // 다음 메시지 확인 (그룹의 끝인지 판단)
+      const nextMessage =
+        index < sortedMessages.length - 1 ? sortedMessages[index + 1] : null;
+      const isInSameTimeGroupWithNext = nextMessage
+        ? isSameTimeGroup(nextMessage, message)
+        : false;
+
+      // 그룹의 시작인지 판단: 이전 메시지와 같은 시간 그룹이 아니면 시작
+      const isGroupStart = !isInSameTimeGroupWithPrevious;
+
+      // 그룹의 끝인지 판단: 다음 메시지와 같은 시간 그룹이 아니면 끝
+      const isGroupEnd = !isInSameTimeGroupWithNext;
+
       const formattedTime = formatMessageTime(message.created_at);
       const formattedContent = formatMessageContent(message);
 
@@ -800,6 +854,8 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
         type: 'message',
         message,
         isConsecutive,
+        isGroupStart,
+        isGroupEnd,
         isOwnMessage,
         formattedTime,
         formattedContent,

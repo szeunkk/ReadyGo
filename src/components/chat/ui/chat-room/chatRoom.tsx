@@ -255,6 +255,8 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
             const {
               message,
               isConsecutive,
+              isGroupStart,
+              isGroupEnd,
               isOwnMessage,
               formattedTime,
               formattedContent,
@@ -288,7 +290,9 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
                   aria-label={`내 메시지: ${formattedContent}`}
                 >
                   <div className={styles.ownMessageContainer}>
-                    <div className={styles.messageTime}>{formattedTime}</div>
+                    {isGroupEnd && (
+                      <div className={styles.messageTime}>{formattedTime}</div>
+                    )}
                     <div className={styles.ownMessageBubble}>
                       <span className={styles.messageContent}>
                         {formattedContent}
@@ -308,10 +312,10 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
               >
                 <div
                   className={`${styles.otherMessageContainer} ${
-                    isConsecutive ? styles.consecutive : ''
+                    !isGroupStart ? styles.consecutive : ''
                   }`}
                 >
-                  {!isConsecutive && (
+                  {isGroupStart && (
                     <Avatar
                       imageUrl={displayAvatarImagePath}
                       animalType={displayAnimalType as AnimalType}
@@ -322,14 +326,16 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
                       className={styles.messageAvatar}
                     />
                   )}
-                  {isConsecutive && <div className={styles.avatarSpacer} />}
+                  {!isGroupStart && <div className={styles.avatarSpacer} />}
                   <div className={styles.otherMessageContent}>
                     <div className={styles.otherMessageBubble}>
                       <span className={styles.messageContent}>
                         {formattedContent}
                       </span>
                     </div>
-                    <div className={styles.messageTime}>{formattedTime}</div>
+                    {isGroupEnd && (
+                      <div className={styles.messageTime}>{formattedTime}</div>
+                    )}
                   </div>
                 </div>
               </div>
