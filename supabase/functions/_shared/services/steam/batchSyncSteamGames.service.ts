@@ -19,7 +19,7 @@ type TargetUser = {
 
 /**
  * steam_id가 있는 유저 목록 조회
- * 
+ *
  * @param client - DB 클라이언트
  * @param limit - 조회할 최대 유저 수 (기본: 100)
  * @returns 유저 목록
@@ -94,7 +94,9 @@ export const batchSyncSteamGames = async (
 
       if (syncResult.status === 'success') {
         result.success++;
-        console.log(`[${user.id}] ✓ Success - ${syncResult.syncedGamesCount} games`);
+        console.log(
+          `[${user.id}] ✓ Success - ${syncResult.syncedGamesCount} games`
+        );
       } else {
         result.failed++;
         result.errors.push({
@@ -105,7 +107,8 @@ export const batchSyncSteamGames = async (
       }
     } catch (error) {
       // 예상치 못한 에러 (syncSteamGames는 throw하지 않지만 만약을 위해)
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       result.failed++;
       result.errors.push({
         userId: user.id,
@@ -116,9 +119,10 @@ export const batchSyncSteamGames = async (
     }
   }
 
-  console.log(`[Batch Sync] Completed - Success: ${result.success}, Failed: ${result.failed}`);
+  console.log(
+    `[Batch Sync] Completed - Success: ${result.success}, Failed: ${result.failed}`
+  );
 
   // 3. 결과 반환
   return result;
 };
-

@@ -44,7 +44,9 @@ export const getOwnedGames = async (
   const steamApiKey = Deno.env.get('STEAM_API_KEY');
 
   if (!steamApiKey) {
-    console.error('[Steam API] STEAM_API_KEY not found in environment variables');
+    console.error(
+      '[Steam API] STEAM_API_KEY not found in environment variables'
+    );
     return {
       ok: false,
       reason: 'network_error',
@@ -72,7 +74,9 @@ export const getOwnedGames = async (
     });
 
     if (!response.ok) {
-      console.error(`[Steam API] HTTP ${response.status}: ${response.statusText}`);
+      console.error(
+        `[Steam API] HTTP ${response.status}: ${response.statusText}`
+      );
       return {
         ok: false,
         reason: 'network_error',
@@ -98,7 +102,9 @@ export const getOwnedGames = async (
       .slice(0, 1000);
 
     if (originalCount > 1000) {
-      console.log(`[Steam API] Limiting ${originalCount} games to top 1000 by playtime`);
+      console.log(
+        `[Steam API] Limiting ${originalCount} games to top 1000 by playtime`
+      );
     } else {
       console.log(`[Steam API] Successfully fetched ${originalCount} games`);
     }
@@ -124,4 +130,3 @@ export const getOwnedGames = async (
     };
   }
 };
-

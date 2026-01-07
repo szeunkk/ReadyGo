@@ -45,4 +45,3 @@ export const insertLog = async (
     synced_at: new Date().toISOString(),
   });
 };
-

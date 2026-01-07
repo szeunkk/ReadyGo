@@ -53,4 +53,3 @@ export const bulkUpsert = async (
     onConflict: 'user_id,app_id',
   });
 };
-

@@ -162,12 +162,11 @@ export const POST = async (request: NextRequest) => {
 
       try {
         // 유저 존재 확인
-        const { data: userProfile, error: userCheckError } =
-          await supabaseAdmin
-            .from('user_profiles')
-            .select('id, steam_id')
-            .eq('id', userId)
-            .maybeSingle();
+        const { data: userProfile, error: userCheckError } = await supabaseAdmin
+          .from('user_profiles')
+          .select('id, steam_id')
+          .eq('id', userId)
+          .maybeSingle();
 
         if (userCheckError) {
           console.error('User check error:', userCheckError);
@@ -320,4 +319,3 @@ export const POST = async (request: NextRequest) => {
     );
   }
 };
-

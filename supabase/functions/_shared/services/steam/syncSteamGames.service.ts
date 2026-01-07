@@ -68,7 +68,10 @@ export const syncSteamGames = async (
 
   // Repository 에러는 throw (인프라 오류)
   if (profileResult.error) {
-    console.error(`[Sync User ${userId}] Failed to fetch user profile:`, profileResult.error);
+    console.error(
+      `[Sync User ${userId}] Failed to fetch user profile:`,
+      profileResult.error
+    );
     throw new Error(
       `Failed to fetch user profile: ${profileResult.error.message}`
     );
@@ -113,7 +116,9 @@ export const syncSteamGames = async (
   }
 
   // 3. Steam API 호출
-  console.log(`[Sync User ${userId}] Calling Steam API with steamId: ${steamId}`);
+  console.log(
+    `[Sync User ${userId}] Calling Steam API with steamId: ${steamId}`
+  );
   const apiResult = await steamApiClient.getOwnedGames(steamId);
 
   if (!apiResult.ok) {
@@ -135,7 +140,9 @@ export const syncSteamGames = async (
     }
 
     // 네트워크 오류/타임아웃
-    console.error(`[Sync User ${userId}] Steam API call failed: ${apiResult.reason}`);
+    console.error(
+      `[Sync User ${userId}] Steam API call failed: ${apiResult.reason}`
+    );
     const result: SyncResult = {
       status: 'failed',
       syncedGamesCount: 0,
@@ -166,7 +173,9 @@ export const syncSteamGames = async (
   );
 
   // 5. DB 저장 (bulk upsert)
-  console.log(`[Sync User ${userId}] Upserting ${gameInputs.length} games to DB`);
+  console.log(
+    `[Sync User ${userId}] Upserting ${gameInputs.length} games to DB`
+  );
   const upsertResult = await steamUserGamesRepository.bulkUpsert(
     client,
     userId,
@@ -175,7 +184,10 @@ export const syncSteamGames = async (
 
   // Repository 에러는 throw (인프라 오류)
   if (upsertResult.error) {
-    console.error(`[Sync User ${userId}] Failed to upsert games:`, upsertResult.error);
+    console.error(
+      `[Sync User ${userId}] Failed to upsert games:`,
+      upsertResult.error
+    );
     throw new Error(`Failed to upsert games: ${upsertResult.error.message}`);
   }
 
@@ -195,4 +207,3 @@ export const syncSteamGames = async (
     syncedGamesCount: syncedCount,
   };
 };
-

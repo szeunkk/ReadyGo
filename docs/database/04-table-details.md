@@ -367,14 +367,14 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 - 유저별 Steam 플레이 통계 및 성향 분석 데이터
 
-| Column              | Type        | Nullable | Description                            |
-| ------------------- | ----------- | -------- | -------------------------------------- |
-| user_id             | uuid        | ❌       | PK, 유저 ID                            |
-| play_style          | text        | ❌       | 플레이 스타일 (casual, hardcore 등)    |
-| avg_weekly_playtime | numeric     | ⭕       | 주당 평균 플레이 시간 (시간 단위)      |
-| main_genres         | text[]      | ⭕       | 주로 플레이하는 장르 목록              |
-| active_time_slots   | text[]      | ⭕       | 주로 활동하는 시간대 (dawn, morning 등)|
-| updated_at          | timestamptz | ❌       | 마지막 업데이트 시각                   |
+| Column              | Type        | Nullable | Description                             |
+| ------------------- | ----------- | -------- | --------------------------------------- |
+| user_id             | uuid        | ❌       | PK, 유저 ID                             |
+| play_style          | text        | ❌       | 플레이 스타일 (casual, hardcore 등)     |
+| avg_weekly_playtime | numeric     | ⭕       | 주당 평균 플레이 시간 (시간 단위)       |
+| main_genres         | text[]      | ⭕       | 주로 플레이하는 장르 목록               |
+| active_time_slots   | text[]      | ⭕       | 주로 활동하는 시간대 (dawn, morning 등) |
+| updated_at          | timestamptz | ❌       | 마지막 업데이트 시각                    |
 
 ---
 
