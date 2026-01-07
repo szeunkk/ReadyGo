@@ -24,6 +24,7 @@ interface UsePartyBindingReturn {
   isLoading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
+  currentUserRole: 'leader' | 'member' | null;
 }
 
 // 날짜 형식 변환: YYYY-MM-DD → mm/dd
@@ -115,6 +116,9 @@ export const usePartyBinding = (): UsePartyBindingReturn => {
   const [data, setData] = useState<PartyDetailData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [currentUserRole, setCurrentUserRole] = useState<
+    'leader' | 'member' | null
+  >(null);
 
   const fetchPartyData = useCallback(async () => {
     if (!partyId) {
@@ -153,7 +157,8 @@ export const usePartyBinding = (): UsePartyBindingReturn => {
       }
 
       // JSON 파싱
-      const { data: partyData } = await response.json();
+      const responseData = await response.json();
+      const { data: partyData, currentUserRole } = responseData;
 
       if (!partyData) {
         throw new Error('파티 데이터를 찾을 수 없습니다.');
@@ -177,6 +182,12 @@ export const usePartyBinding = (): UsePartyBindingReturn => {
       };
 
       setData(transformedData);
+      // currentUserRole 설정 (null, 'leader', 'member' 중 하나)
+      setCurrentUserRole(
+        currentUserRole === 'leader' || currentUserRole === 'member'
+          ? currentUserRole
+          : null
+      );
     } catch (err) {
       setError(
         err instanceof Error
@@ -184,6 +195,7 @@ export const usePartyBinding = (): UsePartyBindingReturn => {
           : new Error('데이터를 불러오는 중 오류가 발생했습니다.')
       );
       setData(null);
+      setCurrentUserRole(null);
     } finally {
       setIsLoading(false);
     }
@@ -193,5 +205,11 @@ export const usePartyBinding = (): UsePartyBindingReturn => {
     fetchPartyData();
   }, [fetchPartyData]);
 
-  return { data, isLoading, error, refetch: fetchPartyData };
+  return {
+    data,
+    isLoading,
+    error,
+    refetch: fetchPartyData,
+    currentUserRole,
+  };
 };

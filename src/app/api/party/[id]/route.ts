@@ -50,7 +50,22 @@ export const GET = async (
       return NextResponse.json({ error: fetchError.message }, { status: 500 });
     }
 
-    return NextResponse.json({ data: partyData });
+    // 현재 유저의 party_members role 조회
+    const { data: memberData } = await supabase
+      .from('party_members')
+      .select('role')
+      .eq('post_id', id)
+      .eq('user_id', user.id)
+      .single();
+
+    // 데이터가 없으면 role은 null
+    // (에러가 발생해도 파티 데이터는 반환해야 하므로 에러는 무시)
+    const currentUserRole = memberData?.role || null;
+
+    return NextResponse.json({
+      data: partyData,
+      currentUserRole,
+    });
   } catch (error) {
     console.error('Party detail API error:', error);
     return NextResponse.json(

@@ -11,18 +11,20 @@ interface PartyInfoProps {
   data: PartyDetailData | null;
   isLoading: boolean;
   error: Error | null;
+  userRole?: 'leader' | 'member' | null;
   onJoinClick?: () => void;
   onLeaveClick?: () => void;
-  isJoined?: boolean;
+  onGameStartClick?: () => void;
 }
 
 export default function PartyInfo({
   data,
   isLoading,
   error,
+  userRole = null,
   onJoinClick,
   onLeaveClick,
-  isJoined = false,
+  onGameStartClick,
 }: PartyInfoProps) {
   if (isLoading) {
     return (
@@ -158,7 +160,18 @@ export default function PartyInfo({
           </div>
         )}
       </div>
-      {isJoined ? (
+      {userRole === 'leader' ? (
+        <Button
+          variant="primary"
+          size="m"
+          shape="round"
+          className={styles.button}
+          onClick={onGameStartClick}
+          data-testid="party-detail-game-start-button"
+        >
+          게임시작
+        </Button>
+      ) : userRole === 'member' ? (
         <Button
           variant="primary"
           size="m"
@@ -167,7 +180,7 @@ export default function PartyInfo({
           onClick={onLeaveClick}
           data-testid="party-detail-leave-button"
         >
-          나가기
+          파티 나가기
         </Button>
       ) : (
         <Button

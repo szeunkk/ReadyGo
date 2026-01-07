@@ -75,6 +75,25 @@
                 - handleJoinClick 함수에서 Hook의 joinParty 함수 호출
                 - joinParty 호출 시 useParams로 가져온 partyId 전달
                 - 참여하기 버튼 클릭 시 API 호출이 실행되도록 구현
+                
+            7-1) 파티 멤버 역할 기반 UI 조건
+                - 현재 로그인한 유저의 party_members role을 확인하여 UI를 조건부 렌더링할 것
+                - role 확인 방법:
+                    - usePartyBinding Hook에서 반환되는 데이터에 현재 유저의 party_members 정보가 포함되어야 함
+                    - 또는 별도의 API 호출을 통해 현재 유저의 party_members role을 조회할 것
+                    - party_members 테이블에서 post_id와 user_id로 조회하여 role 필드 확인
+                - role이 'leader'인 경우:
+                    - PartyInfo 컴포넌트에 '게임시작' 버튼이 렌더링되도록 구현
+                    - '게임시작' 버튼의 onClick 핸들러는 별도로 구현할 것 (현재는 빈 함수로 구현)
+                - role이 'member'인 경우:
+                    - PartyInfo 컴포넌트에 '파티 나가기' 버튼이 렌더링되도록 구현
+                    - '파티 나가기' 버튼은 기존의 onLeaveClick 핸들러를 사용할 것
+                - role이 'leader' 또는 'member'인 경우:
+                    - ChatRoom 컴포넌트가 렌더링되도록 구현
+                    - ChatNull 컴포넌트는 role이 null이거나 undefined인 경우에만 렌더링
+                - role이 null이거나 undefined인 경우 (참여하지 않은 경우):
+                    - PartyInfo 컴포넌트에 '참여하기' 버튼이 렌더링되도록 구현
+                    - ChatNull 컴포넌트가 렌더링되도록 구현
 
             8) 테스트 검증 포인트(Playwright)
                 - 파티 상세 페이지(/party/[id]) 로드 후 data-testid="party-detail-page"로 대기
@@ -83,6 +102,12 @@
                 - 실패 시나리오: 에러 발생 시 모달 노출 확인
                 - 중복 참여 시나리오: 이미 참여한 파티에 재참여 시도 시 에러 처리 확인
                 - 인원 초과 시나리오: 최대 인원이 가득 찬 파티 참여 시도 시 에러 처리 확인
+                - 역할 기반 UI 시나리오:
+                    - 파티장(role: 'leader')인 경우 '게임시작' 버튼이 표시되는지 확인
+                    - 일반 멤버(role: 'member')인 경우 '파티 나가기' 버튼이 표시되는지 확인
+                    - 참여하지 않은 유저(role: null)인 경우 '참여하기' 버튼이 표시되는지 확인
+                    - 파티장 또는 멤버인 경우 ChatRoom 컴포넌트가 렌더링되는지 확인
+                    - 참여하지 않은 유저인 경우 ChatNull 컴포넌트가 렌더링되는지 확인
 
             9) 구현 방법
                 9-1) Hook 구조
@@ -116,3 +141,25 @@
                     - handleJoinClick 함수를 수정하여 Hook의 joinParty 함수 호출
                     - joinParty 호출 시 partyId를 파라미터로 전달 (await joinParty(partyId))
                     - 기존의 setIsJoined(true) 로직은 제거하거나 참여 성공 후 처리하도록 변경
+                    
+                9-6) 파티 멤버 역할 기반 UI 구현
+                    - 현재 로그인한 유저의 party_members role 확인:
+                        - useAuth로 현재 유저 정보 가져오기
+                        - usePartyBinding의 데이터에서 party_members 정보 확인하거나
+                        - 별도 API 호출을 통해 현재 유저의 party_members role 조회
+                        - party_members 테이블에서 post_id와 user_id로 조회하여 role 필드 확인
+                    - role 상태 관리:
+                        - useState로 currentUserRole 상태 관리 (null | 'leader' | 'member')
+                        - usePartyBinding의 refetch 후 role 정보 업데이트
+                    - 조건부 렌더링:
+                        - currentUserRole === 'leader' → PartyInfo에 '게임시작' 버튼 전달
+                        - currentUserRole === 'member' → PartyInfo에 '파티 나가기' 버튼 전달
+                        - currentUserRole === null → PartyInfo에 '참여하기' 버튼 전달
+                        - (currentUserRole === 'leader' || currentUserRole === 'member') → ChatRoom 렌더링
+                        - currentUserRole === null → ChatNull 렌더링
+                    - PartyInfo 컴포넌트 수정:
+                        - PartyInfoProps에 userRole?: 'leader' | 'member' | null 추가
+                        - userRole에 따라 버튼 텍스트와 onClick 핸들러 변경
+                        - userRole === 'leader' → 버튼 텍스트: '게임시작', onClick: handleGameStart (빈 함수로 구현)
+                        - userRole === 'member' → 버튼 텍스트: '파티 나가기', onClick: onLeaveClick
+                        - userRole === null → 버튼 텍스트: '참여하기', onClick: onJoinClick
