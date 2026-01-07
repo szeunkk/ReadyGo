@@ -8,7 +8,7 @@ import Icon from '@/commons/components/icon';
 interface FriendRequest {
   id: string;
   nickname: string;
-  status: 'online' | 'offline' | 'away' | 'ban';
+  status: 'online' | 'offline' | 'away' | 'dnd';
 }
 
 export default function FriendRequests() {

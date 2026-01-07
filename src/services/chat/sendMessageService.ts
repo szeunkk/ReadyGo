@@ -5,7 +5,7 @@ import {
 } from '@/commons/errors/chat/chatErrors';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
-import type { ChatMessage } from '@/types/supabase';
+import type { ChatMessage } from '@/types/chat';
 
 /**
  * 메시지 전송 Service

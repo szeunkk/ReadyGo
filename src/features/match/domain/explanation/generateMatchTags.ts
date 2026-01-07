@@ -22,8 +22,8 @@
 
 import type { MatchContextCoreDTO } from '@/commons/types/match/matchContextCore.dto';
 import type { MatchTagCoreDTO } from '@/commons/types/match/matchTagCore.dto';
-import { calculateTraitsSimilarity } from './utils/traitsSimilarity';
-import { calculateScheduleSimilarity } from './utils/scheduleSimilarity';
+import { calculateTraitsSimilarity } from '../utils/traitsSimilarity';
+import { calculateScheduleSimilarity } from '../utils/scheduleSimilarity';
 
 /**
  * 매칭 태그 생성

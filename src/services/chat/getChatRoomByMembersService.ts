@@ -2,7 +2,7 @@ import * as chatRepository from '@/repositories/chat.repository';
 import { ChatFetchError } from '@/commons/errors/chat/chatErrors';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
-import type { ChatRoom } from '@/types/supabase';
+import type { ChatRoom } from '@/types/chat';
 
 /**
  * 두 사용자 간의 1:1 채팅방 조회 Service
