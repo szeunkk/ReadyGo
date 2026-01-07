@@ -9,10 +9,12 @@
 
 ==============================================
 
-조건-파일경로) 수정할 TSX 파일경로: src/components/chat/ui/chat-room/chatRoom.tsx
-조건-파일경로) 참고할 Hook 파일경로: src/components/chat/hooks/useChatRoom.hook.tsx
-조건-파일경로) 참고할 Repository 파일경로: src/repositories/chat.repository.ts
+조건-파일경로) 수정할 TSX 파일경로: src/components/party-detail/ui/chat-room/chatRoom.tsx
+조건-파일경로) 수정할 CSS 파일경로: src/components/party-detail/ui/chat-room/styles.module.css
+조건-파일경로) 참고할 Repository 파일경로: src/repositories/partyMessages.repository.ts
+조건-파일경로) 참고할 Service 파일경로: src/services/party/getPartyMessagesService.ts, src/services/party/sendPartyMessageService.ts, src/services/party/getPartyMembersService.ts
 조건-파일경로) 참고할 Auth Provider: src/commons/providers/auth/auth.provider.tsx
+조건-파일경로) 구현할 Hook 파일경로: /src/components/party-detail/hooks/index.binding.chatRoom.hook.ts
 
 ==============================================
 
@@ -23,19 +25,19 @@
             - 컴포넌트(chatRoom.tsx): UI 렌더링만 담당, 최소한의 UI 상태 관리만 수행
             - Hook(useChatRoom.hook.tsx): 모든 비즈니스 로직, 데이터 포맷팅, 그룹화, 상태 관리 처리
             - Hook은 UI에서 바로 사용 가능한 포맷된 데이터를 반환 (formattedChatRooms 패턴 참고)
+            - party_messages 테이블 사용: post_id, sender_id, content, created_at 필드만 존재 (content_type, is_read 필드 없음)
 
             1) Hook 확장 (useChatRoom.hook.tsx 수정 필요)
                 - useChatRoom Hook을 확장하여 UI에서 바로 사용 가능한 포맷된 데이터를 반환하도록 수정할 것.
                 - 반환 타입에 다음 필드 추가:
                     - formattedMessages: FormattedMessageItem[] (UI에서 바로 사용 가능한 포맷된 메시지 배열)
-                    - otherMemberInfo: FormattedOtherMemberInfo | null (상대방 정보, 포맷된 형태)
                     - isBlocked: boolean (차단 상태, 기본값 false)
+                    - 주의: partyMembers는 Hook 내부에서만 사용하여 메시지 발신자 정보를 조회하며, 반환하지 않음
                 - Hook 내부에서 다음 로직 처리:
                     - 메시지 그룹화 (날짜 구분선, 연속 메시지 판단)
                     - 메시지 포맷팅 (formatMessageTime, formatMessageContent, formatDateDivider)
-                    - 상대방 정보 조회 및 포맷팅 (useChatList Hook 활용)
+                    - 파티 멤버 정보 조회 및 포맷팅 (getPartyMembersService 활용)
                     - 아바타 이미지 경로 계산 (getAvatarImagePath 사용)
-                    - 사용자 상태 조회 (getEffectiveStatus 사용)
                     - isOwnMessage 판단 (현재 사용자 ID와 비교)
                 - 포맷팅 함수들을 Hook 내부로 이동:
                     - formatMessageTime: Hook 내부 함수로 이동
@@ -46,52 +48,52 @@
                 - FormattedMessageItem 타입 정의 (Hook 파일에 추가):
                     - type: 'date-divider' | 'message'
                     - date?: string | null (date-divider인 경우)
-                    - message?: ChatMessage (message인 경우)
+                    - message?: PartyMessage (message인 경우)
                     - isConsecutive?: boolean (message인 경우)
                     - isOwnMessage?: boolean (message인 경우)
                     - formattedTime?: string (message인 경우)
                     - formattedContent?: string (message인 경우)
-                    - isRead?: boolean (message인 경우)
-                - FormattedOtherMemberInfo 타입 정의 (Hook 파일에 추가):
+                    - senderNickname?: string (message인 경우, 파티 멤버에서 조회)
+                    - senderAvatarImagePath?: string (message인 경우, 파티 멤버에서 조회)
+                    - senderAnimalType?: string (message인 경우, 파티 멤버에서 조회)
+                - FormattedPartyMemberInfo 타입 정의 (Hook 파일에 추가):
                     - id: string
                     - nickname: string
                     - avatarImagePath: string
-                    - userStatus: 'online' | 'away' | 'dnd' | 'offline'
                     - animalType?: string
                 - formattedMessages 생성 로직:
                     - messages 배열을 순회하며 날짜 구분선과 메시지를 함께 포함한 배열 생성
-                    - 각 메시지에 대해 isOwnMessage, formattedTime, formattedContent, isRead 계산
-                    - 연속 메시지 판단 로직 포함
-                - otherMemberInfo 생성 로직:
-                    - useChatList Hook을 Hook 내부에서 호출하여 chatRooms 조회
-                    - 현재 roomId와 일치하는 채팅방 찾기
-                    - otherMember 정보 추출 및 포맷팅
+                    - 각 메시지에 대해 isOwnMessage, formattedTime, formattedContent 계산
+                    - 각 메시지의 sender_id로 파티 멤버 정보 조회하여 senderNickname, senderAvatarImagePath, senderAnimalType 추가
+                    - 연속 메시지 판단 로직 포함 (같은 sender_id인 경우)
+                - 파티 멤버 정보 조회 로직 (내부 사용):
+                    - getPartyMembersService를 호출하여 파티 멤버 조회
+                    - 각 멤버의 user_id로 user_profiles 조회 (또는 이미 조회된 프로필 정보 활용)
+                    - formattedMessages 생성 시 각 메시지의 sender_id로 이 정보를 사용하여 발신자 정보 추가
                     - getAvatarImagePath로 아바타 이미지 경로 계산
-                    - getEffectiveStatus로 사용자 상태 조회
-                - 주의: Hook 내부에서 useChatList를 호출할 때는 무한 루프 방지를 위해 주의 필요
-                    - useChatList는 자동으로 호출되므로, useChatRoom 내부에서 호출해도 문제 없음
-                    - 또는 useChatRoom의 파라미터로 chatRooms를 받도록 수정 가능
+                    - 주의: partyMembers는 Hook 내부에서만 사용하며 반환하지 않음
+                - 메시지 전송 로직:
+                    - sendPartyMessageService 사용 (content_type 파라미터 없음)
+                    - postId, senderId(user?.id), content만 전달
 
             2) 컴포넌트 수정 (chatRoom.tsx)
-                - roomId prop을 number로 변환하여 useChatRoom Hook에 전달할 것.
-                    - roomId는 string 타입 (URL 파라미터)이므로 parseInt(roomId, 10)으로 변환
+                - postId prop을 number로 변환하여 useChatRoom Hook에 전달할 것.
+                    - postId는 string 타입 (URL 파라미터)이므로 parseInt(postId, 10)으로 변환
                     - parseInt 결과가 NaN인 경우 0을 전달 (Hook이 early return하여 빈 메시지 목록 반환)
-                    - roomId가 없거나 유효하지 않은 경우 0 전달
-                - useChatRoom Hook을 호출하여 formattedMessages, otherMemberInfo, sendMessage, isLoading, error, isConnected, isBlocked를 받을 것.
+                    - postId가 없거나 유효하지 않은 경우 0 전달
+                - useChatRoom Hook을 호출하여 formattedMessages, sendMessage, isLoading, error, isBlocked를 받을 것.
                 - Hook에서 받은 포맷된 데이터를 그대로 렌더링:
                     - formattedMessages를 map하여 렌더링 (date-divider와 message 구분)
-                    - otherMemberInfo를 사용하여 헤더 정보 표시
+                    - 각 메시지의 senderNickname, senderAvatarImagePath, senderAnimalType 사용
                     - 포맷팅 로직은 컴포넌트에서 제거 (Hook에서 처리)
                 - Mock 데이터 및 포맷팅 함수 제거:
-                    - MOCK_ROOM_DATA, DEFAULT_MOCK_DATA 객체 제거
-                    - MOCK_CURRENT_USER_ID 상수 제거
-                    - ChatMessage, ChatMessageRead 등의 Mock 타입 정의 제거
+                    - MOCK_MESSAGES, MOCK_CURRENT_USER_ID 상수 제거
+                    - ChatMessage 등의 Mock 타입 정의 제거
                     - formatMessageTime, formatDateDivider, isNewDate, isConsecutiveMessage 함수 제거
-                    - mockChatRooms import 제거
                 - 메시지 전송 기능:
                     - Input 컴포넌트에 상태 관리 추가: const [messageInput, setMessageInput] = useState('');
-                - Input의 value와 onChange 연결
-                    - 전송 버튼 클릭 시: sendMessage(messageInput, 'text') 호출
+                    - Input의 value와 onChange 연결
+                    - 전송 버튼 클릭 시: sendMessage(messageInput) 호출 (content_type 파라미터 없음)
                     - 전송 성공 시 messageInput 초기화
                 - Enter 키 입력 시 전송 (선택사항)
                     - 차단 상태인 경우 전송 비활성화 (isBlocked 사용)
@@ -113,15 +115,13 @@
                 - isNewDate: Hook 내부 함수로 이동
                     - 두 날짜가 다른 날인지 확인
                 - isConsecutiveMessage: Hook 내부 함수로 이동
-                    - 같은 발신자이고 content_type이 'system'이 아닌 경우 연속 메시지로 판단
+                    - 같은 발신자(sender_id)인 경우 연속 메시지로 판단 (party_messages에는 content_type 필드 없음)
                 - formatMessageContent: Hook 내부 함수로 이동
                     - content가 null인 경우: "메시지가 없습니다" 반환
-                    - content_type이 'image'인 경우: "📷 이미지" 반환
-                    - content_type이 'system'인 경우: content 그대로 반환
-                    - 그 외: content 반환
+                    - 그 외: content 그대로 반환 (party_messages에는 content_type 필드 없음)
 
             2) formattedMessages 생성 로직
-                - useMemo를 사용하여 messages 변경 시 재계산
+                - useMemo를 사용하여 messages, partyMembers 변경 시 재계산
                 - messages 배열을 순회하며 다음 로직 수행:
                     - 이전 메시지와 날짜 비교 (isNewDate 사용)
                     - 날짜가 다르면 date-divider 아이템 추가
@@ -130,66 +130,112 @@
                         - isOwnMessage 계산 (sender_id === currentUserId)
                         - formattedTime 계산 (formatMessageTime 사용)
                         - formattedContent 계산 (formatMessageContent 사용)
-                        - isRead 계산 (is_read 필드 사용, null이면 false)
+                        - senderNickname, senderAvatarImagePath, senderAnimalType 계산:
+                            - partyMembers 배열에서 sender_id와 일치하는 멤버 찾기
+                            - 멤버의 user_id로 user_profiles 조회 (또는 이미 조회된 프로필 정보 활용)
+                            - getAvatarImagePath로 아바타 이미지 경로 계산
                 - 반환 타입: Array<FormattedMessageItem>
 
-            3) otherMemberInfo 생성 로직
-                - useChatList Hook을 Hook 내부에서 호출 (또는 파라미터로 받기)
-                - useMemo를 사용하여 roomId, chatRooms 변경 시 재계산
-                - chatRooms 배열에서 현재 roomId와 일치하는 채팅방 찾기
-                - otherMember 정보 추출 및 포맷팅:
-                    - nickname: otherMember?.nickname ?? "알 수 없음"
-                    - avatarImagePath: getAvatarImagePath(otherMember?.avatar_url, otherMember?.animal_type)
-                    - userStatus: otherMember?.id ? getEffectiveStatus(otherMember.id) : 'offline'
-                    - animalType: otherMember?.animal_type
-                    - id: otherMember?.id ?? ''
-                - 반환 타입: FormattedOtherMemberInfo | null
+            3) 파티 멤버 정보 조회 로직 (내부 사용)
+                - getPartyMembersService를 호출하여 파티 멤버 조회
+                - useMemo를 사용하여 postId 변경 시 재계산
+                - 각 멤버의 user_id로 user_profiles 조회 (API 호출 또는 이미 조회된 프로필 정보 활용)
+                - formattedMessages 생성 시 각 메시지의 sender_id로 이 정보를 사용하여 발신자 정보 추가
+                - 주의: partyMembers는 Hook 내부에서만 사용하며 반환하지 않음
 
-            4) 타입 정의 추가
+            4) 메시지 조회 및 실시간 구독 로직
+                - getPartyMessagesService를 사용하여 초기 메시지 로드
+                - postgres_changes로 party_messages 테이블의 INSERT 이벤트 구독
+                    - post_id가 현재 postId와 일치하는 메시지만 수신
+                - 중복 메시지 방지 (seenMessageIdsRef 사용)
+
+            5) 메시지 전송 로직
+                - sendPartyMessageService 호출
+                    - postId: 현재 postId
+                    - senderId: user?.id
+                    - content: 전송할 메시지 내용
+                - content_type 파라미터는 전달하지 않음 (party_messages 테이블에 해당 필드 없음)
+
+            6) 타입 정의 추가
                 - FormattedMessageItem 타입 정의
-                - FormattedOtherMemberInfo 타입 정의
-                - UseChatRoomReturn 타입에 formattedMessages, otherMemberInfo, isBlocked 추가
+                - UseChatRoomReturn 타입에 formattedMessages, isBlocked 추가
+                - PartyMessage 타입: Database['public']['Tables']['party_messages']['Row'] 사용
 
 ==============================================
 
 세부요구사항) 컴포넌트 구현 상세 (chatRoom.tsx)
 
-            1) Hook 사용
+            1) Hook 사용 및 상태 관리
                 - useChatRoom Hook 호출:
-                    - const roomIdNumber = isNaN(parseInt(roomId, 10)) ? 0 : parseInt(roomId, 10);
-                    - const { formattedMessages, otherMemberInfo, sendMessage, isLoading, error, isBlocked } = useChatRoom({ roomId: roomIdNumber });
-                - useSideProfilePanel Hook은 그대로 유지
-                - messageInput 상태 추가 (UI 상태만 관리)
+                    - postId는 URL 파라미터에서 가져오거나 props로 전달받음
+                    - const postIdNumber = isNaN(parseInt(postId, 10)) ? 0 : parseInt(postId, 10);
+                    - const { formattedMessages, sendMessage, isLoading, error, isBlocked } = useChatRoom({ postId: postIdNumber });
+                - messageInput 상태 추가: const [messageInput, setMessageInput] = useState('');
 
-            2) 메시지 렌더링
-                - formattedMessages를 map하여 렌더링:
-                    - item.type === 'date-divider'인 경우: 날짜 구분선 렌더링
-                    - item.type === 'message'인 경우: 메시지 렌더링
-                    - item.isOwnMessage로 내 메시지/상대방 메시지 구분
-                    - item.isConsecutive로 아바타 표시 여부 결정
-                    - item.formattedTime, item.formattedContent 사용
-                    - item.isRead로 읽음 표시 여부 결정
+            2) 메시지 렌더링 구조 (chatRoom.tsx 구조 참고)
+                - formattedMessages를 두 번 순회하여 렌더링:
+                    - 첫 번째 순회: date-divider 아이템만 렌더링
+                        - item.type === 'date-divider'인 경우: <div className={styles.dateDivider}> 렌더링
+                        - item.date를 사용하여 날짜 구분선 표시 (Hook에서 포맷팅된 데이터 사용)
+                    - 두 번째 순회: message 아이템만 렌더링 (messagesWrapper 내부)
+                        - item.type === 'message'인 경우만 처리
+                        - item.isOwnMessage로 내 메시지/상대방 메시지 구분
+                        - item.isConsecutive로 아바타 표시 여부 결정 (연속 메시지인 경우 아바타 숨김)
+                - 내 메시지 렌더링 (item.isOwnMessage === true):
+                    - <div className={styles.messageGroup}>
+                    - <div className={styles.messageRow}>
+                    - <div className={styles.ownMessageContainer}>
+                    - <div className={styles.messageTime}>{item.formattedTime}</div>
+                    - <div className={styles.ownMessageBubble}>
+                    - <span className={styles.messageContent}>{item.formattedContent}</span>
+                - 상대방 메시지 렌더링 (item.isOwnMessage === false):
+                    - <div className={styles.messageGroup}>
+                    - <div className={styles.messageRow}>
+                    - <div className={styles.otherMessageContainer}>
+                    - 아바타 렌더링 (item.isConsecutive가 false인 경우에만 표시):
+                        - <Avatar
+                            animalType={item.senderAnimalType}
+                            alt={item.senderNickname}
+                            size="s"
+                            className={styles.messageAvatar}
+                          />
+                    - <div className={styles.otherMessageContent}>
+                    - <div className={styles.senderNickname}>{item.senderNickname}</div>
+                    - <div className={styles.messageBubbles}>
+                    - <div className={styles.otherMessageWrapper}>
+                    - <div className={styles.otherMessageBubble}>
+                    - <span className={styles.messageContent}>{item.formattedContent}</span>
+                    - <div className={styles.messageTime}>{item.formattedTime}</div>
                 - 포맷팅 로직은 모두 제거 (Hook에서 처리된 데이터 사용)
+                - Mock 데이터 및 포맷팅 함수 제거:
+                    - MOCK_MESSAGES, MOCK_CURRENT_USER_ID 제거
+                    - ChatMessage, MessageGroup 타입 정의 제거
+                    - formatMessageTime, formatDateDivider, isNewDate, isOwnMessage, groupMessages 함수 제거
 
-            3) 헤더 렌더링
-                - otherMemberInfo를 사용하여 헤더 정보 표시:
-                    - nickname: otherMemberInfo?.nickname ?? "알 수 없음"
-                    - avatarImagePath: otherMemberInfo?.avatarImagePath
-                    - userStatus: otherMemberInfo?.userStatus ?? 'offline'
-                    - animalType: otherMemberInfo?.animalType
-                - 상대방 정보 조회 로직은 모두 제거 (Hook에서 처리된 데이터 사용)
-
-            4) 메시지 전송
+            3) 메시지 전송
                 - handleSendMessage 함수 작성:
-                    - messageInput이 비어있으면 전송하지 않음
-                    - sendMessage(messageInput, 'text') 호출
+                    - messageInput.trim()이 비어있으면 전송하지 않음
+                    - sendMessage(messageInput) 호출 (content_type 파라미터 없음)
                     - try-catch로 에러 처리
                     - 전송 성공 시 setMessageInput('')로 초기화
-                - Enter 키 입력 시 전송 (선택사항)
-                - 차단 상태인 경우 전송 비활성화 (isBlocked 사용)
+                - handleKeyDown 함수 작성:
+                    - Enter 키 입력 시 전송 (Shift+Enter는 줄바꿈)
+                    - e.key === 'Enter' && !e.shiftKey인 경우 handleSendMessage 호출
+                - Input 컴포넌트에 연결:
+                    - value={messageInput}
+                    - onChange={(e) => setMessageInput(e.target.value)}
+                    - onKeyDown={handleKeyDown}
+                    - iconRight="send"
+                    - onIconRightClick={handleSendMessage}
+                - 차단 상태인 경우 전송 비활성화 (isBlocked 사용, 선택사항)
 
-            5) 기존 UI 구조 유지
-                - 헤더, 메시지 리스트, 입력 영역 구조는 그대로 유지
+            4) 기존 UI 구조 유지
+                - <div className={styles.chatRoom}>
+                - <div className={styles.messageList} aria-label="메시지 목록">
+                - <div className={styles.messagesContainer}>
+                - <div className={styles.messagesWrapper}>
+                - <div className={styles.inputArea} aria-label="메시지 입력 영역">
+                - <div className={styles.inputWrapper}>
                 - 스타일링은 변경하지 않음
                 - 접근성 속성(aria-label 등)은 그대로 유지
 
@@ -198,29 +244,32 @@
 세부요구사항) 에러 처리 및 예외 상황
 
             1) Hook에서 처리할 예외 상황
-                - roomId 없음 또는 유효하지 않음:
-                    - roomId가 0 이하인 경우: formattedMessages를 빈 배열로 반환, otherMemberInfo를 null로 반환
+                - postId 없음 또는 유효하지 않음:
+                    - postId가 0 이하인 경우: formattedMessages를 빈 배열로 반환
                     - early return하여 추가 처리 중단
                 - 사용자 인증 없음:
-                    - user?.id가 없는 경우: formattedMessages를 빈 배열로 반환, otherMemberInfo를 null로 반환
+                    - user?.id가 없는 경우: formattedMessages를 빈 배열로 반환
                     - Hook 내부에서 useAuth를 호출하므로 자동 처리됨
                 - 메시지 필드 null 처리:
                     - formatMessageContent: content가 null이면 "메시지가 없습니다" 반환
                     - formatMessageTime: created_at이 null이면 빈 문자열 반환
-                    - is_read: null이면 false로 처리
-                - 상대방 정보 없음:
-                    - chatRooms에서 해당 roomId를 찾지 못한 경우: 기본값 사용
-                    - nickname: "알 수 없음"
-                    - avatarImagePath: getAvatarImagePath(null, null) → 기본값 bear 아바타
-                    - userStatus: 'offline'
+                - 파티 멤버 정보 없음:
+                    - getPartyMembersService 호출 실패 시: formattedMessages 생성 시 발신자 정보를 기본값으로 처리
+                    - 각 멤버의 프로필 정보가 없는 경우: 기본값 사용
+                    - senderNickname: "알 수 없음"
+                    - senderAvatarImagePath: getAvatarImagePath(null, null) → 기본값 bear 아바타
+                - 메시지 발신자 정보 없음:
+                    - formattedMessages 생성 시 sender_id로 파티 멤버를 찾지 못한 경우:
+                        - senderNickname: "알 수 없음"
+                        - senderAvatarImagePath: 기본값 bear 아바타
+                        - senderAnimalType: undefined
                 - 로딩/에러 상태:
                     - isLoading, error 상태는 Hook에서 관리
                     - 컴포넌트에서는 Hook에서 받은 상태를 그대로 사용
 
             2) 컴포넌트에서 처리할 예외 상황
-                - roomId 없음 또는 유효하지 않음:
+                - postId 없음 또는 유효하지 않음:
                     - formattedMessages가 빈 배열인 경우: 빈 메시지 UI 표시
-                    - otherMemberInfo가 null인 경우: 기본값 사용 ("알 수 없음", 기본 아바타)
                 - 로딩 중:
                     - isLoading === true인 경우: 로딩 UI 표시
                 - 에러 발생:
@@ -237,25 +286,27 @@
 체크리스트) 구현이 완료되면 다음 항목을 포함한 체크리스트를 반환할 것.
             - [ ] 커서룰 @01-common.mdc 적용 결과
             - [ ] 커서룰 @04-func.mdc 적용 결과
-            - [ ] useChatRoom Hook 확장 완료 (formattedMessages, otherMemberInfo, isBlocked 추가)
+            - [ ] useChatRoom Hook 확장 완료 (formattedMessages, partyMembers, isBlocked 추가)
             - [ ] 포맷팅 함수들을 Hook 내부로 이동 완료 (formatMessageTime, formatDateDivider, isNewDate, isConsecutiveMessage, formatMessageContent)
-            - [ ] FormattedMessageItem 타입 정의 완료
-            - [ ] FormattedOtherMemberInfo 타입 정의 완료
-            - [ ] formattedMessages 생성 로직 구현 완료 (날짜 구분선, 연속 메시지, 포맷팅 포함)
-            - [ ] otherMemberInfo 생성 로직 구현 완료 (useChatList 활용, 아바타 경로, 사용자 상태 포함)
+            - [ ] FormattedMessageItem 타입 정의 완료 (senderNickname, senderAvatarImagePath, senderAnimalType 추가)
+            - [ ] formattedMessages 생성 로직 구현 완료 (날짜 구분선, 연속 메시지, 포맷팅, 발신자 정보 포함)
+            - [ ] 파티 멤버 정보 조회 로직 구현 완료 (getPartyMembersService 활용, formattedMessages 생성 시 발신자 정보 추가)
+            - [ ] 메시지 조회 로직 구현 완료 (getPartyMessagesService 사용)
+            - [ ] 실시간 구독 로직 구현 완료 (postgres_changes로 party_messages INSERT 이벤트 구독)
+            - [ ] 메시지 전송 로직 구현 완료 (sendPartyMessageService 사용, content_type 파라미터 없음)
             - [ ] useChatRoom Hook import 및 사용 완료 (컴포넌트에서)
-            - [ ] roomId string → number 변환 완료 (NaN 처리 포함)
-            - [ ] roomId가 0인 경우 UI 처리 완료 (빈 상태)
+            - [ ] postId string → number 변환 완료 (NaN 처리 포함)
+            - [ ] postId가 0인 경우 UI 처리 완료 (빈 상태)
             - [ ] Mock 데이터 및 타입 정의 제거 완료 (컴포넌트에서)
             - [ ] 포맷팅 함수 제거 완료 (컴포넌트에서)
-            - [ ] formattedMessages 렌더링 완료 (date-divider와 message 구분)
-            - [ ] otherMemberInfo를 사용한 헤더 렌더링 완료
-            - [ ] 메시지 전송 기능 구현 완료 (Input 상태, 전송 버튼, 에러 처리)
+            - [ ] formattedMessages 렌더링 완료 (date-divider와 message 구분, 내 메시지/상대방 메시지 구분, 아바타 표시 조건 처리)
+            - [ ] 메시지 전송 기능 구현 완료 (Input 상태, 전송 버튼, 에러 처리, content_type 파라미터 없음)
             - [ ] 로딩 상태 처리 완료 (컴포넌트에서)
             - [ ] 에러 상태 처리 완료 (컴포넌트에서)
             - [ ] 기존 UI 구조 및 스타일 유지 완료
             - [ ] 접근성 속성 유지 완료
             - [ ] 컴포넌트는 UI만 담당하고 로직은 모두 Hook에서 처리하는 구조 완료
+            - [ ] party_messages 테이블 구조에 맞게 구현 완료 (content_type, is_read 필드 없음)
 
 ==============================================
 
@@ -267,60 +318,69 @@
                - 동일한 패턴을 useChatRoom + chatRoom.tsx에 적용할 것
 
             2) useChatRoom Hook 확장 사항:
-               - 기존 기능 유지: 초기 메시지 로드, postgres_changes 구독, useRealtimeChat 통합, 읽음 처리, 중복 메시지 방지
-               - 추가 기능: 메시지 그룹화, 포맷팅, 상대방 정보 조회 및 포맷팅
-               - 반환 타입 확장: formattedMessages, otherMemberInfo, isBlocked 추가
+               - 초기 메시지 로드: getPartyMessagesService 사용
+               - postgres_changes 구독: party_messages 테이블의 INSERT 이벤트 구독
+               - 중복 메시지 방지: seenMessageIdsRef로 관리
+               - 추가 기능: 메시지 그룹화, 포맷팅, 파티 멤버 정보 조회 및 포맷팅
+               - 반환 타입 확장: formattedMessages, partyMembers, isBlocked 추가
+               - 주의: party_messages에는 is_read 필드가 없으므로 읽음 처리 로직 제거
 
-            3) Hook 내부에서 useChatList 호출:
-               - useChatRoom Hook 내부에서 useChatList를 호출하여 chatRooms 조회
-               - 무한 루프 방지: useChatList는 독립적으로 동작하므로 문제 없음
-               - 또는 useChatRoom의 파라미터로 chatRooms를 받도록 수정 가능 (성능 최적화)
+            3) 파티 멤버 정보 조회:
+               - getPartyMembersService를 사용하여 파티 멤버 조회
+               - 각 멤버의 user_id로 user_profiles 조회 (별도 API 호출 또는 이미 조회된 프로필 정보 활용)
+               - formattedMessages 생성 시 각 메시지의 sender_id로 이 정보를 사용하여 발신자 정보 추가
+               - Hook 내부에서만 사용하며 반환하지 않음
 
             4) 메시지 전송 플로우:
-               - sendMessage 호출 → API로 DB 저장 → Broadcast로 실시간 전송
+               - sendMessage 호출 → sendPartyMessageService로 DB 저장 → postgres_changes로 INSERT 이벤트 수신
                - postgres_changes로 INSERT 이벤트 수신 → messages 배열에 자동 추가
                - 중복 방지를 위해 seenMessageIdsRef로 관리
                - formattedMessages는 useMemo로 자동 재계산됨
+               - 주의: content_type 파라미터는 전달하지 않음 (party_messages 테이블에 해당 필드 없음)
 
             5) 포맷팅 함수 위치:
                - 모든 포맷팅 함수는 Hook 내부에 정의
                - 컴포넌트에서는 포맷팅 함수를 import하거나 정의하지 않음
                - Hook에서 포맷팅된 데이터를 받아서 그대로 사용
 
-            6) 상대방 정보 조회:
-               - useChatList Hook을 사용하여 상대방 정보를 가져오는 것이 권장 방법임.
-               - 이미 로드된 chatRooms 데이터를 재사용하므로 추가 API 호출이 불필요하고 성능상 이점이 있음.
-               - Hook 내부에서 처리하므로 컴포넌트에서는 otherMemberInfo를 그대로 사용
+            6) 메시지 발신자 정보 조회:
+               - formattedMessages 생성 시 각 메시지의 sender_id로 partyMembers에서 해당 멤버 찾기
+               - 멤버의 user_id로 user_profiles 조회하여 nickname, avatar_url, animal_type 가져오기
+               - getAvatarImagePath로 아바타 이미지 경로 계산
+               - Hook 내부에서 처리하므로 컴포넌트에서는 senderNickname, senderAvatarImagePath, senderAnimalType를 그대로 사용
 
             7) 아바타 이미지 선택 로직:
                - 공통 유틸리티 함수 사용: src/lib/avatar/getAvatarImagePath.ts
                - Hook 내부에서 getAvatarImagePath 호출하여 avatarImagePath 계산
                - 선택 우선순위:
-                 1) otherMember?.avatar_url이 null이 아닌 경우: avatar_url 사용
-                 2) otherMember?.avatar_url이 null인 경우: animal_type을 사용하여 동물 타입 이미지 가져오기
+                 1) memberProfile?.avatar_url이 null이 아닌 경우: avatar_url 사용
+                 2) memberProfile?.avatar_url이 null인 경우: animal_type을 사용하여 동물 타입 이미지 가져오기
                  3) 둘 다 없으면 기본값 bear 아바타 사용
-               - 컴포넌트에서는 otherMemberInfo.avatarImagePath를 그대로 사용
+               - 컴포넌트에서는 senderAvatarImagePath를 그대로 사용
+               - 주의: 아바타 status는 관리하지 않으므로 Avatar 컴포넌트에 status, showStatus prop 전달하지 않음
 
-            8) 사용자 상태 조회:
-               - getEffectiveStatus 함수 사용 (src/stores/user-status.store)
-               - Hook 내부에서 otherMember?.id로 사용자 상태 조회
-               - 컴포넌트에서는 otherMemberInfo.userStatus를 그대로 사용
-
-            9) DB 스키마 정리:
-               - chat_rooms 테이블: id (number), type (string | null), created_at (string | null)만 존재
+            8) DB 스키마 정리:
+               - party_messages 테이블: id (number), post_id (number | null), sender_id (string | null), content (string | null), created_at (string | null)
+               - party_messages에는 content_type, is_read 필드가 없음
+               - party_members 테이블: id (number), post_id (number | null), user_id (string | null), role (string | null), joined_at (string | null)
                - user_profiles 테이블: id (string), nickname (string | null), animal_type (string), avatar_url (string | null) 등
                - user_profiles에 user_id, status 필드는 없음 (id 필드가 user_id 역할, status는 presence store에서 조회)
-               - chat_messages 테이블: content, content_type, created_at이 모두 nullable
 
             10) 인증 방식:
                 - Hook 내부에서 useAuth() 호출하여 현재 사용자 ID 조회
                 - 컴포넌트에서는 인증 관련 로직을 처리하지 않음
-                - Hook에서 user?.id를 사용하여 isOwnMessage 판단
+                - Hook에서 user?.id를 사용하여 isOwnMessage 판단 및 파티 멤버 필터링
 
             11) 컴포넌트 역할:
                 - chatRoom.tsx는 오로지 UI 렌더링만 담당
                 - Hook에서 받은 포맷된 데이터를 그대로 렌더링
                 - 최소한의 UI 상태 관리만 수행 (messageInput 등)
                 - 비즈니스 로직, 포맷팅, 데이터 처리 로직은 모두 Hook에서 처리
+
+            12) 파티 채팅방 특성:
+                - 파티 채팅방은 1:1 채팅이 아니므로 여러 멤버가 참여할 수 있음
+                - 각 메시지마다 발신자 정보(senderNickname, senderAvatarImagePath, senderAnimalType)를 표시
+                - 연속 메시지인 경우 아바타를 숨김 처리 (item.isConsecutive 사용)
+                - 헤더에 특정 상대방 정보를 표시하지 않음 (1:1 채팅과 다름)
 
 
