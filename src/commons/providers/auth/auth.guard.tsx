@@ -138,7 +138,15 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     return <>{children}</>;
   }
 
-  // 초기 마운트 전: 로딩 스피너 표시
+  // ✅ 회원 전용 경로만 세션 동기화 대기
+  const isMemberPath = pathname && isMemberOnlyPath(pathname);
+
+  // ✅ 공개 페이지는 즉시 렌더링 (로딩 없음)
+  if (!isMemberPath) {
+    return <>{children}</>;
+  }
+
+  // 초기 마운트 전: 회원 전용 페이지에서만 로딩 스피너 표시
   if (!isMounted) {
     return (
       <div
@@ -173,12 +181,9 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     );
   }
 
-  // ✅ 회원 전용 경로만 세션 동기화 대기
-  const isMemberPath = pathname && isMemberOnlyPath(pathname);
-
   // 회원 전용 페이지에서만 세션 동기화 및 OAuth 콜백 대기
   const shouldShowLoading =
-    isMemberPath && (!isSessionSynced || (isOAuthCallback && !accessToken));
+    !isSessionSynced || (isOAuthCallback && !accessToken);
 
   if (shouldShowLoading) {
     return (
@@ -214,8 +219,8 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     );
   }
 
-  // 회원 전용 페이지 접근 제어
-  if (isMemberPath && !accessToken) {
+  // 회원 전용 페이지 접근 제어 (이미 isMemberPath는 true)
+  if (!accessToken) {
     // 모달은 useEffect에서 표시, 빈 화면 유지
     return null;
   }
