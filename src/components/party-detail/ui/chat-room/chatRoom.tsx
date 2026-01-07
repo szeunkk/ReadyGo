@@ -168,6 +168,7 @@ export default function ChatRoom() {
                           alt={senderNickname || ''}
                           size="s"
                           className={styles.messageAvatar}
+                          showStatus={false}
                         />
                       )}
                       {isConsecutive && <div className={styles.avatarSpacer} />}
