@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
+import { supabase as baseSupabase } from '@/lib/supabase/client';
 import { useAuth } from '@/commons/providers/auth/auth.provider';
 import { usePartyBinding } from './index.binding.hook';
 import { getAvatarImagePath } from '@/lib/avatar/getAvatarImagePath';
@@ -37,6 +39,7 @@ export interface UseMemberListReturn {
   maxMemberCount: number;
   isLoading: boolean;
   error: Error | null;
+  refetch: () => Promise<void>;
 }
 
 /**
@@ -46,6 +49,7 @@ export interface UseMemberListReturn {
  * - 포맷된 멤버 목록 반환 (파티장 우선, 빈 자리 포함)
  * - 아바타 이미지 경로 계산
  * - 파티 정보 조회 (max_members)
+ * - Supabase Realtime을 통한 실시간 멤버 목록 업데이트
  */
 export const useMemberList = (
   props: UseMemberListProps
@@ -60,6 +64,11 @@ export const useMemberList = (
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const isMountedRef = useRef<boolean>(true);
+
+  // Realtime 채널 관리
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  const subscribedPostIdRef = useRef<number | null>(null);
+  const fetchMembersRef = useRef<() => Promise<void>>();
 
   /**
    * 파티 멤버 및 프로필 조회 함수
@@ -145,17 +154,118 @@ export const useMemberList = (
     }
   }, [postId, user?.id]);
 
+  // fetchMembers의 최신 버전을 ref에 저장
+  useEffect(() => {
+    fetchMembersRef.current = fetchMembers;
+  }, [fetchMembers]);
+
   /**
-   * 초기 목록 로드
+   * Realtime 채널 정리 함수
+   */
+  const cleanupChannel = useCallback(() => {
+    if (channelRef.current) {
+      baseSupabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+    subscribedPostIdRef.current = null;
+  }, []);
+
+  /**
+   * Supabase Realtime 구독 설정
+   * party_members 테이블의 INSERT/DELETE 이벤트를 감지하여 자동 갱신
+   */
+  const subscribeToPostgresChanges = useCallback(
+    async (targetPostId: number) => {
+      // postId가 유효하지 않으면 early return
+      if (targetPostId <= 0 || !user?.id) {
+        cleanupChannel();
+        return;
+      }
+
+      // 이미 같은 postId에 구독 중이면 early return
+      if (
+        channelRef.current &&
+        subscribedPostIdRef.current === targetPostId
+      ) {
+        return;
+      }
+
+      // 기존 채널 정리
+      cleanupChannel();
+
+      try {
+        // postgres_changes 채널 생성
+        const channel = baseSupabase
+          .channel(`party_members:${targetPostId}`)
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'party_members',
+              filter: `post_id=eq.${targetPostId}`,
+            },
+            (payload) => {
+              console.log('Party member INSERT event received:', payload);
+              // 멤버 추가 시 목록 갱신
+              if (isMountedRef.current && fetchMembersRef.current) {
+                fetchMembersRef.current();
+              }
+            }
+          )
+          .on(
+            'postgres_changes',
+            {
+              event: 'DELETE',
+              schema: 'public',
+              table: 'party_members',
+              filter: `post_id=eq.${targetPostId}`,
+            },
+            (payload) => {
+              console.log('Party member DELETE event received:', payload);
+              // 멤버 삭제 시 목록 갱신
+              if (isMountedRef.current && fetchMembersRef.current) {
+                fetchMembersRef.current();
+              }
+            }
+          )
+          .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              console.log(
+                `Subscribed to party_members changes for post ${targetPostId}`
+              );
+            } else if (status === 'CHANNEL_ERROR') {
+              console.error('Channel error occurred');
+            }
+          });
+
+        channelRef.current = channel;
+        subscribedPostIdRef.current = targetPostId;
+      } catch (error) {
+        console.error('Failed to setup Realtime subscription:', error);
+        cleanupChannel();
+      }
+    },
+    [user?.id, cleanupChannel]
+  );
+
+  /**
+   * 초기 목록 로드 및 Realtime 구독
    */
   useEffect(() => {
     isMountedRef.current = true;
-    fetchMembers();
+
+    if (postId > 0 && user?.id) {
+      fetchMembers();
+      subscribeToPostgresChanges(postId);
+    }
 
     return () => {
       isMountedRef.current = false;
+      cleanupChannel();
     };
-  }, [fetchMembers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [postId, user?.id]);
 
   /**
    * max_members 계산 (usePartyBinding에서 가져오기, 없으면 기본값 8)
@@ -265,5 +375,6 @@ export const useMemberList = (
     maxMemberCount,
     isLoading,
     error,
+    refetch: fetchMembers,
   };
 };
