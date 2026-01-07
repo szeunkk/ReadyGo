@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
+import type { CookieOptions } from '@supabase/ssr';
+import type { Database } from '@/types/supabase';
 import { checkUserProfile } from '@/services/auth/checkUserProfile';
 import { createUserProfile } from '@/services/auth/createUserProfile';
 import { updateUserStatusOnline } from '@/services/auth/updateUserStatusOnline';
@@ -57,10 +58,33 @@ export const GET = async function (request: NextRequest) {
       return NextResponse.redirect(loginUrl.toString());
     }
 
-    // Supabase SSR 클라이언트 생성 (쿠키 자동 관리)
-    const supabase = createClient();
+    // ✅ Supabase가 설정한 쿠키를 임시 저장
+    const supabaseCookies: Array<{ name: string; value: string; options: CookieOptions }> = [];
+    
+    // ✅ Supabase 클라이언트: 쿠키를 배열에 저장
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
+            // 쿠키를 배열에 저장 (나중에 리다이렉트 응답에 추가)
+            supabaseCookies.push(...cookiesToSet);
+            
+            // eslint-disable-next-line no-console
+            console.log('Supabase cookies captured:', {
+              count: cookiesToSet.length,
+              names: cookiesToSet.map((c) => c.name),
+            });
+          },
+        },
+      }
+    );
 
-    // 1. OAuth code로 세션 교환 (쿠키 자동 저장)
+    // 1. OAuth code로 세션 교환 (쿠키가 supabaseCookies 배열에 저장됨)
     const {
       data: { session, user },
       error: exchangeError,
@@ -145,57 +169,25 @@ export const GET = async function (request: NextRequest) {
     // 3. 프로필 확인 (동일 supabase 인스턴스 재사용)
     const hasProfile = await checkUserProfile(supabase, verifiedUser.id);
 
-    // 세션에서 직접 토큰 추출 (쿠키 타이밍 이슈 해결)
-    // exchangeCodeForSession이 반환한 세션을 사용
-    const sessionData = {
-      access_token: session.access_token,
-      refresh_token: session.refresh_token,
-      expires_at: session.expires_at,
-      expires_in: session.expires_in,
-    };
-
-    // eslint-disable-next-line no-console
-    console.log('OAuth callback: Session tokens extracted', {
-      hasAccessToken: !!sessionData.access_token,
-      hasRefreshToken: !!sessionData.refresh_token,
-      expiresAt: sessionData.expires_at,
-    });
-
-    // 4. 신규 유저면 프로필 생성 (동일 supabase 인스턴스 재사용)
+    // 4. 신규 유저면 프로필 생성 후 /signup-success로, 기존 유저는 /home으로
     if (!hasProfile) {
       try {
         await createUserProfile(supabase, verifiedUser.id);
         const signupSuccessUrl = new URL(URL_PATHS.SIGNUP_SUCCESS, request.url);
-
-        // 리다이렉트 응답 생성
-        const redirectResponse = NextResponse.redirect(
-          signupSuccessUrl.toString()
-        );
-
-        // 세션 토큰을 직접 쿠키로 설정 (타이밍 이슈 해결)
-        const cookiePrefix = `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0]}-auth-token`;
         
-        redirectResponse.cookies.set(cookiePrefix, JSON.stringify({
-          access_token: sessionData.access_token,
-          refresh_token: sessionData.refresh_token,
-          expires_at: sessionData.expires_at,
-          expires_in: sessionData.expires_in,
-        }), {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          path: '/',
-          maxAge: 60 * 60 * 24 * 7, // 7 days
+        // ✅ 리다이렉트 응답 생성
+        const redirectResponse = NextResponse.redirect(signupSuccessUrl.toString());
+        
+        // ✅ Supabase가 설정한 쿠키를 리다이렉트 응답에 추가
+        supabaseCookies.forEach(({ name, value, options }) => {
+          redirectResponse.cookies.set(name, value, options);
         });
 
         // eslint-disable-next-line no-console
-        console.log(
-          'OAuth callback: Redirecting to signup-success with session cookie',
-          {
-            cookieName: cookiePrefix,
-            redirectUrl: signupSuccessUrl.toString(),
-          }
-        );
+        console.log('OAuth callback: Redirecting to signup-success', {
+          redirectUrl: signupSuccessUrl.toString(),
+          cookiesSet: supabaseCookies.length,
+        });
         return redirectResponse;
       } catch (profileError) {
         // eslint-disable-next-line no-console
@@ -208,30 +200,19 @@ export const GET = async function (request: NextRequest) {
 
     // 5. 기존 유저는 홈으로
     const homeUrl = new URL(URL_PATHS.HOME, request.url);
-
-    // 리다이렉트 응답 생성
-    const redirectResponse = NextResponse.redirect(homeUrl.toString());
-
-    // 세션 토큰을 직접 쿠키로 설정 (타이밍 이슈 해결)
-    const cookiePrefix = `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0]}-auth-token`;
     
-    redirectResponse.cookies.set(cookiePrefix, JSON.stringify({
-      access_token: sessionData.access_token,
-      refresh_token: sessionData.refresh_token,
-      expires_at: sessionData.expires_at,
-      expires_in: sessionData.expires_in,
-    }), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+    // ✅ 리다이렉트 응답 생성
+    const redirectResponse = NextResponse.redirect(homeUrl.toString());
+    
+    // ✅ Supabase가 설정한 쿠키를 리다이렉트 응답에 추가
+    supabaseCookies.forEach(({ name, value, options }) => {
+      redirectResponse.cookies.set(name, value, options);
     });
 
     // eslint-disable-next-line no-console
-    console.log('OAuth callback: Redirecting to home with session cookie', {
-      cookieName: cookiePrefix,
+    console.log('OAuth callback: Redirecting to home', {
       redirectUrl: homeUrl.toString(),
+      cookiesSet: supabaseCookies.length,
     });
     return redirectResponse;
   } catch (error) {
