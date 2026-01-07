@@ -36,8 +36,8 @@ Deno.serve(async (req) => {
     console.log('[Edge Function] Starting batch sync...');
 
     // 1. Service Role Supabase Client 생성
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const supabaseUrl = Deno.env.get('PROJECT_SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('PROJECT_SERVICE_ROLE_KEY');
 
     if (!supabaseUrl || !supabaseServiceKey) {
       throw new Error('Missing Supabase configuration');
