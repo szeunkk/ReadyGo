@@ -45,3 +45,6 @@ next-env.d.ts
 storybook-static
 
 .auth
+
+# admin api docs (보안상 비공개)
+docs/api/admin/
