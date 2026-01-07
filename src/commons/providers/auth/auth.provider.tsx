@@ -122,7 +122,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 type: 'AUTH_SESSION_UPDATED',
                 payload: { user: newUser },
               });
-            } catch (error) {
+            } catch {
               // BroadcastChannel postMessage 실패 무시
             }
           }
@@ -242,7 +242,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Cleanup: BroadcastChannel 닫기
       try {
         authChannelRef.current?.close();
-      } catch (error) {
+      } catch {
         // 무시
       }
     };
@@ -351,7 +351,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (authChannelRef.current) {
         try {
           authChannelRef.current.postMessage({ type: 'AUTH_LOGOUT' });
-        } catch (error) {
+        } catch {
           // BroadcastChannel postMessage 실패 무시
         }
       }
@@ -369,7 +369,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (authChannelRef.current) {
         try {
           authChannelRef.current.postMessage({ type: 'AUTH_LOGOUT' });
-        } catch (error) {
+        } catch {
           // BroadcastChannel postMessage 실패 무시
         }
       }
