@@ -59,7 +59,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
   // 회원 전용 페이지 접근 제어
   useEffect(() => {
-    if (!isMounted || !isSessionSynced) {
+    if (!isMounted) {
       return;
     }
 
@@ -67,6 +67,11 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
     // 공개 경로는 인가 검증 불필요
     if (!isMemberPath) {
+      return;
+    }
+
+    // 회원 전용 경로에서만 세션 동기화 대기
+    if (!isSessionSynced) {
       return;
     }
 
@@ -133,12 +138,50 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     return <>{children}</>;
   }
 
-  // 초기 마운트 또는 세션 동기화 전: 로딩 스피너 표시
-  // ✅ OAuth 콜백 중일 때는 accessToken이 설정될 때까지 추가 대기
+  // 초기 마운트 전: 로딩 스피너 표시
+  if (!isMounted) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <div
+          style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #3498db',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+          }}
+        />
+        <style jsx>{`
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  // ✅ 회원 전용 경로만 세션 동기화 대기
+  const isMemberPath = pathname && isMemberOnlyPath(pathname);
+  
+  // 회원 전용 페이지에서만 세션 동기화 및 OAuth 콜백 대기
   const shouldShowLoading = 
-    !isMounted || 
-    !isSessionSynced || 
-    (isOAuthCallback && !accessToken);
+    isMemberPath && (
+      !isSessionSynced || 
+      (isOAuthCallback && !accessToken)
+    );
 
   if (shouldShowLoading) {
     return (
@@ -175,7 +218,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   }
 
   // 회원 전용 페이지 접근 제어
-  if (pathname && isMemberOnlyPath(pathname) && !accessToken) {
+  if (isMemberPath && !accessToken) {
     // 모달은 useEffect에서 표시, 빈 화면 유지
     return null;
   }
