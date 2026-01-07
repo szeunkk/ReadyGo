@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth.store';
 import { useAuth } from './auth.provider';
@@ -24,21 +24,27 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const { openModal, closeAllModals } = useModal();
 
   const [isMounted, setIsMounted] = useState(false);
+  const [isOAuthCallback, setIsOAuthCallback] = useState(false);
   const hasPromptedRef = useRef(false);
 
-  const isTestEnv = useMemo(() => {
-    if (typeof window === 'undefined') {
-      return false;
+  // ✅ OAuth 콜백 중인지 감지 (client-side에서만 실행)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      setIsOAuthCallback(urlParams.has('code'));
     }
+  }, []);
 
-    if (
-      typeof process !== 'undefined' &&
-      process.env.NEXT_PUBLIC_TEST_ENV === 'test'
-    ) {
-      return true;
+  const [isTestEnv, setIsTestEnv] = useState(false);
+
+  // 테스트 환경 체크 (client-side에서만 실행)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsTestEnv(
+        typeof process !== 'undefined' &&
+          process.env.NEXT_PUBLIC_TEST_ENV === 'test'
+      );
     }
-
-    return false;
   }, []);
 
   // 클라이언트 마운트 체크
@@ -53,7 +59,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
   // 회원 전용 페이지 접근 제어
   useEffect(() => {
-    if (!isMounted || !isSessionSynced) {
+    if (!isMounted) {
       return;
     }
 
@@ -61,6 +67,11 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
     // 공개 경로는 인가 검증 불필요
     if (!isMemberPath) {
+      return;
+    }
+
+    // 회원 전용 경로에서만 세션 동기화 대기
+    if (!isSessionSynced) {
       return;
     }
 
@@ -74,24 +85,24 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
       return;
     }
 
-    // 비로그인 상태: OAuth 콜백 후 세션 동기화 지연을 고려하여 짧은 대기 후 확인
+    // 비로그인 상태: OAuth 콜백 후 세션 동기화 지연을 고려하여 대기 후 확인
     if (!isTestEnv && !hasPromptedRef.current) {
-      // OAuth 콜백 후 세션 동기화가 완료될 때까지 대기 (최대 1초)
+      // ✅ OAuth 콜백 중이면 더 오래 대기 (최대 8초)
+      // ✅ 일반 페이지는 짧게 대기 (최대 1초)
       const checkAccessToken = async () => {
         let retries = 0;
-        const maxRetries = 10; // 1초 (100ms * 10)
+        const maxRetries = isOAuthCallback ? 80 : 10; // OAuth: 8초, 일반: 1초
 
         while (retries < maxRetries) {
           const currentAccessToken = useAuthStore.getState().accessToken;
           if (currentAccessToken) {
-            // accessToken이 설정되었으면 모달 표시하지 않음
             return;
           }
           await new Promise((resolve) => setTimeout(resolve, 100));
           retries++;
         }
 
-        // 1초 후에도 accessToken이 없으면 모달 표시
+        // 대기 시간 후에도 accessToken이 없으면 모달 표시
         if (!useAuthStore.getState().accessToken && !hasPromptedRef.current) {
           hasPromptedRef.current = true;
 
@@ -116,6 +127,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     pathname,
     accessToken,
     isTestEnv,
+    isOAuthCallback,
     openModal,
     closeAllModals,
     loginRedirect,
@@ -126,8 +138,52 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     return <>{children}</>;
   }
 
-  // 초기 마운트 또는 세션 동기화 전: 로딩 스피너 표시
-  if (!isMounted || !isSessionSynced) {
+  // 초기 마운트 전: 로딩 스피너 표시
+  if (!isMounted) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <div
+          style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #3498db',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+          }}
+        />
+        <style jsx>{`
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  // ✅ 회원 전용 경로만 세션 동기화 대기
+  const isMemberPath = pathname && isMemberOnlyPath(pathname);
+  
+  // 회원 전용 페이지에서만 세션 동기화 및 OAuth 콜백 대기
+  const shouldShowLoading = 
+    isMemberPath && (
+      !isSessionSynced || 
+      (isOAuthCallback && !accessToken)
+    );
+
+  if (shouldShowLoading) {
     return (
       <div
         style={{
@@ -162,7 +218,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   }
 
   // 회원 전용 페이지 접근 제어
-  if (pathname && isMemberOnlyPath(pathname) && !accessToken) {
+  if (isMemberPath && !accessToken) {
     // 모달은 useEffect에서 표시, 빈 화면 유지
     return null;
   }

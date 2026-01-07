@@ -114,7 +114,7 @@ export const useRealtimeChat = (
           const channel = baseSupabase
             .channel(`chat:${roomId}`, {
               config: {
-                broadcast: { self: true },
+                broadcast: { self: false }, // 자기가 보낸 메시지는 받지 않음 (중복 방지)
               },
             })
             .on('broadcast', { event: 'message' }, (payload) => {

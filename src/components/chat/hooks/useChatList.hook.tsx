@@ -390,9 +390,7 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
               }
             )
             .subscribe((status, err) => {
-              if (status === 'SUBSCRIBED') {
-                // 구독 성공
-              } else if (status === 'CHANNEL_ERROR') {
+              if (status === 'CHANNEL_ERROR') {
                 const errorMessage =
                   'Realtime error: Channel subscription failed';
                 console.error(errorMessage, err);

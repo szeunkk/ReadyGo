@@ -134,9 +134,9 @@ export const StatusAway: Story = {
   },
 };
 
-export const StatusBan: Story = {
+export const StatusDnd: Story = {
   args: {
-    status: 'ban',
+    status: 'dnd',
   },
 };
 
@@ -213,7 +213,7 @@ export const AllStatuses: Story = {
     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
       <Avatar status="online" />
       <Avatar status="away" />
-      <Avatar status="ban" />
+      <Avatar status="dnd" />
       <Avatar status="offline" />
     </div>
   ),
@@ -239,7 +239,7 @@ export const LightThemeStatuses: Story = {
     >
       <Avatar status="online" />
       <Avatar status="away" />
-      <Avatar status="ban" />
+      <Avatar status="dnd" />
       <Avatar status="offline" />
     </div>
   ),
@@ -266,7 +266,7 @@ export const DarkThemeStatuses: Story = {
     >
       <Avatar status="online" />
       <Avatar status="away" />
-      <Avatar status="ban" />
+      <Avatar status="dnd" />
       <Avatar status="offline" />
     </div>
   ),
@@ -313,7 +313,7 @@ export const SizeAndStatusMatrix: Story = {
         <div style={{ fontWeight: 'bold' }}>Small (s)</div>
         <Avatar size="s" status="online" />
         <Avatar size="s" status="away" />
-        <Avatar size="s" status="ban" />
+        <Avatar size="s" status="dnd" />
         <Avatar size="s" status="offline" />
       </div>
       <div
@@ -327,7 +327,7 @@ export const SizeAndStatusMatrix: Story = {
         <div style={{ fontWeight: 'bold' }}>Medium (m)</div>
         <Avatar size="m" status="online" />
         <Avatar size="m" status="away" />
-        <Avatar size="m" status="ban" />
+        <Avatar size="m" status="dnd" />
         <Avatar size="m" status="offline" />
       </div>
       <div
@@ -341,7 +341,7 @@ export const SizeAndStatusMatrix: Story = {
         <div style={{ fontWeight: 'bold' }}>Large (L)</div>
         <Avatar size="L" status="online" />
         <Avatar size="L" status="away" />
-        <Avatar size="L" status="ban" />
+        <Avatar size="L" status="dnd" />
         <Avatar size="L" status="offline" />
       </div>
     </div>
@@ -392,7 +392,7 @@ export const ThemeComparison: Story = {
         <div style={{ fontWeight: 'bold' }}>Light</div>
         <Avatar status="online" />
         <Avatar status="away" />
-        <Avatar status="ban" />
+        <Avatar status="dnd" />
         <Avatar status="offline" />
       </div>
       <div
@@ -409,7 +409,7 @@ export const ThemeComparison: Story = {
         <div style={{ fontWeight: 'bold', color: '#ffffff' }}>Dark</div>
         <Avatar status="online" />
         <Avatar status="away" />
-        <Avatar status="ban" />
+        <Avatar status="dnd" />
         <Avatar status="offline" />
       </div>
     </div>
@@ -635,7 +635,7 @@ export const CompleteExample: Story = {
               alignItems: 'center',
             }}
           >
-            <Avatar size="L" status="ban" />
+            <Avatar size="L" status="dnd" />
             <span style={{ fontSize: '12px' }}>Large Ban</span>
           </div>
           <div
@@ -701,7 +701,7 @@ export const CompleteExample: Story = {
               alignItems: 'center',
             }}
           >
-            <Avatar size="L" status="ban" />
+            <Avatar size="L" status="dnd" />
             <span style={{ fontSize: '12px', color: '#ffffff' }}>
               Large Ban
             </span>

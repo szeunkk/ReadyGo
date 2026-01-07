@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
+import type { CookieOptions } from '@supabase/ssr';
+import type { Database } from '@/types/supabase';
 import { checkUserProfile } from '@/services/auth/checkUserProfile';
 import { createUserProfile } from '@/services/auth/createUserProfile';
 import { updateUserStatusOnline } from '@/services/auth/updateUserStatusOnline';
@@ -57,10 +58,43 @@ export const GET = async function (request: NextRequest) {
       return NextResponse.redirect(loginUrl.toString());
     }
 
-    // Supabase SSR 클라이언트 생성 (쿠키 자동 관리)
-    const supabase = createClient();
+    // ✅ Supabase가 설정한 쿠키를 임시 저장
+    const supabaseCookies: Array<{
+      name: string;
+      value: string;
+      options: CookieOptions;
+    }> = [];
 
-    // 1. OAuth code로 세션 교환 (쿠키 자동 저장)
+    // ✅ Supabase 클라이언트: 쿠키를 배열에 저장
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(
+            cookiesToSet: {
+              name: string;
+              value: string;
+              options: CookieOptions;
+            }[]
+          ) {
+            // 쿠키를 배열에 저장 (나중에 리다이렉트 응답에 추가)
+            supabaseCookies.push(...cookiesToSet);
+
+            // eslint-disable-next-line no-console
+            console.log('Supabase cookies captured:', {
+              count: cookiesToSet.length,
+              names: cookiesToSet.map((c) => c.name),
+            });
+          },
+        },
+      }
+    );
+
+    // 1. OAuth code로 세션 교환 (쿠키가 supabaseCookies 배열에 저장됨)
     const {
       data: { session, user },
       error: exchangeError,
@@ -145,67 +179,27 @@ export const GET = async function (request: NextRequest) {
     // 3. 프로필 확인 (동일 supabase 인스턴스 재사용)
     const hasProfile = await checkUserProfile(supabase, verifiedUser.id);
 
-    // 리다이렉트 전에 쿠키 확인 및 로깅
-    const cookieStore = cookies();
-    const allCookies = cookieStore.getAll();
-    const supabaseCookies = allCookies.filter(
-      (cookie) =>
-        cookie.name.includes('supabase') ||
-        cookie.name.includes('sb-') ||
-        cookie.name.startsWith('sb')
-    );
-
-    // eslint-disable-next-line no-console
-    console.log('OAuth callback: Cookies before redirect', {
-      totalCookies: allCookies.length,
-      supabaseCookies: supabaseCookies.length,
-      cookieNames: allCookies.map((c) => c.name),
-      supabaseCookieNames: supabaseCookies.map((c) => c.name),
-    });
-
-    // 쿠키가 없으면 에러
-    if (supabaseCookies.length === 0) {
-      // eslint-disable-next-line no-console
-      console.error('No Supabase cookies found after session exchange!', {
-        allCookies: allCookies.map((c) => c.name),
-      });
-    }
-
-    // 4. 신규 유저면 프로필 생성 (동일 supabase 인스턴스 재사용)
+    // 4. 신규 유저면 프로필 생성 후 /signup-success로, 기존 유저는 /home으로
     if (!hasProfile) {
       try {
         await createUserProfile(supabase, verifiedUser.id);
         const signupSuccessUrl = new URL(URL_PATHS.SIGNUP_SUCCESS, request.url);
 
-        // 리다이렉트 응답 생성
-        // Next.js Route Handler에서 cookies().set()으로 설정한 쿠키는
-        // 자동으로 응답에 포함되어야 하지만, 리다이렉트의 경우 명시적으로 포함 필요
+        // ✅ 리다이렉트 응답 생성
         const redirectResponse = NextResponse.redirect(
           signupSuccessUrl.toString()
         );
 
-        // Supabase가 설정한 쿠키를 리다이렉트 응답에 명시적으로 포함
-        // 모든 쿠키를 포함 (Supabase가 설정한 쿠키만 필터링)
-        supabaseCookies.forEach((cookie) => {
-          redirectResponse.cookies.set(cookie.name, cookie.value, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-            // maxAge는 Supabase가 설정한 대로 유지 (기본값 사용)
-          });
-          // eslint-disable-next-line no-console
-          console.log('Cookie added to redirect response:', cookie.name);
+        // ✅ Supabase가 설정한 쿠키를 리다이렉트 응답에 추가
+        supabaseCookies.forEach(({ name, value, options }) => {
+          redirectResponse.cookies.set(name, value, options);
         });
 
         // eslint-disable-next-line no-console
-        console.log(
-          'OAuth callback: Redirecting to signup-success, session verified',
-          {
-            cookiesIncluded: supabaseCookies.length,
-            redirectUrl: signupSuccessUrl.toString(),
-          }
-        );
+        console.log('OAuth callback: Redirecting to signup-success', {
+          redirectUrl: signupSuccessUrl.toString(),
+          cookiesSet: supabaseCookies.length,
+        });
         return redirectResponse;
       } catch (profileError) {
         // eslint-disable-next-line no-console
@@ -219,25 +213,18 @@ export const GET = async function (request: NextRequest) {
     // 5. 기존 유저는 홈으로
     const homeUrl = new URL(URL_PATHS.HOME, request.url);
 
-    // 리다이렉트 응답 생성
+    // ✅ 리다이렉트 응답 생성
     const redirectResponse = NextResponse.redirect(homeUrl.toString());
 
-    // Supabase가 설정한 쿠키를 리다이렉트 응답에 명시적으로 포함
-    supabaseCookies.forEach((cookie) => {
-      redirectResponse.cookies.set(cookie.name, cookie.value, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-      });
-      // eslint-disable-next-line no-console
-      console.log('Cookie added to redirect response:', cookie.name);
+    // ✅ Supabase가 설정한 쿠키를 리다이렉트 응답에 추가
+    supabaseCookies.forEach(({ name, value, options }) => {
+      redirectResponse.cookies.set(name, value, options);
     });
 
     // eslint-disable-next-line no-console
-    console.log('OAuth callback: Redirecting to home, session verified', {
-      cookiesIncluded: supabaseCookies.length,
+    console.log('OAuth callback: Redirecting to home', {
       redirectUrl: homeUrl.toString(),
+      cookiesSet: supabaseCookies.length,
     });
     return redirectResponse;
   } catch (error) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
+import type { CookieOptions } from '@supabase/ssr';
+import type { Database } from '@/types/supabase';
 import { checkUserProfile } from '@/services/auth/checkUserProfile';
 import { createUserProfile } from '@/services/auth/createUserProfile';
 import { updateUserStatusOnline } from '@/services/auth/updateUserStatusOnline';
@@ -39,10 +40,43 @@ export const POST = async function (request: NextRequest) {
       );
     }
 
-    // Supabase SSR 클라이언트 생성
-    const supabase = createClient();
+    // ✅ Supabase가 설정한 쿠키를 임시 저장
+    const supabaseCookies: Array<{
+      name: string;
+      value: string;
+      options: CookieOptions;
+    }> = [];
 
-    // 세션 설정 (쿠키에 자동 저장)
+    // ✅ Supabase 클라이언트: 쿠키를 배열에 저장
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(
+            cookiesToSet: {
+              name: string;
+              value: string;
+              options: CookieOptions;
+            }[]
+          ) {
+            // 쿠키를 배열에 저장 (나중에 응답에 추가)
+            supabaseCookies.push(...cookiesToSet);
+
+            // eslint-disable-next-line no-console
+            console.log('Supabase cookies captured:', {
+              count: cookiesToSet.length,
+              names: cookiesToSet.map((c) => c.name),
+            });
+          },
+        },
+      }
+    );
+
+    // 세션 설정 (쿠키가 supabaseCookies 배열에 저장됨)
     // eslint-disable-next-line no-console
     console.log('OAuth session API - setting session...');
     const { data, error } = await supabase.auth.setSession({
@@ -73,23 +107,7 @@ export const POST = async function (request: NextRequest) {
       email: data.user.email,
       createdAt: data.user.created_at,
       lastSignInAt: data.user.last_sign_in_at,
-    });
-
-    // 쿠키 확인
-    const cookieStore = cookies();
-    const allCookies = cookieStore.getAll();
-    const supabaseCookies = allCookies.filter(
-      (cookie) =>
-        cookie.name.includes('supabase') ||
-        cookie.name.includes('sb-') ||
-        cookie.name.startsWith('sb')
-    );
-
-    // eslint-disable-next-line no-console
-    console.log('OAuth session API - Cookies after setSession', {
-      totalCookies: allCookies.length,
-      supabaseCookies: supabaseCookies.length,
-      cookieNames: allCookies.map((c) => c.name),
+      cookiesCaptured: supabaseCookies.length,
     });
 
     // user_status를 online으로 업데이트
@@ -138,14 +156,9 @@ export const POST = async function (request: NextRequest) {
           },
         });
 
-        // 쿠키를 명시적으로 응답에 포함
-        supabaseCookies.forEach((cookie) => {
-          response.cookies.set(cookie.name, cookie.value, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-          });
+        // ✅ Supabase가 설정한 쿠키를 응답에 추가
+        supabaseCookies.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
         });
 
         // eslint-disable-next-line no-console
@@ -178,13 +191,9 @@ export const POST = async function (request: NextRequest) {
               },
             });
 
-            supabaseCookies.forEach((cookie) => {
-              response.cookies.set(cookie.name, cookie.value, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                path: '/',
-              });
+            // ✅ Supabase가 설정한 쿠키를 응답에 추가
+            supabaseCookies.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options);
             });
 
             // eslint-disable-next-line no-console
@@ -229,14 +238,9 @@ export const POST = async function (request: NextRequest) {
       },
     });
 
-    // 쿠키를 명시적으로 응답에 포함
-    supabaseCookies.forEach((cookie) => {
-      response.cookies.set(cookie.name, cookie.value, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-      });
+    // ✅ Supabase가 설정한 쿠키를 응답에 추가
+    supabaseCookies.forEach(({ name, value, options }) => {
+      response.cookies.set(name, value, options);
     });
 
     // eslint-disable-next-line no-console

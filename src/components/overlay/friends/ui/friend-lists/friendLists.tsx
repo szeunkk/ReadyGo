@@ -8,7 +8,7 @@ import Icon from '@/commons/components/icon';
 interface Friend {
   id: string;
   nickname: string;
-  status: 'online' | 'offline' | 'away' | 'ban';
+  status: 'online' | 'offline' | 'away' | 'dnd';
 }
 
 export default function FriendLists() {
@@ -16,7 +16,7 @@ export default function FriendLists() {
     { id: '1', nickname: '게이머호랑이', status: 'online' },
     { id: '2', nickname: '게이머호랑이', status: 'offline' },
     { id: '3', nickname: '게이머호랑이', status: 'away' },
-    { id: '4', nickname: '게이머호랑이', status: 'ban' },
+    { id: '4', nickname: '게이머호랑이', status: 'dnd' },
     { id: '5', nickname: '까칠한까마귀', status: 'online' },
   ]);
 
