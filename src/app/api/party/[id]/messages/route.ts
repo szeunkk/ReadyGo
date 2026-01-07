@@ -91,10 +91,7 @@ export const GET = async (
           { status: 404 }
         );
       }
-      return NextResponse.json(
-        { error: fetchError.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: fetchError.message }, { status: 500 });
     }
 
     // 5. 권한 확인
@@ -212,7 +209,7 @@ export const POST = async (
     let body;
     try {
       body = await request.json();
-    } catch (parseError) {
+    } catch {
       return NextResponse.json(
         {
           code: 'CHAT_VALIDATION_ERROR',
@@ -238,10 +235,7 @@ export const POST = async (
           { status: 404 }
         );
       }
-      return NextResponse.json(
-        { error: fetchError.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: fetchError.message }, { status: 500 });
     }
 
     // 5. 권한 확인
@@ -309,4 +303,3 @@ export const POST = async (
     );
   }
 };
-
