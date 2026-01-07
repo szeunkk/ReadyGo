@@ -204,18 +204,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const retryTimeouts = [
         setTimeout(() => {
           if (!useAuthStore.getState().accessToken) {
+            // eslint-disable-next-line no-console
             console.log('세션 재시도 (2초 후)');
             syncSessionToStore(0, false);
           }
         }, 2000),
         setTimeout(() => {
           if (!useAuthStore.getState().accessToken) {
+            // eslint-disable-next-line no-console
             console.log('세션 재시도 (4초 후)');
             syncSessionToStore(0, false);
           }
         }, 4000),
         setTimeout(() => {
           if (!useAuthStore.getState().accessToken) {
+            // eslint-disable-next-line no-console
             console.log('세션 재시도 (6초 후)');
             syncSessionToStore(0, false);
           }
