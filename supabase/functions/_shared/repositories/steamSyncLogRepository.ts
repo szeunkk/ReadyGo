@@ -33,10 +33,7 @@ export type SyncLogInput = {
  * @param params - 로그 입력 데이터
  * @returns DB 응답 구조를 그대로 반환
  */
-export const insertLog = async (
-  client: DbClient,
-  params: SyncLogInput
-) => {
+export const insertLog = async (client: DbClient, params: SyncLogInput) => {
   return await client.from('steam_sync_logs').insert({
     user_id: params.userId,
     status: params.status,
@@ -44,4 +41,3 @@ export const insertLog = async (
     synced_at: new Date().toISOString(),
   });
 };
-
