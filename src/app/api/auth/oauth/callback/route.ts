@@ -145,31 +145,21 @@ export const GET = async function (request: NextRequest) {
     // 3. 프로필 확인 (동일 supabase 인스턴스 재사용)
     const hasProfile = await checkUserProfile(supabase, verifiedUser.id);
 
-    // 리다이렉트 전에 쿠키 확인 및 로깅
-    const cookieStore = await cookies();
-    const allCookies = cookieStore.getAll();
-    const supabaseCookies = allCookies.filter(
-      (cookie) =>
-        cookie.name.includes('supabase') ||
-        cookie.name.includes('sb-') ||
-        cookie.name.startsWith('sb')
-    );
+    // 세션에서 직접 토큰 추출 (쿠키 타이밍 이슈 해결)
+    // exchangeCodeForSession이 반환한 세션을 사용
+    const sessionData = {
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+      expires_at: session.expires_at,
+      expires_in: session.expires_in,
+    };
 
     // eslint-disable-next-line no-console
-    console.log('OAuth callback: Cookies before redirect', {
-      totalCookies: allCookies.length,
-      supabaseCookies: supabaseCookies.length,
-      cookieNames: allCookies.map((c) => c.name),
-      supabaseCookieNames: supabaseCookies.map((c) => c.name),
+    console.log('OAuth callback: Session tokens extracted', {
+      hasAccessToken: !!sessionData.access_token,
+      hasRefreshToken: !!sessionData.refresh_token,
+      expiresAt: sessionData.expires_at,
     });
-
-    // 쿠키가 없으면 에러
-    if (supabaseCookies.length === 0) {
-      // eslint-disable-next-line no-console
-      console.error('No Supabase cookies found after session exchange!', {
-        allCookies: allCookies.map((c) => c.name),
-      });
-    }
 
     // 4. 신규 유저면 프로필 생성 (동일 supabase 인스턴스 재사용)
     if (!hasProfile) {
@@ -178,31 +168,31 @@ export const GET = async function (request: NextRequest) {
         const signupSuccessUrl = new URL(URL_PATHS.SIGNUP_SUCCESS, request.url);
 
         // 리다이렉트 응답 생성
-        // Next.js Route Handler에서 cookies().set()으로 설정한 쿠키는
-        // 자동으로 응답에 포함되어야 하지만, 리다이렉트의 경우 명시적으로 포함 필요
         const redirectResponse = NextResponse.redirect(
           signupSuccessUrl.toString()
         );
 
-        // Supabase가 설정한 쿠키를 리다이렉트 응답에 명시적으로 포함
-        // 모든 쿠키를 포함 (Supabase가 설정한 쿠키만 필터링)
-        supabaseCookies.forEach((cookie) => {
-          redirectResponse.cookies.set(cookie.name, cookie.value, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-            // maxAge는 Supabase가 설정한 대로 유지 (기본값 사용)
-          });
-          // eslint-disable-next-line no-console
-          console.log('Cookie added to redirect response:', cookie.name);
+        // 세션 토큰을 직접 쿠키로 설정 (타이밍 이슈 해결)
+        const cookiePrefix = `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0]}-auth-token`;
+        
+        redirectResponse.cookies.set(cookiePrefix, JSON.stringify({
+          access_token: sessionData.access_token,
+          refresh_token: sessionData.refresh_token,
+          expires_at: sessionData.expires_at,
+          expires_in: sessionData.expires_in,
+        }), {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          path: '/',
+          maxAge: 60 * 60 * 24 * 7, // 7 days
         });
 
         // eslint-disable-next-line no-console
         console.log(
-          'OAuth callback: Redirecting to signup-success, session verified',
+          'OAuth callback: Redirecting to signup-success with session cookie',
           {
-            cookiesIncluded: supabaseCookies.length,
+            cookieName: cookiePrefix,
             redirectUrl: signupSuccessUrl.toString(),
           }
         );
@@ -222,21 +212,25 @@ export const GET = async function (request: NextRequest) {
     // 리다이렉트 응답 생성
     const redirectResponse = NextResponse.redirect(homeUrl.toString());
 
-    // Supabase가 설정한 쿠키를 리다이렉트 응답에 명시적으로 포함
-    supabaseCookies.forEach((cookie) => {
-      redirectResponse.cookies.set(cookie.name, cookie.value, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-      });
-      // eslint-disable-next-line no-console
-      console.log('Cookie added to redirect response:', cookie.name);
+    // 세션 토큰을 직접 쿠키로 설정 (타이밍 이슈 해결)
+    const cookiePrefix = `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0]}-auth-token`;
+    
+    redirectResponse.cookies.set(cookiePrefix, JSON.stringify({
+      access_token: sessionData.access_token,
+      refresh_token: sessionData.refresh_token,
+      expires_at: sessionData.expires_at,
+      expires_in: sessionData.expires_in,
+    }), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
     // eslint-disable-next-line no-console
-    console.log('OAuth callback: Redirecting to home, session verified', {
-      cookiesIncluded: supabaseCookies.length,
+    console.log('OAuth callback: Redirecting to home with session cookie', {
+      cookieName: cookiePrefix,
       redirectUrl: homeUrl.toString(),
     });
     return redirectResponse;
