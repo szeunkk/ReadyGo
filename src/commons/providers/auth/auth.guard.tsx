@@ -27,13 +27,15 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const [isOAuthCallback, setIsOAuthCallback] = useState(false);
   const hasPromptedRef = useRef(false);
 
-  // ✅ OAuth 콜백 중인지 감지 (client-side에서만 실행)
+  // ✅ OAuth 콜백 중인지 감지: 루트 경로이면서 code 파라미터가 있을 때
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
-      setIsOAuthCallback(urlParams.has('code'));
+      const hasCode = urlParams.has('code');
+      const isRoot = pathname === '/';
+      setIsOAuthCallback(isRoot && hasCode);
     }
-  }, []);
+  }, [pathname]);
 
   const [isTestEnv, setIsTestEnv] = useState(false);
 
