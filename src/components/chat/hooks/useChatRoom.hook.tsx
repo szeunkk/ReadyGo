@@ -209,8 +209,6 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
     if (seenMessageIdsRef.current.has(message.id)) {
       return;
     }
-      message.content
-    );
     seenMessageIdsRef.current.add(message.id);
 
     setMessages((prev) => {
