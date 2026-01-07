@@ -117,10 +117,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
           // ✅ 다른 탭에 세션 업데이트 알림 (로그인 또는 세션 갱신)
           if (newUser && authChannelRef.current) {
-            authChannelRef.current.postMessage({
-              type: 'AUTH_SESSION_UPDATED',
-              payload: { user: newUser },
-            });
+            try {
+              authChannelRef.current.postMessage({
+                type: 'AUTH_SESSION_UPDATED',
+                payload: { user: newUser },
+              });
+            } catch (error) {
+              // BroadcastChannel postMessage 실패 무시
+            }
           }
         }
 
@@ -204,41 +208,43 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     // 브라우저 환경에서만 BroadcastChannel 사용
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-      authChannelRef.current = new BroadcastChannel('readygo-auth');
+      try {
+        authChannelRef.current = new BroadcastChannel('readygo-auth');
 
-      // 다른 탭에서 보낸 메시지 수신
-      authChannelRef.current.onmessage = (event) => {
-        const { type, payload } = event.data;
+        // 다른 탭에서 보낸 메시지 수신
+        authChannelRef.current.onmessage = (event) => {
+          const { type, payload } = event.data;
 
-        // eslint-disable-next-line no-console
-        console.log('📡 BroadcastChannel 메시지 수신:', type);
+          switch (type) {
+            case 'AUTH_LOGOUT':
+              // 다른 탭에서 로그아웃 → 이 탭도 즉시 로그아웃
+              clearAuth();
+              useSidePanelStore.getState().close();
+              useOverlayStore.getState().close();
+              router.push(URL_PATHS.LOGIN);
+              break;
 
-        switch (type) {
-          case 'AUTH_LOGOUT':
-            // 다른 탭에서 로그아웃 → 이 탭도 즉시 로그아웃
-            // eslint-disable-next-line no-console
-            console.log('다른 탭에서 로그아웃 감지 → 로그아웃 처리');
-            clearAuth();
-            useSidePanelStore.getState().close();
-            useOverlayStore.getState().close();
-            router.push(URL_PATHS.LOGIN);
-            break;
-
-          case 'AUTH_SESSION_UPDATED':
-            // 다른 탭에서 세션 업데이트 → 이 탭도 동기화
-            // eslint-disable-next-line no-console
-            console.log('다른 탭에서 세션 업데이트 감지 → 세션 동기화');
-            if (payload?.user) {
-              setAuth('authenticated', payload.user);
-            }
-            break;
-        }
-      };
+            case 'AUTH_SESSION_UPDATED':
+              // 다른 탭에서 세션 업데이트 → 이 탭도 동기화
+              if (payload?.user) {
+                setAuth('authenticated', payload.user);
+              }
+              break;
+          }
+        };
+      } catch (error) {
+        // 시크릿 모드 등에서 BroadcastChannel 초기화 실패 시 무시
+        console.warn('BroadcastChannel initialization failed:', error);
+      }
     }
 
     return () => {
       // Cleanup: BroadcastChannel 닫기
-      authChannelRef.current?.close();
+      try {
+        authChannelRef.current?.close();
+      } catch (error) {
+        // 무시
+      }
     };
   }, [router, setAuth, clearAuth]);
 
@@ -255,22 +261,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const retryTimeouts = [
         setTimeout(() => {
           if (!useAuthStore.getState().accessToken) {
-            // eslint-disable-next-line no-console
-            console.log('세션 재시도 (2초 후)');
             syncSessionToStore(0, false);
           }
         }, 2000),
         setTimeout(() => {
           if (!useAuthStore.getState().accessToken) {
-            // eslint-disable-next-line no-console
-            console.log('세션 재시도 (4초 후)');
             syncSessionToStore(0, false);
           }
         }, 4000),
         setTimeout(() => {
           if (!useAuthStore.getState().accessToken) {
-            // eslint-disable-next-line no-console
-            console.log('세션 재시도 (6초 후)');
             syncSessionToStore(0, false);
           }
         }, 6000),
@@ -349,7 +349,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // ✅ 4. 다른 탭에 로그아웃 알림
       if (authChannelRef.current) {
-        authChannelRef.current.postMessage({ type: 'AUTH_LOGOUT' });
+        try {
+          authChannelRef.current.postMessage({ type: 'AUTH_LOGOUT' });
+        } catch (error) {
+          // BroadcastChannel postMessage 실패 무시
+        }
       }
 
       // 5. 로그인 페이지로 이동
@@ -363,7 +367,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // 다른 탭에 알림
       if (authChannelRef.current) {
-        authChannelRef.current.postMessage({ type: 'AUTH_LOGOUT' });
+        try {
+          authChannelRef.current.postMessage({ type: 'AUTH_LOGOUT' });
+        } catch (error) {
+          // BroadcastChannel postMessage 실패 무시
+        }
       }
 
       router.push(URL_PATHS.LOGIN);
