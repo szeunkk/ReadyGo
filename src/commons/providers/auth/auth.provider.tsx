@@ -46,6 +46,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const isSessionSyncedRef = useRef(false);
   const [isSessionSynced, setIsSessionSynced] = useState(false); // 세션 동기화 완료 상태
   const storeRef = useRef({ accessToken, user });
+  const authChannelRef = useRef<BroadcastChannel | null>(null); // 탭 간 통신 채널
 
   // store 상태를 ref에 동기화 (무한 루프 방지)
   useEffect(() => {
@@ -113,6 +114,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           JSON.stringify(currentUser) !== JSON.stringify(newUser)
         ) {
           setAuth(newAccessToken, newUser);
+
+          // ✅ 다른 탭에 세션 업데이트 알림 (로그인 또는 세션 갱신)
+          if (newUser && authChannelRef.current) {
+            authChannelRef.current.postMessage({
+              type: 'AUTH_SESSION_UPDATED',
+              payload: { user: newUser },
+            });
+          }
         }
 
         // 성공 시 플래그 설정 (재시도 중이어도 성공하면 플래그 설정)
@@ -190,6 +199,48 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     },
     [clearAuth, setAuth]
   );
+
+  // BroadcastChannel 초기화 (탭 간 통신)
+  useEffect(() => {
+    // 브라우저 환경에서만 BroadcastChannel 사용
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      authChannelRef.current = new BroadcastChannel('readygo-auth');
+
+      // 다른 탭에서 보낸 메시지 수신
+      authChannelRef.current.onmessage = (event) => {
+        const { type, payload } = event.data;
+
+        // eslint-disable-next-line no-console
+        console.log('📡 BroadcastChannel 메시지 수신:', type);
+
+        switch (type) {
+          case 'AUTH_LOGOUT':
+            // 다른 탭에서 로그아웃 → 이 탭도 즉시 로그아웃
+            // eslint-disable-next-line no-console
+            console.log('다른 탭에서 로그아웃 감지 → 로그아웃 처리');
+            clearAuth();
+            useSidePanelStore.getState().close();
+            useOverlayStore.getState().close();
+            router.push(URL_PATHS.LOGIN);
+            break;
+
+          case 'AUTH_SESSION_UPDATED':
+            // 다른 탭에서 세션 업데이트 → 이 탭도 동기화
+            // eslint-disable-next-line no-console
+            console.log('다른 탭에서 세션 업데이트 감지 → 세션 동기화');
+            if (payload?.user) {
+              setAuth('authenticated', payload.user);
+            }
+            break;
+        }
+      };
+    }
+
+    return () => {
+      // Cleanup: BroadcastChannel 닫기
+      authChannelRef.current?.close();
+    };
+  }, [router, setAuth, clearAuth]);
 
   // 마운트 시 초기 세션 동기화
   useEffect(() => {
@@ -279,6 +330,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
    * - API를 통해 서버 쿠키 삭제 및 Supabase 세션 제거
    * - 클라이언트 store 초기화
    * - UI 상태 정리 (사이드 패널, 오버레이)
+   * - 다른 탭에 로그아웃 알림
    */
   const logout = async () => {
     try {
@@ -295,7 +347,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // 3. Zustand store 초기화 (이 시점에서 user가 null이 되면서 Provider들이 자동 cleanup)
       clearAuth();
 
-      // 4. 로그인 페이지로 이동
+      // ✅ 4. 다른 탭에 로그아웃 알림
+      if (authChannelRef.current) {
+        authChannelRef.current.postMessage({ type: 'AUTH_LOGOUT' });
+      }
+
+      // 5. 로그인 페이지로 이동
       router.push(URL_PATHS.LOGIN);
     } catch (error) {
       console.error('Failed to logout:', error);
@@ -303,6 +360,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       clearAuth();
       useSidePanelStore.getState().close();
       useOverlayStore.getState().close();
+
+      // 다른 탭에 알림
+      if (authChannelRef.current) {
+        authChannelRef.current.postMessage({ type: 'AUTH_LOGOUT' });
+      }
+
       router.push(URL_PATHS.LOGIN);
     }
   };
