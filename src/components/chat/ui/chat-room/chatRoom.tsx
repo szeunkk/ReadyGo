@@ -218,20 +218,6 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
         className={styles.messageList}
         aria-label="메시지 목록"
       >
-        {/* 플로팅 버튼: 최근 메시지로 이동 (메시지 리스트 상단에 고정) */}
-        {showScrollToBottomButton && (
-          <div className={styles.scrollToBottomButtonWrapper}>
-            <button
-              className={styles.scrollToBottomButton}
-              onClick={handleScrollToBottomClick}
-              aria-label="최근 메시지로 이동"
-              type="button"
-            >
-              <Icon name="chevron-down" size={20} />
-              <span>최근 메시지</span>
-            </button>
-          </div>
-        )}
         {isLoading ? null : formattedMessages.length === 0 ? ( // 메시지 로딩 중일 때는 빈 상태로 표시 (스켈레톤 없음)
           <div style={{ padding: '20px', textAlign: 'center' }}>
             메시지가 없습니다
@@ -347,6 +333,20 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
               </div>
             );
           })
+        )}
+        {/* 플로팅 버튼: 최근 메시지로 이동 (메시지 리스트 하단에 고정) */}
+        {showScrollToBottomButton && (
+          <div className={styles.scrollToBottomButtonWrapper}>
+            <button
+              className={styles.scrollToBottomButton}
+              onClick={handleScrollToBottomClick}
+              aria-label="최근 메시지로 이동"
+              type="button"
+            >
+              <Icon name="chevron-down" size={20} />
+              <span>최근 메시지</span>
+            </button>
+          </div>
         )}
       </div>
 

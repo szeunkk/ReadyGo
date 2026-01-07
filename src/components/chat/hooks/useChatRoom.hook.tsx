@@ -63,9 +63,13 @@ export interface UseChatRoomReturn {
   error: string | null;
   isConnected: boolean;
   scrollToBottom: (containerRef: React.RefObject<HTMLDivElement>) => void;
-  scrollToUnreadBoundary: (containerRef: React.RefObject<HTMLDivElement>) => void;
+  scrollToUnreadBoundary: (
+    containerRef: React.RefObject<HTMLDivElement>
+  ) => void;
   getUnreadBoundaryMessageId: () => number | null;
-  shouldShowScrollToBottomButton: (containerRef: React.RefObject<HTMLDivElement>) => boolean;
+  shouldShowScrollToBottomButton: (
+    containerRef: React.RefObject<HTMLDivElement>
+  ) => boolean;
   shouldScrollToBottom: boolean;
   shouldScrollToUnread: boolean;
   clearScrollTriggers: () => void;
@@ -190,7 +194,11 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
   const { user } = useAuth();
 
   // useChatList Hook 호출하여 chatRooms 조회
-  const { chatRooms, isLoading: isChatListLoading, markRoomAsReadOptimistic } = useChatList();
+  const {
+    chatRooms,
+    isLoading: isChatListLoading,
+    markRoomAsReadOptimistic,
+  } = useChatList();
 
   // 상태 관리
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -207,6 +215,9 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
   const isSendingRef = useRef(false); // 중복 전송 방지
   const shouldAutoScrollRef = useRef(true); // 자동 스크롤 여부 (사용자가 수동 스크롤 시 false)
   const initialLoadMessageIdsRef = useRef<Set<number>>(new Set()); // 초기 로드된 메시지 ID들
+  const initialLoadMessageReadStatusRef = useRef<Map<number, boolean>>(
+    new Map()
+  ); // 초기 로드 시점의 메시지별 is_read 상태
 
   // onMessage ref 업데이트 (최신 콜백 유지)
   useEffect(() => {
@@ -319,9 +330,19 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
 
       // seenMessageIds 초기화 및 업데이트
       seenMessageIdsRef.current = new Set(reversedMessages.map((m) => m.id));
-      
+
       // 초기 로드된 메시지 ID 저장 (구분선 표시용)
-      initialLoadMessageIdsRef.current = new Set(reversedMessages.map((m) => m.id));
+      initialLoadMessageIdsRef.current = new Set(
+        reversedMessages.map((m) => m.id)
+      );
+
+      // 초기 로드 시점의 is_read 상태 저장 (markRoomAsRead 호출 전 상태)
+      // 구분선 표시는 이 초기 상태를 기준으로 판단
+      const initialReadStatusMap = new Map<number, boolean>();
+      reversedMessages.forEach((msg) => {
+        initialReadStatusMap.set(msg.id, msg.is_read ?? false);
+      });
+      initialLoadMessageReadStatusRef.current = initialReadStatusMap;
 
       setMessages(reversedMessages);
       // 스크롤 트리거는 formattedMessages가 준비된 후 별도 useEffect에서 처리
@@ -642,6 +663,8 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
     seenMessageIdsRef.current.clear();
     // 초기 로드 메시지 ID 초기화
     initialLoadMessageIdsRef.current.clear();
+    // 초기 로드 시점의 is_read 상태 초기화
+    initialLoadMessageReadStatusRef.current.clear();
     // isLoading 리셋
     setIsLoading(true);
     // error 상태 초기화
@@ -713,23 +736,44 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
 
       // 안읽은 메시지 구분선 추가 (초기 로드된 메시지 중 가장 오래된 안읽은 메시지 앞에 한 번만)
       // 실시간으로 들어오는 메시지에는 구분선 추가하지 않음
+      // 초기 로드 시점의 is_read 상태를 기준으로 판단 (markRoomAsRead 호출 후에도 유지)
       if (
         !hasAddedUnreadDivider &&
         !isOwnMessage &&
-        isRead === false &&
         initialLoadMessageIdsRef.current.has(message.id) // 초기 로드된 메시지만 체크
       ) {
-        // 현재 메시지가 안읽은 상대방 메시지이고 초기 로드된 메시지인 경우
-        // 이전 메시지가 없거나, 이전 메시지가 읽었거나 자신의 메시지인 경우 구분선 추가
-        if (
-          !previousMessage ||
-          previousMessage.sender_id === user.id ||
-          previousMessage.is_read === true
-        ) {
-          result.push({
-            type: 'unread-divider',
-          });
-          hasAddedUnreadDivider = true;
+        // 초기 로드 시점의 is_read 상태 확인
+        const initialIsRead =
+          initialLoadMessageReadStatusRef.current.get(message.id) ?? false;
+
+        // 초기 로드 시점에 안읽은 메시지였던 경우에만 구분선 추가
+        if (initialIsRead === false) {
+          // 이전 메시지 확인
+          let shouldAddDivider = false;
+
+          if (!previousMessage) {
+            // 첫 번째 메시지인 경우
+            shouldAddDivider = true;
+          } else if (previousMessage.sender_id === user.id) {
+            // 이전 메시지가 자신의 메시지인 경우
+            shouldAddDivider = true;
+          } else {
+            // 이전 메시지의 초기 로드 시점 is_read 상태 확인
+            const previousInitialIsRead =
+              initialLoadMessageReadStatusRef.current.get(previousMessage.id) ??
+              false;
+            if (previousInitialIsRead === true) {
+              // 이전 메시지가 초기 로드 시점에 읽은 상태였던 경우
+              shouldAddDivider = true;
+            }
+          }
+
+          if (shouldAddDivider) {
+            result.push({
+              type: 'unread-divider',
+            });
+            hasAddedUnreadDivider = true;
+          }
         }
       }
 
@@ -779,7 +823,7 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
     // 초기 로드 완료 후 한 번만 실행
     if (!isInitialLoadRef.current) {
       isInitialLoadRef.current = true;
-      
+
       // 안읽은 메시지가 있는지 확인 (formattedMessages 기반)
       const hasUnread = formattedMessages.some(
         (item) =>
@@ -939,7 +983,10 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
 
         if (unreadDividerElement) {
           // divider 요소로 스크롤 (약간의 여백을 두고)
-          unreadDividerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          unreadDividerElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
           return;
         }
 
@@ -952,7 +999,10 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
 
           if (messageElement) {
             // 메시지 요소로 스크롤 (약간의 여백을 두고)
-            messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            messageElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
             return;
           }
         }
@@ -977,6 +1027,8 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
 
   /**
    * 최하단 이동 버튼 표시 여부 확인
+   * 스크롤이 전체 길이의 50% 이상 올라갔을 때만 표시
+   * (최근 메시지가 화면에서 안 보일 때만 표시)
    */
   const shouldShowScrollToBottomButton = useCallback(
     (containerRef: React.RefObject<HTMLDivElement>): boolean => {
@@ -985,9 +1037,24 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
       }
 
       const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
-      const threshold = 50; // 50px 이내면 최하단으로 간주
 
-      return scrollTop + clientHeight < scrollHeight - threshold;
+      // 스크롤 가능한 전체 높이 계산
+      const scrollableHeight = scrollHeight - clientHeight;
+
+      // 스크롤 가능한 높이가 없으면 버튼 표시 안 함 (모든 메시지가 화면에 보임)
+      if (scrollableHeight <= 0) {
+        return false;
+      }
+
+      // 현재 스크롤 위치가 하단에서 얼마나 떨어져 있는지 계산
+      // scrollTop + clientHeight = 현재 보이는 영역의 하단 위치
+      // scrollHeight - (scrollTop + clientHeight) = 하단까지 남은 거리
+      const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
+
+      // 하단까지의 거리가 전체 스크롤 가능한 높이의 50% 이상일 때만 버튼 표시
+      // 즉, 스크롤이 전체 길이의 50% 이상 올라갔을 때만 표시
+      const threshold = scrollableHeight * 0.5;
+      return distanceFromBottom > threshold;
     },
     []
   );
