@@ -169,6 +169,7 @@ export default function PartyInfo({
           onClick={onGameStartClick}
           data-testid="party-detail-game-start-button"
         >
+          <Icon name="play-circle" size={20} />
           게임시작
         </Button>
       ) : userRole === 'member' ? (
