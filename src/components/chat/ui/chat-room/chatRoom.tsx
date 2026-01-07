@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AnimalType } from '@/commons/constants/animal';
 import { useSideProfilePanel } from '@/hooks/useSideProfilePanel';
 import { useChatRoom, useChatRoomInput } from '@/components/chat/hooks';
+import { formatDateDivider } from '@/lib/chat/messageFormatter';
 
 interface ChatRoomProps {
   roomId?: string;
@@ -44,6 +45,7 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
     shouldScrollToUnread,
     clearScrollTriggers,
     shouldShowScrollToBottomButton,
+    roomCreatedAt,
   } = useChatRoom({ roomId: roomIdNumber });
 
   // 플로팅 버튼 표시 여부
@@ -219,9 +221,18 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
         aria-label="메시지 목록"
       >
         {isLoading ? null : formattedMessages.length === 0 ? ( // 메시지 로딩 중일 때는 빈 상태로 표시 (스켈레톤 없음)
-          <div style={{ padding: '20px', textAlign: 'center' }}>
-            메시지가 없습니다
-          </div>
+          <>
+            {roomCreatedAt && (
+              <div className={styles.dateDivider}>
+                {formatDateDivider(roomCreatedAt)}
+              </div>
+            )}
+            <div className={styles.unreadDivider}>
+              <span className={styles.unreadDividerText}>
+                메시지가 없습니다
+              </span>
+            </div>
+          </>
         ) : (
           formattedMessages.map((item, index) => {
             if (item.type === 'date-divider') {

@@ -10,6 +10,15 @@ import { useChatList } from './useChatList.hook';
 import { getEffectiveStatus } from '@/stores/user-status.store';
 import { getAvatarImagePath } from '@/lib/avatar/getAvatarImagePath';
 import type { Database } from '@/types/supabase';
+import {
+  formatMessageTime,
+  formatDateDivider,
+  isNewDate,
+  isConsecutiveMessage,
+  isSameTimeGroup,
+  formatMessageContent,
+} from '@/lib/chat/messageFormatter';
+import { useChatRoomScroll } from './useChatRoomScroll.hook';
 
 // 타입 정의
 type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
@@ -75,145 +84,8 @@ export interface UseChatRoomReturn {
   shouldScrollToBottom: boolean;
   shouldScrollToUnread: boolean;
   clearScrollTriggers: () => void;
+  roomCreatedAt: string | null; // 채팅방 생성 날짜
 }
-
-/**
- * 메시지 시간 포맷팅 함수
- */
-const formatMessageTime = (dateString: string | null): string => {
-  if (!dateString) {
-    return '';
-  }
-
-  const date = new Date(dateString);
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  const ampm = hours >= 12 ? '오후' : '오전';
-  const displayHours = hours % 12 || 12;
-  const timeString = `${ampm} ${displayHours}:${minutes
-    .toString()
-    .padStart(2, '0')}`;
-
-  return timeString;
-};
-
-/**
- * 날짜 구분선 포맷팅 함수
- */
-const formatDateDivider = (dateString: string | null): string => {
-  if (!dateString) {
-    return '';
-  }
-
-  const date = new Date(dateString);
-  const weekdays = [
-    '일요일',
-    '월요일',
-    '화요일',
-    '수요일',
-    '목요일',
-    '금요일',
-    '토요일',
-  ];
-  const weekday = weekdays[date.getDay()];
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 ${weekday}`;
-};
-
-/**
- * 날짜가 변경되었는지 확인하는 함수
- */
-const isNewDate = (
-  currentDate: string | null,
-  previousDate: string | null
-): boolean => {
-  if (!currentDate || !previousDate) {
-    return true;
-  }
-
-  const current = new Date(currentDate);
-  const previous = new Date(previousDate);
-
-  return (
-    current.getFullYear() !== previous.getFullYear() ||
-    current.getMonth() !== previous.getMonth() ||
-    current.getDate() !== previous.getDate()
-  );
-};
-
-/**
- * 연속된 메시지인지 확인하는 함수 (하위 호환성)
- */
-const isConsecutiveMessage = (
-  currentMessage: ChatMessage,
-  previousMessage: ChatMessage | null
-): boolean => {
-  if (!previousMessage) {
-    return false;
-  }
-  return (
-    currentMessage.sender_id === previousMessage.sender_id &&
-    currentMessage.content_type !== 'system'
-  );
-};
-
-/**
- * 같은 시간(시, 분)에 전송된 메시지인지 확인하는 함수
- */
-const isSameTimeGroup = (
-  currentMessage: ChatMessage,
-  previousMessage: ChatMessage | null
-): boolean => {
-  if (!previousMessage) {
-    return false;
-  }
-
-  // 같은 발신자이고 시스템 메시지가 아니어야 함
-  if (
-    currentMessage.sender_id !== previousMessage.sender_id ||
-    currentMessage.content_type === 'system' ||
-    previousMessage.content_type === 'system'
-  ) {
-    return false;
-  }
-
-  // 시간(시, 분) 비교
-  if (!currentMessage.created_at || !previousMessage.created_at) {
-    return false;
-  }
-
-  const currentDate = new Date(currentMessage.created_at);
-  const previousDate = new Date(previousMessage.created_at);
-
-  return (
-    currentDate.getHours() === previousDate.getHours() &&
-    currentDate.getMinutes() === previousDate.getMinutes()
-  );
-};
-
-/**
- * 메시지 내용 포맷팅 함수
- */
-const formatMessageContent = (message: ChatMessage | null): string => {
-  if (!message) {
-    return '메시지가 없습니다';
-  }
-
-  const { content, content_type: contentType } = message;
-
-  if (content === null) {
-    return '메시지가 없습니다';
-  }
-
-  if (contentType === 'image') {
-    return '📷 이미지';
-  }
-
-  if (contentType === 'system') {
-    return content;
-  }
-
-  return content;
-};
 
 /**
  * useChatRoom Hook
@@ -240,8 +112,6 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
-  const [shouldScrollToUnread, setShouldScrollToUnread] = useState(false);
 
   // postgres_changes 채널 관리
   const channelRef = useRef<RealtimeChannel | null>(null);
@@ -249,11 +119,13 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
   const onMessageRef = useRef(onMessage);
   const seenMessageIdsRef = useRef<Set<number>>(new Set());
   const isSendingRef = useRef(false); // 중복 전송 방지
-  const shouldAutoScrollRef = useRef(true); // 자동 스크롤 여부 (사용자가 수동 스크롤 시 false)
   const initialLoadMessageIdsRef = useRef<Set<number>>(new Set()); // 초기 로드된 메시지 ID들
   const initialLoadMessageReadStatusRef = useRef<Map<number, boolean>>(
     new Map()
   ); // 초기 로드 시점의 메시지별 is_read 상태
+  const triggerScrollToBottomRef = useRef<(() => void) | null>(null); // 스크롤 트리거 함수 ref
+  const shouldAutoScrollRef = useRef(true); // 자동 스크롤 여부 (사용자가 수동 스크롤 시 false)
+  const isInitialLoadRef = useRef(false); // 초기 로드 플래그
 
   // onMessage ref 업데이트 (최신 콜백 유지)
   useEffect(() => {
@@ -274,10 +146,10 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
       // 자신이 보낸 메시지이면 최하단 스크롤 트리거
       if (message.sender_id === user?.id) {
         shouldAutoScrollRef.current = true;
-        setShouldScrollToBottom(true);
+        triggerScrollToBottomRef.current?.();
       } else if (shouldAutoScrollRef.current) {
         // 상대방 메시지이고 자동 스크롤이 활성화되어 있으면 최하단 스크롤
-        setShouldScrollToBottom(true);
+        triggerScrollToBottomRef.current?.();
       }
 
       // 채팅방이 열려있는 상태에서 상대방 메시지가 들어오면 채팅 목록의 안읽은 표시 즉시 제거
@@ -545,8 +417,7 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
         // postgres_changes 구독이 자동으로 메시지를 추가하므로
         // 여기서는 로컬 상태에 추가하지 않음 (중복 방지)
         // 메시지 전송 성공 시 최하단 스크롤 트리거
-        shouldAutoScrollRef.current = true;
-        setShouldScrollToBottom(true);
+        triggerScrollToBottomRef.current?.();
       } catch (error) {
         const errorMessage =
           error instanceof Error
@@ -723,7 +594,6 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
   /**
    * roomId 변경 시 초기 로드 플래그 리셋
    */
-  const isInitialLoadRef = useRef(false);
   useEffect(() => {
     isInitialLoadRef.current = false;
   }, [roomId]);
@@ -867,35 +737,18 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
   }, [sortedMessages, user?.id, roomId]);
 
   /**
-   * formattedMessages가 준비된 후 초기 스크롤 처리
-   * (안읽은 메시지 경계 스크롤은 formattedMessages가 필요하므로)
+   * 스크롤 hook 호출 (formattedMessages가 정의된 후에 호출)
    */
+  const scrollHook = useChatRoomScroll({
+    formattedMessages,
+    userId: user?.id,
+    isLoading,
+  });
+
+  // 스크롤 트리거 함수 ref 업데이트
   useEffect(() => {
-    // 초기 로드가 완료되고 formattedMessages가 준비되었을 때만 실행
-    if (isLoading || formattedMessages.length === 0) {
-      return;
-    }
-
-    // 초기 로드 완료 후 한 번만 실행
-    if (!isInitialLoadRef.current) {
-      isInitialLoadRef.current = true;
-
-      // 안읽은 메시지가 있는지 확인 (formattedMessages 기반)
-      const hasUnread = formattedMessages.some(
-        (item) =>
-          item.type === 'message' &&
-          item.message &&
-          !item.isOwnMessage &&
-          item.isRead === false
-      );
-
-      if (hasUnread) {
-        setShouldScrollToUnread(true);
-      } else {
-        setShouldScrollToBottom(true);
-      }
-    }
-  }, [isLoading, formattedMessages]);
+    triggerScrollToBottomRef.current = scrollHook.triggerScrollToBottom;
+  }, [scrollHook.triggerScrollToBottom]);
 
   /**
    * 상대방 정보 조회 및 포맷팅
@@ -971,157 +824,16 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
   }, [roomId, user?.id, otherMemberInfo]);
 
   /**
-   * 가장 오래된 안읽은 메시지 ID 찾기
+   * 채팅방 생성 날짜
    */
-  const getUnreadBoundaryMessageId = useCallback((): number | null => {
-    if (!user?.id) {
+  const roomCreatedAt = useMemo<string | null>(() => {
+    if (!roomId || roomId <= 0) {
       return null;
     }
 
-    // formattedMessages를 순회하며 isRead: false인 첫 번째 메시지 찾기
-    for (const item of formattedMessages) {
-      if (item.type === 'message' && item.message && !item.isOwnMessage) {
-        if (item.isRead === false) {
-          return item.message.id;
-        }
-      }
-    }
-
-    return null;
-  }, [formattedMessages, user?.id]);
-
-  /**
-   * 안읽은 메시지 구분선이 있는지 확인
-   */
-  const hasUnreadDivider = useCallback((): boolean => {
-    return formattedMessages.some((item) => item.type === 'unread-divider');
-  }, [formattedMessages]);
-
-  /**
-   * 최하단으로 스크롤
-   */
-  const scrollToBottom = useCallback(
-    (containerRef: React.RefObject<HTMLDivElement>) => {
-      if (!containerRef.current) {
-        return;
-      }
-
-      // DOM 렌더링 완료 후 스크롤
-      requestAnimationFrame(() => {
-        if (containerRef.current) {
-          containerRef.current.scrollTop = containerRef.current.scrollHeight;
-          shouldAutoScrollRef.current = true;
-        }
-      });
-    },
-    []
-  );
-
-  /**
-   * 안읽은 메시지 경계로 스크롤
-   */
-  const scrollToUnreadBoundary = useCallback(
-    (containerRef: React.RefObject<HTMLDivElement>) => {
-      if (!containerRef.current) {
-        return;
-      }
-
-      // 먼저 unread-divider를 찾아서 스크롤 시도
-      const findAndScroll = (attempts = 0) => {
-        if (!containerRef.current) {
-          return;
-        }
-
-        // unread-divider 요소 찾기
-        const unreadDividerElement = containerRef.current.querySelector(
-          '[data-unread-divider="true"]'
-        );
-
-        if (unreadDividerElement) {
-          // divider 요소로 스크롤 (약간의 여백을 두고)
-          unreadDividerElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
-          return;
-        }
-
-        // divider를 찾지 못하면 메시지로 fallback
-        const unreadMessageId = getUnreadBoundaryMessageId();
-        if (unreadMessageId) {
-          const messageElement = containerRef.current.querySelector(
-            `[data-message-id="${unreadMessageId}"]`
-          );
-
-          if (messageElement) {
-            // 메시지 요소로 스크롤 (약간의 여백을 두고)
-            messageElement.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-            return;
-          }
-        }
-
-        // 요소를 찾지 못하면 재시도 또는 최하단으로 스크롤
-        if (attempts < 10) {
-          // 최대 10번까지 재시도 (DOM 렌더링 대기)
-          setTimeout(() => findAndScroll(attempts + 1), 50);
-        } else {
-          // 여러 번 시도해도 찾지 못하면 최하단으로 스크롤
-          scrollToBottom(containerRef);
-        }
-      };
-
-      // requestAnimationFrame으로 시작하여 다음 프레임에 실행
-      requestAnimationFrame(() => {
-        findAndScroll(0);
-      });
-    },
-    [getUnreadBoundaryMessageId, scrollToBottom]
-  );
-
-  /**
-   * 최하단 이동 버튼 표시 여부 확인
-   * 스크롤이 전체 길이의 50% 이상 올라갔을 때만 표시
-   * (최근 메시지가 화면에서 안 보일 때만 표시)
-   */
-  const shouldShowScrollToBottomButton = useCallback(
-    (containerRef: React.RefObject<HTMLDivElement>): boolean => {
-      if (!containerRef.current) {
-        return false;
-      }
-
-      const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
-
-      // 스크롤 가능한 전체 높이 계산
-      const scrollableHeight = scrollHeight - clientHeight;
-
-      // 스크롤 가능한 높이가 없으면 버튼 표시 안 함 (모든 메시지가 화면에 보임)
-      if (scrollableHeight <= 0) {
-        return false;
-      }
-
-      // 현재 스크롤 위치가 하단에서 얼마나 떨어져 있는지 계산
-      // scrollTop + clientHeight = 현재 보이는 영역의 하단 위치
-      // scrollHeight - (scrollTop + clientHeight) = 하단까지 남은 거리
-      const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
-
-      // 하단까지의 거리가 전체 스크롤 가능한 높이의 50% 이상일 때만 버튼 표시
-      // 즉, 스크롤이 전체 길이의 50% 이상 올라갔을 때만 표시
-      const threshold = scrollableHeight * 0.5;
-      return distanceFromBottom > threshold;
-    },
-    []
-  );
-
-  /**
-   * 스크롤 트리거 초기화
-   */
-  const clearScrollTriggers = useCallback(() => {
-    setShouldScrollToBottom(false);
-    setShouldScrollToUnread(false);
-  }, []);
+    const chatRoomItem = chatRooms.find((item) => item.room.id === roomId);
+    return chatRoomItem?.room.created_at || null;
+  }, [roomId, chatRooms]);
 
   return {
     messages: sortedMessages, // 하위 호환성을 위해 유지
@@ -1134,12 +846,13 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
     isLoading,
     error,
     isConnected: false, // Realtime 연결 상태는 더 이상 사용하지 않음
-    scrollToBottom,
-    scrollToUnreadBoundary,
-    getUnreadBoundaryMessageId,
-    shouldShowScrollToBottomButton,
-    shouldScrollToBottom,
-    shouldScrollToUnread,
-    clearScrollTriggers,
+    scrollToBottom: scrollHook.scrollToBottom,
+    scrollToUnreadBoundary: scrollHook.scrollToUnreadBoundary,
+    getUnreadBoundaryMessageId: scrollHook.getUnreadBoundaryMessageId,
+    shouldShowScrollToBottomButton: scrollHook.shouldShowScrollToBottomButton,
+    shouldScrollToBottom: scrollHook.shouldScrollToBottom,
+    shouldScrollToUnread: scrollHook.shouldScrollToUnread,
+    clearScrollTriggers: scrollHook.clearScrollTriggers,
+    roomCreatedAt,
   };
 };
