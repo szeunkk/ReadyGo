@@ -195,7 +195,7 @@ export default function AnimalCard({
               size={20}
               className={styles.primaryButtonIcon}
             />
-            <p className={styles.primaryButtonText}>메시지 보내기</p>
+            <p className={styles.primaryButtonText}>채팅하기</p>
           </button>
           <button className={styles.iconButton} onClick={onProfileClick}>
             <Icon name="add-user" size={20} className={styles.icon} />
