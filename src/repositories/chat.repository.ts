@@ -39,7 +39,6 @@ export const getChatUserIds = async (
   }
 
   if (!myRooms || myRooms.length === 0) {
-    console.log('[getChatUserIds] No rooms found, returning empty array');
     return [];
   }
 
@@ -64,9 +63,6 @@ export const getChatUserIds = async (
   }
 
   if (!directRooms || directRooms.length === 0) {
-    console.log(
-      '[getChatUserIds] No direct rooms found, returning empty array'
-    );
     return [];
   }
 
@@ -95,9 +91,6 @@ export const getChatUserIds = async (
   }
 
   if (!otherMembers || otherMembers.length === 0) {
-    console.log(
-      '[getChatUserIds] No other members found, returning empty array'
-    );
     return [];
   }
 
