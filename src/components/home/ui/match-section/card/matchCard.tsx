@@ -24,7 +24,7 @@ export interface MatchCardProps {
   /**
    * 사용자 온라인 상태
    */
-  status?: 'online' | 'away' | 'ban' | 'offline';
+  status?: 'online' | 'away' | 'dnd' | 'offline';
   /**
    * 동물 타입
    */
