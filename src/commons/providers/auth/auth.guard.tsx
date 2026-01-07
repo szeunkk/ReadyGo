@@ -175,13 +175,10 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
   // ✅ 회원 전용 경로만 세션 동기화 대기
   const isMemberPath = pathname && isMemberOnlyPath(pathname);
-  
+
   // 회원 전용 페이지에서만 세션 동기화 및 OAuth 콜백 대기
-  const shouldShowLoading = 
-    isMemberPath && (
-      !isSessionSynced || 
-      (isOAuthCallback && !accessToken)
-    );
+  const shouldShowLoading =
+    isMemberPath && (!isSessionSynced || (isOAuthCallback && !accessToken));
 
   if (shouldShowLoading) {
     return (
