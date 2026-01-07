@@ -12,8 +12,8 @@ export const useGoogleOAuth = () => {
   const handleGoogleOAuth = async () => {
     try {
       const { origin } = window.location;
-      // Supabase 리다이렉트 URL이 루트만 등록되어 있으므로 루트로 리다이렉트
-      const redirectTo = origin;
+      // ✅ 서버 사이드 OAuth 콜백 사용 (안정적)
+      const redirectTo = `${origin}/api/auth/oauth/callback`;
 
       // eslint-disable-next-line no-console
       console.log('=== Google OAuth Started ===', {
