@@ -8,7 +8,7 @@ export const updateUserStatusOffline = async function (
   userId: string
 ): Promise<void> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any).from('user_status').upsert(
       {

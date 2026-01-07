@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
 import type { ChatRoom, ChatMessage, UserProfile } from '@/types/chat';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export interface ChatRoomListItem {
   room: ChatRoom;
@@ -17,6 +18,10 @@ export interface ChatRoomListItem {
  * 특정 사용자와 1:1 채팅방이 있는 모든 사용자 ID 목록 조회
  * - DB 접근만 수행, 에러 처리 없음
  * - N+1 방지를 위한 batch 조회용 함수
+ *
+ * NOTE: 이 함수는 매칭 시스템에서 사용되며, 다른 사용자의 chat_room_members를
+ * 조회해야 하므로 RLS 정책이 올바르게 설정되어 있어야 합니다.
+ * RLS 정책: room_id IN (SELECT room_id FROM chat_room_members WHERE user_id = auth.uid())
  */
 export const getChatUserIds = async (
   client: SupabaseClient<Database>,
@@ -29,10 +34,12 @@ export const getChatUserIds = async (
     .eq('user_id', userId);
 
   if (error1) {
+    console.error('[getChatUserIds] Error fetching myRooms:', error1);
     throw error1;
   }
 
   if (!myRooms || myRooms.length === 0) {
+    console.log('[getChatUserIds] No rooms found, returning empty array');
     return [];
   }
 
@@ -52,10 +59,14 @@ export const getChatUserIds = async (
     .eq('type', 'direct');
 
   if (error2) {
+    console.error('[getChatUserIds] Error fetching directRooms:', error2);
     throw error2;
   }
 
   if (!directRooms || directRooms.length === 0) {
+    console.log(
+      '[getChatUserIds] No direct rooms found, returning empty array'
+    );
     return [];
   }
 
@@ -68,17 +79,25 @@ export const getChatUserIds = async (
   }
 
   // 해당 direct 채팅방의 다른 멤버 조회
-  const { data: otherMembers, error: error3 } = await client
+  // ⚠️ Admin 클라이언트 사용 (RLS 단순 정책으로는 무한 재귀 발생)
+
+  const { data: allMembersInRooms, error: error3 } = await supabaseAdmin
     .from('chat_room_members')
-    .select('user_id')
+    .select('room_id, user_id')
     .in('room_id', directRoomIds)
     .neq('user_id', userId);
 
+  const otherMembers = allMembersInRooms || [];
+
   if (error3) {
+    console.error('[getChatUserIds] Error fetching otherMembers:', error3);
     throw error3;
   }
 
   if (!otherMembers || otherMembers.length === 0) {
+    console.log(
+      '[getChatUserIds] No other members found, returning empty array'
+    );
     return [];
   }
 
@@ -157,13 +176,14 @@ export const getChatRoomByMembers = async (
  * 새로운 1:1 채팅방 생성
  * - DB 접근만 수행, 에러 처리 및 비즈니스 로직 없음
  * - Supabase 응답 구조를 그대로 반환
+ * - ⚠️ Admin 클라이언트 사용 (RLS INSERT 정책 우회)
  */
 export const createChatRoom = async (
   client: SupabaseClient<Database>,
   memberIds: string[]
 ): Promise<ChatRoom> => {
-  // 새 채팅방 생성
-  const { data: newRoom, error: roomError } = await client
+  // 새 채팅방 생성 (Admin 클라이언트로 RLS 우회)
+  const { data: newRoom, error: roomError } = await supabaseAdmin
     .from('chat_rooms')
     .insert({ type: 'direct' })
     .select()
@@ -183,7 +203,7 @@ export const createChatRoom = async (
     throw new Error('채팅방 생성에 실패했습니다.');
   }
 
-  // 채팅방 멤버 추가
+  // 채팅방 멤버 추가 (Admin 클라이언트로 RLS 우회)
   const now = new Date().toISOString();
   const membersData = memberIds.map((userId) => ({
     room_id: newRoom.id,
@@ -191,7 +211,7 @@ export const createChatRoom = async (
     joined_at: now,
   }));
 
-  const { error: membersError } = await client
+  const { error: membersError } = await supabaseAdmin
     .from('chat_room_members')
     .insert(membersData);
 

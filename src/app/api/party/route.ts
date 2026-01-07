@@ -14,7 +14,7 @@ type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
 export const GET = async (request: NextRequest) => {
   try {
     // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // 인증 체크: 인증된 유저만 파티 목록 조회 가능
     const {
@@ -271,7 +271,7 @@ export const GET = async (request: NextRequest) => {
 export const POST = async (request: NextRequest) => {
   try {
     // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // 사용자 정보 확인 (session/route.ts와 동일한 패턴)
     const {

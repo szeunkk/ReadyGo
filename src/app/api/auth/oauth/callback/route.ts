@@ -58,7 +58,7 @@ export const GET = async function (request: NextRequest) {
     }
 
     // Supabase SSR 클라이언트 생성 (쿠키 자동 관리)
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // 1. OAuth code로 세션 교환 (쿠키 자동 저장)
     const {
@@ -146,7 +146,7 @@ export const GET = async function (request: NextRequest) {
     const hasProfile = await checkUserProfile(supabase, verifiedUser.id);
 
     // 리다이렉트 전에 쿠키 확인 및 로깅
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const allCookies = cookieStore.getAll();
     const supabaseCookies = allCookies.filter(
       (cookie) =>

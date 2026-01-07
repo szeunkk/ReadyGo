@@ -11,7 +11,7 @@ export const GET = async (
 ) => {
   try {
     // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // 사용자 정보 확인 (인증 체크)
     const {
@@ -70,7 +70,7 @@ export const DELETE = async (
 ) => {
   try {
     // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // 사용자 정보 확인 (session/route.ts와 동일한 패턴)
     const {
@@ -148,7 +148,7 @@ export const PATCH = async (
 ) => {
   try {
     // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // 사용자 정보 확인 (session/route.ts와 동일한 패턴)
     const {

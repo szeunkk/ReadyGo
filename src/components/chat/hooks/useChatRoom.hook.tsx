@@ -194,6 +194,7 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
   const subscribedRoomIdRef = useRef<number | null>(null);
   const onMessageRef = useRef(onMessage);
   const seenMessageIdsRef = useRef<Set<number>>(new Set());
+  const isSendingRef = useRef(false); // 중복 전송 방지
 
   // onMessage ref 업데이트 (최신 콜백 유지)
   useEffect(() => {
@@ -206,9 +207,11 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
   const handleNewMessage = useCallback((message: ChatMessage) => {
     // 중복 체크 (Set 기반)
     if (seenMessageIdsRef.current.has(message.id)) {
+      console.log(`[useChatRoom] Duplicate message detected and skipped:`, message.id);
       return;
     }
 
+    console.log(`[useChatRoom] Adding new message:`, message.id, message.content);
     seenMessageIdsRef.current.add(message.id);
 
     setMessages((prev) => {
@@ -319,11 +322,14 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
 
       // 중복 구독 방지
       if (subscribedRoomIdRef.current === targetRoomId && channelRef.current) {
+        console.log(`[useChatRoom] Already subscribed to room ${targetRoomId}, skipping`);
         return;
       }
 
       // 기존 채널 정리
       if (channelRef.current) {
+        console.log(`[useChatRoom] Cleaning up old channel for room ${subscribedRoomIdRef.current}`);
+
         const oldChannel = channelRef.current;
         // 참조를 먼저 null로 설정
         channelRef.current = null;
@@ -351,6 +357,7 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
             },
             (payload) => {
               try {
+                console.log(`[useChatRoom] postgres_changes INSERT detected:`, payload.new);
                 // payload.new는 이미 ChatMessage 타입
                 const newMessage = payload.new as ChatMessage;
 
@@ -374,8 +381,9 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
             }
           )
           .subscribe((status) => {
+            console.log(`[useChatRoom] Channel status for room ${targetRoomId}:`, status);
             if (status === 'SUBSCRIBED') {
-              // 구독 성공
+              console.log(`[useChatRoom] Successfully subscribed to room ${targetRoomId}`);
             } else if (status === 'CHANNEL_ERROR') {
               const errorMessage = 'Postgres changes channel error occurred';
               setError(errorMessage);
@@ -412,6 +420,12 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
    */
   const sendMessage = useCallback(
     async (content: string, contentType: string = 'text'): Promise<void> => {
+      // 중복 전송 방지
+      if (isSendingRef.current) {
+        console.warn('[useChatRoom] Message is already being sent, ignoring duplicate request');
+        return;
+      }
+
       // roomId가 유효하지 않으면 에러
       if (!roomId || roomId <= 0) {
         throw new Error('유효한 채팅방이 선택되지 않았습니다.');
@@ -420,6 +434,10 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
       if (!user?.id) {
         throw new Error('로그인이 필요합니다.');
       }
+
+      // 전송 시작
+      isSendingRef.current = true;
+      console.log('[useChatRoom] Sending message:', content);
 
       try {
         const response = await fetch('/api/chat/message', {
@@ -443,16 +461,21 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
         const result = await response.json();
         const savedMessage = result.data as ChatMessage;
 
-        // 저장된 메시지를 로컬 상태에 추가
-        handleNewMessage(savedMessage);
+        // postgres_changes 구독이 자동으로 메시지를 추가하므로
+        // 여기서는 로컬 상태에 추가하지 않음 (중복 방지)
+        // handleNewMessage(savedMessage); // 제거: postgres_changes가 처리
+        console.log('[useChatRoom] Message sent successfully:', savedMessage.id);
       } catch (error) {
         const errorMessage =
           error instanceof Error
             ? error.message
             : '메시지 전송에 실패했습니다.';
         setError(errorMessage);
-        console.error('Failed to send message:', error);
+        console.error('[useChatRoom] Failed to send message:', error);
         throw error;
+      } finally {
+        // 전송 완료
+        isSendingRef.current = false;
       }
     },
     [roomId, user?.id, handleNewMessage]

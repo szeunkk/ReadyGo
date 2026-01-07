@@ -11,7 +11,7 @@ import { createClient } from '@/lib/supabase/server';
 export const POST = async function (_request: NextRequest) {
   try {
     // Supabase SSR 클라이언트 생성 (쿠키 자동 관리)
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // 사용자 정보 조회 (토큰 갱신은 자동으로 처리됨)
     const {

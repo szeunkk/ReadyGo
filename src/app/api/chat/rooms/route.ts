@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic';
 export const GET = async (_request: NextRequest) => {
   try {
     // 1. 인증된 클라이언트 생성
-    const supabase = createClient();
+    const supabase = await createClient();
     const {
       data: { user },
       error: authError,

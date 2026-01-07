@@ -390,8 +390,9 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
               }
             )
             .subscribe((status, err) => {
+              console.log(`[useChatList] Channel status for user ${userId}:`, status);
               if (status === 'SUBSCRIBED') {
-                // 구독 성공
+                console.log(`[useChatList] Successfully subscribed for user ${userId}`);
               } else if (status === 'CHANNEL_ERROR') {
                 const errorMessage =
                   'Realtime error: Channel subscription failed';

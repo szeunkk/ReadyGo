@@ -30,7 +30,7 @@ export const GET = async (
 ) => {
   try {
     // 1. Supabase SSR 클라이언트 생성 (쿠키 자동 관리, 토큰 자동 갱신)
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // 2. 사용자 인증 확인 (토큰 갱신은 자동으로 처리됨)
     const {
