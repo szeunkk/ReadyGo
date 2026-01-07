@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import React, { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth.store';
 import { useAuth } from './auth.provider';
 import { useModal } from '../modal/modal.provider';
@@ -19,33 +19,32 @@ interface AuthGuardProps {
  */
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const accessToken = useAuthStore((s) => s.accessToken);
   const { isSessionSynced, loginRedirect } = useAuth();
   const { openModal, closeAllModals } = useModal();
 
   const [isMounted, setIsMounted] = useState(false);
+  const [isOAuthCallback, setIsOAuthCallback] = useState(false);
   const hasPromptedRef = useRef(false);
 
-  // ✅ OAuth 콜백 중인지 감지
-  const isOAuthCallback = useMemo(() => {
-    // URL에 code 파라미터가 있으면 OAuth 콜백 중
-    return searchParams.get('code') !== null;
-  }, [searchParams]);
-
-  const isTestEnv = useMemo(() => {
-    if (typeof window === 'undefined') {
-      return false;
+  // ✅ OAuth 콜백 중인지 감지 (client-side에서만 실행)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      setIsOAuthCallback(urlParams.has('code'));
     }
+  }, []);
 
-    if (
-      typeof process !== 'undefined' &&
-      process.env.NEXT_PUBLIC_TEST_ENV === 'test'
-    ) {
-      return true;
+  const [isTestEnv, setIsTestEnv] = useState(false);
+
+  // 테스트 환경 체크 (client-side에서만 실행)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsTestEnv(
+        typeof process !== 'undefined' &&
+          process.env.NEXT_PUBLIC_TEST_ENV === 'test'
+      );
     }
-
-    return false;
   }, []);
 
   // 클라이언트 마운트 체크
@@ -89,18 +88,9 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
         let retries = 0;
         const maxRetries = isOAuthCallback ? 80 : 10; // OAuth: 8초, 일반: 1초
 
-        // eslint-disable-next-line no-console
-        console.log(
-          `AuthGuard: 세션 확인 시작 (OAuth 콜백: ${isOAuthCallback}, 최대 대기: ${maxRetries * 100}ms)`
-        );
-
         while (retries < maxRetries) {
           const currentAccessToken = useAuthStore.getState().accessToken;
           if (currentAccessToken) {
-            // eslint-disable-next-line no-console
-            console.log(
-              `AuthGuard: 세션 인식 성공 (${retries * 100}ms 후)`
-            );
             return;
           }
           await new Promise((resolve) => setTimeout(resolve, 100));
@@ -110,11 +100,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
         // 대기 시간 후에도 accessToken이 없으면 모달 표시
         if (!useAuthStore.getState().accessToken && !hasPromptedRef.current) {
           hasPromptedRef.current = true;
-
-          // eslint-disable-next-line no-console
-          console.log(
-            `AuthGuard: 세션 인식 실패 (${maxRetries * 100}ms 초과) - 로그인 모달 표시`
-          );
 
           openModal({
             variant: 'single',
@@ -149,7 +134,13 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   }
 
   // 초기 마운트 또는 세션 동기화 전: 로딩 스피너 표시
-  if (!isMounted || !isSessionSynced) {
+  // ✅ OAuth 콜백 중일 때는 accessToken이 설정될 때까지 추가 대기
+  const shouldShowLoading = 
+    !isMounted || 
+    !isSessionSynced || 
+    (isOAuthCallback && !accessToken);
+
+  if (shouldShowLoading) {
     return (
       <div
         style={{
