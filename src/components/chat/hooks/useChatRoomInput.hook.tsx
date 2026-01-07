@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useModal } from '@/commons/providers/modal/modal.provider';
 
 /**
@@ -39,12 +39,21 @@ export const useChatRoomInput = (
 
   // 메시지 입력 상태
   const [messageInput, setMessageInput] = useState('');
+  const isSendingRef = useRef(false); // 전송 중 상태 (중복 전송 방지)
 
   // 메시지 전송 핸들러
   const handleSendMessage = useCallback(async () => {
+    // 중복 전송 방지
+    if (isSendingRef.current) {
+      return;
+    }
+
     if (!messageInput.trim() || isBlocked) {
       return;
     }
+
+    // 전송 시작
+    isSendingRef.current = true;
 
     try {
       await sendMessage(messageInput.trim(), 'text');
@@ -52,6 +61,9 @@ export const useChatRoomInput = (
     } catch (err) {
       console.error('Failed to send message:', err);
       // 에러 발생 시 messageInput은 그대로 유지하여 재전송 가능
+    } finally {
+      // 전송 완료
+      isSendingRef.current = false;
     }
   }, [messageInput, isBlocked, sendMessage]);
 

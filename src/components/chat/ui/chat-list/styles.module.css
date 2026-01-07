@@ -136,10 +136,11 @@
 /* 메타 블록 */
 .metaBlock {
   display: flex;
+  height: 100%;
   flex-direction: column;
   gap: 8px;
   align-items: flex-end;
-  justify-content: center;
+  justify-content: flex-start;
   flex-shrink: 0;
 }
 

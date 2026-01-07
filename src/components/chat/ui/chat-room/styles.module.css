@@ -83,7 +83,7 @@
   height: 40px;
   background-color: var(--color-bg-secondary);
   border: none;
-  border-radius: 16.4px;
+  border-radius: 16px;
   cursor: pointer;
   flex-shrink: 0;
   color: var(--color-icon-primary);
@@ -133,11 +133,32 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 32px 16px;
+  padding: 0px 16px 16px 16px;
   background-color: var(--color-bg-secondary);
   overflow-y: auto;
   flex: 1;
   min-height: 0;
+  position: relative;
+}
+
+/* 플로팅 버튼 래퍼: 메시지 리스트 상단에 고정 */
+.scrollToBottomButtonWrapper {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+  background: linear-gradient(
+    to bottom,
+    var(--color-bg-secondary) 0%,
+    var(--color-bg-secondary) 80%,
+    transparent 100%
+  );
+  pointer-events: none;
+  margin: -32px -16px 0 -16px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .dateDivider {
@@ -154,6 +175,35 @@
   flex-shrink: 0;
 }
 
+.unreadDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 16px 0;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.unreadDivider::before,
+.unreadDivider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-border-secondary);
+}
+
+.unreadDividerText {
+  padding: 0 16px;
+  font-family: var(--typo-body-sm-semibold-font-family);
+  font-size: var(--typo-body-sm-semibold-font-size);
+  line-height: var(--typo-body-sm-semibold-line-height);
+  font-weight: var(--typo-body-sm-semibold-font-weight);
+  color: var(--color-text-interactive-primary, #5ffce2);
+  text-align: center;
+  white-space: nowrap;
+}
+
 .messageRow {
   display: flex;
   width: 100%;
@@ -163,6 +213,7 @@
 .ownMessageContainer {
   display: flex;
   align-items: flex-end;
+  justify-content: flex-end;
   gap: 12px;
   margin-left: auto;
   align-self: flex-end;
@@ -196,7 +247,7 @@
   padding: 12px 20px;
   background-color: var(--color-bg-tertiary);
   border-radius: 24px;
-  max-width: 100%;
+  max-width: 80%;
   word-wrap: break-word;
   word-break: break-word;
 }
@@ -208,7 +259,7 @@
   padding: 12px 20px;
   background-color: var(--color-bg-interactive-primary-hover);
   border-radius: 24px;
-  max-width: 100%;
+  max-width: 80%;
   word-wrap: break-word;
   word-break: break-word;
 }
@@ -321,4 +372,48 @@
 
 .gameStartButtonText {
   white-space: nowrap;
+}
+
+/* 플로팅 버튼: 최근 메시지로 이동 */
+.scrollToBottomButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 24px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition:
+    background-color 0.2s,
+    box-shadow 0.2s;
+  font-family: var(--typo-body-md-medium-font-family);
+  font-size: var(--typo-body-md-medium-font-size);
+  line-height: var(--typo-body-md-medium-line-height);
+  font-weight: var(--typo-body-md-medium-font-weight);
+  color: var(--color-text-primary);
+  width: fit-content;
+  pointer-events: auto;
+}
+
+.scrollToBottomButton:hover {
+  background-color: var(--color-bg-interactive-teritiary-hover);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.scrollToBottomButton:active {
+  background-color: var(--color-bg-interactive-teritiary-pressed);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scrollToBottomButton:focus-visible {
+  outline: 2px solid var(--color-border-focus-ring);
+  outline-offset: 2px;
+}
+
+.scrollToBottomButton svg {
+  color: var(--color-icon-primary);
+  flex-shrink: 0;
 }
