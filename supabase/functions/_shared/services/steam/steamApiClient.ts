@@ -44,6 +44,7 @@ export const getOwnedGames = async (
   const steamApiKey = Deno.env.get('STEAM_API_KEY');
 
   if (!steamApiKey) {
+    console.error('[Steam API] STEAM_API_KEY not found in environment variables');
     return {
       ok: false,
       reason: 'network_error',
@@ -60,6 +61,7 @@ export const getOwnedGames = async (
     url.searchParams.set('include_played_free_games', '1');
     url.searchParams.set('format', 'json');
 
+    console.log(`[Steam API] Fetching games for steamId: ${steamId}`);
     const response = await fetch(url.toString(), {
       method: 'GET',
       headers: {
@@ -70,6 +72,7 @@ export const getOwnedGames = async (
     });
 
     if (!response.ok) {
+      console.error(`[Steam API] HTTP ${response.status}: ${response.statusText}`);
       return {
         ok: false,
         reason: 'network_error',
@@ -86,19 +89,35 @@ export const getOwnedGames = async (
       };
     }
 
+    // 게임 수가 너무 많으면 메모리 문제 발생 가능
+    // playtime 기준 상위 1000개만 처리
+    const games = data.response.games;
+    const originalCount = games.length;
+    const sortedGames = games
+      .sort((a, b) => b.playtime_forever - a.playtime_forever)
+      .slice(0, 1000);
+
+    if (originalCount > 1000) {
+      console.log(`[Steam API] Limiting ${originalCount} games to top 1000 by playtime`);
+    } else {
+      console.log(`[Steam API] Successfully fetched ${originalCount} games`);
+    }
+
     return {
       ok: true,
-      games: data.response.games,
+      games: sortedGames,
     };
   } catch (error) {
     // 네트워크 에러, 타임아웃, JSON 파싱 에러 등
     if (error instanceof Error && error.name === 'TimeoutError') {
+      console.error(`[Steam API] Timeout error for steamId: ${steamId}`);
       return {
         ok: false,
         reason: 'timeout',
       };
     }
 
+    console.error(`[Steam API] Network error:`, error);
     return {
       ok: false,
       reason: 'network_error',

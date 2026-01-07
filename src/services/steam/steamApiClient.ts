@@ -86,9 +86,16 @@ export const getOwnedGames = async (
       };
     }
 
+    // 게임 수가 너무 많으면 메모리 문제 발생 가능
+    // playtime 기준 상위 1000개만 처리
+    const games = data.response.games;
+    const sortedGames = games
+      .sort((a, b) => b.playtime_forever - a.playtime_forever)
+      .slice(0, 1000);
+
     return {
       ok: true,
-      games: data.response.games,
+      games: sortedGames,
     };
   } catch (error) {
     // 네트워크 에러, 타임아웃, JSON 파싱 에러 등

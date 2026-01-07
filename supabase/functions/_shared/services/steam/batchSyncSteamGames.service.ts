@@ -10,7 +10,7 @@ export type BatchSyncResult = {
   total: number;
   success: number;
   failed: number;
-  errors: Array<{ userId: string; status: string }>;
+  errors: Array<{ userId: string; status: string; error?: string }>;
 };
 
 type TargetUser = {
@@ -105,12 +105,14 @@ export const batchSyncSteamGames = async (
       }
     } catch (error) {
       // 예상치 못한 에러 (syncSteamGames는 throw하지 않지만 만약을 위해)
+      const errorMessage = error instanceof Error ? error.message : String(error);
       result.failed++;
       result.errors.push({
         userId: user.id,
         status: 'unexpected_error',
+        error: errorMessage,
       });
-      console.error(`[${user.id}] ✗ Unexpected error:`, error);
+      console.error(`[${user.id}] ✗ Unexpected error:`, errorMessage, error);
     }
   }
 

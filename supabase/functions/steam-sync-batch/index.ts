@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
     });
 
     // 2. 배치 동기화 실행 (Service에 위임)
-    const result = await batchSyncSteamGames(supabase, { limit: 100 });
+    const result = await batchSyncSteamGames(supabase, { limit: 50 });
 
     // 3. 결과 반환
     return new Response(JSON.stringify(result), {
