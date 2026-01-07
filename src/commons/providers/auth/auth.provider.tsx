@@ -197,11 +197,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       isInitializedRef.current = true;
       setIsSessionSynced(false); // 초기화 시작 시 false로 설정
 
-      // 세션 동기화 시작 (초기 동기화이므로 재시도 활성화)
+      // ✅ 세션 동기화 시작 (초기 동기화이므로 재시도 활성화)
       syncSessionToStore(0, true);
 
+      // ✅ OAuth 콜백 후 쿠키 반영을 위한 추가 재시도 (2초, 4초, 6초 후)
+      const retryTimeouts = [
+        setTimeout(() => {
+          if (!useAuthStore.getState().accessToken) {
+            console.log('세션 재시도 (2초 후)');
+            syncSessionToStore(0, false);
+          }
+        }, 2000),
+        setTimeout(() => {
+          if (!useAuthStore.getState().accessToken) {
+            console.log('세션 재시도 (4초 후)');
+            syncSessionToStore(0, false);
+          }
+        }, 4000),
+        setTimeout(() => {
+          if (!useAuthStore.getState().accessToken) {
+            console.log('세션 재시도 (6초 후)');
+            syncSessionToStore(0, false);
+          }
+        }, 6000),
+      ];
+
       // 안전장치: 최대 대기 시간(20초) 후 강제로 isSessionSynced를 true로 설정
-      // 재시도(최대 3회, 총 약 6초) + 타임아웃(10초)을 고려하여 20초로 설정
       const safetyTimeoutId = setTimeout(() => {
         if (!isSessionSyncedRef.current) {
           console.warn(
@@ -214,6 +235,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // Cleanup: 컴포넌트 언마운트 시 타이머 정리
       return () => {
+        retryTimeouts.forEach(clearTimeout);
         clearTimeout(safetyTimeoutId);
       };
     }
