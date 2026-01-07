@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth.store';
 import { useAuth } from './auth.provider';
 import { useModal } from '../modal/modal.provider';
@@ -19,12 +19,19 @@ interface AuthGuardProps {
  */
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const accessToken = useAuthStore((s) => s.accessToken);
   const { isSessionSynced, loginRedirect } = useAuth();
   const { openModal, closeAllModals } = useModal();
 
   const [isMounted, setIsMounted] = useState(false);
   const hasPromptedRef = useRef(false);
+
+  // ✅ OAuth 콜백 중인지 감지
+  const isOAuthCallback = useMemo(() => {
+    // URL에 code 파라미터가 있으면 OAuth 콜백 중
+    return searchParams.get('code') !== null;
+  }, [searchParams]);
 
   const isTestEnv = useMemo(() => {
     if (typeof window === 'undefined') {
@@ -74,26 +81,40 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
       return;
     }
 
-    // 비로그인 상태: OAuth 콜백 후 세션 동기화 지연을 고려하여 짧은 대기 후 확인
+    // 비로그인 상태: OAuth 콜백 후 세션 동기화 지연을 고려하여 대기 후 확인
     if (!isTestEnv && !hasPromptedRef.current) {
-      // OAuth 콜백 후 세션 동기화가 완료될 때까지 대기 (최대 1초)
+      // ✅ OAuth 콜백 중이면 더 오래 대기 (최대 8초)
+      // ✅ 일반 페이지는 짧게 대기 (최대 1초)
       const checkAccessToken = async () => {
         let retries = 0;
-        const maxRetries = 10; // 1초 (100ms * 10)
+        const maxRetries = isOAuthCallback ? 80 : 10; // OAuth: 8초, 일반: 1초
+
+        // eslint-disable-next-line no-console
+        console.log(
+          `AuthGuard: 세션 확인 시작 (OAuth 콜백: ${isOAuthCallback}, 최대 대기: ${maxRetries * 100}ms)`
+        );
 
         while (retries < maxRetries) {
           const currentAccessToken = useAuthStore.getState().accessToken;
           if (currentAccessToken) {
-            // accessToken이 설정되었으면 모달 표시하지 않음
+            // eslint-disable-next-line no-console
+            console.log(
+              `AuthGuard: 세션 인식 성공 (${retries * 100}ms 후)`
+            );
             return;
           }
           await new Promise((resolve) => setTimeout(resolve, 100));
           retries++;
         }
 
-        // 1초 후에도 accessToken이 없으면 모달 표시
+        // 대기 시간 후에도 accessToken이 없으면 모달 표시
         if (!useAuthStore.getState().accessToken && !hasPromptedRef.current) {
           hasPromptedRef.current = true;
+
+          // eslint-disable-next-line no-console
+          console.log(
+            `AuthGuard: 세션 인식 실패 (${maxRetries * 100}ms 초과) - 로그인 모달 표시`
+          );
 
           openModal({
             variant: 'single',
@@ -116,6 +137,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     pathname,
     accessToken,
     isTestEnv,
+    isOAuthCallback,
     openModal,
     closeAllModals,
     loginRedirect,
