@@ -207,11 +207,18 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
   const handleNewMessage = useCallback((message: ChatMessage) => {
     // 중복 체크 (Set 기반)
     if (seenMessageIdsRef.current.has(message.id)) {
-      console.log(`[useChatRoom] Duplicate message detected and skipped:`, message.id);
+      console.log(
+        `[useChatRoom] Duplicate message detected and skipped:`,
+        message.id
+      );
       return;
     }
 
-    console.log(`[useChatRoom] Adding new message:`, message.id, message.content);
+    console.log(
+      `[useChatRoom] Adding new message:`,
+      message.id,
+      message.content
+    );
     seenMessageIdsRef.current.add(message.id);
 
     setMessages((prev) => {
@@ -322,13 +329,17 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
 
       // 중복 구독 방지
       if (subscribedRoomIdRef.current === targetRoomId && channelRef.current) {
-        console.log(`[useChatRoom] Already subscribed to room ${targetRoomId}, skipping`);
+        console.log(
+          `[useChatRoom] Already subscribed to room ${targetRoomId}, skipping`
+        );
         return;
       }
 
       // 기존 채널 정리
       if (channelRef.current) {
-        console.log(`[useChatRoom] Cleaning up old channel for room ${subscribedRoomIdRef.current}`);
+        console.log(
+          `[useChatRoom] Cleaning up old channel for room ${subscribedRoomIdRef.current}`
+        );
 
         const oldChannel = channelRef.current;
         // 참조를 먼저 null로 설정
@@ -357,7 +368,10 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
             },
             (payload) => {
               try {
-                console.log(`[useChatRoom] postgres_changes INSERT detected:`, payload.new);
+                console.log(
+                  `[useChatRoom] postgres_changes INSERT detected:`,
+                  payload.new
+                );
                 // payload.new는 이미 ChatMessage 타입
                 const newMessage = payload.new as ChatMessage;
 
@@ -381,9 +395,14 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
             }
           )
           .subscribe((status) => {
-            console.log(`[useChatRoom] Channel status for room ${targetRoomId}:`, status);
+            console.log(
+              `[useChatRoom] Channel status for room ${targetRoomId}:`,
+              status
+            );
             if (status === 'SUBSCRIBED') {
-              console.log(`[useChatRoom] Successfully subscribed to room ${targetRoomId}`);
+              console.log(
+                `[useChatRoom] Successfully subscribed to room ${targetRoomId}`
+              );
             } else if (status === 'CHANNEL_ERROR') {
               const errorMessage = 'Postgres changes channel error occurred';
               setError(errorMessage);
@@ -422,7 +441,9 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
     async (content: string, contentType: string = 'text'): Promise<void> => {
       // 중복 전송 방지
       if (isSendingRef.current) {
-        console.warn('[useChatRoom] Message is already being sent, ignoring duplicate request');
+        console.warn(
+          '[useChatRoom] Message is already being sent, ignoring duplicate request'
+        );
         return;
       }
 
@@ -464,7 +485,10 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
         // postgres_changes 구독이 자동으로 메시지를 추가하므로
         // 여기서는 로컬 상태에 추가하지 않음 (중복 방지)
         // handleNewMessage(savedMessage); // 제거: postgres_changes가 처리
-        console.log('[useChatRoom] Message sent successfully:', savedMessage.id);
+        console.log(
+          '[useChatRoom] Message sent successfully:',
+          savedMessage.id
+        );
       } catch (error) {
         const errorMessage =
           error instanceof Error
