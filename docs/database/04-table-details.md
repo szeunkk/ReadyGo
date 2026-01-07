@@ -1,6 +1,6 @@
 # Table Details(ReadyGo)
 
-본 문서는 ReadyGo 서비스의 public schema 전체 테이블(36개)에 대한 상세 정의 문서이다.
+본 문서는 ReadyGo 서비스의 public schema 전체 테이블(35개)에 대한 상세 정의 문서이다.
 
 ### Source of Truth (SSOT)
 
@@ -363,11 +363,24 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | reason     | text        | ⭕       | 실패 또는 스킵 사유        |
 | created_at | timestamptz | ⭕       | 처리 시각                  |
 
+#### 26. steam_user_stats
+
+- 유저별 Steam 플레이 통계 및 성향 분석 데이터
+
+| Column              | Type        | Nullable | Description                            |
+| ------------------- | ----------- | -------- | -------------------------------------- |
+| user_id             | uuid        | ❌       | PK, 유저 ID                            |
+| play_style          | text        | ❌       | 플레이 스타일 (casual, hardcore 등)    |
+| avg_weekly_playtime | numeric     | ⭕       | 주당 평균 플레이 시간 (시간 단위)      |
+| main_genres         | text[]      | ⭕       | 주로 플레이하는 장르 목록              |
+| active_time_slots   | text[]      | ⭕       | 주로 활동하는 시간대 (dawn, morning 등)|
+| updated_at          | timestamptz | ❌       | 마지막 업데이트 시각                   |
+
 ---
 
 ### 6️⃣ Social / Interaction Domain
 
-#### 26. friend_requests
+#### 27. friend_requests
 
 - 유저 간 친구 요청 상태
 - 요청 생성, 수락, 거절 등 관계 형성 이전 단계 기록
@@ -380,7 +393,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | status      | text        | ⭕       | 요청 상태      |
 | created_at  | timestamptz | ⭕       | 요청 시각      |
 
-#### 27. friendships
+#### 28. friendships
 
 - 친구로 연결된 유저 간의 관계 정보
 - 쌍방 관계를 하나의 레코드로 관리
@@ -393,7 +406,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | status     | text        | ⭕       | 관계 상태   |
 | created_at | timestamptz | ⭕       | 생성 시각   |
 
-#### 28. reviews
+#### 29. reviews
 
 - 파티 또는 플레이 이후 유저가 남긴 평가 기록
 - 매너, 협업, 소통 등 점수 및 코멘트 포함
@@ -414,7 +427,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 ### 7️⃣ System / Logs Domain
 
-#### 29. analytics_user_actions
+#### 30. analytics_user_actions
 
 - 행동 로그
 
@@ -426,7 +439,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | target_id  | text        | ⭕       | 행동 대상 식별자   |
 | created_at | timestamptz | ⭕       | 행동 발생 시각     |
 
-#### 30. event_logs
+#### 31. event_logs
 
 - 서비스 이벤트 기록 테이블
 - 유저 행동 또는 시스템 이벤트를 구조적으로 기록
@@ -439,7 +452,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | metadata   | jsonb       | ⭕       | 이벤트 데이터 |
 | created_at | timestamptz | ⭕       | 발생 시각     |
 
-#### 31. error_logs
+#### 32. error_logs
 
 - 시스템 에러 기록 테이블
 - 서버/클라이언트/배치 작업 등에서 발생한 오류를 기록
@@ -452,7 +465,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | stacktrace | text        | ⭕       | 스택 트레이스  |
 | created_at | timestamptz | ⭕       | 발생 시각      |
 
-#### 32. bans
+#### 33. bans
 
 - 유저 제재 정보 테이블
 - 일시적 또는 영구 제재 상태 관리
@@ -465,7 +478,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | expires_at | timestamptz | ⭕       | 제재 만료 시각 |
 | created_at | timestamptz | ⭕       | 제재 생성 시각 |
 
-#### 33. temperature_logs
+#### 34. temperature_logs
 
 - 유저 온도 점수 변경 로그
 - 후기, 신고, 시스템 판단에 따른 점수 변화 기록
@@ -478,7 +491,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | reason     | text        | ⭕       | 변경 사유   |
 | created_at | timestamptz | ⭕       | 발생 시각   |
 
-#### 34. tier_history
+#### 35. tier_history
 
 - 유저 티어 변경 이력 테이블
 - 티어 상승/하락 이력 보존
@@ -491,7 +504,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | current_tier  | text        | ⭕       | 변경 후 티어 |
 | changed_at    | timestamptz | ⭕       | 변경 시각    |
 
-#### 35. notifications
+#### 36. notifications
 
 - 유저에게 전달되는 시스템 알림 테이블
 
@@ -505,7 +518,7 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 | is_read    | boolean     | ⭕       | 읽음 여부      |
 | created_at | timestamptz | ⭕       | 생성 시각      |
 
-#### 36. push_tokens
+#### 37. push_tokens
 
 - 푸시 알림 전송을 위한 디바이스 토큰 관리 테이블
 
@@ -528,8 +541,8 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 
 - **Author**: ReadyGo / Eunkyoung Kim(김은경)
 - **Created At**: 2025-12-24
-- **Last Updated At**: 2025-12-31
-- **Document Version**: v1.0.9
+- **Last Updated At**: 2025-01-07
+- **Document Version**: v1.0.10
 - **Status**: Active
 - **Source of Truth**:
   - Supabase Production Database
@@ -549,3 +562,4 @@ ERD 구조는 02-domain-erd.md, 03-full-erd.md를 참고한다.
 |  v1.0.7 | 2025-12-29 | user_play_schedules 테이블 추가, 테이블 번호 순서 정리 (5번 중복 해결, 6~36번으로 재정렬)                    |
 |  v1.0.8 | 2025-01-13 | chat_blocks 테이블명을 user_blocks로 변경, User/Profile Domain으로 이동                                      |
 |  v1.0.9 | 2025-01-15 | chat_message_reads 테이블: message_id, user_id를 NOT NULL로 변경, (message_id, user_id) UNIQUE 제약조건 추가 |
+| v1.0.10 | 2025-01-07 | Steam Domain에 steam_user_stats 테이블 추가, 테이블 번호 재정렬 (27~37번)                                    |
