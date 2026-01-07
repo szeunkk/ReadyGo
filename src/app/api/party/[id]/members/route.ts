@@ -1,5 +1,112 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import type { Database } from '@/types/supabase';
+
+type PartyMember = Database['public']['Tables']['party_members']['Row'];
+type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
+
+/**
+ * 파티 멤버 조회
+ * GET /api/party/[id]/members
+ */
+export const GET = async (
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) => {
+  try {
+    // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
+    const supabase = createClient();
+
+    // 사용자 정보 확인
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: '인증이 필요합니다.' },
+        { status: 401 }
+      );
+    }
+
+    // 파라미터 검증
+    const postId = parseInt(params.id, 10);
+    if (isNaN(postId)) {
+      return NextResponse.json(
+        { error: '유효하지 않은 파티 ID입니다.' },
+        { status: 400 }
+      );
+    }
+
+    // 파티 존재 확인
+    const { data: _partyData, error: fetchError } = await supabase
+      .from('party_posts')
+      .select('id')
+      .eq('id', postId)
+      .single();
+
+    if (fetchError) {
+      if (fetchError.code === 'PGRST116') {
+        return NextResponse.json(
+          { error: '파티를 찾을 수 없습니다.' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ error: fetchError.message }, { status: 500 });
+    }
+
+    // party_members 조회
+    const { data: partyMembers, error: membersError } = await supabase
+      .from('party_members')
+      .select('*')
+      .eq('post_id', postId)
+      .order('joined_at', { ascending: true });
+
+    if (membersError) {
+      return NextResponse.json(
+        { error: membersError.message },
+        { status: 500 }
+      );
+    }
+
+    const members: PartyMember[] = partyMembers || [];
+
+    // user_profiles 조회: 모든 user_id에 대한 프로필 조회
+    const userIds = Array.from(
+      new Set(
+        members.map((m) => m.user_id).filter((id): id is string => Boolean(id))
+      )
+    );
+
+    let profiles: UserProfile[] = [];
+
+    if (userIds.length > 0) {
+      const { data: userProfiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.error('user_profiles 조회 실패:', profilesError);
+        // 프로필 조회 실패해도 멤버 정보는 반환
+      } else {
+        profiles = userProfiles || [];
+      }
+    }
+
+    return NextResponse.json({
+      members,
+      profiles,
+    });
+  } catch (error) {
+    console.error('Party members GET API error:', error);
+    return NextResponse.json(
+      { error: '서버 오류가 발생했습니다.' },
+      { status: 500 }
+    );
+  }
+};
 
 /**
  * 파티 참여
