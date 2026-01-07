@@ -26,9 +26,11 @@
 ## 설명
 
 - Steam `GetAppList` API를 호출하여 최신 게임 목록을 가져옵니다.
-- 이미 동기화가 완료된 게임(`steam_game_sync_logs` 기준)을 제외하고, 설정된 `limit`만큼 상세 정보를 조회(`appdetails`)합니다.
+- **페이지네이션**: `steam_game_sync_logs`에서 마지막으로 처리한 `app_id`를 조회하여 `last_appid` 파라미터로 전달합니다.
+- 이미 처리된 게임(`success`, `failed`, `skipped` 모두 포함)을 제외하고, 설정된 `limit`만큼 상세 정보를 조회(`appdetails`)합니다.
 - 유효한 게임 정보(type='game')인 경우 `steam_game_info` 테이블에 저장 또는 업데이트합니다.
 - 처리 결과(성공, 실패, 건너뜀)는 `steam_game_sync_logs`에 기록됩니다.
+- **중복 방지**: 동일한 `app_id`는 재시도하지 않고 건너뜁니다.
 
 ---
 
@@ -121,3 +123,10 @@
   - Steam API 호출량 제한(Rate Limit)을 고려하여 `limit` 값을 적절히 조절해야 합니다.
 - **로그 기록**:
   - 개별 게임의 동기화 성공/실패 여부는 `steam_game_sync_logs` 테이블에 상세히 기록됩니다.
+- **페이지네이션 로직**:
+  - 첫 호출: `last_appid` 없이 호출 → 첫 500개 후보 중 200개 처리
+  - 이후 호출: 마지막 처리된 `app_id` 기준으로 다음 500개 후보 조회
+  - 이미 처리된 앱은 자동으로 건너뛰므로 매번 새로운 게임이 처리됩니다.
+- **중복 처리 방지**:
+  - `upsert` 사용으로 동일한 `app_id`가 이미 존재하면 UPDATE, 없으면 INSERT 합니다.
+  - 실패/건너뛴 앱도 재시도하지 않습니다.

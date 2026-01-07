@@ -1,0 +1,102 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+	- Repository는 단일 테이블 접근만 담당
+	- DB 접근만 수행, 에러 처리는 상위 레이어에서 담당
+	- 비즈니스 로직 포함 금지
+	- 데이터 검증 금지
+	- Supabase 응답 구조를 그대로 반환
+	- named export만 허용
+
+==============================================
+
+조건-파일경로) 참고 및 기준 파일 경로는 다음과 같다.
+	- 구현 대상
+		- src/repositories/steamUserGamesRepository.ts
+	- 참고 패턴
+		- src/repositories/userProfiles.repository.ts
+		- src/repositories/chat.repository.ts
+	- DB Table
+		- steam_user_games
+
+==============================================
+
+조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
+	- Repository는 SupabaseClient를 외부에서 주입받음
+	- 함수 시그니처: (client: SupabaseClient<Database>, ...)
+	- Supabase 응답을 그대로 반환 (data, error 구조)
+	- 단일 테이블만 접근
+	- JOIN 금지 (필요시 Service에서 조합)
+
+==============================================
+
+핵심요구사항) 다음 기능을 step-by-step으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
+
+1. 함수 정의
+	- bulkUpsert(client, userId, games): Promise<PostgrestResponse>
+	- steam_user_games 테이블 전용
+
+2. Input 타입
+	- SteamUserGameInput {
+	    app_id: number;
+	    name: string | null;
+	    playtime_forever: number;
+	    playtime_recent: number | null;
+	    last_played: string | null; // timestamptz (ISO 8601)
+	  }
+
+3. Upsert 전략
+	- onConflict: 'user_id,app_id'
+	- (user_id, app_id) unique 기준으로 upsert
+	- 갱신 컬럼:
+		- name
+		- playtime_forever
+		- playtime_recent
+		- last_played
+	- updated_at은 DB default 또는 trigger가 처리
+
+4. Bulk 처리
+	- games.length === 0 인 경우 즉시 { data: null, error: null } 반환
+	- 모든 게임을 단일 upsert 호출로 처리
+	- N+1 방지
+
+5. Row 구조
+	- 각 row는 다음 필드 포함:
+		- user_id: userId
+		- app_id: game.app_id
+		- name: game.name
+		- playtime_forever: game.playtime_forever
+		- playtime_recent: game.playtime_recent
+		- last_played: game.last_played
+
+6. 금지 사항
+	- 데이터 검증 금지
+	- 매핑 로직 금지 (이미 매핑된 데이터 받음)
+	- 비즈니스 로직 금지
+	- 에러 throw 금지
+
+==============================================
+
+조건-Hook 책임)
+	- 해당 없음
+
+==============================================
+
+조건-UI 책임)
+	- 해당 없음
+
+==============================================
+
+구현 완료 후 반환) 아래 체크리스트를 반드시 반환할 것.
+	- bulkUpsert 함수만 export 한다
+	- SupabaseClient를 외부에서 주입받는다
+	- steam_user_games 테이블만 접근한다
+	- (user_id, app_id) unique 기준 upsert를 수행한다
+	- Supabase 응답 구조를 그대로 반환한다
+	- 비즈니스 로직이 포함되지 않았다
+	- 데이터 검증을 수행하지 않는다
+	- games가 빈 배열일 때 안전하게 처리한다
+
