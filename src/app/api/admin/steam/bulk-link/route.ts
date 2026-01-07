@@ -77,7 +77,7 @@ export const POST = async (request: NextRequest) => {
     let body: BulkLinkRequestBody;
     try {
       body = await request.json();
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         {
           success: false,
@@ -215,7 +215,7 @@ export const POST = async (request: NextRequest) => {
 
         if (existingProfiles && existingProfiles.length > 0) {
           if (!force) {
-            const existingUser = existingProfiles[0];
+            const [existingUser] = existingProfiles;
             results.push({
               userId,
               steamId,

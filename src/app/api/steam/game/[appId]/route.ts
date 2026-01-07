@@ -52,7 +52,7 @@ export const GET = async (
     }
 
     // 3. app_id 파싱
-    const appId = params.appId;
+    const { appId } = params;
     if (!appId || isNaN(Number(appId))) {
       return NextResponse.json(
         {

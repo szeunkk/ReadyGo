@@ -63,7 +63,7 @@ export const DELETE = async (request: NextRequest) => {
     let body: UnlinkRequestBody;
     try {
       body = await request.json();
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         {
           success: false,
@@ -181,10 +181,6 @@ export const DELETE = async (request: NextRequest) => {
     }
 
     // 8. 성공 응답
-    console.log(
-      `[ADMIN] Unlinked Steam ID. User: ${userId}, Previous Steam ID: ${previousSteamId}`
-    );
-
     return NextResponse.json(
       {
         success: true,

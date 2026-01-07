@@ -69,7 +69,7 @@ export const POST = async (request: NextRequest) => {
     let body: LinkRequestBody;
     try {
       body = await request.json();
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         {
           success: false,
@@ -175,7 +175,7 @@ export const POST = async (request: NextRequest) => {
     // 다른 유저에게 이미 연결되어 있는 경우
     if (existingProfiles && existingProfiles.length > 0) {
       if (!force) {
-        const existingUser = existingProfiles[0];
+        const [existingUser] = existingProfiles;
         return NextResponse.json(
           {
             success: false,
