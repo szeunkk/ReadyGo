@@ -324,7 +324,6 @@ export const useChatRoom = (props: UseChatRoomProps): UseChatRoomReturn => {
 
       // 기존 채널 정리
       if (channelRef.current) {
-
         const oldChannel = channelRef.current;
         // 참조를 먼저 null로 설정
         channelRef.current = null;

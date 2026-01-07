@@ -41,8 +41,12 @@ export const POST = async function (request: NextRequest) {
     }
 
     // ✅ Supabase가 설정한 쿠키를 임시 저장
-    const supabaseCookies: Array<{ name: string; value: string; options: CookieOptions }> = [];
-    
+    const supabaseCookies: Array<{
+      name: string;
+      value: string;
+      options: CookieOptions;
+    }> = [];
+
     // ✅ Supabase 클라이언트: 쿠키를 배열에 저장
     const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -52,10 +56,16 @@ export const POST = async function (request: NextRequest) {
           getAll() {
             return request.cookies.getAll();
           },
-          setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
+          setAll(
+            cookiesToSet: {
+              name: string;
+              value: string;
+              options: CookieOptions;
+            }[]
+          ) {
             // 쿠키를 배열에 저장 (나중에 응답에 추가)
             supabaseCookies.push(...cookiesToSet);
-            
+
             // eslint-disable-next-line no-console
             console.log('Supabase cookies captured:', {
               count: cookiesToSet.length,

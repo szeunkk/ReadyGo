@@ -20,7 +20,7 @@ export default function ProfilePanel({
 }: ProfilePanelProps) {
   const router = useRouter();
   const [isCreatingChat, setIsCreatingChat] = useState(false);
-  
+
   // 쿠키에서 내 userId 가져오기
   const myUserId = useAuthStore((state) => state.user?.id);
 
@@ -58,7 +58,7 @@ export default function ProfilePanel({
       }
 
       const { data: newRoom } = await response.json();
-      
+
       // 채팅 페이지로 이동
       router.push(`/chat/${newRoom.id}`);
     } catch (error) {
