@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Icon from '@/commons/components/icon';
@@ -18,11 +18,11 @@ import { useLeaveParty } from './hooks/index.leave.hook';
 import styles from './styles.module.css';
 
 export default function PartyDetail() {
-  const [isJoined, setIsJoined] = useState(false);
   const params = useParams();
   const partyId = params?.id as string | undefined;
   const { user } = useAuth();
-  const { data, isLoading, error, refetch } = usePartyBinding();
+  const { data, isLoading, error, refetch, currentUserRole } =
+    usePartyBinding();
   const { openUpdateModal } = useLinkUpdateModal({ onRefetch: refetch });
   const { openDeleteModal } = useDeleteParty({ onRefetch: refetch });
   const { joinParty } = useJoinParty({ onRefetch: refetch });
@@ -33,27 +33,20 @@ export default function PartyDetail() {
 
   const handleJoinClick = async () => {
     if (partyId) {
-      try {
-        await joinParty(partyId);
-        // 참여 성공 시 ChatRoom 렌더링
-        setIsJoined(true);
-      } catch {
-        // 에러는 joinParty 내부에서 모달로 처리되므로 여기서는 상태만 유지
-        // 참여 실패 시 isJoined는 false로 유지됨
-      }
+      await joinParty(partyId);
+      // 참여 성공 시 refetch가 자동으로 호출되어 currentUserRole이 업데이트됨
     }
   };
 
   const handleLeaveClick = async () => {
     if (partyId) {
-      try {
-        await leaveParty(partyId);
-        // 참여 상태가 업데이트되면 자동으로 버튼이 변경됨
-        setIsJoined(false);
-      } catch {
-        // 에러는 leaveParty 내부에서 모달로 처리
-      }
+      await leaveParty(partyId);
+      // 나가기 성공 시 refetch가 자동으로 호출되어 currentUserRole이 업데이트됨
     }
+  };
+
+  const handleGameStart = () => {
+    // 게임시작 기능은 별도로 구현할 예정 (현재는 빈 함수)
   };
 
   const handleEditClick = () => {
@@ -129,16 +122,21 @@ export default function PartyDetail() {
         </div>
       </div>
       <div className={styles.mainArea}>
-        {isJoined ? <ChatRoom /> : <ChatNull />}
+        {currentUserRole === 'leader' || currentUserRole === 'member' ? (
+          <ChatRoom />
+        ) : (
+          <ChatNull />
+        )}
         <div className={styles.sideArea}>
           <MemberList />
           <PartyInfo
             data={data}
             isLoading={isLoading}
             error={error}
+            userRole={currentUserRole}
             onJoinClick={handleJoinClick}
             onLeaveClick={handleLeaveClick}
-            isJoined={isJoined}
+            onGameStartClick={handleGameStart}
           />
         </div>
       </div>

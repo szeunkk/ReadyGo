@@ -37,6 +37,8 @@ export default function PartySubmit({
   const [gameSearchQuery, setGameSearchQuery] = useState('');
   const [isGameOptionsOpen, setIsGameOptionsOpen] = useState(false);
   const [gameList, setGameList] = useState<SelectboxItem[]>([]);
+  const [isLoadingGames, setIsLoadingGames] = useState(true);
+  const [gameLoadError, setGameLoadError] = useState<string | null>(null);
   const gameSearchRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
 
@@ -57,6 +59,7 @@ export default function PartySubmit({
   // API를 통해 게임 목록 가져오기 (SSR 방식)
   useEffect(() => {
     const fetchGames = async () => {
+      setIsLoadingGames(true);
       try {
         const response = await fetch('/api/steam/games', {
           method: 'GET',
@@ -68,10 +71,17 @@ export default function PartySubmit({
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          console.error(
-            '게임 목록 조회 실패:',
-            errorData.message || errorData.detail || response.statusText
-          );
+          const errorMessage =
+            errorData.message || errorData.detail || response.statusText;
+          console.error('게임 목록 조회 실패:', errorMessage);
+
+          // 인증 오류인 경우 특별 처리
+          if (response.status === 401) {
+            setGameLoadError('로그인이 필요합니다.');
+          } else {
+            setGameLoadError('게임 목록을 불러올 수 없습니다.');
+          }
+
           // 에러 발생 시 빈 배열로 설정하여 UI가 깨지지 않도록 함
           setGameList([]);
           return;
@@ -81,10 +91,14 @@ export default function PartySubmit({
 
         // data가 없거나 빈 배열인 경우도 처리
         setGameList(result.data || []);
+        setGameLoadError(null); // 성공 시 에러 메시지 초기화
       } catch (error) {
         console.error('게임 목록 조회 중 오류 발생:', error);
+        setGameLoadError('게임 목록을 불러오는 중 오류가 발생했습니다.');
         // 에러 발생 시 빈 배열로 설정하여 UI가 깨지지 않도록 함
         setGameList([]);
+      } finally {
+        setIsLoadingGames(false);
       }
     };
 
@@ -126,7 +140,16 @@ export default function PartySubmit({
     }
     const { value } = e.target;
     setGameSearchQuery(value);
-    setIsGameOptionsOpen(value.length > 0 && filteredGames.length > 0);
+
+    // 검색어가 있고 게임 목록이 로드되었을 때만 옵션 표시
+    if (value.length > 0 && !isLoadingGames) {
+      const filtered = gameList.filter((game) =>
+        game.value.toLowerCase().includes(value.toLowerCase())
+      );
+      setIsGameOptionsOpen(filtered.length > 0);
+    } else {
+      setIsGameOptionsOpen(false);
+    }
   };
 
   // 게임 선택 핸들러 (작성 모드에서만 동작)
@@ -266,6 +289,7 @@ export default function PartySubmit({
                       onFocus={() => {
                         if (
                           gameSearchQuery.length > 0 &&
+                          !isLoadingGames &&
                           filteredGames.length > 0
                         ) {
                           setIsGameOptionsOpen(true);
@@ -299,6 +323,11 @@ export default function PartySubmit({
                           );
                         })}
                       </div>
+                    )}
+                    {gameLoadError && (
+                      <span className={styles.errorMessage}>
+                        {gameLoadError}
+                      </span>
                     )}
                     {errors?.game_title && (
                       <span className={styles.errorMessage}>
