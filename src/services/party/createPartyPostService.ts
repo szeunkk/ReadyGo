@@ -23,40 +23,92 @@ export const createPartyPostService = async (
   input: CreatePartyPostInput
 ): Promise<PartyPost> => {
   // 입력 검증
-  if (!input.creator_id || typeof input.creator_id !== 'string' || !input.creator_id.trim()) {
-    throw new ChatValidationError('creator_id는 비어있지 않은 문자열이어야 합니다.');
+  if (
+    !input.creator_id ||
+    typeof input.creator_id !== 'string' ||
+    !input.creator_id.trim()
+  ) {
+    throw new ChatValidationError(
+      'creator_id는 비어있지 않은 문자열이어야 합니다.'
+    );
   }
 
-  if (!input.game_title || typeof input.game_title !== 'string' || !input.game_title.trim()) {
-    throw new ChatValidationError('game_title은 비어있지 않은 문자열이어야 합니다.');
+  if (
+    !input.game_title ||
+    typeof input.game_title !== 'string' ||
+    !input.game_title.trim()
+  ) {
+    throw new ChatValidationError(
+      'game_title은 비어있지 않은 문자열이어야 합니다.'
+    );
   }
 
-  if (!input.party_title || typeof input.party_title !== 'string' || !input.party_title.trim()) {
-    throw new ChatValidationError('party_title은 비어있지 않은 문자열이어야 합니다.');
+  if (
+    !input.party_title ||
+    typeof input.party_title !== 'string' ||
+    !input.party_title.trim()
+  ) {
+    throw new ChatValidationError(
+      'party_title은 비어있지 않은 문자열이어야 합니다.'
+    );
   }
 
-  if (!input.start_date || typeof input.start_date !== 'string' || !input.start_date.trim()) {
-    throw new ChatValidationError('start_date는 비어있지 않은 문자열이어야 합니다.');
+  if (
+    !input.start_date ||
+    typeof input.start_date !== 'string' ||
+    !input.start_date.trim()
+  ) {
+    throw new ChatValidationError(
+      'start_date는 비어있지 않은 문자열이어야 합니다.'
+    );
   }
 
-  if (!input.start_time || typeof input.start_time !== 'string' || !input.start_time.trim()) {
-    throw new ChatValidationError('start_time은 비어있지 않은 문자열이어야 합니다.');
+  if (
+    !input.start_time ||
+    typeof input.start_time !== 'string' ||
+    !input.start_time.trim()
+  ) {
+    throw new ChatValidationError(
+      'start_time은 비어있지 않은 문자열이어야 합니다.'
+    );
   }
 
-  if (!input.description || typeof input.description !== 'string' || !input.description.trim()) {
-    throw new ChatValidationError('description은 비어있지 않은 문자열이어야 합니다.');
+  if (
+    !input.description ||
+    typeof input.description !== 'string' ||
+    !input.description.trim()
+  ) {
+    throw new ChatValidationError(
+      'description은 비어있지 않은 문자열이어야 합니다.'
+    );
   }
 
-  if (typeof input.max_members !== 'number' || isNaN(input.max_members) || input.max_members <= 0) {
+  if (
+    typeof input.max_members !== 'number' ||
+    isNaN(input.max_members) ||
+    input.max_members <= 0
+  ) {
     throw new ChatValidationError('max_members는 양수여야 합니다.');
   }
 
-  if (!input.control_level || typeof input.control_level !== 'string' || !input.control_level.trim()) {
-    throw new ChatValidationError('control_level은 비어있지 않은 문자열이어야 합니다.');
+  if (
+    !input.control_level ||
+    typeof input.control_level !== 'string' ||
+    !input.control_level.trim()
+  ) {
+    throw new ChatValidationError(
+      'control_level은 비어있지 않은 문자열이어야 합니다.'
+    );
   }
 
-  if (!input.difficulty || typeof input.difficulty !== 'string' || !input.difficulty.trim()) {
-    throw new ChatValidationError('difficulty는 비어있지 않은 문자열이어야 합니다.');
+  if (
+    !input.difficulty ||
+    typeof input.difficulty !== 'string' ||
+    !input.difficulty.trim()
+  ) {
+    throw new ChatValidationError(
+      'difficulty는 비어있지 않은 문자열이어야 합니다.'
+    );
   }
 
   // 문자열 필드 trim 처리
@@ -94,4 +146,3 @@ export const createPartyPostService = async (
     );
   }
 };
-

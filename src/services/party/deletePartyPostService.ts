@@ -15,9 +15,7 @@ import {
  * - 권한 체크
  * - Domain 로직
  */
-export const deletePartyPostService = async (
-  postId: number
-): Promise<void> => {
+export const deletePartyPostService = async (postId: number): Promise<void> => {
   // 입력 검증
   if (typeof postId !== 'number' || isNaN(postId) || postId <= 0) {
     throw new ChatValidationError('postId는 양수여야 합니다.');
@@ -32,4 +30,3 @@ export const deletePartyPostService = async (
     );
   }
 };
-

@@ -24,13 +24,21 @@ export const getPartyPostsService = async (
 ): Promise<PartyPost[]> => {
   // 입력 검증
   if (options?.limit !== undefined) {
-    if (typeof options.limit !== 'number' || isNaN(options.limit) || options.limit < 1) {
+    if (
+      typeof options.limit !== 'number' ||
+      isNaN(options.limit) ||
+      options.limit < 1
+    ) {
       throw new ChatValidationError('limit은 1 이상의 숫자여야 합니다.');
     }
   }
 
   if (options?.offset !== undefined) {
-    if (typeof options.offset !== 'number' || isNaN(options.offset) || options.offset < 0) {
+    if (
+      typeof options.offset !== 'number' ||
+      isNaN(options.offset) ||
+      options.offset < 0
+    ) {
       throw new ChatValidationError('offset은 0 이상의 숫자여야 합니다.');
     }
   }
@@ -39,22 +47,40 @@ export const getPartyPostsService = async (
   const validatedOptions: GetPartyPostsOptions = { ...options };
 
   if (options?.creatorId !== undefined) {
-    if (!options.creatorId || typeof options.creatorId !== 'string' || !options.creatorId.trim()) {
-      throw new ChatValidationError('creatorId는 비어있지 않은 문자열이어야 합니다.');
+    if (
+      !options.creatorId ||
+      typeof options.creatorId !== 'string' ||
+      !options.creatorId.trim()
+    ) {
+      throw new ChatValidationError(
+        'creatorId는 비어있지 않은 문자열이어야 합니다.'
+      );
     }
     validatedOptions.creatorId = options.creatorId.trim();
   }
 
   if (options?.gameTitle !== undefined) {
-    if (!options.gameTitle || typeof options.gameTitle !== 'string' || !options.gameTitle.trim()) {
-      throw new ChatValidationError('gameTitle은 비어있지 않은 문자열이어야 합니다.');
+    if (
+      !options.gameTitle ||
+      typeof options.gameTitle !== 'string' ||
+      !options.gameTitle.trim()
+    ) {
+      throw new ChatValidationError(
+        'gameTitle은 비어있지 않은 문자열이어야 합니다.'
+      );
     }
     validatedOptions.gameTitle = options.gameTitle.trim();
   }
 
   if (options?.status !== undefined) {
-    if (!options.status || typeof options.status !== 'string' || !options.status.trim()) {
-      throw new ChatValidationError('status는 비어있지 않은 문자열이어야 합니다.');
+    if (
+      !options.status ||
+      typeof options.status !== 'string' ||
+      !options.status.trim()
+    ) {
+      throw new ChatValidationError(
+        'status는 비어있지 않은 문자열이어야 합니다.'
+      );
     }
     validatedOptions.status = options.status.trim();
   }
@@ -69,4 +95,3 @@ export const getPartyPostsService = async (
     );
   }
 };
-

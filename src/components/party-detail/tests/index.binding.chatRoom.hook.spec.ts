@@ -1,10 +1,10 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
   /**
    * 유효한 파티 ID 조회 헬퍼 함수
    */
-  const getValidPartyId = async (page: any): Promise<number | null> => {
+  const getValidPartyId = async (page: Page): Promise<number | null> => {
     return await page.evaluate(async () => {
       try {
         const response = await fetch('/api/party?limit=10', {
@@ -33,10 +33,7 @@ test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
               );
               if (membersResponse.ok) {
                 const membersResult = await membersResponse.json();
-                if (
-                  membersResult.data &&
-                  Array.isArray(membersResult.data)
-                ) {
+                if (membersResult.data && Array.isArray(membersResult.data)) {
                   const userResponse = await fetch('/api/auth/user', {
                     method: 'GET',
                     credentials: 'include',
@@ -87,9 +84,7 @@ test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
 
     if (isChatRoomVisible) {
       // 빈 메시지 목록이 표시되는지 확인
-      const messagesWrapper = chatRoom.locator(
-        '[class*="messagesWrapper"]'
-      );
+      const messagesWrapper = chatRoom.locator('[class*="messagesWrapper"]');
       await expect(messagesWrapper).toBeVisible();
     }
   });
@@ -116,9 +111,7 @@ test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
 
     if (isChatRoomVisible) {
       // 빈 메시지 목록이 표시되는지 확인
-      const messagesWrapper = chatRoom.locator(
-        '[class*="messagesWrapper"]'
-      );
+      const messagesWrapper = chatRoom.locator('[class*="messagesWrapper"]');
       await expect(messagesWrapper).toBeVisible();
     }
   });
@@ -211,7 +204,7 @@ test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
 
       // 날짜 구분선이 있는지 확인 (메시지가 있는 경우)
       const dateDivider = chatRoom.locator('[class*="dateDivider"]');
-      const hasDateDivider = await dateDivider.count().catch(() => 0);
+      const _hasDateDivider = await dateDivider.count().catch(() => 0);
 
       // 메시지 버블이 있는지 확인
       const messageBubbles = chatRoom.locator('[class*="messageBubble"]');
@@ -351,7 +344,7 @@ test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
 
       // 전송 버튼이 비활성화되었는지 확인 (또는 전송되지 않는지 확인)
       const sendButton = page.locator('[aria-label="메시지 입력"]');
-      const isDisabled = await sendButton.isDisabled().catch(() => false);
+      const _isDisabled = await sendButton.isDisabled().catch(() => false);
 
       // 빈 메시지는 전송되지 않아야 함
       // API 호출이 발생하지 않는지 확인
@@ -484,7 +477,9 @@ test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
       const otherMessageContainer = chatRoom.locator(
         '[class*="otherMessageContainer"]'
       );
-      const hasOtherMessages = await otherMessageContainer.count().catch(() => 0);
+      const hasOtherMessages = await otherMessageContainer
+        .count()
+        .catch(() => 0);
 
       // 메시지가 있으면 내 메시지 또는 상대방 메시지가 표시되어야 함
       if (hasOwnMessages > 0 || hasOtherMessages > 0) {
@@ -556,9 +551,7 @@ test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
     }
   });
 
-  test('에러 처리 - 메시지 조회 실패 시 에러 상태 확인', async ({
-    page,
-  }) => {
+  test('에러 처리 - 메시지 조회 실패 시 에러 상태 확인', async ({ page }) => {
     // 유효한 파티 ID 조회
     const validPartyId = await getValidPartyId(page);
 
@@ -568,16 +561,13 @@ test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
     }
 
     // 메시지 조회 API를 실패시키기 위해 네트워크 요청 차단
-    await page.route(
-      `**/api/party/${validPartyId}/messages*`,
-      (route) => {
-        route.fulfill({
-          status: 500,
-          contentType: 'application/json',
-          body: JSON.stringify({ error: '서버 오류가 발생했습니다.' }),
-        });
-      }
-    );
+    await page.route(`**/api/party/${validPartyId}/messages*`, (route) => {
+      route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: '서버 오류가 발생했습니다.' }),
+      });
+    });
 
     // 파티 상세 페이지로 이동
     await page.goto(`/party/${validPartyId}`, {
@@ -610,9 +600,7 @@ test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
     }
   });
 
-  test('에러 처리 - 메시지 전송 실패 시 에러 상태 확인', async ({
-    page,
-  }) => {
+  test('에러 처리 - 메시지 전송 실패 시 에러 상태 확인', async ({ page }) => {
     // 유효한 파티 ID 조회
     const validPartyId = await getValidPartyId(page);
 
@@ -647,20 +635,17 @@ test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
       );
 
       // 메시지 전송 API를 실패시키기 위해 네트워크 요청 차단
-      await page.route(
-        `**/api/party/${validPartyId}/messages`,
-        (route) => {
-          if (route.request().method() === 'POST') {
-            route.fulfill({
-              status: 500,
-              contentType: 'application/json',
-              body: JSON.stringify({ error: '메시지 전송에 실패했습니다.' }),
-            });
-          } else {
-            route.continue();
-          }
+      await page.route(`**/api/party/${validPartyId}/messages`, (route) => {
+        if (route.request().method() === 'POST') {
+          route.fulfill({
+            status: 500,
+            contentType: 'application/json',
+            body: JSON.stringify({ error: '메시지 전송에 실패했습니다.' }),
+          });
+        } else {
+          route.continue();
         }
-      );
+      });
 
       // 메시지 입력 필드 확인
       const messageInput = page.locator('[aria-label="메시지 입력"]');
@@ -679,9 +664,7 @@ test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
     }
   });
 
-  test('로딩 상태 - isLoading이 올바르게 동작하는지 확인', async ({
-    page,
-  }) => {
+  test('로딩 상태 - isLoading이 올바르게 동작하는지 확인', async ({ page }) => {
     // 유효한 파티 ID 조회
     const validPartyId = await getValidPartyId(page);
 
@@ -729,9 +712,7 @@ test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
     }
   });
 
-  test('차단 상태 - isBlocked가 올바르게 동작하는지 확인', async ({
-    page,
-  }) => {
+  test('차단 상태 - isBlocked가 올바르게 동작하는지 확인', async ({ page }) => {
     // 유효한 파티 ID 조회
     const validPartyId = await getValidPartyId(page);
 
@@ -825,9 +806,10 @@ test.describe('파티 채팅방 Hook (useChatRoom) 바인딩 기능', () => {
         // 날짜 포맷 확인 (YYYY년 MM월 DD일 요일 형식)
         const dateText = await dateDivider.first().textContent();
         expect(dateText).toBeTruthy();
-        expect(dateText).toMatch(/\d{4}년\s+\d{1,2}월\s+\d{1,2}일\s+(일|월|화|수|목|금|토)요일/);
+        expect(dateText).toMatch(
+          /\d{4}년\s+\d{1,2}월\s+\d{1,2}일\s+(일|월|화|수|목|금|토)요일/
+        );
       }
     }
   });
 });
-
