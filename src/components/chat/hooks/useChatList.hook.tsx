@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { usePathname } from 'next/navigation';
 
 import { supabase as baseSupabase } from '@/lib/supabase/client';
 import { useAuth } from '@/commons/providers/auth/auth.provider';
@@ -148,6 +149,7 @@ export interface UseChatListReturn {
 export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
   const { autoRefresh = true, refreshInterval = 30000 } = props || {};
   const { user } = useAuth();
+  const pathname = usePathname();
 
   // 상태 관리
   const [chatRooms, setChatRooms] = useState<ChatRoomListItem[]>([]);
@@ -371,8 +373,48 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
                 schema: 'public',
                 table: 'chat_messages',
               },
-              () => {
+              (payload) => {
                 // 새 메시지 수신 시 목록 업데이트 (마지막 메시지, 시간 등)
+                const newMessage = payload.new as {
+                  id?: number;
+                  room_id?: number;
+                  sender_id?: string;
+                  is_read?: boolean;
+                } | null;
+
+                if (newMessage && newMessage.sender_id !== userId) {
+                  // 상대방이 보낸 메시지인 경우
+                  const messageRoomId = newMessage.room_id;
+
+                  if (messageRoomId) {
+                    // 현재 열려있는 채팅방인지 확인
+                    const currentRoomIdMatch = pathname?.match(/^\/chat\/(\d+)$/);
+                    const currentRoomId = currentRoomIdMatch
+                      ? parseInt(currentRoomIdMatch[1], 10)
+                      : null;
+
+                    // 현재 열려있는 채팅방이 아니고, 낙관적으로 읽음 처리되지 않은 채팅방이면
+                    // unreadCount를 즉시 증가시킴
+                    if (
+                      currentRoomId !== messageRoomId &&
+                      !optimisticReadRoomsRef.current.has(messageRoomId)
+                    ) {
+                      setChatRooms((prev) =>
+                        prev.map((room) => {
+                          if (room.room.id === messageRoomId) {
+                            return {
+                              ...room,
+                              unreadCount: (room.unreadCount || 0) + 1,
+                            };
+                          }
+                          return room;
+                        })
+                      );
+                    }
+                  }
+                }
+
+                // 목록 업데이트 (마지막 메시지, 시간 등)
                 debouncedRefresh();
               }
             )
@@ -453,7 +495,7 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
 
       await setupRealtimeSubscription();
     },
-    [cleanupChannel, debouncedRefresh, markRoomAsReadOptimistic]
+    [cleanupChannel, debouncedRefresh, markRoomAsReadOptimistic, pathname]
   );
 
   /**
