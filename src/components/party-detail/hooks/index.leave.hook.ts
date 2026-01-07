@@ -76,5 +76,3 @@ export const useLeaveParty = (
     leaveParty,
   };
 };
-
-

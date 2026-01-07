@@ -1,0 +1,85 @@
+아래 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+	        - Domain 로직은 순수 함수로 구현할 것 (side effect X)
+	        - calculateFinalMatchScore 단일 진입점 함수만 외부에 노출할 것
+	        - 계산 과정 중간 결과는 내부 타입으로만 유지하고 외부 반환 X
+	        - additive 방식의 점수 보정 절대 사용 X
+	        - 각 factor는 서로 의존하지 않고 독립적으로 계산될 것
+	        - Steam 연동 여부와 무관하게 항상 동작할 것
+
+==============================================
+
+조건-파일경로) 참고 및 기준 파일 경로는 다음과 같다.
+            - src/features/match/domain/score/
+            - src/features/match/domain/context/MatchContext.ts
+            - src/features/match/domain/score/calculateFinalMatchScore.ts
+
+            - 단, 기존에 구현된 factor 계산 함수들은 "재구현"하지 말고 "조합"만 수행할 것.
+
+==============================================
+
+조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
+            - 단일 진입점 Domain 함수 패턴
+            - Core DTO → Domain 계산 → 결과 DTO 반환 구조
+            - factor 계산 함수 분리 + 최종 파이프라인 조합 방식
+            - base score + environment factor 분리 설계
+
+==============================================
+
+핵심요구사항) 다음 기능을 step-by-step으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
+
+        1. MatchContext 정의
+	        - traits, animalType, schedule, online 상태를 입력으로 받는다
+	        - Steam 관련 필드는 optional 로만 존재할 수 있다
+	        - Cold Start 판단은 context 내부 플래그로만 처리한다
+
+        2. Base Similarity 계산
+            - Traits 기반 점수를 중심 점수로 사용한다
+            - Cold Start 시 baseScore = 50
+            - baseScore는 이후 단계에서 직접 감소 X
+            - 출력 범위: 0~100
+
+        3. Compatibility Factors 계층 구현
+	        - animalCompatibilityFactor 계산 함수 구현
+	        - scheduleCompatibilityFactor 계산 함수 구현
+	        - 모든 보정은 multiplicative factor 형태로만 처리
+	        - additive 로직 포함 X
+
+        4. Availability / Situation 처리
+            - onlineFactor는 최대 1.02 이하
+            - online 여부는 점수 외 메타 정보로도 함께 반환
+            - isOnlineMatched / availabilityHint는 score와 분리
+
+        5. Clamp & Normalize
+	        - 최종 점수는 0~100 보장
+	        - Math.round → Math.min/max 순서 고정
+
+        6. 단일 진입점 구현
+	        - calculateFinalMatchScore(context: MatchContext)
+	        - 반환값에 finalScore + availability 메타 포함
+
+==============================================
+
+조건-Hook 책임) 
+	        - Domain 계산 로직을 호출하는 Hook은 calculateFinalMatchScore만 사용한다
+	        - factor 계산 함수 직접 호출 X
+
+==============================================
+
+조건-UI 책임)
+	        - UI는 finalScore와 메타 정보만 사용
+	        - 계산 과정, factor 값, 중간 점수 접근 X
+
+==============================================
+
+구현 완료 후 반환) 아래 체크리스트를 반드시 반환할 것.
+	        - MatchContext가 Steam 미연동 상황에서도 완결되는가
+	        - Base Similarity가 절대 중심 점수로 유지되는가
+	        - 모든 보정이 multiplicative factor로만 적용되는가
+	        - online 영향이 score와 랭킹 메타로 분리되었는가
+	        - 최종 점수가 0~100으로 안정화되는가
+	        - 단일 진입점만 외부에 노출되는가

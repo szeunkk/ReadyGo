@@ -29,7 +29,7 @@ export const checkUserProfile = async function (
     userId,
     hasProfile,
     data: data ? 'exists' : 'null',
-    error: error?.message,
+    error: error ? (error as { message?: string }).message : undefined,
   });
 
   return hasProfile;

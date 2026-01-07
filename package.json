@@ -12,6 +12,8 @@
     "build-storybook": "storybook build",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "test": "vitest --project=unit",
+    "test:watch": "vitest --project=unit --watch",
     "test:e2e": "playwright test",
     "supabase:types": "supabase gen types --linked --schema public > supabase/types/database.types.ts"
   },
@@ -66,6 +68,7 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5",
     "vite": "^7.2.7",
+    "vite-tsconfig-paths": "^6.0.3",
     "vitest": "^4.0.15"
   }
 }

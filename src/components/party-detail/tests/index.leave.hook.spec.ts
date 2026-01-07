@@ -125,9 +125,7 @@ test.describe('파티 나가기 기능', () => {
     }
   });
 
-  test('성공시나리오: API 호출 성공 후 적절한 처리 확인', async ({
-    page,
-  }) => {
+  test('성공시나리오: API 호출 성공 후 적절한 처리 확인', async ({ page }) => {
     // 페이지 컨텍스트에서 실제 파티 ID 조회 (이미 참여한 파티)
     const validPartyId = await page.evaluate(async () => {
       try {
@@ -528,5 +526,3 @@ test.describe('파티 나가기 기능', () => {
     }
   });
 });
-
-

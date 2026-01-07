@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers';
 import TraitsResultPage from '@/components/traits/traitsResultPage';
 import {
   AnimalType,
@@ -7,6 +6,8 @@ import {
 } from '@/commons/constants/animal';
 import { URL_PATHS } from '@/commons/constants/url';
 import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { getTraitsResult } from '@/services/traits/getTraitsResult.service';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,30 +28,25 @@ type TraitsResultApiResponse = {
 };
 
 const fetchTraitsResult = async (): Promise<TraitsResultApiResponse | null> => {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get('sb-access-token')?.value || '';
-
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-
   try {
-    const res = await fetch(`${baseUrl}/api/traits/result`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      cache: 'no-store',
-    });
+    // Server Component에서 직접 Supabase 사용
+    const supabase = createClient();
 
-    if (!res.ok) {
-      if (res.status === 401) {
-        redirect(URL_PATHS.LOGIN);
-      }
-      return null;
+    // 사용자 인증 확인
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      redirect(URL_PATHS.LOGIN);
     }
 
-    const data: TraitsResultApiResponse = await res.json();
-    return data;
-  } catch {
+    // 서비스 호출
+    const result = await getTraitsResult(supabase, user.id);
+    return result;
+  } catch (error) {
+    console.error('Failed to fetch traits result:', error);
     return null;
   }
 };

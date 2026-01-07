@@ -1,4 +1,4 @@
-import * as chatRepository from '@/repositories/chat.repository';
+import * as userBlocksRepository from '@/repositories/userBlocks.repository';
 import {
   ChatFetchError,
   ChatValidationError,
@@ -31,7 +31,7 @@ export const isUserBlockedService = async (
   }
 
   try {
-    const isBlocked = await chatRepository.isUserBlocked(
+    const isBlocked = await userBlocksRepository.isUserBlocked(
       client,
       userId,
       otherUserId

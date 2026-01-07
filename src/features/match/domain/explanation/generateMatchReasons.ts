@@ -36,8 +36,8 @@ import type { MatchReasonCoreDTO } from '@/commons/types/match/matchReasonCore.d
 import {
   calculateTraitsSimilarity,
   findTopTrait,
-} from './utils/traitsSimilarity';
-import { calculateScheduleSimilarity } from './utils/scheduleSimilarity';
+} from '../utils/traitsSimilarity';
+import { calculateScheduleSimilarity } from '../utils/scheduleSimilarity';
 
 /**
  * 매칭 이유 생성

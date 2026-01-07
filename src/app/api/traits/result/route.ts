@@ -1,16 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { createClient } from '@supabase/supabase-js';
-// import { createClient } from '@/lib/supabase/server'; // TODO: server.ts 리팩토링 후 재도입
-import { Database } from '@/types/supabase';
+import { createClient } from '@/lib/supabase/server';
 import { getTraitsResult } from '@/services/traits/getTraitsResult.service';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
 
 export const dynamic = 'force-dynamic';
 
@@ -23,39 +13,12 @@ export const dynamic = 'force-dynamic';
  * - 응답 반환
  */
 
-export const GET = async (request: NextRequest) => {
+export const GET = async (_request: NextRequest) => {
   try {
-    const cookieStore = cookies();
-    const authHeader = request.headers.get('authorization');
-    const headerToken = authHeader?.startsWith('Bearer ')
-      ? authHeader.slice(7)
-      : undefined;
-    const cookieToken = cookieStore.get('sb-access-token')?.value;
-    const accessToken = cookieToken || headerToken;
+    // server.ts의 createClient 사용 (SSR 쿠키 자동 관리)
+    const supabase = createClient();
 
-    if (!accessToken) {
-      return NextResponse.json(
-        {
-          message: 'Unauthorized',
-          detail: 'Authentication required',
-        },
-        { status: 401 }
-      );
-    }
-
-    // TODO: server.ts 개선 후 공용 SSR client 재사용 검토
-    const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: false,
-      },
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    });
-
-    // 2. 사용자 정보 확인
+    // 사용자 정보 확인
     const {
       data: { user },
       error: authError,
@@ -71,7 +34,7 @@ export const GET = async (request: NextRequest) => {
       );
     }
 
-    // 3. user_id는 auth.user.id만 사용 (query/body 무시)
+    // user_id는 auth.user.id만 사용 (query/body 무시)
     const userId = user.id;
 
     // 4. Service 호출

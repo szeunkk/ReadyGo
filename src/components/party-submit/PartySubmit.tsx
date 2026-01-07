@@ -12,7 +12,6 @@ import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
 import { usePartySubmit } from './hooks/index.submit.hook';
 import { useLinkModalClose } from './hooks/index.link.modal.close.hook';
-import { supabase } from '@/lib/supabase/client';
 
 interface PartySubmitProps {
   onClose?: () => void;
@@ -55,33 +54,37 @@ export default function PartySubmit({
     }
   }, [watchedValues.game_title]);
 
-  // Supabase에서 게임 목록 가져오기
+  // API를 통해 게임 목록 가져오기 (SSR 방식)
   useEffect(() => {
     const fetchGames = async () => {
       try {
-        const { data, error } = await supabase
-          .from('steam_game_info')
-          .select('app_id, name')
-          .not('name', 'is', null)
-          .order('name', { ascending: true });
+        const response = await fetch('/api/steam/games', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
-        if (error) {
-          console.error('게임 목록 조회 실패:', error);
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error(
+            '게임 목록 조회 실패:',
+            errorData.message || errorData.detail || response.statusText
+          );
+          // 에러 발생 시 빈 배열로 설정하여 UI가 깨지지 않도록 함
+          setGameList([]);
           return;
         }
 
-        if (data) {
-          // SelectboxItem 형식으로 변환
-          const games: SelectboxItem[] = data
-            .filter((game) => game.name) // null 체크
-            .map((game) => ({
-              id: game.app_id.toString(),
-              value: game.name!,
-            }));
-          setGameList(games);
-        }
+        const result = await response.json();
+
+        // data가 없거나 빈 배열인 경우도 처리
+        setGameList(result.data || []);
       } catch (error) {
         console.error('게임 목록 조회 중 오류 발생:', error);
+        // 에러 발생 시 빈 배열로 설정하여 UI가 깨지지 않도록 함
+        setGameList([]);
       }
     };
 

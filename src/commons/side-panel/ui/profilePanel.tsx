@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './styles.module.css';
 import AnimalCard from '../../components/animal-card';
 import RadarChart from '../../components/radar-chart';
@@ -17,6 +18,9 @@ export default function ProfilePanel({
   userId,
   className = '',
 }: ProfilePanelProps) {
+  const router = useRouter();
+  const [isCreatingChat, setIsCreatingChat] = useState(false);
+
   // 쿠키에서 내 userId 가져오기
   const myUserId = useAuthStore((state) => state.user?.id);
 
@@ -25,6 +29,45 @@ export default function ProfilePanel({
 
   // 상대방 프로필 가져오기
   const { loading, viewModel, error, empty } = useProfileByUserId(userId);
+
+  // 채팅하기 버튼 핸들러
+  const handleStartChat = async () => {
+    if (!myUserId || !userId || isCreatingChat) {
+      return;
+    }
+
+    try {
+      setIsCreatingChat(true);
+
+      // 채팅방 생성 API 호출
+      const response = await fetch('/api/chat/room', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          memberIds: [myUserId, userId],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('[ProfilePanel] Failed to create chat room:', errorData);
+        alert('채팅방 생성에 실패했습니다.');
+        return;
+      }
+
+      const { data: newRoom } = await response.json();
+
+      // 채팅 페이지로 이동
+      router.push(`/chat/${newRoom.id}`);
+    } catch (error) {
+      console.error('[ProfilePanel] Error creating chat room:', error);
+      alert('채팅방 생성 중 오류가 발생했습니다.');
+    } finally {
+      setIsCreatingChat(false);
+    }
+  };
 
   const containerClasses = [styles.profilePanel, className]
     .filter(Boolean)
@@ -112,6 +155,7 @@ export default function ProfilePanel({
         weeklyAverage="알 수 없음"
         matchPercentage={0}
         matchReasons={[]}
+        onMessageClick={handleStartChat}
       />
 
       {/* 플레이스타일과 최근 플레이 패턴을 포함하는 통합 섹션 */}

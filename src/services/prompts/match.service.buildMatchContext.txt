@@ -1,0 +1,108 @@
+아래 요구사항을 모두 만족하는 Cursor 실행용 기능 구현 프롬프트를 생성하라.
+설명, 해설, 코멘트는 절대 포함하지 말고 프롬프트 본문만 출력하라.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+	        - Service Layer는 “조립(Assembly)” 책임만 가진다
+	        - Domain 로직 호출 ❌
+	        - 계산 / 해석 / 판단 로직 ❌
+	        - Cold Start를 에러로 취급하지 않는다
+	        - undefined / optional 정책을 타입과 값으로 일관되게 유지한다
+	        - 단일 진입점, 단일 반환값을 유지한다
+
+==============================================
+
+조건-파일경로) 참고 및 기준 파일 경로는 다음과 같다.
+	        - 구현 대상
+    	        - src/services/match/buildMatchContext.service.ts
+	        - Repository 경로 (실제 존재하는 것만 사용)
+    	        - src/repositories/userProfiles.repository.ts
+	            - src/repositories/userTraits.repository.ts
+	            - src/repositories/userPlaySchedules.repository.ts
+	            - ❗ steamGame.repository.ts/steamGameSyncLog.repository.ts는 사용하지 않는다
+	        - Domain 타입
+	            - MatchContext
+	            - UserMatchInput
+
+==============================================
+
+조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
+	        - Service는 Repository를 호출해 raw data를 수집한다
+	        - 수집한 데이터를 의미 해석 없이 구조에 맞게 조립한다
+	        - Domain은 Context를 입력으로만 받으며 Service 로직을 알지 못한다
+	        - Cold Start는 “데이터 없음 상태”로 Context에 표현한다
+	        - Steam 유저 연동은 아직 구현되지 않은 상태로 간주한다
+
+
+==============================================
+
+핵심요구사항) 다음 기능을 step-by-step으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
+
+1. 함수 시그니처
+	        - buildMatchContext(viewerId: string, targetUserId: string) 함수 구현
+	        - 입력은 viewerId / targetUserId만 받는다
+	        - 반환은 항상 MatchContext 하나만 반환한다
+            (throw ❌ / null ❌ / undefined ❌)
+
+
+2. 반환 구조
+            - 반환되는 MatchContext는 반드시 다음 구조를 따른다.
+            - MatchContext {
+            viewer: UserMatchInput
+            target: UserMatchInput
+            }
+
+3. 기본 규칙
+	        - viewer.userId === viewerId
+	        - target.userId === targetUserId
+	        - userId 외의 모든 필드는 optional
+	        - null 사용 ❌ (undefined만 허용)
+
+4. traits 조립 규칙
+	        - Repository에서 traits 데이터가 없으면 → traits 필드 자체를 undefined
+	        - 기본값 삽입 ❌
+	        - 계산 / 점수화 ❌
+
+5. activity 조립 규칙
+	        - schedule 데이터가 없으면 → activity 또는 activity.schedule을 undefined
+	        - 빈 배열 강제 ❌
+	        - isOnline 미확인 시 undefined 유지
+
+6. Cold Start 처리
+	        - 데이터 없음은 정상 상태
+	        - Cold Start를 판단하는 별도 로직 ❌
+	        - Context 부족으로 에러 발생 ❌
+
+7. Immutability
+	        - Context 생성 이후 mutation ❌
+	        - Object.assign ❌
+	        - 불변 객체로 반환
+
+==============================================
+
+조건-Hook 책임)
+	•	없음
+	•	Hook 구현 ❌
+
+==============================================
+
+조건-UI 책임)
+	•	없음
+	•	ViewModel 생성 ❌
+	•	UI 조건 분기 ❌
+
+==============================================
+
+구현 완료 후 반환) 아래 체크리스트를 반드시 반환할 것.
+	        - 파일 위치가 src/services/match/buildMatchContext.service.ts 인가
+	        - Service Layer 책임만 수행하는가
+	        - Domain 함수 호출이 없는가
+	        - 항상 MatchContext를 반환하는가
+	        - viewer / target 모두 userId를 포함하는가
+	        - optional 필드에 기본값을 삽입하지 않았는가
+	        - Cold Start 상황에서 에러가 발생하지 않는가
+	        - steam 필드가 항상 optional(undefined)로 유지되는가
+	        - activity / traits / reliability가 optional 정책을 준수하는가
+	        - Context 생성 이후 mutation이 없는가
+	        - calculateFinalMatchScore의 단일 입력으로 사용 가능한가
