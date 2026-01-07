@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import Avatar from '@/commons/components/avatar';
 import { getChatRoomUrl } from '@/commons/constants/url';
 import styles from './styles.module.css';
@@ -111,12 +111,29 @@ const ChatListItem = ({
 };
 
 export default function ChatList() {
+  const router = useRouter();
+  const pathname = usePathname();
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const { formattedChatRooms, isLoading, error, markRoomAsReadOptimistic } =
     useChatList({
       autoRefresh: true,
       refreshInterval: 30000,
     });
+
+  // URL에서 현재 roomId 추출하여 선택 상태 초기화
+  useEffect(() => {
+    // pathname이 /chat/[roomId] 형식인지 확인
+    const chatRoomMatch = pathname?.match(/^\/chat\/(\d+)$/);
+    if (chatRoomMatch) {
+      const roomIdFromUrl = parseInt(chatRoomMatch[1], 10);
+      if (!isNaN(roomIdFromUrl)) {
+        setSelectedRoomId(roomIdFromUrl);
+      }
+    } else {
+      // 채팅방이 선택되지 않은 경우 선택 상태 초기화
+      setSelectedRoomId(null);
+    }
+  }, [pathname]);
 
   // 에러 상태 처리
   if (error) {

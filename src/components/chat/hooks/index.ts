@@ -21,3 +21,9 @@ export {
   type UseChatRoomInputProps,
   type UseChatRoomInputReturn,
 } from './useChatRoomInput.hook';
+
+export {
+  useChatRoomScroll,
+  type UseChatRoomScrollProps,
+  type UseChatRoomScrollReturn,
+} from './useChatRoomScroll.hook';

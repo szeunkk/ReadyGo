@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import styles from './styles.module.css';
 import Avatar from '@/commons/components/avatar';
 import Icon from '@/commons/components/icon';
@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AnimalType } from '@/commons/constants/animal';
 import { useSideProfilePanel } from '@/hooks/useSideProfilePanel';
 import { useChatRoom, useChatRoomInput } from '@/components/chat/hooks';
+import { formatDateDivider } from '@/lib/chat/messageFormatter';
 
 interface ChatRoomProps {
   roomId?: string;
@@ -26,6 +27,9 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
     ? 0
     : parseInt(roomId || '', 10);
 
+  // 메시지 리스트 컨테이너 ref
+  const messageListRef = useRef<HTMLDivElement>(null);
+
   // useChatRoom Hook 호출
   const {
     formattedMessages,
@@ -35,7 +39,18 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
     isLoading,
     error,
     isBlocked,
+    scrollToBottom,
+    scrollToUnreadBoundary,
+    shouldScrollToBottom,
+    shouldScrollToUnread,
+    clearScrollTriggers,
+    shouldShowScrollToBottomButton,
+    roomCreatedAt,
   } = useChatRoom({ roomId: roomIdNumber });
+
+  // 플로팅 버튼 표시 여부
+  const [showScrollToBottomButton, setShowScrollToBottomButton] =
+    useState(false);
 
   // 채팅 입력 관련 로직
   const {
@@ -62,6 +77,54 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
       openProfile(otherMemberInfo.id);
     }
   }, [roomId, otherMemberInfo, isOpen, targetUserId, openProfile]);
+
+  // 스크롤 트리거 처리
+  useEffect(() => {
+    if (shouldScrollToBottom && messageListRef.current) {
+      scrollToBottom(messageListRef);
+      clearScrollTriggers();
+    } else if (shouldScrollToUnread && messageListRef.current) {
+      scrollToUnreadBoundary(messageListRef);
+      clearScrollTriggers();
+    }
+  }, [
+    shouldScrollToBottom,
+    shouldScrollToUnread,
+    scrollToBottom,
+    scrollToUnreadBoundary,
+    clearScrollTriggers,
+  ]);
+
+  // 스크롤 위치 감지
+  const handleScroll = useCallback(() => {
+    if (messageListRef.current) {
+      const shouldShow = shouldShowScrollToBottomButton(messageListRef);
+      setShowScrollToBottomButton(shouldShow);
+    }
+  }, [shouldShowScrollToBottomButton]);
+
+  // 스크롤 이벤트 리스너 등록
+  useEffect(() => {
+    const container = messageListRef.current;
+    if (!container) {
+      return;
+    }
+
+    container.addEventListener('scroll', handleScroll);
+    // 초기 상태 확인
+    handleScroll();
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [handleScroll, formattedMessages.length]);
+
+  // 최하단 이동 버튼 클릭 핸들러
+  const handleScrollToBottomClick = useCallback(() => {
+    if (messageListRef.current) {
+      scrollToBottom(messageListRef);
+    }
+  }, [scrollToBottom]);
 
   // 현재 사용자의 프로필이 열려있는지 확인
   const isProfileActive =
@@ -152,11 +215,24 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
       )}
 
       {/* 메시지 리스트 영역 */}
-      <div className={styles.messageList} aria-label="메시지 목록">
+      <div
+        ref={messageListRef}
+        className={styles.messageList}
+        aria-label="메시지 목록"
+      >
         {isLoading ? null : formattedMessages.length === 0 ? ( // 메시지 로딩 중일 때는 빈 상태로 표시 (스켈레톤 없음)
-          <div style={{ padding: '20px', textAlign: 'center' }}>
-            메시지가 없습니다
-          </div>
+          <>
+            {roomCreatedAt && (
+              <div className={styles.dateDivider}>
+                {formatDateDivider(roomCreatedAt)}
+              </div>
+            )}
+            <div className={styles.unreadDivider}>
+              <span className={styles.unreadDividerText}>
+                메시지가 없습니다
+              </span>
+            </div>
+          </>
         ) : (
           formattedMessages.map((item, index) => {
             if (item.type === 'date-divider') {
@@ -171,10 +247,27 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
               );
             }
 
+            if (item.type === 'unread-divider') {
+              return (
+                <div
+                  key={`unread-divider-${index}`}
+                  data-unread-divider="true"
+                  className={styles.unreadDivider}
+                  aria-label="여기까지 읽었습니다"
+                >
+                  <span className={styles.unreadDividerText}>
+                    여기까지 읽었습니다
+                  </span>
+                </div>
+              );
+            }
+
             // message 타입인 경우
             const {
               message,
               isConsecutive,
+              isGroupStart,
+              isGroupEnd,
               isOwnMessage,
               formattedTime,
               formattedContent,
@@ -203,11 +296,14 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
               return (
                 <div
                   key={message.id}
+                  data-message-id={message.id}
                   className={styles.messageRow}
                   aria-label={`내 메시지: ${formattedContent}`}
                 >
                   <div className={styles.ownMessageContainer}>
-                    <div className={styles.messageTime}>{formattedTime}</div>
+                    {isGroupEnd && (
+                      <div className={styles.messageTime}>{formattedTime}</div>
+                    )}
                     <div className={styles.ownMessageBubble}>
                       <span className={styles.messageContent}>
                         {formattedContent}
@@ -221,15 +317,16 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
             return (
               <div
                 key={message.id}
+                data-message-id={message.id}
                 className={styles.messageRow}
                 aria-label={`${displayNickname}의 메시지: ${formattedContent}`}
               >
                 <div
                   className={`${styles.otherMessageContainer} ${
-                    isConsecutive ? styles.consecutive : ''
+                    !isGroupStart ? styles.consecutive : ''
                   }`}
                 >
-                  {!isConsecutive && (
+                  {isGroupStart && (
                     <Avatar
                       imageUrl={displayAvatarImagePath}
                       animalType={displayAnimalType as AnimalType}
@@ -240,19 +337,35 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
                       className={styles.messageAvatar}
                     />
                   )}
-                  {isConsecutive && <div className={styles.avatarSpacer} />}
+                  {!isGroupStart && <div className={styles.avatarSpacer} />}
                   <div className={styles.otherMessageContent}>
                     <div className={styles.otherMessageBubble}>
                       <span className={styles.messageContent}>
                         {formattedContent}
                       </span>
                     </div>
-                    <div className={styles.messageTime}>{formattedTime}</div>
+                    {isGroupEnd && (
+                      <div className={styles.messageTime}>{formattedTime}</div>
+                    )}
                   </div>
                 </div>
               </div>
             );
           })
+        )}
+        {/* 플로팅 버튼: 최근 메시지로 이동 (메시지 리스트 하단에 고정) */}
+        {showScrollToBottomButton && (
+          <div className={styles.scrollToBottomButtonWrapper}>
+            <button
+              className={styles.scrollToBottomButton}
+              onClick={handleScrollToBottomClick}
+              aria-label="최근 메시지로 이동"
+              type="button"
+            >
+              <Icon name="chevron-down" size={20} />
+              <span>최근 메시지</span>
+            </button>
+          </div>
         )}
       </div>
 
