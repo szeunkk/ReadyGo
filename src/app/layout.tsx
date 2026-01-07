@@ -8,7 +8,6 @@ import { NextThemesProvider } from '../commons/providers/next-themes/next-themes
 import { ModalProvider } from '../commons/providers/modal/modal.provider';
 import { AuthGuard } from '../commons/providers/auth/auth.guard';
 import { Layout } from '../commons/layout';
-import { OAuthCallbackHandler } from '../components/auth/oauth-callback';
 
 const pretendard = localFont({
   src: '../fonts/PretendardVariable.woff2',
@@ -40,7 +39,6 @@ export default function RootLayout({
             <UserStatusProvider>
               <NextThemesProvider>
                 <ModalProvider>
-                  <OAuthCallbackHandler />
                   <AuthGuard>
                     <Layout>{children}</Layout>
                   </AuthGuard>

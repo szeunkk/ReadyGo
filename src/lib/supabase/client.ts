@@ -13,9 +13,20 @@ if (!supabaseUrl || !supabaseAnonKey) {
  *
  * - 쿠키 기반 세션 자동 관리
  * - Realtime (Broadcast, Presence, Postgres Changes) 지원
- * - localStorage 대신 쿠키 사용
+ * - OAuth PKCE를 위한 localStorage 사용
+ * - 세션은 API를 통해서만 관리 (AuthProvider 참조)
  */
 export const supabase = createBrowserClient<Database>(
   supabaseUrl,
-  supabaseAnonKey
+  supabaseAnonKey,
+  {
+    auth: {
+      // ✅ OAuth PKCE를 위해 localStorage 사용 (code_verifier 저장)
+      persistSession: true,
+      // ✅ 자동 토큰 갱신 비활성화 (API에서 처리)
+      autoRefreshToken: false,
+      // ✅ 세션 감지 비활성화 (서버에서 처리)
+      detectSessionInUrl: false,
+    },
+  }
 );
