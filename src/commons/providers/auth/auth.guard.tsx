@@ -185,8 +185,10 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   }
 
   // 회원 전용 페이지 또는 OAuth 콜백 중일 때 세션 동기화 대기
+  // 단, accessToken이 있으면 바로 렌더링 (OAuth 콜백 완료 후)
   const shouldShowLoading =
-    (isMemberPath && !isSessionSynced) || (isOAuthCallback && !accessToken);
+    (isMemberPath && !isSessionSynced && !accessToken) ||
+    (isOAuthCallback && !accessToken);
 
   if (shouldShowLoading) {
     return (
