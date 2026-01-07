@@ -76,7 +76,7 @@ export const POST = async function (request: NextRequest) {
     });
 
     // 쿠키 확인
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const allCookies = cookieStore.getAll();
     const supabaseCookies = allCookies.filter(
       (cookie) =>
