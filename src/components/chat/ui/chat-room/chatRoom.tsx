@@ -242,9 +242,11 @@ export default function ChatRoom({ roomId }: ChatRoomProps) {
                   key={`unread-divider-${index}`}
                   data-unread-divider="true"
                   className={styles.unreadDivider}
-                  aria-label="안읽은 메시지 구분선"
+                  aria-label="여기까지 읽었습니다"
                 >
-                  <span className={styles.unreadDividerText}>NEW!</span>
+                  <span className={styles.unreadDividerText}>
+                    여기까지 읽었습니다
+                  </span>
                 </div>
               );
             }

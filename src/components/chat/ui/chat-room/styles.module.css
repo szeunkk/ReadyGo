@@ -174,7 +174,8 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 16px 0;
+  gap: 16px;
+  margin: 16px 0;
   flex-shrink: 0;
   position: relative;
 }
@@ -189,11 +190,11 @@
 
 .unreadDividerText {
   padding: 0 16px;
-  font-family: var(--typo-body-sm-semibold-font-family);
-  font-size: var(--typo-body-sm-semibold-font-size);
-  line-height: var(--typo-body-sm-semibold-line-height);
-  font-weight: var(--typo-body-sm-semibold-font-weight);
-  color: var(--color-text-interactive-primary, #5ffce2);
+  font-family: var(--typo-body-sm-medium-font-family);
+  font-size: var(--typo-body-sm-medium-font-size);
+  line-height: var(--typo-body-sm-medium-line-height);
+  font-weight: var(--typo-body-sm-medium-font-weight);
+  color: var(--color-text-interactive-secondary);
   text-align: center;
   white-space: nowrap;
 }
