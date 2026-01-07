@@ -99,20 +99,21 @@ export const GET = async function () {
     // Supabase SSR 클라이언트 생성 (쿠키 자동 관리, 토큰 자동 갱신)
     const supabase = createClient();
 
-    // 사용자 정보 조회 (토큰 갱신은 자동으로 처리됨)
+    // getSession()을 사용하여 토큰 갱신 처리
+    // getUser()는 토큰 갱신을 하지 않지만, getSession()은 만료 시 자동 갱신 시도
     const {
-      data: { user },
+      data: { session },
       error,
-    } = await supabase.auth.getUser();
+    } = await supabase.auth.getSession();
 
-    if (error || !user) {
+    if (error || !session) {
       return NextResponse.json({ user: null }, { status: 200 });
     }
 
     return NextResponse.json({
       user: {
-        id: user.id,
-        email: user.email,
+        id: session.user.id,
+        email: session.user.email,
       },
     });
   } catch (error) {
