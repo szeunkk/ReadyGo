@@ -96,7 +96,7 @@ export const POST = async (request: NextRequest) => {
 
     // 3. 현재 로그인 유저 세션 확인 (서버에서 직접)
     // Supabase SSR 클라이언트 사용 (쿠키 자동 관리, 토큰 자동 갱신)
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 사용자 정보 조회 (토큰 갱신은 자동으로 처리됨)
     const {

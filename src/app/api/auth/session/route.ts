@@ -28,7 +28,7 @@ export const POST = async function (request: NextRequest) {
     }
 
     // Supabase SSR 클라이언트 생성 (쿠키 자동 관리)
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 로그인 시도
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -97,7 +97,7 @@ export const POST = async function (request: NextRequest) {
 export const GET = async function () {
   try {
     // Supabase SSR 클라이언트 생성 (쿠키 자동 관리, 토큰 자동 갱신)
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 사용자 정보 조회 (토큰 갱신은 자동으로 처리됨)
     const {
@@ -131,7 +131,7 @@ export const GET = async function () {
 export const DELETE = async function () {
   try {
     // Supabase SSR 클라이언트 생성 (쿠키 자동 관리)
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 사용자 정보 조회 (user_status 업데이트를 위해)
     const {

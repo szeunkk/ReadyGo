@@ -24,7 +24,7 @@ export const dynamic = 'force-dynamic';
 export const POST = async (request: NextRequest) => {
   try {
     // 1. 인증된 클라이언트 생성
-    const supabase = await createClient();
+    const supabase = createClient();
     const {
       data: { user },
       error: authError,

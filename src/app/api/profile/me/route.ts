@@ -26,7 +26,7 @@ export const dynamic = 'force-dynamic';
 export const GET = async (_request: NextRequest) => {
   try {
     // 1. Supabase SSR 클라이언트 생성 (쿠키 자동 관리, 토큰 자동 갱신)
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 2. 사용자 정보 확인 (토큰 갱신은 자동으로 처리됨)
     const {

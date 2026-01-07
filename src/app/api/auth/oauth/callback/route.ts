@@ -58,7 +58,7 @@ export const GET = async function (request: NextRequest) {
     }
 
     // Supabase SSR 클라이언트 생성 (쿠키 자동 관리)
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 1. OAuth code로 세션 교환 (쿠키 자동 저장)
     const {

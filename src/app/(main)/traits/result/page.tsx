@@ -30,7 +30,7 @@ type TraitsResultApiResponse = {
 const fetchTraitsResult = async (): Promise<TraitsResultApiResponse | null> => {
   try {
     // Server Component에서 직접 Supabase 사용
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 사용자 인증 확인
     const {

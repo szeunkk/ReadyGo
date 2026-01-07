@@ -16,7 +16,7 @@ import { getAvatarImagePath } from '@/lib/avatar/getAvatarImagePath';
 export const GET = async () => {
   try {
     // 1. 서버 사이드 Supabase 클라이언트 생성 (쿠키에서 세션 자동 로드)
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 2. 현재 로그인한 사용자 확인
     const {

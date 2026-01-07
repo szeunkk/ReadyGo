@@ -11,7 +11,7 @@ export const POST = async (
 ) => {
   try {
     // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 사용자 정보 확인
     const {
@@ -135,7 +135,7 @@ export const DELETE = async (
 ) => {
   try {
     // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 사용자 정보 확인
     const {

@@ -27,7 +27,7 @@ export const POST = async function (request: NextRequest) {
     }
 
     // Supabase SSR 클라이언트 생성 (쿠키 자동 관리)
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 1. Supabase Auth 회원가입
     const { data: authData, error: authError } = await supabase.auth.signUp({

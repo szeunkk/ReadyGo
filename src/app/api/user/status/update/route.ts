@@ -20,7 +20,7 @@ export const POST = async function (request: NextRequest) {
     }
 
     // Supabase SSR 클라이언트 생성 (쿠키 자동 관리)
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 사용자 정보 조회 (토큰 갱신은 자동으로 처리됨)
     const {

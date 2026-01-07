@@ -40,7 +40,7 @@ export const POST = async function (request: NextRequest) {
     }
 
     // Supabase SSR 클라이언트 생성
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 세션 설정 (쿠키에 자동 저장)
     // eslint-disable-next-line no-console

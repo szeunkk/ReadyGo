@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const GET = async (request: NextRequest) => {
   try {
     // server.ts의 createClient 사용 (SSR 쿠키 자동 관리)
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // 사용자 정보 확인
     const {
