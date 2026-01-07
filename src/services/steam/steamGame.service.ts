@@ -1,6 +1,7 @@
 import { upsertSteamGame } from '@/repositories/steamGame.repository';
 import {
-  getSuccessAppIds,
+  getLastProcessedAppId,
+  getProcessedAppIds,
   insertSteamGameSyncLog,
 } from '@/repositories/steamGameSyncLog.repository';
 
@@ -24,17 +25,26 @@ export const syncSteamGames = async (limit = 200) => {
   // ✅ 후보는 넉넉히 받기 (이미 성공한 애들 걸러야 하니까)
   const candidateCount = Math.min(limit * 5, 500);
 
-  // 1) 앱 리스트
-  const listRes = await fetch(
-    `https://api.steampowered.com/IStoreService/GetAppList/v1/?key=${steamApiKey}&max_results=${candidateCount}`,
-    {
-      cache: 'no-store',
-      headers: {
-        'User-Agent': 'ReadyGo/1.0 (Steam Sync Service)',
-        Accept: 'application/json',
-      },
-    }
+  // 마지막으로 처리한 app_id 조회 (페이지네이션용)
+  const lastAppId = await getLastProcessedAppId();
+
+  // 1) 앱 리스트 (last_appid 이후부터 가져오기)
+  const apiUrl = new URL(
+    'https://api.steampowered.com/IStoreService/GetAppList/v1/'
   );
+  apiUrl.searchParams.set('key', steamApiKey);
+  apiUrl.searchParams.set('max_results', candidateCount.toString());
+  if (lastAppId) {
+    apiUrl.searchParams.set('last_appid', lastAppId.toString());
+  }
+
+  const listRes = await fetch(apiUrl.toString(), {
+    cache: 'no-store',
+    headers: {
+      'User-Agent': 'ReadyGo/1.0 (Steam Sync Service)',
+      Accept: 'application/json',
+    },
+  });
 
   if (!listRes.ok) {
     throw new Error(`Steam app list fetch failed: ${listRes.status}`);
@@ -43,12 +53,12 @@ export const syncSteamGames = async (limit = 200) => {
   const listData = (await listRes.json()) as SteamAppListResponse;
   const apps = listData.response?.apps ?? [];
 
-  // 이미 성공한 app_id 한 번에 조회
-  const successSet = await getSuccessAppIds(apps.map((a) => a.appid));
+  // 이미 처리된 app_id 한 번에 조회 (success/failed/skipped 모두 제외)
+  const processedSet = await getProcessedAppIds(apps.map((a) => a.appid));
 
-  // 성공한 것 제외하고 limit개만 처리
+  // 처리된 것 제외하고 limit개만 처리
   const targetApps = apps
-    .filter((a) => !successSet.has(a.appid))
+    .filter((a) => !processedSet.has(a.appid))
     .slice(0, limit);
 
   // 2) 상세 조회 + 업서트
