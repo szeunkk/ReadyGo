@@ -252,12 +252,15 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
   /**
    * 낙관적 unreadCount 조회: refresh 후에도 낙관적으로 읽음 처리된 채팅방은 0 반환
    */
-  const getOptimisticUnreadCount = useCallback((roomId: number): number | null => {
-    if (optimisticReadRoomsRef.current.has(roomId)) {
-      return 0;
-    }
-    return null; // 낙관적 처리되지 않은 경우 null 반환
-  }, []);
+  const getOptimisticUnreadCount = useCallback(
+    (roomId: number): number | null => {
+      if (optimisticReadRoomsRef.current.has(roomId)) {
+        return 0;
+      }
+      return null; // 낙관적 처리되지 않은 경우 null 반환
+    },
+    []
+  );
 
   /**
    * debounced refresh 함수 (필수에 가까운 권장)
@@ -388,7 +391,8 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
 
                   if (messageRoomId) {
                     // 현재 열려있는 채팅방인지 확인
-                    const currentRoomIdMatch = pathname?.match(/^\/chat\/(\d+)$/);
+                    const currentRoomIdMatch =
+                      pathname?.match(/^\/chat\/(\d+)$/);
                     const currentRoomId = currentRoomIdMatch
                       ? parseInt(currentRoomIdMatch[1], 10)
                       : null;
@@ -442,7 +446,9 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
 
                     if (messageData?.room_id) {
                       // 실제 읽음 처리가 완료되었으므로 낙관적 업데이트 제거
-                      optimisticReadRoomsRef.current.delete(messageData.room_id);
+                      optimisticReadRoomsRef.current.delete(
+                        messageData.room_id
+                      );
                       // 즉시 낙관적 업데이트 (이미 읽음 처리되었으므로)
                       markRoomAsReadOptimistic(messageData.room_id);
                     }
