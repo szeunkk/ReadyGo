@@ -94,19 +94,31 @@ export const getOwnedGames = async (
     }
 
     // 게임 수가 너무 많으면 메모리 문제 발생 가능
-    // playtime 기준 상위 1000개만 처리
+    // 최근 플레이 게임 우선, 부족하면 총 플레이 시간으로 채움 (최대 1000개)
     const { games } = data.response;
     const originalCount = games.length;
-    const sortedGames = games
-      .sort((a, b) => b.playtime_forever - a.playtime_forever)
-      .slice(0, 1000);
+
+    // 1. 최근 2주간 플레이한 게임 (playtime_2weeks > 0)
+    const recentGames = games
+      .filter((g) => g.playtime_2weeks && g.playtime_2weeks > 0)
+      .sort((a, b) => b.playtime_2weeks! - a.playtime_2weeks!);
+
+    // 2. 최근 2주간 플레이하지 않은 게임 (총 플레이 시간 순)
+    const olderGames = games
+      .filter((g) => !g.playtime_2weeks || g.playtime_2weeks === 0)
+      .sort((a, b) => b.playtime_forever - a.playtime_forever);
+
+    // 3. 최근 게임 우선, 최대 1000개
+    const sortedGames = [...recentGames, ...olderGames].slice(0, 1000);
 
     if (originalCount > 1000) {
       console.log(
-        `[Steam API] Limiting ${originalCount} games to top 1000 by playtime`
+        `[Steam API] Limiting ${originalCount} items to 1000 (recent: ${recentGames.length}, older: ${Math.min(olderGames.length, 1000 - recentGames.length)})`
       );
     } else {
-      console.log(`[Steam API] Successfully fetched ${originalCount} games`);
+      console.log(
+        `[Steam API] Fetched ${originalCount} items (recent: ${recentGames.length}, older: ${olderGames.length})`
+      );
     }
 
     return {
