@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { usePathname } from 'next/navigation';
 
 import { supabase as baseSupabase } from '@/lib/supabase/client';
 import { useAuth } from '@/commons/providers/auth/auth.provider';
@@ -134,6 +135,7 @@ export interface UseChatListReturn {
   isLoading: boolean;
   error: string | null;
   markRoomAsReadOptimistic: (roomId: number) => void; // 낙관적 업데이트 함수
+  getOptimisticUnreadCount: (roomId: number) => number | null; // 낙관적 unreadCount 조회
 }
 
 /**
@@ -147,6 +149,7 @@ export interface UseChatListReturn {
 export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
   const { autoRefresh = true, refreshInterval = 30000 } = props || {};
   const { user } = useAuth();
+  const pathname = usePathname();
 
   // 상태 관리
   const [chatRooms, setChatRooms] = useState<ChatRoomListItem[]>([]);
@@ -158,6 +161,7 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
   const subscribedUserIdRef = useRef<string | null>(null);
   const isMountedRef = useRef<boolean>(true);
   const autoRefreshTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const optimisticReadRoomsRef = useRef<Set<number>>(new Set()); // 낙관적으로 읽음 처리된 채팅방 ID들
 
   /**
    * 내부 refresh 함수 (API를 통해 전체 목록 재조회)
@@ -202,7 +206,15 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
       const rooms: ChatRoomListItem[] = result.data || [];
 
       if (isMountedRef.current) {
-        setChatRooms(rooms);
+        // 낙관적으로 읽음 처리된 채팅방의 unreadCount는 0으로 유지
+        const updatedRooms = rooms.map((room) => {
+          if (optimisticReadRoomsRef.current.has(room.room.id || 0)) {
+            return { ...room, unreadCount: 0 };
+          }
+          return room;
+        });
+
+        setChatRooms(updatedRooms);
         setIsLoading(false);
         setError(null);
       }
@@ -227,11 +239,24 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
       return;
     }
 
+    // 낙관적으로 읽음 처리된 채팅방 ID 저장
+    optimisticReadRoomsRef.current.add(roomId);
+
     setChatRooms((prev) =>
       prev.map((room) =>
         room.room.id === roomId ? { ...room, unreadCount: 0 } : room
       )
     );
+  }, []);
+
+  /**
+   * 낙관적 unreadCount 조회: refresh 후에도 낙관적으로 읽음 처리된 채팅방은 0 반환
+   */
+  const getOptimisticUnreadCount = useCallback((roomId: number): number | null => {
+    if (optimisticReadRoomsRef.current.has(roomId)) {
+      return 0;
+    }
+    return null; // 낙관적 처리되지 않은 경우 null 반환
   }, []);
 
   /**
@@ -348,8 +373,48 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
                 schema: 'public',
                 table: 'chat_messages',
               },
-              () => {
+              (payload) => {
                 // 새 메시지 수신 시 목록 업데이트 (마지막 메시지, 시간 등)
+                const newMessage = payload.new as {
+                  id?: number;
+                  room_id?: number;
+                  sender_id?: string;
+                  is_read?: boolean;
+                } | null;
+
+                if (newMessage && newMessage.sender_id !== userId) {
+                  // 상대방이 보낸 메시지인 경우
+                  const messageRoomId = newMessage.room_id;
+
+                  if (messageRoomId) {
+                    // 현재 열려있는 채팅방인지 확인
+                    const currentRoomIdMatch = pathname?.match(/^\/chat\/(\d+)$/);
+                    const currentRoomId = currentRoomIdMatch
+                      ? parseInt(currentRoomIdMatch[1], 10)
+                      : null;
+
+                    // 현재 열려있는 채팅방이 아니고, 낙관적으로 읽음 처리되지 않은 채팅방이면
+                    // unreadCount를 즉시 증가시킴
+                    if (
+                      currentRoomId !== messageRoomId &&
+                      !optimisticReadRoomsRef.current.has(messageRoomId)
+                    ) {
+                      setChatRooms((prev) =>
+                        prev.map((room) => {
+                          if (room.room.id === messageRoomId) {
+                            return {
+                              ...room,
+                              unreadCount: (room.unreadCount || 0) + 1,
+                            };
+                          }
+                          return room;
+                        })
+                      );
+                    }
+                  }
+                }
+
+                // 목록 업데이트 (마지막 메시지, 시간 등)
                 debouncedRefresh();
               }
             )
@@ -376,7 +441,9 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
                       .single();
 
                     if (messageData?.room_id) {
-                      // 즉시 낙관적 업데이트
+                      // 실제 읽음 처리가 완료되었으므로 낙관적 업데이트 제거
+                      optimisticReadRoomsRef.current.delete(messageData.room_id);
+                      // 즉시 낙관적 업데이트 (이미 읽음 처리되었으므로)
                       markRoomAsReadOptimistic(messageData.room_id);
                     }
                   }
@@ -428,7 +495,7 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
 
       await setupRealtimeSubscription();
     },
-    [cleanupChannel, debouncedRefresh, markRoomAsReadOptimistic]
+    [cleanupChannel, debouncedRefresh, markRoomAsReadOptimistic, pathname]
   );
 
   /**
@@ -548,5 +615,6 @@ export const useChatList = (props?: UseChatListProps): UseChatListReturn => {
     isLoading,
     error,
     markRoomAsReadOptimistic,
+    getOptimisticUnreadCount,
   };
 };

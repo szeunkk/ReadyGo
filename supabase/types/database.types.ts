@@ -689,6 +689,33 @@ export type Database = {
         }
         Relationships: []
       }
+      steam_user_stats: {
+        Row: {
+          active_time_slots: string[]
+          avg_weekly_playtime: number
+          main_genres: string[]
+          play_style: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_time_slots?: string[]
+          avg_weekly_playtime?: number
+          main_genres?: string[]
+          play_style: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_time_slots?: string[]
+          avg_weekly_playtime?: number
+          main_genres?: string[]
+          play_style?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tags: {
         Row: {
           created_at: string | null

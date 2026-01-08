@@ -4,6 +4,8 @@
   width: 100%;
   height: 100%;
   background-color: var(--color-bg-primary);
+  overflow-x: hidden;
+  min-width: 0;
 }
 
 /* 헤더 영역 */
@@ -15,6 +17,8 @@
   gap: 16px;
   background-color: var(--color-bg-primary);
   flex-shrink: 0;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .headerLeft {
@@ -83,7 +87,7 @@
   height: 40px;
   background-color: var(--color-bg-secondary);
   border: none;
-  border-radius: 16.4px;
+  border-radius: 16px;
   cursor: pointer;
   flex-shrink: 0;
   color: var(--color-icon-primary);
@@ -133,11 +137,28 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 32px 16px;
+  padding: 16px;
   background-color: var(--color-bg-secondary);
   overflow-y: auto;
+  overflow-x: hidden;
   flex: 1;
   min-height: 0;
+  min-width: 0;
+  position: relative;
+}
+
+/* 플로팅 버튼 래퍼: 메시지 리스트 하단에 고정 */
+.scrollToBottomButtonWrapper {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+
+  pointer-events: none;
+  margin: 0 -16px -32px -16px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .dateDivider {
@@ -154,6 +175,36 @@
   flex-shrink: 0;
 }
 
+.unreadDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 16px;
+  margin: 16px 0;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.unreadDivider::before,
+.unreadDivider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-border-secondary);
+}
+
+.unreadDividerText {
+  padding: 0 16px;
+  font-family: var(--typo-body-sm-medium-font-family);
+  font-size: var(--typo-body-sm-medium-font-size);
+  line-height: var(--typo-body-sm-medium-line-height);
+  font-weight: var(--typo-body-sm-medium-font-weight);
+  color: var(--color-text-interactive-secondary);
+  text-align: center;
+  white-space: nowrap;
+}
+
 .messageRow {
   display: flex;
   width: 100%;
@@ -163,9 +214,11 @@
 .ownMessageContainer {
   display: flex;
   align-items: flex-end;
+  justify-content: flex-end;
   gap: 12px;
   margin-left: auto;
   align-self: flex-end;
+  max-width: 80%;
 }
 
 .otherMessageContainer {
@@ -188,6 +241,7 @@
   flex-direction: row;
   gap: 12px;
   align-items: flex-end;
+  max-width: 80%;
 }
 
 .otherMessageBubble {
@@ -196,9 +250,6 @@
   padding: 12px 20px;
   background-color: var(--color-bg-tertiary);
   border-radius: 24px;
-  max-width: 100%;
-  word-wrap: break-word;
-  word-break: break-word;
 }
 
 .ownMessageBubble {
@@ -208,9 +259,6 @@
   padding: 12px 20px;
   background-color: var(--color-bg-interactive-primary-hover);
   border-radius: 24px;
-  max-width: 100%;
-  word-wrap: break-word;
-  word-break: break-word;
 }
 
 .messageContent {
@@ -219,8 +267,9 @@
   line-height: var(--typo-body-lg-line-height);
   font-weight: var(--typo-body-lg-font-weight);
   color: var(--color-text-primary);
-  word-wrap: break-word;
-  white-space: pre-wrap;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 .ownMessageBubble .messageContent {
@@ -228,6 +277,7 @@
 }
 
 .messageTime {
+  height: 100%;
   font-family: var(--typo-body-sm-font-family);
   font-size: var(--typo-body-sm-font-size);
   line-height: var(--typo-body-sm-line-height);
@@ -235,7 +285,7 @@
   color: var(--color-text-interactive-secondary);
   white-space: nowrap;
   flex-shrink: 0;
-  padding-bottom: 14px;
+  padding-bottom: 12px;
 }
 
 .unreadIndicator {
@@ -321,4 +371,48 @@
 
 .gameStartButtonText {
   white-space: nowrap;
+}
+
+/* 플로팅 버튼: 최근 메시지로 이동 */
+.scrollToBottomButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 24px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition:
+    background-color 0.2s,
+    box-shadow 0.2s;
+  font-family: var(--typo-body-md-medium-font-family);
+  font-size: var(--typo-body-md-medium-font-size);
+  line-height: var(--typo-body-md-medium-line-height);
+  font-weight: var(--typo-body-md-medium-font-weight);
+  color: var(--color-text-primary);
+  width: fit-content;
+  pointer-events: auto;
+}
+
+.scrollToBottomButton:hover {
+  background-color: var(--color-bg-interactive-teritiary-hover);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.scrollToBottomButton:active {
+  background-color: var(--color-bg-interactive-teritiary-pressed);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scrollToBottomButton:focus-visible {
+  outline: 2px solid var(--color-border-focus-ring);
+  outline-offset: 2px;
+}
+
+.scrollToBottomButton svg {
+  color: var(--color-icon-primary);
+  flex-shrink: 0;
 }
