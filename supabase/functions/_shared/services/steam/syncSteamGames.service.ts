@@ -159,28 +159,70 @@ export const syncSteamGames = async (
     return result;
   }
 
-  const { games: rawGames } = apiResult;
+  const { games: allGames } = apiResult;
 
-  // 4. 게임 필터링: steam_game_info 캐시 활용
+  // 4. 게임 필터링: 점진적 검증 (Incremental Validation)
   console.log(
-    `[Sync User ${userId}] Filtering ${rawGames.length} items (checking steam_game_info cache)`
+    `[Sync User ${userId}] Starting incremental validation for ${allGames.length} items`
   );
-  const appIds = rawGames.map((g) => g.appid);
+
+  // 4-1. 캐시 조회 (배치 - 빠름)
+  const appIds = allGames.map((g) => g.appid);
   const existingGameIds = await steamGameRepository.checkGameExists(
     client,
     appIds
   );
   const existingSet = new Set(existingGameIds);
 
-  const validatedGames = [];
-  let storeApiCallCount = 0;
+  // 4-2. 캐시 히트 게임 분리
+  const cachedGames = allGames.filter((g) => existingSet.has(g.appid));
+  const uncachedGames = allGames.filter((g) => !existingSet.has(g.appid));
 
-  for (const game of rawGames) {
-    if (existingSet.has(game.appid)) {
-      // 캐시에 있음 → 게임 확정
-      validatedGames.push(game);
-    } else {
-      // 캐시에 없음 → Store API 호출하여 검증
+  console.log(
+    `[Sync User ${userId}] Cache: ${cachedGames.length} hits, ${uncachedGames.length} misses`
+  );
+
+  // 4-3. 캐시 히트 게임 정렬 (최근성 우선)
+  const sortedCachedGames = [
+    ...cachedGames
+      .filter((g) => g.playtime_2weeks && g.playtime_2weeks > 0)
+      .sort((a, b) => b.playtime_2weeks! - a.playtime_2weeks!),
+    ...cachedGames
+      .filter((g) => !g.playtime_2weeks || g.playtime_2weeks === 0)
+      .sort((a, b) => b.playtime_forever - a.playtime_forever),
+  ];
+
+  // 4-4. 1000개 채우기 위해 필요한 만큼만 미검증 게임 검증
+  const TARGET_GAME_COUNT = 1000;
+  const validatedGames = [...sortedCachedGames];
+  const needed = TARGET_GAME_COUNT - sortedCachedGames.length;
+
+  if (needed > 0 && uncachedGames.length > 0) {
+    console.log(
+      `[Sync User ${userId}] Need ${needed} more games, validating uncached items...`
+    );
+
+    // 미검증 게임도 최근성 기준 정렬
+    const sortedUncached = [
+      ...uncachedGames
+        .filter((g) => g.playtime_2weeks && g.playtime_2weeks > 0)
+        .sort((a, b) => b.playtime_2weeks! - a.playtime_2weeks!),
+      ...uncachedGames
+        .filter((g) => !g.playtime_2weeks || g.playtime_2weeks === 0)
+        .sort((a, b) => b.playtime_forever - a.playtime_forever),
+    ];
+
+    // 필요한 개수 + 50% 여유분만큼 검증 (일부는 게임이 아닐 수 있음)
+    const toValidate = sortedUncached.slice(0, Math.ceil(needed * 1.5));
+    let storeApiCallCount = 0;
+    let validatedCount = 0;
+
+    for (const game of toValidate) {
+      // 충분히 채웠으면 중단
+      if (validatedCount >= needed) {
+        break;
+      }
+
       storeApiCallCount++;
       const storeResult = await steamStoreApiClient.fetchGameDetails(
         game.appid
@@ -194,6 +236,7 @@ export const syncSteamGames = async (
             storeResult.gameInfo
           );
           validatedGames.push(game);
+          validatedCount++;
         } catch (error) {
           console.error(
             `[Sync User ${userId}] Failed to save game info for app_id ${game.appid}:`,
@@ -209,15 +252,22 @@ export const syncSteamGames = async (
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
+
+    console.log(
+      `[Sync User ${userId}] Validated ${validatedCount} new games (${storeApiCallCount} Store API calls)`
+    );
   }
 
+  // 4-5. 최종 1000개 선택
+  const finalGames = validatedGames.slice(0, TARGET_GAME_COUNT);
+
   console.log(
-    `[Sync User ${userId}] Filtered ${rawGames.length} items → ${validatedGames.length} games (${storeApiCallCount} Store API calls)`
+    `[Sync User ${userId}] Final result: ${finalGames.length} games (from ${allGames.length} total items)`
   );
 
   // 5. 응답 매핑 (Steam API 형식 → DB 형식)
   const gameInputs: steamUserGamesRepository.SteamUserGameInput[] =
-    validatedGames.map((game) => ({
+    finalGames.map((game) => ({
       app_id: game.appid,
       name: game.name ?? null,
       playtime_forever: game.playtime_forever,

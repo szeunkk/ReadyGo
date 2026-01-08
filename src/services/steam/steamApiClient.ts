@@ -86,26 +86,13 @@ export const getOwnedGames = async (
       };
     }
 
-    // 게임 수가 너무 많으면 메모리 문제 발생 가능
-    // 최근 플레이 게임 우선, 부족하면 총 플레이 시간으로 채움 (최대 1000개)
+    // Steam API에서 받은 전체 게임 목록 반환
+    // 정렬 및 필터링은 syncSteamGames에서 수행
     const { games } = data.response;
-    
-    // 1. 최근 2주간 플레이한 게임 (playtime_2weeks > 0)
-    const recentGames = games
-      .filter((g) => g.playtime_2weeks && g.playtime_2weeks > 0)
-      .sort((a, b) => b.playtime_2weeks! - a.playtime_2weeks!);
-
-    // 2. 최근 2주간 플레이하지 않은 게임 (총 플레이 시간 순)
-    const olderGames = games
-      .filter((g) => !g.playtime_2weeks || g.playtime_2weeks === 0)
-      .sort((a, b) => b.playtime_forever - a.playtime_forever);
-
-    // 3. 최근 게임 우선, 최대 1000개
-    const sortedGames = [...recentGames, ...olderGames].slice(0, 1000);
 
     return {
       ok: true,
-      games: sortedGames,
+      games: games,
     };
   } catch (error) {
     // 네트워크 에러, 타임아웃, JSON 파싱 에러 등
