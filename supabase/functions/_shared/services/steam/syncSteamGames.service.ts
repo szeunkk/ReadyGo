@@ -2,7 +2,9 @@ import type { DbClient } from '../../types/dbClient.ts';
 import * as userProfilesRepository from '../../repositories/userProfilesRepository.ts';
 import * as steamUserGamesRepository from '../../repositories/steamUserGamesRepository.ts';
 import * as steamSyncLogRepository from '../../repositories/steamSyncLogRepository.ts';
+import * as steamGameRepository from '../../repositories/steamGameRepository.ts';
 import * as steamApiClient from './steamApiClient.ts';
+import * as steamStoreApiClient from './steamStoreApiClient.ts';
 
 /**
  * syncSteamGames Service
@@ -157,11 +159,65 @@ export const syncSteamGames = async (
     return result;
   }
 
-  const { games } = apiResult;
+  const { games: rawGames } = apiResult;
 
-  // 4. 응답 매핑 (Steam API 형식 → DB 형식)
-  const gameInputs: steamUserGamesRepository.SteamUserGameInput[] = games.map(
-    (game) => ({
+  // 4. 게임 필터링: steam_game_info 캐시 활용
+  console.log(
+    `[Sync User ${userId}] Filtering ${rawGames.length} items (checking steam_game_info cache)`
+  );
+  const appIds = rawGames.map((g) => g.appid);
+  const existingGameIds = await steamGameRepository.checkGameExists(
+    client,
+    appIds
+  );
+  const existingSet = new Set(existingGameIds);
+
+  const validatedGames = [];
+  let storeApiCallCount = 0;
+
+  for (const game of rawGames) {
+    if (existingSet.has(game.appid)) {
+      // 캐시에 있음 → 게임 확정
+      validatedGames.push(game);
+    } else {
+      // 캐시에 없음 → Store API 호출하여 검증
+      storeApiCallCount++;
+      const storeResult = await steamStoreApiClient.fetchGameDetails(
+        game.appid
+      );
+
+      if (storeResult.ok) {
+        // 게임이면 steam_game_info에 저장
+        try {
+          await steamGameRepository.upsertSteamGame(
+            client,
+            storeResult.gameInfo
+          );
+          validatedGames.push(game);
+        } catch (error) {
+          console.error(
+            `[Sync User ${userId}] Failed to save game info for app_id ${game.appid}:`,
+            error
+          );
+          // 저장 실패해도 계속 진행
+        }
+      }
+      // storeResult.ok === false면 무시 (게임 아님)
+
+      // Rate limit 방지: 100ms 대기
+      if (storeApiCallCount % 10 === 0) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+    }
+  }
+
+  console.log(
+    `[Sync User ${userId}] Filtered ${rawGames.length} items → ${validatedGames.length} games (${storeApiCallCount} Store API calls)`
+  );
+
+  // 5. 응답 매핑 (Steam API 형식 → DB 형식)
+  const gameInputs: steamUserGamesRepository.SteamUserGameInput[] =
+    validatedGames.map((game) => ({
       app_id: game.appid,
       name: game.name ?? null,
       playtime_forever: game.playtime_forever,
@@ -169,10 +225,9 @@ export const syncSteamGames = async (
       last_played: game.rtime_last_played
         ? convertUnixToTimestamptz(game.rtime_last_played)
         : null,
-    })
-  );
+    }));
 
-  // 5. DB 저장 (bulk upsert)
+  // 6. DB 저장 (bulk upsert)
   console.log(
     `[Sync User ${userId}] Upserting ${gameInputs.length} games to DB`
   );
@@ -193,7 +248,7 @@ export const syncSteamGames = async (
 
   const syncedCount = gameInputs.length;
 
-  // 6. 로그 기록 (성공)
+  // 7. 로그 기록 (성공)
   console.log(`[Sync User ${userId}] Successfully synced ${syncedCount} games`);
   await steamSyncLogRepository.insertLog(client, {
     userId,
@@ -201,7 +256,7 @@ export const syncSteamGames = async (
     syncedGamesCount: syncedCount,
   });
 
-  // 7. Result 반환
+  // 8. Result 반환
   return {
     status: 'success',
     syncedGamesCount: syncedCount,
