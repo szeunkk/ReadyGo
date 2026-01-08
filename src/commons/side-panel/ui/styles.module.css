@@ -5,17 +5,17 @@
 .profilePanel {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   align-items: flex-start;
-  padding: 32px 0;
+  padding: 16px 0;
   height: fit-content;
 }
 
 /* ============================================ */
-/* Play Style Section */
+/* Stats Container (플레이스타일 + 최근 플레이 패턴) */
 /* ============================================ */
 
-.playStyleSection {
+.statsContainer {
   background-color: var(--color-bg-primary);
   border: 1px solid var(--color-border-secondary);
   border-radius: 42px;
@@ -26,6 +26,18 @@
   justify-content: center;
   padding: 32px 24px;
   width: 408px;
+}
+
+/* ============================================ */
+/* Play Style Section */
+/* ============================================ */
+
+.playStyleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+  width: 100%;
 }
 
 .sectionHeader {
@@ -59,16 +71,11 @@
 /* ============================================ */
 
 .playPatternSection {
-  background-color: var(--color-bg-primary);
-  border: 1px solid var(--color-border-secondary);
-  border-radius: 42px;
   display: flex;
   flex-direction: column;
   gap: 24px;
   align-items: flex-start;
-  justify-content: center;
-  padding: 32px 24px;
-  width: 408px;
+  width: 100%;
 }
 
 .barChartWrapper {
@@ -76,7 +83,7 @@
   flex-direction: column;
   gap: 20px;
   align-items: flex-start;
-  width: 360px;
+  width: 100%;
 }
 
 /* ============================================ */

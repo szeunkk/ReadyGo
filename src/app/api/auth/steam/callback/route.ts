@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
-import { Database } from '@/types/supabase';
+import { createClient } from '@/lib/supabase/server';
 
 // nonce 기반 검증 결과 캐시 (메모리 기반, 서버 재시작 시 초기화)
 // 프로덕션에서는 Redis 등을 사용하는 것이 좋지만, 현재는 간단한 메모리 캐시 사용
@@ -97,71 +95,16 @@ export const POST = async (request: NextRequest) => {
     const { steamId } = verificationResult;
 
     // 3. 현재 로그인 유저 세션 확인 (서버에서 직접)
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+    // Supabase SSR 클라이언트 사용 (쿠키 자동 관리, 토큰 자동 갱신)
+    const supabase = createClient();
 
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: '서버 설정 오류가 발생했습니다.',
-          errorCode: 'server_error',
-        },
-        { status: 500 }
-      );
-    }
-
-    // 서버 클라이언트 생성 (cookies 기반)
-    const cookieStore = await cookies();
-
-    // Request에서 Authorization 헤더 확인 (클라이언트가 전달한 경우)
-    const authHeader = request.headers.get('authorization');
-
-    // Supabase 클라이언트 생성
-    let supabase: ReturnType<typeof createClient<Database>>;
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      // Authorization 헤더가 있으면 사용
-      const token = authHeader.replace('Bearer ', '');
-      supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-        global: {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      });
-    } else {
-      // cookies에서 세션 확인
-      const cookieHeader = cookieStore
-        .getAll()
-        .map((cookie) => `${cookie.name}=${cookie.value}`)
-        .join('; ');
-
-      supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-        auth: {
-          persistSession: false,
-        },
-        global: {
-          headers: {
-            Cookie: cookieHeader,
-          },
-        },
-      });
-    }
-
-    // 세션에서 현재 유저 확인
+    // 사용자 정보 조회 (토큰 갱신은 자동으로 처리됨)
     const {
       data: { user },
-      error: userError,
+      error,
     } = await supabase.auth.getUser();
 
-    if (userError || !user || !user.id) {
-      console.error('Session check failed:', {
-        error: userError?.message,
-        hasUser: !!user,
-        cookieCount: cookieStore.getAll().length,
-        hasAuthHeader: !!authHeader,
-      });
+    if (error || !user) {
       return NextResponse.json(
         {
           success: false,
@@ -172,10 +115,12 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
+    // 사용자 정보가 정상적으로 조회된 경우
     const currentUserId = user.id;
+    const workingSupabase = supabase;
 
     // 4. 중복 연결 방지 검사
-    const { data: existingProfiles, error: checkError } = await supabase
+    const { data: existingProfiles, error: checkError } = await workingSupabase
       .from('user_profiles')
       .select('id')
       .eq('steam_id', steamId)
@@ -210,7 +155,7 @@ export const POST = async (request: NextRequest) => {
 
     // 5. DB 저장 (트랜잭션)
     // user_profiles 업데이트
-    const { error: updateError } = await supabase
+    const { error: updateError } = await workingSupabase
       .from('user_profiles')
       .update({ steam_id: steamId as string | null })
       .eq('id', currentUserId as string);
@@ -228,7 +173,7 @@ export const POST = async (request: NextRequest) => {
     }
 
     // steam_sync_logs insert (중복 방지: 같은 user_id로 이미 'linked' 상태가 있으면 insert하지 않음)
-    const { data: existingLogs, error: checkLogError } = await supabase
+    const { data: existingLogs, error: checkLogError } = await workingSupabase
       .from('steam_sync_logs')
       .select('id')
       .eq('user_id', currentUserId)
@@ -237,7 +182,7 @@ export const POST = async (request: NextRequest) => {
 
     // 기존 'linked' 로그가 없을 때만 insert
     if (!checkLogError && (!existingLogs || existingLogs.length === 0)) {
-      const { error: logError } = await supabase
+      const { error: logError } = await workingSupabase
         .from('steam_sync_logs')
         .insert({
           user_id: currentUserId as string | null,

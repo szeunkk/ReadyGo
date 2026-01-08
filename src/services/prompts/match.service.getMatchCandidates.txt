@@ -1,0 +1,133 @@
+아래 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+	        - Service Layer는 조회 + 조립 + 구조적 제외 책임만 가진다
+	        - Domain 로직 호출 ❌
+	        - 점수 계산 / 의미 해석 / 정책 판단 ❌
+	        - Repository는 사실 조회(Boolean / ID 목록) 만 담당
+	        - Immutability 유지 (Repository 결과 직접 수정 ❌)
+	        - 예외 throw ❌ (후보 없음 → 빈 배열 반환)
+	        - null 반환 ❌ (항상 배열 반환)
+	        - 존재하지 않는 테이블/Repository를 가정하지 말 것
+	        - 현재 코드베이스의 Repository / Service 패턴을 그대로 따른다
+
+==============================================
+
+조건-파일경로) 참고 및 기준 파일 경로는 다음과 같다.
+            - 구현 대상
+                - src/services/match/getMatchCandidates.service.ts
+
+            - 참고 (이미 존재하는 패턴만 사용)
+                - src/services/chat/getUserChatRoomsService.ts
+                    - 특히 1:1 채팅방 존재 여부를 판단하는 서비스/로직 패턴
+                - src/repositories/*
+                    - 현재 프로젝트에 실제로 존재하는 repository 스타일
+                    - 함수 시그니처, 반환타입, supabase 호출 방식 참고
+
+            - Repository 경로 (실제 존재하는 것만 사용)
+    	        - src/repositories/userProfiles.repository.ts
+	            - src/repositories/userTraits.repository.ts
+	            - src/repositories/userPlaySchedules.repository.ts
+	            - ❗ steamGame.repository.ts/steamGameSyncLog.repository.ts는 사용하지 않는다
+
+            - Repository가 부족하다면:
+	            - 새 Repository 파일 생성은 허용
+	            - 단, 현재 repositories 폴더 네이밍/패턴을 그대로 따른다
+	            - 테이블 구조를 추측하지 말고, “ID 조회/boolean 판단” 수준까지만 정의
+
+==============================================
+
+핵심요구사항) 다음 기능을 step-by-step으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
+	        1.	Service 함수 정의
+	            - 아래 단일 함수만 구현 및 export
+                    - getMatchCandidates(viewerId: string): Promise<MatchCandidate[]>
+                - service 파일은 단일 public 함수만 export
+                - 내부 helper 함수는 허용
+
+	        2.	반환 타입은 아래 인터페이스를 따른다
+                - interface MatchCandidate {
+                userId: string
+                }
+
+            3. 후보 Pool 조회 (Repository 책임)
+                - viewerId 기준으로 매칭 후보 userId 목록을 조회한다
+                - 후보 pool 정의는 repository 책임
+                - Service는
+                    - 어떤 테이블에서 왔는지
+                    - 어떤 조건으로 뽑았는지
+                    - 왜 후보인지
+                    를 알지 못한다
+                - 규칙
+                    - repository는 string[] 또는 { userId: string }[] 형태 반환
+                    - 후보가 없으면 빈 배열 반환
+                    - service는 이 결과를 그대로 사용
+
+            4. 제외 규칙 (service 책임)
+                - viewerId 기준으로 아래 조건에 해당하는 사용자는 반드시 제외한다.
+                - 자기 자신 
+                    - viewerId === targetUserId
+                - 차단 관계 (supabase - user_blocks)
+                    - viewer -> target 차단
+                    - target -> viewer 차단
+                - 이미 친구 관계인 사용자 (supabase - friendships)
+                - 이미 1:1 채팅방이 존재하는 사용자
+                    - 친구 요청 이전에도 채팅 가능하므로 반드시 제외
+
+            5. 제외 판단 방식 (중요)
+                - 제외 여부 판단은 repository / service에서 제공하는 boolean 결과만 사용
+                - service는 의미 해석 X
+                - service는 true면 제외, falser면 유지만 수행
+
+                - 권장 패턴
+                    - isBlocked(viewerId, targetUserId): boolean
+                    - isFriend(viewerId, targetUserId): boolean
+                    - hasDirectChatRoom(viewerId, targetUserId): boolean
+
+                또는
+                    - getBlockedUserIds(viewerId): Set<string>
+                    - getFriendUserIds(viewerId): Set<string>
+                    - getChatUserIds(viewerId): Set<string>
+
+                - N+1 방지를 위해 batch 조회를 우선 고려
+                - 단, repository가 아직 없다면 최소 계약부터 정의
+
+            6. 금지 사항
+                - 아래 항목은 절재 포함하지 말 것
+                    - Domain 타입 사용 X
+                    - Domain 함수 호출 X
+                    - MatchContext 생성 X
+                    - 매칭 점수 / 성향 / Online / Steam 관련 판단 X
+	                - UI / Hook / ViewModel 로직 X
+	                - 추천 / 가능성 / 우선순위 같은 의미 해석 X
+
+==============================================
+
+조건-Hook 책임)
+	- 해당 Service는 Hook을 알지 못한다
+	- Hook 호출 / 상태 관리 로직 포함 X
+
+==============================================
+
+조건-UI 책임)
+	- UI 관련 타입 / ViewModel / 문구 처리 X
+	- userId 외 필드 노출 X
+
+==============================================
+
+구현 완료 후 반환) 아래 체크리스트를 반드시 반환할 것.
+	- Service Layer 책임(조회 + 구조적 제외)만 수행했는가
+	- Domain 로직 호출이 없는가
+	- MatchContext 생성이 없는가
+	- 자기 자신이 제외되는가
+	- 차단 관계가 모두 제외되는가
+	- 친구인 유저가 제외되는가
+	- 이미 채팅 중인 유저가 제외되는가
+	- 점수/성향/온라인/Steam 판단이 없는가
+	- viewerId 하나로만 동작하는가
+	- 반환 타입이 userId 목록인가
+	- 후보 없음 시 빈 배열을 반환하는가
+	- Immutability 규칙을 지켰는가
+    - 현재 코드베이스 repository / service 패턴을 따르는가

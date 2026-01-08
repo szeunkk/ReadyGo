@@ -1,5 +1,19 @@
-import type { TraitKey } from '@/commons/constants/animal/trait.enum';
+/**
+ * ReadyGo 성향 테스트 질문 세트 (Effect 기반 V2)
+ *
+ * 총 10문항, 5개 성향 축을 기반으로 구성
+ * 각 선택지는 주 성향 + 보조 효과를 가짐
+ *
+ * Effect 범위:
+ * - 주 특성: -20 ~ +20
+ * - 보조 특성: -10 ~ +10
+ */
 
+import type { QuestionWithEffect } from './questionEffects.types';
+
+/**
+ * 기존 Question 타입 (호환성 유지)
+ */
 export interface QuestionChoice {
   value: 1 | 2 | 3 | 4 | 5;
   label: string;
@@ -7,40 +21,97 @@ export interface QuestionChoice {
 
 export interface Question {
   id: string;
-  axis: TraitKey;
-  weight: number;
+  axis: string; // deprecated: effect 기반 시스템에서는 사용하지 않음
+  weight: number; // deprecated
   text: string;
   choices: QuestionChoice[];
 }
 
-export const QUESTIONS: Question[] = [
+/**
+ * Effect 기반 질문 목록
+ */
+export const QUESTIONS_WITH_EFFECTS: QuestionWithEffect[] = [
   // =============================
   // 1. 협동성 (COOPERATION)
   // =============================
   {
     id: 'Q1',
-    axis: 'cooperation',
-    weight: 1.0,
     text: '게임할 때 더 편한 방식은?',
     choices: [
-      { value: 1, label: '완전 혼자서 플레이하는 걸 선호함' },
-      { value: 2, label: '혼자 플레이가 편하지만 파티도 가끔 함' },
-      { value: 3, label: '둘 다 상관없음' },
-      { value: 4, label: '팀 플레이가 더 즐거움' },
-      { value: 5, label: '팀원과 협력하는 플레이가 핵심이라고 생각함' },
+      {
+        value: 1,
+        label: '완전 혼자서 플레이하는 걸 선호함',
+        effects: {
+          cooperation: -20,
+          social: -10,
+        },
+      },
+      {
+        value: 2,
+        label: '혼자 플레이가 편하지만 파티도 가끔 함',
+        effects: {
+          cooperation: -10,
+        },
+      },
+      {
+        value: 3,
+        label: '둘 다 상관없음',
+        effects: {},
+      },
+      {
+        value: 4,
+        label: '팀 플레이가 더 즐거움',
+        effects: {
+          cooperation: 10,
+        },
+      },
+      {
+        value: 5,
+        label: '팀원과 협력하는 플레이가 핵심이라고 생각함',
+        effects: {
+          cooperation: 20,
+          leadership: 6,
+        },
+      },
     ],
   },
   {
     id: 'Q2',
-    axis: 'cooperation',
-    weight: 1.2,
     text: '파티원이 실수했을 때 반응은?',
     choices: [
-      { value: 1, label: '말 없이 조용히 플레이함' },
-      { value: 2, label: '조금 불편하지만 넘어감' },
-      { value: 3, label: '상황 따라 달라짐' },
-      { value: 4, label: '가볍게 농담하며 분위기 풀어줌' },
-      { value: 5, label: '오히려 팀을 다독이고 적극적으로 협력하려 함' },
+      {
+        value: 1,
+        label: '말 없이 조용히 플레이함',
+        effects: {
+          cooperation: -20,
+          social: -10,
+        },
+      },
+      {
+        value: 2,
+        label: '조금 불편하지만 넘어감',
+        effects: {},
+      },
+      {
+        value: 3,
+        label: '상황에 따라 다름',
+        effects: {},
+      },
+      {
+        value: 4,
+        label: '가볍게 농담하며 분위기 풀어줌',
+        effects: {
+          social: 10,
+        },
+      },
+      {
+        value: 5,
+        label: '팀을 다독이며 적극적으로 협력함',
+        effects: {
+          cooperation: 20,
+          leadership: 6,
+        },
+      },
     ],
   },
 
@@ -49,28 +120,78 @@ export const QUESTIONS: Question[] = [
   // =============================
   {
     id: 'Q3',
-    axis: 'exploration',
-    weight: 1.0,
-    text: '새로운 캐릭터나 빌드를 만났을 때 선택은?',
+    text: '새로운 캐릭터나 빌드를 만났을 때?',
     choices: [
-      { value: 1, label: '절대 모험 안 함. 안정적 선택' },
-      { value: 2, label: '익숙해지면 조금 시도' },
-      { value: 3, label: '반반 정도' },
-      { value: 4, label: '종종 새로운 빌드 도전' },
-      { value: 5, label: '새로운 조합·전략 실험이 가장 재밌음' },
+      {
+        value: 1,
+        label: '절대 모험 안 함, 안정적 선택',
+        effects: {
+          exploration: -20,
+          strategy: 6,
+        },
+      },
+      {
+        value: 2,
+        label: '익숙해지면 조금 시도',
+        effects: {},
+      },
+      {
+        value: 3,
+        label: '반반 정도',
+        effects: {},
+      },
+      {
+        value: 4,
+        label: '종종 새로운 빌드에 도전',
+        effects: {
+          exploration: 10,
+        },
+      },
+      {
+        value: 5,
+        label: '실험과 새로운 조합이 가장 재밌음',
+        effects: {
+          exploration: 20,
+        },
+      },
     ],
   },
   {
     id: 'Q4',
-    axis: 'exploration',
-    weight: 1.3,
-    text: '고난도 콘텐츠나 랭킹전 참여 의향은?',
+    text: '고난도 콘텐츠나 랭킹전은?',
     choices: [
-      { value: 1, label: '스트레스라서 거의 안 함' },
-      { value: 2, label: '가끔 도전' },
-      { value: 3, label: '기분 따라 다름' },
-      { value: 4, label: '꾸준히 도전' },
-      { value: 5, label: '높은 난이도를 깨는 게 진짜 재미라고 생각함' },
+      {
+        value: 1,
+        label: '스트레스라 거의 안 함',
+        effects: {
+          exploration: -20,
+        },
+      },
+      {
+        value: 2,
+        label: '가끔 도전',
+        effects: {},
+      },
+      {
+        value: 3,
+        label: '기분에 따라 다름',
+        effects: {},
+      },
+      {
+        value: 4,
+        label: '꾸준히 도전',
+        effects: {
+          exploration: 10,
+        },
+      },
+      {
+        value: 5,
+        label: '높은 난이도를 깨는 게 진짜 재미',
+        effects: {
+          exploration: 20,
+          leadership: 6,
+        },
+      },
     ],
   },
 
@@ -79,28 +200,77 @@ export const QUESTIONS: Question[] = [
   // =============================
   {
     id: 'Q5',
-    axis: 'strategy',
-    weight: 1.1,
     text: '전투·플레이 중 의사결정 스타일은?',
     choices: [
-      { value: 1, label: '즉흥적으로 바로 판단' },
-      { value: 2, label: '대략적인 계획만' },
-      { value: 3, label: '상황 따라 조절' },
-      { value: 4, label: '계획적이고 안정적으로 판단' },
-      { value: 5, label: '전투 전에 시나리오·동선 계산함' },
+      {
+        value: 1,
+        label: '즉흥적으로 바로 판단',
+        effects: {
+          strategy: -20,
+        },
+      },
+      {
+        value: 2,
+        label: '대략적인 계획만 세움',
+        effects: {},
+      },
+      {
+        value: 3,
+        label: '상황에 따라 조절',
+        effects: {},
+      },
+      {
+        value: 4,
+        label: '계획적이고 안정적으로 판단',
+        effects: {
+          strategy: 10,
+        },
+      },
+      {
+        value: 5,
+        label: '전투 전 시나리오·동선까지 계산',
+        effects: {
+          strategy: 20,
+        },
+      },
     ],
   },
   {
     id: 'Q6',
-    axis: 'strategy',
-    weight: 1.2,
-    text: '공략을 볼 때 선호하는 방식은?',
+    text: '공략을 볼 때 선호 방식은?',
     choices: [
-      { value: 1, label: '공략 잘 안 봄. 그냥 해봄' },
-      { value: 2, label: '핵심만 훑고 바로 플레이' },
-      { value: 3, label: '필요하면 확인' },
-      { value: 4, label: '꼼꼼하게 보고 따라함' },
-      { value: 5, label: '직접 분석해서 커스텀 공략 만드는 편' },
+      {
+        value: 1,
+        label: '공략 거의 안 보고 직접 해봄',
+        effects: {
+          strategy: -20,
+          exploration: 6,
+        },
+      },
+      {
+        value: 2,
+        label: '핵심만 훑고 바로 플레이',
+        effects: {},
+      },
+      {
+        value: 3,
+        label: '필요하면 확인',
+        effects: {},
+      },
+      {
+        value: 4,
+        label: '꼼꼼히 보고 그대로 따라함',
+        effects: {
+          strategy: 10,
+        },
+      },
+      {
+        value: 5,
+        label: '직접 분석해서 커스텀 공략 제작',
+        effects: {
+          strategy: 20,
+        },
+      },
     ],
   },
 
@@ -109,28 +279,77 @@ export const QUESTIONS: Question[] = [
   // =============================
   {
     id: 'Q7',
-    axis: 'leadership',
-    weight: 1.1,
     text: '파티에서 주로 맡는 역할은?',
     choices: [
-      { value: 1, label: '리딩 부담 싫고 따라가는 타입' },
-      { value: 2, label: '요청받으면 가끔 리딩' },
-      { value: 3, label: '리딩/팔로잉 상황별로 조절' },
-      { value: 4, label: '적극적으로 의견 제안' },
-      { value: 5, label: '전략 설명하고 팀 리딩까지 맡는 편' },
+      {
+        value: 1,
+        label: '리딩 부담 싫고 따라가는 타입',
+        effects: {
+          leadership: -20,
+        },
+      },
+      {
+        value: 2,
+        label: '요청받으면 가끔 리딩',
+        effects: {},
+      },
+      {
+        value: 3,
+        label: '리딩·팔로잉 상황별 조절',
+        effects: {},
+      },
+      {
+        value: 4,
+        label: '적극적으로 의견 제안',
+        effects: {
+          leadership: 10,
+        },
+      },
+      {
+        value: 5,
+        label: '전략 설명하고 팀을 이끎',
+        effects: {
+          leadership: 20,
+          cooperation: 6,
+        },
+      },
     ],
   },
   {
     id: 'Q8',
-    axis: 'leadership',
-    weight: 1.3,
     text: '팀이 우왕좌왕할 때 행동은?',
     choices: [
-      { value: 1, label: '흐름에 맡김' },
-      { value: 2, label: '필요할 때만 조용히 의견' },
-      { value: 3, label: '상황 따라 반응' },
-      { value: 4, label: '정리해서 방향 제시' },
-      { value: 5, label: '명확하게 목표·전략을 제안하고 팀 이끔' },
+      {
+        value: 1,
+        label: '흐름에 맡김',
+        effects: {
+          leadership: -20,
+        },
+      },
+      {
+        value: 2,
+        label: '필요할 때만 조용히 의견',
+        effects: {},
+      },
+      {
+        value: 3,
+        label: '상황에 따라 반응',
+        effects: {},
+      },
+      {
+        value: 4,
+        label: '정리해서 방향 제시',
+        effects: {
+          leadership: 10,
+        },
+      },
+      {
+        value: 5,
+        label: '명확하게 목표·전략을 제시하며 리딩',
+        effects: {
+          leadership: 20,
+        },
+      },
     ],
   },
 
@@ -139,28 +358,83 @@ export const QUESTIONS: Question[] = [
   // =============================
   {
     id: 'Q9',
-    axis: 'social',
-    weight: 1.1,
     text: '게임 중 커뮤니케이션 스타일은?',
     choices: [
-      { value: 1, label: '말 거의 안 함' },
-      { value: 2, label: '필요하면 최소한만' },
-      { value: 3, label: '상황따라 달라짐' },
-      { value: 4, label: '분위기 좋게 만들려고 편하게 말함' },
-      { value: 5, label: '적극 소통 + 팀 분위기 주도함' },
+      {
+        value: 1,
+        label: '말 거의 안 함',
+        effects: {
+          social: -20,
+        },
+      },
+      {
+        value: 2,
+        label: '필요한 말만 최소한',
+        effects: {},
+      },
+      {
+        value: 3,
+        label: '상황에 따라 다름',
+        effects: {},
+      },
+      {
+        value: 4,
+        label: '분위기 좋게 편하게 소통',
+        effects: {
+          social: 10,
+        },
+      },
+      {
+        value: 5,
+        label: '적극 소통하며 분위기 주도',
+        effects: {
+          social: 20,
+          leadership: 6,
+        },
+      },
     ],
   },
   {
     id: 'Q10',
-    axis: 'social',
-    weight: 1.2,
     text: '새로운 사람과 파티할 때 느낌은?',
     choices: [
-      { value: 1, label: '불편하고 최소한의 대화만 원함' },
-      { value: 2, label: '적당히 괜찮음' },
-      { value: 3, label: '상황 따라 달라짐' },
-      { value: 4, label: '오히려 친해질 기회라고 생각함' },
-      { value: 5, label: '새로운 사람 만나는 걸 즐기고 먼저 말 검' },
+      {
+        value: 1,
+        label: '불편하고 최소한의 대화만 원함',
+        effects: {
+          social: -20,
+        },
+      },
+      {
+        value: 2,
+        label: '적당히 괜찮음',
+        effects: {},
+      },
+      {
+        value: 3,
+        label: '상황에 따라 다름',
+        effects: {},
+      },
+      {
+        value: 4,
+        label: '친해질 기회라고 생각',
+        effects: {
+          social: 10,
+        },
+      },
+      {
+        value: 5,
+        label: '새로운 사람 만나는 걸 즐김',
+        effects: {
+          social: 20,
+        },
+      },
     ],
   },
 ];
+
+/**
+ * 기존 코드 호환성을 위한 QUESTIONS export
+ * Effect 기반 시스템으로 마이그레이션되었습니다.
+ */
+export const QUESTIONS = QUESTIONS_WITH_EFFECTS as unknown as Question[];

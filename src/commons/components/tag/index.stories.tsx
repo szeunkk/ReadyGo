@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import Tag from './index';
+import Icon from '../icon';
 
 const meta = {
   title: 'Commons/Components/Tag',
@@ -17,7 +18,7 @@ const meta = {
   argTypes: {
     style: {
       control: 'select',
-      options: ['rectangle', 'duotone', 'circle'],
+      options: ['rectangle', 'duotone', 'circle', 'leader'],
       description: '태그의 스타일',
       table: {
         type: { summary: 'TagStyle' },
@@ -63,6 +64,13 @@ export const Circle: Story = {
   },
 };
 
+export const Leader: Story = {
+  args: {
+    style: 'leader',
+    children: '파티장',
+  },
+};
+
 // 조합 스토리
 export const AllStyles: Story = {
   render: () => (
@@ -70,6 +78,7 @@ export const AllStyles: Story = {
       <Tag style="rectangle">Rectangle</Tag>
       <Tag style="duotone">Duotone</Tag>
       <Tag style="circle">Circle</Tag>
+      <Tag style="leader">Leader</Tag>
     </div>
   ),
   parameters: {
@@ -96,6 +105,23 @@ export const CompleteExample: Story = {
     docs: {
       description: {
         story: '실제 사용 예시로 다양한 태그를 조합한 경우입니다.',
+      },
+    },
+  },
+};
+
+export const LeaderWithIcon: Story = {
+  render: () => (
+    <Tag style="leader">
+      <Icon name="crown" size={14} />
+      파티장
+    </Tag>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'leader 스타일과 아이콘을 함께 사용하는 예시입니다. 실제 파티장 태그 사용 예시입니다.',
       },
     },
   },

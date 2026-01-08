@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useModal } from '@/commons/providers/modal';
 import { URL_PATHS } from '@/commons/constants/url';
 import { useSteamOAuth } from '@/components/auth/hooks/useSteamOAuth.hook';
-import { supabase } from '@/lib/supabase/client';
+import { useAuth } from '@/commons/providers/auth/auth.provider';
 
 /**
  * Steam 콜백 처리를 위한 Hook
@@ -16,6 +16,7 @@ export const useSteamCallback = (initialParams?: Record<string, string>) => {
   const searchParams = useSearchParams();
   const { openModal, closeAllModals } = useModal();
   const { handleSteamLink } = useSteamOAuth();
+  const { user, isSessionSynced, syncSession } = useAuth();
   const hasShownErrorModalRef = useRef(false);
   const isProcessingRef = useRef(false); // API 요청 진행 중 플래그
 
@@ -25,6 +26,21 @@ export const useSteamCallback = (initialParams?: Record<string, string>) => {
       if (isProcessingRef.current || hasShownErrorModalRef.current) {
         return;
       }
+
+      // 세션 동기화가 완료되지 않았으면 동기화 시도
+      if (!isSessionSynced) {
+        await syncSession();
+        // 세션 동기화 후 잠시 대기 (store 업데이트 대기)
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        // 재귀 호출하여 다시 확인
+        processCallback();
+        return;
+      }
+
+      // 서버에서 직접 세션 확인 (클라이언트 상태보다 더 정확)
+      // Steam 콜백은 POST 요청으로 오므로 쿠키가 자동으로 포함됨
+      // 세션 확인은 Steam 연동 API에서 처리하므로 여기서는 바로 진행
+      // 만약 세션이 없으면 Steam 연동 API에서 invalid_session 에러를 반환할 것임
 
       // 처리 시작 플래그 설정
       isProcessingRef.current = true;
@@ -66,28 +82,19 @@ export const useSteamCallback = (initialParams?: Record<string, string>) => {
         }
 
         // 서버 API Route로 OpenID 검증 요청
-        // 현재 세션의 access token 가져오기
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        const accessToken = session?.access_token;
-
+        // HttpOnly 쿠키에 저장된 세션을 사용하므로 Authorization 헤더 불필요
+        // credentials: 'include'로 쿠키가 자동으로 전달됨
         const requestBody = JSON.stringify(openIdParams);
 
         const headers: HeadersInit = {
           'Content-Type': 'application/json',
         };
 
-        // access token이 있으면 Authorization 헤더에 추가
-        if (accessToken) {
-          headers['Authorization'] = `Bearer ${accessToken}`;
-        }
-
         const response = await fetch('/api/auth/steam/callback', {
           method: 'POST',
           headers,
           body: requestBody,
-          credentials: 'include', // cookies 포함
+          credentials: 'include', // HttpOnly 쿠키 포함
         });
 
         if (!response.ok) {
@@ -115,8 +122,20 @@ export const useSteamCallback = (initialParams?: Record<string, string>) => {
               onConfirm: () => {
                 closeAllModals();
                 hasShownErrorModalRef.current = false;
-                // 스팀 로그인 페이지로 다시 이동
-                handleSteamLink();
+                router.push(URL_PATHS.HOME);
+              },
+            });
+          } else if (data.errorCode === 'invalid_session') {
+            // 세션 만료 또는 없음
+            openModal({
+              variant: 'single',
+              title: '로그인 필요',
+              description: '로그인 세션이 만료되었습니다. 다시 로그인해주세요.',
+              confirmText: '확인',
+              onConfirm: () => {
+                closeAllModals();
+                hasShownErrorModalRef.current = false;
+                router.push(URL_PATHS.LOGIN);
               },
             });
           } else {
@@ -129,8 +148,7 @@ export const useSteamCallback = (initialParams?: Record<string, string>) => {
               onConfirm: () => {
                 closeAllModals();
                 hasShownErrorModalRef.current = false;
-                // 스팀 로그인 페이지로 다시 이동
-                handleSteamLink();
+                router.push(URL_PATHS.HOME);
               },
             });
           }
@@ -152,8 +170,7 @@ export const useSteamCallback = (initialParams?: Record<string, string>) => {
               closeAllModals();
               hasShownErrorModalRef.current = false;
               isProcessingRef.current = false; // 플래그 리셋
-              // 스팀 로그인 페이지로 다시 이동
-              handleSteamLink();
+              router.push(URL_PATHS.HOME);
             },
           });
         }
@@ -165,5 +182,5 @@ export const useSteamCallback = (initialParams?: Record<string, string>) => {
 
     processCallback();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user, isSessionSynced, syncSession]);
 };

@@ -1,0 +1,110 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+	- 외부 API 호출 전담 Client Layer
+	- 비즈니스 로직 포함 금지
+	- DB 접근 금지
+	- 데이터 매핑/변환 금지 (원본 형식 유지)
+	- throw 금지, Result 객체로 성공/실패 반환
+	- named export만 허용
+
+==============================================
+
+조건-파일경로) 참고 및 기준 파일 경로는 다음과 같다.
+	- 구현 대상
+		- src/services/steam/steamApiClient.ts
+	- 환경변수
+		- STEAM_API_KEY (process.env)
+
+==============================================
+
+조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
+	- 외부 API 호출은 전용 Client로 분리
+	- Service가 아닌 독립 Client로 구현
+	- fetch 에러는 catch하여 Result 객체로 변환
+	- 타임아웃은 AbortSignal.timeout 사용
+
+==============================================
+
+핵심요구사항) 다음 기능을 step-by-step으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
+
+1. 함수 정의
+	- getOwnedGames(steamId: string): Promise<GetOwnedGamesResult>
+	- 단일 public 함수만 export
+
+2. Steam Web API 호출
+	- 엔드포인트: IPlayerService/GetOwnedGames/v0001/
+	- URL: https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/
+	- Method: GET
+	- Query Parameters:
+		- key: STEAM_API_KEY
+		- steamid: steamId
+		- include_appinfo: 1
+		- include_played_free_games: 1
+		- format: json
+
+3. 반환 타입
+	- Result 패턴 사용
+	- 성공 시:
+		type GetOwnedGamesResult = {
+		  ok: true;
+		  games: SteamGame[];
+		}
+	- 실패 시:
+		type GetOwnedGamesResult = {
+		  ok: false;
+		  reason: "network_error" | "private" | "timeout";
+		}
+
+4. Steam 응답 타입
+	- Steam API 원본 형식 유지
+	- SteamGame {
+	    appid: number;
+	    name?: string;
+	    playtime_forever: number;
+	    playtime_2weeks?: number;
+	    rtime_last_played?: number;
+	  }
+
+5. 응답 처리
+	- 전체 게임 목록을 그대로 반환 (정렬/필터링 금지)
+	- 게임/비게임 구분 없이 모두 반환
+	- 정렬 및 필터링은 syncSteamGames Service에서 수행
+	- 이유: 캐시 기반 점진적 검증을 위해 전체 목록 필요
+
+6. 에러 처리
+	- 네트워크 에러 → reason: "network_error"
+	- 타임아웃 (10초) → reason: "timeout"
+	- response.games 없음 → reason: "private"
+	- HTTP 4xx/5xx → reason: "network_error"
+	- throw 절대 금지
+
+7. Headers
+	- User-Agent: "ReadyGo/1.0 (Steam Sync Service)"
+	- Accept: "application/json"
+
+==============================================
+
+조건-Hook 책임)
+	- 해당 없음
+
+==============================================
+
+조건-UI 책임)
+	- 해당 없음
+
+==============================================
+
+구현 완료 후 반환) 아래 체크리스트를 반드시 반환할 것.
+	- getOwnedGames 함수만 export 한다
+	- Steam API 원본 형식을 유지한다
+	- Result 객체로 성공/실패를 반환한다
+	- throw를 사용하지 않는다
+	- 타임아웃(10초)이 설정되어 있다
+	- 비공개 프로필을 감지한다
+	- 비즈니스 로직이 포함되지 않았다
+	- DB 접근이 없다
+

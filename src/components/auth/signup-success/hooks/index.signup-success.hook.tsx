@@ -6,45 +6,37 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { URL_PATHS } from '@/commons/constants/url';
 import { useSteamOAuth } from '@/components/auth/hooks/useSteamOAuth.hook';
+import { useAuth } from '@/commons/providers/auth/auth.provider';
 
 export const useSignupSuccess = () => {
   const router = useRouter();
   const { handleSteamLink } = useSteamOAuth();
+  const { user, isSessionSynced, syncSession } = useAuth();
   const [nickname, setNickname] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
+  // 세션 동기화 및 닉네임 조회
   useEffect(() => {
     const fetchNickname = async () => {
+      // 세션 동기화가 완료되지 않았으면 동기화 시도
+      if (!isSessionSynced) {
+        await syncSession();
+        return;
+      }
+
+      // 사용자 정보가 없으면 로그인 페이지로 리다이렉트
+      if (!user) {
+        console.error('No user session found');
+        router.replace(URL_PATHS.LOGIN);
+        return;
+      }
+
+      // user_profiles 테이블에서 닉네임 조회
       try {
-        // 1. API를 통해 현재 로그인한 유저 정보 조회
-        const sessionResponse = await fetch('/api/auth/session', {
-          method: 'GET',
-          credentials: 'include', // 쿠키 포함
-        });
-
-        if (!sessionResponse.ok) {
-          console.error('Failed to get session');
-          router.replace(URL_PATHS.LOGIN);
-          return;
-        }
-
-        const sessionData = await sessionResponse.json();
-
-        // 로그인 세션이 없는 경우 로그인 페이지로 리다이렉트
-        if (!sessionData.user || !sessionData.user.id) {
-          console.error('No user session found');
-          router.replace(URL_PATHS.LOGIN);
-          return;
-        }
-
-        const userId = sessionData.user.id;
-
-        // 2. user_profiles 테이블에서 닉네임 조회
-        // Supabase 클라이언트는 데이터베이스 쿼리용으로 계속 사용
         const { data: profile, error: profileError } = await supabase
           .from('user_profiles')
           .select('nickname')
-          .eq('id', userId)
+          .eq('id', user.id)
           .single();
 
         if (profileError || !profile) {
@@ -54,24 +46,28 @@ export const useSignupSuccess = () => {
           return;
         }
 
-        // 3. 닉네임 설정 (null이거나 빈 문자열인 경우 fallback)
+        // 닉네임 설정 (null이거나 빈 문자열인 경우 fallback)
         if (profile.nickname && profile.nickname.trim()) {
           setNickname(profile.nickname.trim());
         } else {
           setNickname('');
         }
+        setIsLoading(false);
       } catch (error) {
         console.error('Unexpected error while fetching nickname:', error);
         setNickname('');
-      } finally {
         setIsLoading(false);
       }
     };
 
     fetchNickname();
-  }, [router]);
+  }, [isSessionSynced, user, syncSession, router]);
 
-  const handleTraitsTest = () => {
+  const handleTraitsTest = async () => {
+    // 세션 동기화가 완료될 때까지 대기
+    if (!isSessionSynced) {
+      await syncSession();
+    }
     router.push(URL_PATHS.TRAITS);
   };
 

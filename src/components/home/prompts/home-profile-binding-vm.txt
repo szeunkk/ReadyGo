@@ -1,0 +1,91 @@
+아래 조건을 모두 적용하여 요구사항을 모두 구현하라.
+구현 완료 후, “구현 결과 체크리스트”를 반드시 반환하라.
+
+==============================================
+조건-커서룰) 
+- 기존 코드/폴더 구조/네이밍 컨벤션을 최우선으로 따른다.
+- TypeScript 타입 안정성 유지: any 사용 금지.
+- ProfileViewModel 타입 구조 변경 금지 (필드 추가/삭제/rename 금지).
+- UI 컴포넌트는 “ProfileViewModel만” props로 받도록 강제한다.
+- UI 컴포넌트에서 domain 변환 함수(toRadarData/toActiveTimeText/toAnimalMeta 등) 직접 호출 금지.
+- 변환은 단일 진입 함수(toProfileViewModel)로만 수행되도록 강제한다.
+- toProfileViewModel은 pure function이어야 한다.
+  (네트워크/라우터/hook state/console/try-catch/throw 없음)
+- API 응답(Core DTO) 가공/추론/상태판단 로직은 최소화하고 “변환”만 수행한다.
+- 에러 메시지 가공 금지(원문 유지). UI 표시용 문구 생성/치환 금지.
+- 변경은 필요한 파일에만 최소 범위로 수행한다.
+- 완료 후 TypeScript typecheck가 깨지지 않도록 정리한다.
+
+==============================================
+
+조건-파일경로) 참고할 profileDTO 파일 경로
+            - src/commons/types/profile/profileCore.dto.ts
+
+조건-파일경로) 참고할 profile ViewModel 파일 경로
+            - ProfileViewModel 타입
+                - 레포에서 현재 import되는 실제 파일 경로를 사용
+                - src/viewmodels/profile/ProfileViewModel.ts
+            - 단일 변환 함수: 
+                - 레포 컨벤션에 맞는 위치로 생성
+                - src/viewmodels/profile/toProfileViewModel.ts
+
+조건-파일경로) 참고할 domain 변환 유틸 파일 경로
+            - src/features/profile/domain/toRadarData.ts
+            - src/features/profile/domain/toActiveTimeText.ts
+            - src/features/profile/domain/toAnimalMeta.ts
+
+조건-파일경로) 참고할 hook 파일 경로 (/api/profile/me 호출 hook)
+        - src/components/home/hooks/useProfile.ts
+
+조건-파일경로) 해당 데이터를 렌더링하는 페이지/컨테이너 파일 경로
+        - src/components/home/homePage.tsx
+
+==============================================
+정책-상태 분기)
+            - 401: error 상태
+            - 500: error 상태
+            - 404 또는 data가 null/undefined: empty 상태
+            - 에러 메시지는 원문 그대로 전달 (가공/치환 금지)
+
+==============================================
+핵심요구사항) 다음 기능을 step-by-step으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
+            1) 단일 변환 함수 확정/구현
+            - toProfileViewModel(dto: ProfileCoreDTO): ProfileViewModel 를 구현/정리하라.
+            - toProfileViewModel 내부에서만 아래 유틸을 호출하여 조립한다:
+            - toRadarData(dto.traits)
+            - toActiveTimeText(dto.schedule)
+            - toAnimalMeta(dto.animalType)
+            - DTO 값 점수 가공/문구 생성/상태판단 로직 금지.
+            - DTO에서 값이 없으면 ViewModel에서도 undefined 정책 유지.
+
+            2) Hook/Container 레벨에서 ViewModel 변환 수행
+            - /api/profile/me 호출 후 성공 응답을 받은 직후 toProfileViewModel(dto)를 1회 호출한다.
+            - Hook state는 dto와 vm을 동시에 들고 있지 말고 “viewModel만” 유지한다.
+            - Hook이 UI로 노출하는 data는 ProfileViewModel로 고정한다.
+            - 에러는 throw로 전파하지 말고 error state로만 저장한다(기존 정책 유지).
+
+            3) UI 컴포넌트 계약 강제
+            - UI 프리젠테이션 컴포넌트는 ProfileViewModel만 props로 받는다.
+            - UI에서 Core DTO import/참조 제거.
+            - UI에서 domain 변환 함수 import/호출 제거.
+            - Container/page에서만 hook 호출 + 상태 분기(loading/empty/error/success) 수행.
+
+            4) UI 레벨 직접 호출 제거 검증
+            - components 폴더에서 아래 호출이 남아있으면 제거/리팩터링한다:
+            - toRadarData
+            - toActiveTimeText
+            - toAnimalMeta
+            - 위 함수들은 오직 toProfileViewModel 내부에서만 호출되도록 한다.
+
+==============================================
+구현 완료 후 반환 체크리스트)
+            - toProfileViewModel.ts 존재 및 단일 진입 변환 함수로 구현됨 (입력: ProfileCoreDTO, 출력: ProfileViewModel)
+            - toRadarData/toActiveTimeText/toAnimalMeta 호출이 toProfileViewModel 내부에만 존재함
+            - Hook/Container 레벨에서 toProfileViewModel을 1회 호출하고 UI에는 ProfileViewModel만 전달됨
+            - UI 컴포넌트에서 Core DTO import/참조가 제거됨
+            - UI 컴포넌트에서 domain 변환 함수 직접 호출이 제거됨
+            - ProfileViewModel 타입 구조가 변경되지 않음
+            - 에러 메시지 가공 없이 error state로 전달됨
+            - dto/vm 중복 상태가 제거되어 vm 단일 상태 유지됨
+            - TypeScript typecheck 기준으로 타입 오류가 없도록 정리됨
+            - 변경 파일이 최소 범위이며 기존 컨벤션 준수함

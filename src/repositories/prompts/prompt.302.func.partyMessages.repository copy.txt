@@ -1,0 +1,138 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 참고할 Repository 파일경로: src/repositories/chat.repository.ts
+조건-파일경로) 구현될 Repository 파일경로: src/repositories/partyMessages.repository.ts
+조건-파일경로) 참고할 타입 파일경로: supabase/types/database.types.ts
+조건-파일경로) 참고할 DB 문서경로: docs/database/04-table-details.md
+
+==============================================
+
+핵심요구사항) 파티 채팅 기능을 위한 Repository를 구현하고, 적용 결과를 체크리스트로 반환할 것.
+
+            ❗ 전제 조건
+                - party_members.post_id가 같은 사용자들끼리만 채팅 가능
+                - chat_rooms / chat_room_members 사용하지 않음
+                - 파티 단위 채팅은 party_posts ↔ party_members ↔ party_messages 구조로 구현
+
+            1) Repository 기본 구조
+                1-1) Supabase 클라이언트 사용
+                    - src/lib/supabase/server.ts의 supabaseAdmin을 사용할 것.
+                    - import 경로: import { supabaseAdmin } from '@/lib/supabase/server';
+                
+                1-2) 타입 정의
+                    - database.types.ts의 Database 타입을 활용할 것.
+                    - party_posts, party_members, party_messages의 Row, Insert, Update 타입을 활용할 것.
+                    - 커스텀 타입이 필요한 경우 파일 내부에 정의할 것.
+
+                1-3) 에러 처리
+                    - 모든 함수는 error가 발생하면 throw error할 것.
+                    - steamGame.repository.ts의 패턴을 따를 것.
+                
+                1-4) 권한/RLS 전제 조건
+                    - Repository는 supabaseAdmin(service role)을 사용하므로 RLS를 우회한다.
+                    - 파티 멤버 여부 검증은 호출부(API Route 또는 Hook)에서 선행되어야 한다.
+                    - Repository 함수는 순수한 데이터 액세스 로직만 담당한다.
+
+            2) 파티 채팅방 관련 함수 (개념상 "채팅방" = party_post)
+                2-1) getPartyMembers(postId: number): Promise<PartyMember[]>
+                    - 특정 파티의 모든 참여자 조회할 것.
+                    - party_members 테이블 사용할 것.
+                    - post_id로 필터링할 것.
+                    - 반환 타입: database.types.ts의 party_members.Row[] 타입 활용.
+
+            3) 파티 메시지 관련 함수 (핵심)
+                3-1) getPartyMessages(postId: number, limit: number = 50, offset: number = 0): Promise<PartyMessage[]>
+                    - 특정 파티(post_id)의 메시지 목록을 조회할 것.
+                    - party_messages 테이블 사용할 것.
+                    - 조건:
+                        - post_id = postId
+                        - created_at 기준 내림차순 정렬 (최신 메시지가 먼저)
+                    - limit과 offset을 사용하여 페이지네이션 지원할 것.
+                    - 반환 타입: database.types.ts의 party_messages.Row[] 타입 활용.
+
+                3-2) sendPartyMessage(postId: number, senderId: string, content: string): Promise<PartyMessage>
+                    - 파티 메시지를 전송할 것.
+                    - party_messages 테이블에 레코드 생성할 것.
+                    - 필수 조건:
+                        - senderId는 해당 postId의 party_members에 포함된 사용자여야 함
+                        - (검증은 호출부에서 수행)
+                    - insert 필드:
+                        - post_id: 전달받은 postId
+                        - sender_id: 전달받은 senderId
+                        - content: 전달받은 content
+                        - created_at: 현재 시간 (Supabase 자동 설정)
+                    - 생성된 메시지 정보를 반환할 것.
+                    - 반환 타입: database.types.ts의 party_messages.Row 타입 활용.
+
+                3-3) deletePartyMessage(messageId: number): Promise<void>
+                    - 파티 메시지를 삭제할 것 (soft delete 또는 hard delete).
+                    - 현재는 hard delete로 구현할 것.
+                    - party_messages 테이블에서 id로 삭제할 것.
+                    - 삭제 성공 시 아무것도 반환하지 않을 것.
+
+            4) 타입 정의
+                4-1) 커스텀 타입 정의
+                    - PartyMessage: database.types.ts의 party_messages.Row 활용.
+                    - PartyMember: database.types.ts의 party_members.Row 활용.
+                    - PartyPost: database.types.ts의 party_posts.Row 활용.
+
+                4-2) 함수 파라미터 타입
+                    - 모든 함수의 파라미터는 명시적 타입을 지정할 것.
+                    - uuid 타입은 string으로 처리할 것.
+                    - bigint 타입은 number로 처리할 것.
+
+            5) 구현 주의사항
+                5-1) Supabase 쿼리 패턴
+                    - .from()으로 테이블 선택.
+                    - .select()로 필요한 컬럼만 선택 (성능 최적화).
+                    - .eq(), .in() 등으로 필터링.
+                    - .order()로 정렬.
+                    - .limit(), .range()로 페이지네이션.
+                    - .insert()로 생성.
+                    - .update()로 수정 (필요시).
+                    - .delete()로 삭제.
+
+                5-2) 조인 쿼리
+                    - Supabase의 .select()에서 관계된 테이블 조인 가능.
+                    - 예: .select('*, user_profiles(*)')
+                    - 또는 별도 쿼리로 분리하여 처리.
+
+                5-3) 에러 처리
+                    - 모든 Supabase 쿼리 결과에서 error 체크할 것.
+                    - error가 존재하면 throw error할 것.
+                    - try-catch는 호출하는 쪽(Hook 등)에서 처리할 것.
+
+                5-4) 테이블 사용 규칙
+                    - ❌ chat_rooms, chat_room_members, chat_messages 사용 금지
+                    - ✅ 파티 채팅은 post_id = 채팅방 ID
+                    - ✅ Realtime 사용 시:
+                        - party_messages 테이블 구독
+                        - filter: post_id=eq.{postId}
+
+==============================================
+
+구현 완료 후 아래 2가지 체크리스트를 반환할 것.
+
+1) 커서룰(@01-common.mdc, @04-func.mdc) 적용 결과 체크리스트
+   - 파일 경로 준수 여부
+   - 라이브러리 사용 규칙 준수 여부
+   - 코드 구조 및 네이밍 규칙 준수 여부
+
+2) 기능 요구사항 구현 체크리스트
+   - 파티 멤버 조회 함수 구현 완료 여부
+   - 파티 메시지 조회 구현 완료 여부
+   - 파티 메시지 전송 구현 완료 여부
+   - 파티 메시지 삭제 구현 완료 여부
+   - party_* 테이블만 사용 여부
+   - 타입 정의 완료 여부
+   - 에러 처리 일관성 유지 여부
+   - Supabase 쿼리 패턴 준수 여부

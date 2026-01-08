@@ -5,7 +5,11 @@ import Image from 'next/image';
 import RadarChart, { RadarChartData } from '@/commons/components/radar-chart';
 import Icon from '@/commons/components/icon';
 import Button from '@/commons/components/button';
-import { AnimalType, animalTypeMeta } from '@/commons/constants/animal';
+import {
+  AnimalType,
+  animalTypeMeta,
+  animalCompatibilities,
+} from '@/commons/constants/animal';
 import styles from './styles.module.css';
 
 export interface ResultProps {
@@ -32,25 +36,24 @@ export default function Result({
   radarData,
   mainRole,
   subRole,
-  matchTypes,
+  matchTypes: _matchTypes,
   characteristics,
   onPrevious,
   onComplete,
 }: ResultProps) {
   const animalMeta = animalTypeMeta[animalType];
+  const compatibility = animalCompatibilities[animalType];
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>당신의 게임 타입은?</h1>
-      </div>
-
       <div className={styles.content}>
         {/* Main Card */}
         <div className={styles.mainCard}>
           <div className={styles.mainCardHeader}>
             <div className={styles.nicknameSection}>
-              <p className={styles.nickname}>{nickname}</p>
+              <p className={styles.nickname}>
+                {nickname} 님, 당신의 게임 성향은?
+              </p>
             </div>
           </div>
 
@@ -120,12 +123,28 @@ export default function Result({
                   </div>
                 </div>
                 <div className={styles.matchTypesList}>
-                  {matchTypes.map((type, index) => (
-                    <React.Fragment key={index}>
+                  {/* Best Matches (천생연분) */}
+                  {compatibility.bestMatches.map((animal, index) => (
+                    <React.Fragment key={`best-${animal}-${index}`}>
                       <div className={styles.matchType}>
-                        <p>{type}</p>
+                        <p>{animalTypeMeta[animal].label}</p>
                       </div>
-                      {index < matchTypes.length - 1 && (
+                      {(index < compatibility.bestMatches.length - 1 ||
+                        compatibility.goodMatches.length > 0) && (
+                        <div className={styles.matchTypeSeparator}>
+                          <p>·</p>
+                        </div>
+                      )}
+                    </React.Fragment>
+                  ))}
+
+                  {/* Good Matches (좋은 궁합) */}
+                  {compatibility.goodMatches.map((animal, index) => (
+                    <React.Fragment key={`good-${animal}-${index}`}>
+                      <div className={styles.matchType}>
+                        <p>{animalTypeMeta[animal].label}</p>
+                      </div>
+                      {index < compatibility.goodMatches.length - 1 && (
                         <div className={styles.matchTypeSeparator}>
                           <p>·</p>
                         </div>

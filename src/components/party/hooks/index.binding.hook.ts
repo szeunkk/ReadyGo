@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { PartyCardProps } from '../ui/card/card';
+import { AnimalType } from '@/commons/constants/animal';
+import { useAuth } from '@/commons/providers/auth/auth.provider';
 
 // API 응답 타입
 interface PartyPost {
@@ -21,17 +23,17 @@ interface PartyPost {
   created_at: string;
 }
 
-// Mock 데이터 타입
-interface MockPartyMember {
+// 실제 데이터 타입
+interface PartyMember {
   post_id: number;
   user_id: string;
   role: string;
   joined_at: string;
 }
 
-interface MockUserProfile {
-  user_id: string;
-  animal_type: string;
+interface UserProfile {
+  id: string;
+  animal_type: string | null;
 }
 
 interface UsePartyListBindingReturn {
@@ -40,9 +42,11 @@ interface UsePartyListBindingReturn {
   error: Error | null;
 }
 
-// 날짜와 시간을 조합하여 "MM/DD 오전/오후 HH:mm" 또는 "MM/DD 새벽 HH:mm" 형식으로 변환
+// 날짜와 시간을 조합하여 "MM/DD 오전/오후/새벽 HH:mm" 형식으로 변환
 // - 날짜 형식: YYYY-MM-DD → MM/DD
 // - 시간 형식: HH:mm:ss → "오전/오후/새벽 HH:mm"
+// - 예: start_date="2024-12-25", start_time="18:30:00" → "12/25 오후 6:30"
+// - 예: start_date="2024-12-26", start_time="02:00:00" → "12/26 새벽 2:00"
 const formatDateTime = (dateString: string, timeString: string): string => {
   // 날짜 파싱: YYYY-MM-DD → MM/DD
   const dateMatch = dateString.match(/(\d{4})-(\d{2})-(\d{2})/);
@@ -62,21 +66,28 @@ const formatDateTime = (dateString: string, timeString: string): string => {
   const hour = parseInt(hourStr, 10);
   const minute = minuteStr;
 
-  // 새벽 시간대 처리 (0시~5시)
-  if (hour >= 0 && hour < 6) {
-    const displayHour = hour === 0 ? 12 : hour;
-    return `${formattedDate} 새벽 ${displayHour}:${minute}`;
-  }
+  // 새벽/오전/오후 처리
+  let period: string;
+  let displayHour: number;
 
-  // 오전/오후 처리
-  const period = hour < 12 ? '오전' : '오후';
-  const displayHour =
-    hour === 0 ? 12 : hour > 12 ? hour - 12 : hour === 12 ? 12 : hour;
+  if (hour >= 0 && hour < 6) {
+    // 새벽 (0시~5시)
+    period = '새벽';
+    displayHour = hour === 0 ? 12 : hour;
+  } else if (hour < 12) {
+    // 오전 (6시~11시)
+    period = '오전';
+    displayHour = hour;
+  } else {
+    // 오후 (12시~23시)
+    period = '오후';
+    displayHour = hour === 12 ? 12 : hour - 12;
+  }
 
   return `${formattedDate} ${period} ${displayHour.toString().padStart(2, '0')}:${minute}`;
 };
 
-// voice_chat 값을 한글로 변환: 'required' → "필수 사용", 'optional' → "선택 사용", null → "사용 안함" (기본값)
+// voice_chat 값을 한글로 변환: 'required' → "필수 사용", 'optional' → "선택 사용", null → "선택 사용" (기본값)
 const getVoiceChatLabel = (voiceChat: string | null): string => {
   if (voiceChat === 'required') {
     return '필수 사용';
@@ -85,22 +96,10 @@ const getVoiceChatLabel = (voiceChat: string | null): string => {
     return '선택 사용';
   }
   // null인 경우 기본값
-  return '사용 안함';
+  return '선택 사용';
 };
 
-// control_level 값을 한글로 변환: 영어 id를 한국어 label로 변환
-const getControlLevelLabel = (controlLevel: string): string => {
-  const controlLevelMap: Record<string, string> = {
-    beginner: '미숙',
-    intermediate: '반숙',
-    advanced: '완숙',
-    expert: '빡숙',
-    master: '장인',
-  };
-  return controlLevelMap[controlLevel] || controlLevel;
-};
-
-// difficulty 값을 한글로 변환: 영어 id를 한국어 label로 변환
+// difficulty 값을 한글로 변환
 const getDifficultyLabel = (difficulty: string): string => {
   const difficultyMap: Record<string, string> = {
     undefined: '미정',
@@ -113,75 +112,88 @@ const getDifficultyLabel = (difficulty: string): string => {
   return difficultyMap[difficulty] || difficulty;
 };
 
-// Mock 데이터: party_members
-const mockPartyMembers: MockPartyMember[] = [
-  {
-    post_id: 1,
-    user_id: 'user-1',
-    role: 'member',
-    joined_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    post_id: 1,
-    user_id: 'user-2',
-    role: 'member',
-    joined_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    post_id: 2,
-    user_id: 'user-3',
-    role: 'member',
-    joined_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    post_id: 2,
-    user_id: 'user-4',
-    role: 'member',
-    joined_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    post_id: 2,
-    user_id: 'user-5',
-    role: 'member',
-    joined_at: '2024-01-01T00:00:00Z',
-  },
-  {
-    post_id: 3,
-    user_id: 'user-6',
-    role: 'member',
-    joined_at: '2024-01-01T00:00:00Z',
-  },
-];
+// control_level 값을 한글로 변환
+const getControlLevelLabel = (controlLevel: string): string => {
+  const controlLevelMap: Record<string, string> = {
+    beginner: '미숙',
+    intermediate: '반숙',
+    advanced: '완숙',
+    expert: '빡숙',
+    master: '장인',
+  };
+  return controlLevelMap[controlLevel] || controlLevel;
+};
 
-// Mock 데이터: user_profiles
-const mockUserProfiles: MockUserProfile[] = [
-  { user_id: 'user-1', animal_type: 'raven' },
-  { user_id: 'user-2', animal_type: 'hedgehog' },
-  { user_id: 'user-3', animal_type: 'dolphin' },
-  { user_id: 'user-4', animal_type: 'fox' },
-  { user_id: 'user-5', animal_type: 'bear' },
-  { user_id: 'user-6', animal_type: 'tiger' },
-];
+// animal_type 값을 아바타 아이콘 파일명으로 변환
+// animal_type 값은 AnimalType enum 값이며, 이를 아바타 아이콘 파일명으로 변환
+const getAnimalTypeFromProfile = (animalType: string | null): string => {
+  if (!animalType) {
+    return 'default';
+  }
+  // AnimalType enum 값과 일치하는지 확인
+  const validAnimalTypes: string[] = Object.values(AnimalType);
+  if (validAnimalTypes.includes(animalType)) {
+    return animalType;
+  }
+  return 'default';
+};
 
-// memberAvatars 생성 (Mock 데이터 사용): party_posts의 id를 기반으로 Mock party_members 데이터에서 해당 파티의 참여자 정보를 가져옴
+// API 응답의 members와 profiles를 Map으로 변환하여 빠른 조회가 가능하도록 처리
+const createMembersAndProfilesMaps = (
+  members: PartyMember[],
+  profiles: UserProfile[]
+): {
+  membersMap: Map<number, PartyMember[]>;
+  profilesMap: Map<string, UserProfile>;
+} => {
+  const membersMap = new Map<number, PartyMember[]>();
+  const profilesMap = new Map<string, UserProfile>();
+
+  // members 배열을 post_id를 키로 하는 Map으로 변환
+  for (const member of members) {
+    const postId = member.post_id;
+    if (postId) {
+      if (!membersMap.has(postId)) {
+        membersMap.set(postId, []);
+      }
+      membersMap.get(postId)!.push(member);
+    }
+  }
+
+  // profiles 배열을 user_id(id)를 키로 하는 Map으로 변환
+  for (const profile of profiles) {
+    if (profile.id) {
+      profilesMap.set(profile.id, profile);
+    }
+  }
+
+  return { membersMap, profilesMap };
+};
+
+// memberAvatars 생성 (실제 데이터 사용): party_posts의 id를 기반으로 실제 party_members 데이터에서 해당 파티의 참여자 정보를 가져옴
+// - party_members의 user_id를 사용하여 실제 user_profiles 데이터에서 animal_type을 조회
+// - animal_type 값을 아바타 아이콘 파일명과 매칭
 // - 참여자 수만큼 동물 아바타를 표시 (최대 4개)
 // - 참여자가 없는 경우 빈 배열로 처리
-const getMemberAvatars = (postId: number): string[] => {
-  // 해당 파티의 참여자 찾기
-  const members = mockPartyMembers.filter((m) => m.post_id === postId);
-
-  // 참여자 수만큼 동물 아바타 생성 (최대 4개)
+const getMemberAvatars = (
+  postId: number,
+  membersMap: Map<number, PartyMember[]>,
+  profilesMap: Map<string, UserProfile>
+): string[] => {
+  const members = membersMap.get(postId) || [];
   const avatars = members.slice(0, 4).map((member) => {
-    const profile = mockUserProfiles.find((p) => p.user_id === member.user_id);
-    return profile?.animal_type || 'default';
+    const profile = profilesMap.get(member.user_id);
+    return getAnimalTypeFromProfile(profile?.animal_type || null);
   });
-
   return avatars;
 };
 
-// currentMembers 계산 (Mock 데이터 사용): Mock party_members 데이터에서 해당 post_id의 참여자 수를 계산
-const getCurrentMembers = (postId: number): number => {
-  return mockPartyMembers.filter((m) => m.post_id === postId).length;
+// currentMembers 계산 (실제 데이터 사용): party_members 테이블에서 같은 post_id의 row 개수로 계산
+const getCurrentMembers = (
+  postId: number,
+  membersMap: Map<number, PartyMember[]>
+): number => {
+  return membersMap.get(postId)?.length || 0;
 };
 
 // description이 카드 사이즈를 넘어가는 경우 "..."으로 표현하여 카드 사이즈를 넘어가지 않도록 처리
@@ -196,6 +208,7 @@ const truncateDescription = (
 };
 
 export const usePartyListBinding = (): UsePartyListBindingReturn => {
+  const { user } = useAuth();
   const [data, setData] = useState<PartyCardProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -248,15 +261,39 @@ export const usePartyListBinding = (): UsePartyListBindingReturn => {
           return;
         }
 
-        // 데이터 변환
+        // 데이터 변환: API 응답에서 data, members, profiles 추출
         const partyList: PartyPost[] = result.data || [];
+        const members: PartyMember[] = result.members || [];
+        const profiles: UserProfile[] = result.profiles || [];
 
+        if (partyList.length === 0) {
+          setData([]);
+          return;
+        }
+
+        // members와 profiles를 Map으로 변환하여 빠른 조회가 가능하도록 처리
+        const { membersMap, profilesMap } = createMembersAndProfilesMaps(
+          members,
+          profiles
+        );
+
+        // 데이터 변환
         const transformedData: PartyCardProps[] = partyList.map((party) => {
-          // memberAvatars 생성 (Mock 데이터 사용)
-          const memberAvatars = getMemberAvatars(party.id);
+          // memberAvatars 생성 (실제 데이터 사용)
+          const memberAvatars = getMemberAvatars(
+            party.id,
+            membersMap,
+            profilesMap
+          );
 
-          // currentMembers 계산 (Mock 데이터 사용)
-          const currentMembers = getCurrentMembers(party.id);
+          // currentMembers 계산 (실제 데이터 사용)
+          const currentMembers = getCurrentMembers(party.id, membersMap);
+
+          // isLeader 계산: 로그인한 유저의 ID와 party_posts.creator_id가 같을 때만 true
+          // 로그인하지 않은 경우(user가 null인 경우) 또는 creator_id가 없는 경우 false
+          const isLeader = Boolean(
+            user?.id && party.creator_id && user.id === party.creator_id
+          );
 
           return {
             title: party.party_title,
@@ -272,6 +309,7 @@ export const usePartyListBinding = (): UsePartyListBindingReturn => {
               controlLevel: getControlLevelLabel(party.control_level),
             },
             partyId: party.id,
+            isLeader,
           };
         });
 
@@ -290,7 +328,7 @@ export const usePartyListBinding = (): UsePartyListBindingReturn => {
     };
 
     fetchPartyList();
-  }, []);
+  }, [user]);
 
   return { data, isLoading, error };
 };

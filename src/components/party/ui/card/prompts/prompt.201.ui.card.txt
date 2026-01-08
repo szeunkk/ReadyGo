@@ -54,3 +54,9 @@
             
             2)아래 피그마 링크 참고하여 categoryItem의 div구조, 아이콘 색상 폰트 색상, 크기 확앤해서 피그마 디자인과 동일하게 수정할 것.
               - https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=2590-66122&m=dev
+
+==============================================
+
+3차추가요구사항) 아래 조건에 맞게 디자인 수정할 것.
+              1) 아래 피그마 링크 참고하여 titleTagWrapper에 <Tag /> 컴포넌트 추가할 것.
+                - https://www.figma.com/design/XCfazIyDI3zOloIscGe6u2/ReadyGo?node-id=3333-7111&m=dev

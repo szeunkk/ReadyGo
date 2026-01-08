@@ -140,6 +140,14 @@ export const URL_METADATA: Record<string, UrlMetadata> = {
       sidebar: false,
     },
   },
+  [URL_PATHS.STEAM_CALLBACK]: {
+    path: URL_PATHS.STEAM_CALLBACK,
+    accessStatus: 'public',
+    visibility: {
+      header: false,
+      sidebar: false,
+    },
+  },
 };
 
 // ============================================

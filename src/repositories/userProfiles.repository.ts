@@ -1,5 +1,6 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
 import { AnimalType } from '@/commons/constants/animal/animal.enum';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/supabase';
 
 /**
  * user_profiles Repository
@@ -9,48 +10,67 @@ import { AnimalType } from '@/commons/constants/animal/animal.enum';
 export type UserProfileRow = {
   id: string;
   animal_type: string | null;
+  avatar_url: string | null;
+  nickname: string | null;
+  tier: string;
   created_at: string;
   updated_at: string;
 };
 
 /**
  * user_profiles 레코드를 user_id(id)로 조회한다
- * - RLS 기반 쿼리
- * - 존재하지 않으면 null 반환
+ * - DB 접근만 수행, 에러 처리 및 데이터 가공 없음
+ * - Supabase 응답 구조를 그대로 반환
  */
 export const findByUserId = async (
+  client: SupabaseClient<Database>,
   userId: string
-): Promise<UserProfileRow | null> => {
-  const { data, error } = await supabaseAdmin
+) => {
+  return await client
     .from('user_profiles')
     .select('*')
     .eq('id', userId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') {
-      return null;
-    }
-    throw new Error(`Failed to find user_profiles: ${error.message}`);
-  }
-
-  return data;
+    .maybeSingle();
 };
 
 /**
  * user_profiles의 animal_type을 업데이트한다
- * - user_profiles.id = user_id
+ * - DB 접근만 수행, 에러 처리는 상위 레이어에서 담당
+ * - Supabase 응답 구조를 그대로 반환
  */
 export const updateAnimalType = async (
+  client: SupabaseClient<Database>,
   userId: string,
   animalType: AnimalType
-): Promise<void> => {
-  const { error } = await supabaseAdmin
+) => {
+  return await client
     .from('user_profiles')
     .update({ animal_type: animalType })
     .eq('id', userId);
+};
+
+/**
+ * user_profiles의 모든 user id 목록을 조회한다
+ * - DB 접근만 수행, 에러 처리 및 데이터 가공 없음
+ * - Supabase 응답 구조를 그대로 반환
+ */
+export const getAllUserIds = async (
+  client: SupabaseClient<Database>
+): Promise<string[]> => {
+  const { data, error } = await client.from('user_profiles').select('id');
 
   if (error) {
-    throw new Error(`Failed to update animal_type: ${error.message}`);
+    throw error;
   }
+
+  if (!data || data.length === 0) {
+    return [];
+  }
+
+  // id만 추출
+  const userIds = data
+    .map((row) => row.id)
+    .filter((id): id is string => id !== null && id !== undefined);
+
+  return userIds;
 };

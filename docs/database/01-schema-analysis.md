@@ -14,7 +14,7 @@ database.types.ts와 본 문서는 항상 동일 커밋에 포함되어야 한�
 # Supabase Schema Analysis
 
 Schema: public  
-Total Tables: 34  
+Total Tables: 35  
 Generated from: database.types.ts
 
 ## Scope - 분석 범위
@@ -38,7 +38,7 @@ Generated from: database.types.ts
 ```
 - analytics_user_actions
 - bans
-- chat_blocks
+- user_blocks
 - chat_message_reads
 - chat_messages
 - chat_room_members
@@ -61,6 +61,7 @@ Generated from: database.types.ts
 - steam_game_sync_logs
 - steam_sync_logs
 - steam_user_games
+- steam_user_stats
 - tags
 - temperature_logs
 - tier_history
@@ -74,7 +75,7 @@ Generated from: database.types.ts
 - user_play_schedules
 ```
 
-📌 총 36개 (public schema 기준)
+📌 총 35개 (public schema 기준)
 
 ## Column Definition Rules
 
@@ -112,7 +113,7 @@ Generated from: database.types.ts
 - chat_room_members (room_id, user_id)
 - party_members (post_id, user_id)
 - user_tags (user_id, tag_id)
-- chat_blocks (user_id, blocked_user_id)
+- user_blocks (user_id, blocked_user_id)
 - friendships (user_a, user_b)
 ```
 
@@ -133,8 +134,8 @@ Generated from: database.types.ts
 
 - **Author**: ReadyGo / Eunkyoung Kim(김은경)
 - **Created At**: 2025-12-24
-- **Last Updated At**: 2025-12-29
-- **Document Version**: v1.0.3
+- **Last Updated At**: 2025-01-07
+- **Document Version**: v1.0.5
 - **Status**: Active
 - **Source of Truth**:
   - Supabase Production Database
@@ -148,3 +149,5 @@ Generated from: database.types.ts
 |  v1.0.1 | 2025-12-26 | 테이블 추가에 따른 테이블 목록 요약 수정          |
 |  v1.0.2 | 2025-12-29 | user_status 테이블 추가                           |
 |  v1.0.3 | 2025-12-29 | user_play_schedules 테이블 추가                   |
+|  v1.0.4 | 2025-01-13 | chat_blocks 테이블명을 user_blocks로 변경         |
+|  v1.0.5 | 2025-01-07 | steam_user_stats 테이블 추가                      |

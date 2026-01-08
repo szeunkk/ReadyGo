@@ -23,9 +23,8 @@
                 - @testing-library/react
 
             2) 테스트 조건
-                - timeout은 network 통신인 경우 2000ms 미만으로 설정할 것.
-                - timeout은 network 통신이 아닌 경우 설정하지 않거나, 500ms 미만으로 설정할 것.
-                - /party 페이지가 완전히 로드된 후 테스트할 것.
+                - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+                - /party 페이지가 완전히 로드된 후 일기쓰기버튼을 클릭한 이후 테스트할 것.
                     - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
                     - 페이지 로드 식별 금지사항: networkidle 대기 방법
 
@@ -50,18 +49,21 @@
                 2-1) API 엔드포인트: GET /api/party
                 2-2) 요청 파라미터
                     - limit: 한 번에 가져올 파티 개수
-                        - 초기 로드: 6개 (INITIAL_LIMIT = 6)
+                        - 초기 로드: 10개 (INITIAL_LIMIT = 10)
                         - 무한스크롤 로드: 10개 (SCROLL_LIMIT = 10)
                     - offset: 시작 위치 (기본값: 0)
-                2-3) 응답 데이터: { data: PartyPost[] }
+                2-3) 응답 데이터: { data: PartyPost[], members: PartyMember[], profiles: UserProfile[] }
                     - PartyPost 타입은 index.binding.hook.ts의 PartyPost 인터페이스를 참고할 것.
+                    - PartyMember 타입: { post_id: number, user_id: string, role: string, joined_at: string }
+                    - UserProfile 타입: { id: string, animal_type: string | null }
+                    - 클라이언트에서 Supabase를 직접 사용하지 말고, 서버 API를 통해 조회할 것.
 
             3) 유저시나리오(파티목록 무한스크롤)
                 1. 페이지에 접속하면, 파티 목록조회 API를 요청할 것.
-                    1-1) API엔드포인트: GET /api/party?limit=6&offset=0 (초기 렌더링은 6개만 표시)
+                    1-1) API엔드포인트: GET /api/party?limit=10&offset=0 (초기 렌더링은 10개만 표시)
                     1-2) 요청데이터: 없음
-                    1-3) 응답데이터: { data: PartyPost[] }
-                    1-4) 초기 렌더링: 카드 6개만 표시하고, 그 이후부터 무한스크롤이 작동하도록 구현할 것.
+                    1-3) 응답데이터: { data: PartyPost[], members: PartyMember[], profiles: UserProfile[] }
+                    1-4) 초기 렌더링: 카드 10개만 표시하고, 그 이후부터 무한스크롤이 작동하도록 구현할 것.
                 
                 2. 조회 로딩중에는 로딩 상태를 표시할 것.
                     - 로딩 방식: 기존 party.tsx의 로딩 처리 방식을 참고할 것.
@@ -70,20 +72,24 @@
 
                 3. 조회에 성공하여 받은 파티 목록을 무한스크롤 형태로 노출할 것.
                     - react-infinite-scroller의 InfiniteScroll 컴포넌트를 사용할 것.
-                    - 스크롤 감지: InfiniteScroll 컴포넌트가 감싸는 요소 자체의 스크롤을 감지할 것 (getScrollParent prop을 사용하지 않고 기본 window 스크롤 감지 사용).
+                    - 스크롤 감지: Layout의 children 영역(main[class*="children"])의 스크롤을 감지할 것.
+                    - getScrollParent prop을 사용하여 스크롤 가능한 부모 요소를 지정할 것.
+                    - getScrollParent prop은 함수를 전달하여 document.querySelector('main[class*="children"]')를 반환하도록 구현할 것.
+                    - useWindow={false}를 사용하여 window 스크롤이 아닌 부모 요소의 스크롤을 감지하도록 할 것.
                     - 카드 렌더링: 기존 Card 컴포넌트를 사용할 것.
                     - 카드 레이아웃: 카드는 가로로 2개씩 표시되도록 CSS를 설정할 것.
                 
                 4. 유저가 페이지를 스크롤하면, 추가적인 파티 목록을 요청하여 바인딩 할 것.
                     - 스크롤조건: 스크롤이 마지막 2개 카드만 남겨놓은 상태에서 다음 페이지 로드
-                    - 페이지 크기: 초기 로드는 6개, 이후 무한스크롤은 10개씩 로드
-                    - API 요청: GET /api/party?limit=10&offset=6 (두 번째 요청부터)
+                    - 페이지 크기: 초기 로드는 10개, 이후 무한스크롤은 10개씩 로드
+                    - API 요청: GET /api/party?limit=10&offset=10 (두 번째 요청부터)
                     - 데이터 누적: 기존 데이터에 새 데이터를 추가하여 누적 표시
                     - 더 이상 데이터가 없을 경우: hasMore 상태로 제어
                     - 더 이상 데이터가 없을 경우 "마지막 게시물입니다" 메시지 표시
                         - 조건: !hasMore && partyList.length > 0 일 때 표시
                         - 메시지는 InfiniteScroll 컴포넌트 내부에 표시할 것
                         - CSS 클래스는 .statusMessage를 사용하여 다른 상태 메시지와 동일한 스타일을 적용할 것
+                    - 10개 미만의 데이터가 와도 그 데이터는 표시하고, hasMore를 false로 설정할 것.
 
             4) 데이터 변환
                 - API 응답 데이터를 PartyCardProps 형태로 변환할 것.
@@ -92,9 +98,16 @@
                     - getVoiceChatLabel: 음성채팅 라벨 변환
                     - getDifficultyLabel: 난이도 라벨 변환
                     - getControlLevelLabel: 조작레벨 라벨 변환
-                    - getMemberAvatars: 멤버 아바타 생성 (Mock 데이터 사용)
-                    - getCurrentMembers: 현재 멤버 수 계산 (Mock 데이터 사용)
+                    - getMemberAvatars: 멤버 아바타 생성 (API 응답의 members와 profiles 사용)
+                        - API 응답의 members 배열을 post_id별로 그룹화하여 Map으로 변환
+                        - API 응답의 profiles 배열을 user_id를 키로 하는 Map으로 변환
+                        - members에서 해당 post_id의 멤버들을 찾고, 각 멤버의 user_id로 profiles에서 animal_type을 조회
+                        - animal_type을 getAnimalTypeFromProfile 함수를 통해 아바타 아이콘 파일명으로 변환
+                        - 최대 4개까지 아바타를 반환
+                    - getCurrentMembers: 현재 멤버 수 계산 (API 응답의 members 사용)
+                        - API 응답의 members 배열에서 해당 post_id의 멤버 개수를 계산
                     - truncateDescription: 설명 텍스트 자르기
+                - 클라이언트에서 Supabase를 직접 사용하지 말고, API 응답의 members와 profiles를 사용할 것.
 
             5) 훅 구조
                 - useInfinitePartyList 훅을 구현할 것.
@@ -109,18 +122,18 @@
             6) 컴포넌트 통합
                 - party.tsx에서 useInfinitePartyList 훅을 사용할 것.
                 - react-infinite-scroller의 InfiniteScroll 컴포넌트로 mainArea를 감쌀 것.
-                - InfiniteScroll 컴포넌트는 getScrollParent prop을 사용하지 않고, 기본 window 스크롤을 감지하도록 구현할 것.
-                - InfiniteScroll 컴포넌트가 mainArea의 flex 레이아웃을 깨뜨리지 않도록 주의할 것.
-                    - InfiniteScroll에 className을 적용하고, CSS에서 display: contents를 사용하여 flex 레이아웃이 유지되도록 할 것.
-                    - 이를 통해 카드가 가로로 2개씩 정상적으로 배치되고 gap이 유지되도록 해야 함.
+                - InfiniteScroll 컴포넌트는 getScrollParent prop을 사용하여 스크롤 가능한 부모 요소를 지정할 것.
+                - getScrollParent prop은 함수를 전달하여 Layout의 children 영역(main[class*="children"])을 반환하도록 구현할 것.
+                - getScrollParent 함수 내부에서 document.querySelector('main[class*="children"]')를 사용하여 스크롤 가능한 부모 요소를 찾을 것.
+                - useWindow={false}를 설정하여 window 스크롤이 아닌 부모 요소의 스크롤을 감지하도록 할 것.
+                - initialLoad={false}를 설정하여 InfiniteScroll이 초기 로드 시 자동으로 loadMore를 호출하지 않도록 할 것 (초기 로드는 useEffect에서 처리).
+                - Layout의 children 영역은 이미 overflow: auto로 설정되어 있어 스크롤 가능하므로, 별도의 스크롤 컨테이너를 생성하지 않을 것.
                 - 기존 usePartyListBinding 훅은 제거하거나 무한스크롤 훅으로 대체할 것.
                 
             7) CSS 조건
                 - .mainArea에서 카드가 가로로 2개씩 표시되도록 설정할 것.
                     - 각 카드의 너비를 계산하여 2개가 한 줄에 정확히 배치되도록 설정할 것.
                     - gap을 고려하여 카드 너비를 계산할 것 (예: (1272px - gap) / 2).
-                - InfiniteScroll 컴포넌트의 wrapper 클래스에 display: contents를 적용할 것.
-                    - InfiniteScroll이 flex 레이아웃을 방해하지 않도록 하여 카드가 가로로 2개씩 정상적으로 배치되도록 해야 함.
-                    - gap이 정상적으로 적용되도록 해야 함.
-                - 스크롤은 window 스크롤을 사용하므로, 별도의 스크롤 컨테이너 설정이 필요하지 않음.
-                - 필요시 styles.module.css에서 .mainArea 및 카드 관련 스타일을 수정할 것.
+                - Layout의 children 영역은 이미 overflow: auto로 설정되어 있어 스크롤 가능하므로, 별도의 스크롤 컨테이너 CSS를 추가하지 않을 것.
+                - .container는 min-height: 100vh로 설정하여 콘텐츠에 맞게 자동으로 높이가 조정되도록 할 것.
+                - 필요시 styles.module.css에서 .mainArea 관련 스타일을 수정할 것.

@@ -27,8 +27,16 @@
 .titleTagWrapper {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
+  align-items: center;
+  gap: 8px;
+}
+
+.titleLeaderWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
 }
 
 .cardTitle {
@@ -38,7 +46,33 @@
   font-weight: var(--typo-heading-md-font-weight);
   color: var(--color-text-primary);
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
 }
+/* 
+.leaderTag {
+  background-color: var(--color-bg-warning-subtle);
+  border: 1px solid var(--color-border-warning);
+  color: var(--color-text-warning-bold);
+  border-radius: 8px;
+  padding-left: 9px;
+  padding-right: 9px;
+  height: 24px;
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-medium-font-size);
+  line-height: var(--typo-body-sm-medium-line-height);
+  font-weight: var(--typo-body-sm-medium-font-weight);
+}
+
+.leaderTagIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--color-icon-warning);
+} */
 
 .cardDescription {
   font-family: var(--typo-body-md-font-family);

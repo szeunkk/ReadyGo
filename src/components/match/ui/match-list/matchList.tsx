@@ -10,7 +10,8 @@ import {
   matchRateOptions,
   statusOptions,
 } from '@/components/match/constants/filterOptions';
-import { MatchData } from '@/components/match/constants/mockData';
+import { MatchData } from '@/components/match/types/match.types';
+import { getEffectiveStatus } from '@/stores/user-status.store';
 
 export interface MatchListProps {
   /**
@@ -98,18 +99,24 @@ export default function MatchList({
       <div
         className={`${styles.grid} ${isSidePanelOpen ? styles.gridWithPanel : ''}`}
       >
-        {matches.map((match) => (
-          <MatchCard
-            key={match.id}
-            userId={match.userId}
-            nickname={match.nickname}
-            matchRate={match.matchRate}
-            status={match.status}
-            tags={match.tags}
-            onProfileClick={() => onProfileClick(match.userId)}
-            isProfileOpen={activeProfileUserId === match.userId}
-          />
-        ))}
+        {matches.map((match) => {
+          // Presence 기반 실시간 접속 상태 가져오기
+          const effectiveStatus = getEffectiveStatus(match.userId);
+
+          return (
+            <MatchCard
+              key={match.id}
+              userId={match.userId}
+              nickname={match.nickname}
+              matchRate={match.matchRate}
+              status={effectiveStatus}
+              avatarUrl={match.avatarUrl}
+              tags={match.tags}
+              onProfileClick={() => onProfileClick(match.userId)}
+              isProfileOpen={activeProfileUserId === match.userId}
+            />
+          );
+        })}
       </div>
     </div>
   );

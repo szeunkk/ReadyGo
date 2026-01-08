@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export type SteamGameSyncStatus = 'success' | 'skipped' | 'failed';
 
@@ -41,5 +41,43 @@ export const getSuccessAppIds = async (appIds: number[]) => {
     throw error;
   }
 
-  return new Set<number>((data ?? []).map((r) => r.app_id));
+  return new Set<number>((data ?? []).map((r) => r.app_id) as number[]);
+};
+
+/* =========================
+ * SELECT: PROCESSED APP IDS (success/failed/skipped 모두 포함)
+ * ========================= */
+export const getProcessedAppIds = async (appIds: number[]) => {
+  if (appIds.length === 0) {
+    return new Set<number>();
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('steam_game_sync_logs')
+    .select('app_id')
+    .in('app_id', appIds);
+
+  if (error) {
+    throw error;
+  }
+
+  return new Set<number>((data ?? []).map((r) => r.app_id) as number[]);
+};
+
+/* =========================
+ * SELECT: LAST PROCESSED APP ID
+ * ========================= */
+export const getLastProcessedAppId = async (): Promise<number | null> => {
+  const { data, error } = await supabaseAdmin
+    .from('steam_game_sync_logs')
+    .select('app_id')
+    .order('app_id', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return data.app_id;
 };

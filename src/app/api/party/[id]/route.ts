@@ -1,14 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
-import { Database } from '@/types/supabase';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * 단일 파티 조회
@@ -19,27 +10,21 @@ export const GET = async (
   { params }: { params: { id: string } }
 ) => {
   try {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('sb-access-token')?.value;
+    // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
+    const supabase = createClient();
 
-    if (!accessToken) {
+    // 사용자 정보 확인 (인증 체크)
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
       return NextResponse.json(
         { error: '인증이 필요합니다.' },
         { status: 401 }
       );
     }
-
-    // session/route.ts와 동일한 패턴
-    const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: false,
-      },
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    });
 
     const id = parseInt(params.id, 10);
     if (isNaN(id)) {
@@ -65,7 +50,22 @@ export const GET = async (
       return NextResponse.json({ error: fetchError.message }, { status: 500 });
     }
 
-    return NextResponse.json({ data: partyData });
+    // 현재 유저의 party_members role 조회
+    const { data: memberData } = await supabase
+      .from('party_members')
+      .select('role')
+      .eq('post_id', id)
+      .eq('user_id', user.id)
+      .single();
+
+    // 데이터가 없으면 role은 null
+    // (에러가 발생해도 파티 데이터는 반환해야 하므로 에러는 무시)
+    const currentUserRole = memberData?.role || null;
+
+    return NextResponse.json({
+      data: partyData,
+      currentUserRole,
+    });
   } catch (error) {
     console.error('Party detail API error:', error);
     return NextResponse.json(
@@ -84,27 +84,8 @@ export const DELETE = async (
   { params }: { params: { id: string } }
 ) => {
   try {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('sb-access-token')?.value;
-
-    if (!accessToken) {
-      return NextResponse.json(
-        { error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    // session/route.ts와 동일한 패턴
-    const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: false,
-      },
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    });
+    // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
+    const supabase = createClient();
 
     // 사용자 정보 확인 (session/route.ts와 동일한 패턴)
     const {
@@ -181,27 +162,8 @@ export const PATCH = async (
   { params }: { params: { id: string } }
 ) => {
   try {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('sb-access-token')?.value;
-
-    if (!accessToken) {
-      return NextResponse.json(
-        { error: '인증이 필요합니다.' },
-        { status: 401 }
-      );
-    }
-
-    // session/route.ts와 동일한 패턴
-    const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: false,
-      },
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    });
+    // Supabase SSR 클라이언트 생성 (쿠키 자동 처리)
+    const supabase = createClient();
 
     // 사용자 정보 확인 (session/route.ts와 동일한 패턴)
     const {

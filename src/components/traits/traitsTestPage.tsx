@@ -71,18 +71,7 @@ export default function TraitsPage() {
   return (
     <div className={styles.page}>
       {error && (
-        <div
-          style={{
-            padding: '12px',
-            marginBottom: '16px',
-            backgroundColor: '#fef2f2',
-            color: '#dc2626',
-            borderRadius: '8px',
-            fontSize: '14px',
-          }}
-        >
-          오류가 발생했습니다: {error}
-        </div>
+        <div className={styles.errorMessage}>오류가 발생했습니다: {error}</div>
       )}
       <Question onComplete={handleQuestionComplete} />
     </div>

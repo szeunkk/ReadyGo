@@ -1,0 +1,82 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+	        - 기존 Service 로직을 수정하거나 재구현하지 않는다
+	        - Route Handler는 인증 / 권한 체크 / Service 호출만 담당한다
+	        - 비즈니스 규칙, 관계 판단, UI 로직을 추가하지 않는다
+	        - 에러는 Service 의미를 그대로 전달하되 HTTP 상태 코드만 매핑한다
+	        - 테스트 코드 작성 X
+	        - 로그 추가 X
+
+==============================================
+
+조건-파일경로) 구현할 route handler 파일 경로
+	        - src/app/api/profile/[userId]/route.ts
+
+조건-파일경로) 참고할 services 파일 경로
+	        - src/services/profile/getUserProfileByUserId.ts
+
+조건-파일경로) 참고할 profileDTO 파일 경로
+	        - src/commons/types/profile/profileCore.dto.ts
+
+==============================================
+
+조건-구현참고) 반드시 참고할 기존 구현 패턴은 다음과 같다.
+	        - /api/profile/me Route Handler 구현 패턴
+	        - 인증 → 파라미터 추출 → Service 호출 → 결과/에러 매핑 구조
+	        - Service 에러를 switch / if 로 HTTP 코드에만 매핑하는 방식
+
+==============================================
+
+핵심요구사항) 다음 기능을 step-by-step으로 구현하고, 각 항목의 적용 여부를 체크리스트로 반환할 것.
+
+1. 인증 / 파라미터
+            - Route Handler 내부에서 Supabase 인증 로직을 직접 수행한다
+            - supabase.auth.getUser() 결과만을 인증 판단 기준으로 사용한다
+	        - 인증되지 않은 요청은 즉시 401로 종료한다
+	        - req.params.userId를 사용해 targetUserId를 추출한다
+	        - userId 존재 여부만 검증한다 (형식 정규식 검증 X)
+
+2. 권한 체크
+	        - 인증된 사용자만 접근 가능하도록 한다
+	        - 추가적인 관계/차단/매칭 로직을 절대 포함하지 않는다
+	        - 권한 문제 발생 시 403을 반환한다
+
+3. Service 호출
+	        - getUserProfileByUserId(targetUserId)를 호출한다
+	        - Service 반환값을 가공하지 않고 그대로 사용한다
+
+4. 에러 처리
+	        - Service 에러를 HTTP 상태 코드로만 매핑한다
+	        - 의미 변환, 메시지 재작성 X
+
+5. 응답
+	        - 정상 조회 시 HTTP 200 반환
+	        - 응답 body는 ProfileCoreDTO 그대로 반환한다
+
+==============================================
+
+조건-Hook 책임)
+	        - Hook 사용 X
+	        - React / Client 로직 X
+
+==============================================
+
+조건-UI 책임)
+	        - UI 친화적 메시지 생성 X
+	        - ViewModel 변환 X
+
+==============================================
+
+구현 완료 후 반환) 아래 체크리스트를 반드시 반환할 것.
+	        - req.params.userId 사용
+	        - userId 존재 여부 검증
+	        - 인증 실패 시 401 반환
+	        - 권한 문제 시 403 반환
+	        - getUserProfileByUserId 호출
+	        - Service 반환값 무가공 전달
+	        - Service 에러 → HTTP 코드 매핑
+	        - 정상 응답 200 + ProfileCoreDTO 반환

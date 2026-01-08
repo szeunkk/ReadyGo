@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { getTraitsResult } from '@/services/traits/getTraitsResult.service';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/traits/result
@@ -12,21 +13,17 @@ import { getTraitsResult } from '@/services/traits/getTraitsResult.service';
  * - 응답 반환
  */
 
-export const GET = async (request: NextRequest) => {
+export const GET = async (_request: NextRequest) => {
   try {
-    // 1. 인증 확인 (쿠키 우선, Authorization 헤더 대체)
-    const cookieStore = await cookies();
-    const accessToken =
-      cookieStore.get('sb-access-token')?.value ||
-      request.headers.get('Authorization')?.replace('Bearer ', '') ||
-      '';
+    // server.ts의 createClient 사용 (SSR 쿠키 자동 관리)
+    const supabase = createClient();
 
+    // 사용자 정보 확인
     const {
       data: { user },
       error: authError,
-    } = await supabaseAdmin.auth.getUser(accessToken);
+    } = await supabase.auth.getUser();
 
-    // 2. 비로그인 상태면 즉시 401 반환
     if (authError || !user) {
       return NextResponse.json(
         {
@@ -37,11 +34,11 @@ export const GET = async (request: NextRequest) => {
       );
     }
 
-    // 3. user_id는 auth.user.id만 사용 (query/body 무시)
+    // user_id는 auth.user.id만 사용 (query/body 무시)
     const userId = user.id;
 
     // 4. Service 호출
-    const result = await getTraitsResult(userId);
+    const result = await getTraitsResult(supabase, userId);
 
     // 5. 성공 응답
     return NextResponse.json(result, { status: 200 });

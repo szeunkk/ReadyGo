@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './styles.module.css';
 import Avatar from '@/commons/components/avatar';
 import Button from '@/commons/components/button';
@@ -48,6 +49,11 @@ export interface PartyCardProps {
    */
   avatarColor?: string;
   /**
+   * 파티장 여부
+   * @default false
+   */
+  isLeader?: boolean;
+  /**
    * 참여하기 버튼 클릭 핸들러
    */
   onJoinClick?: () => void;
@@ -70,15 +76,64 @@ export default function Card({
   maxMembers,
   categories: _categories,
   avatarColor = 'var(--color-text-secondary)',
+  isLeader = false,
   onJoinClick,
   className = '',
   partyId,
 }: PartyCardProps) {
+  const router = useRouter();
   const containerClasses = [styles.card, className].filter(Boolean).join(' ');
 
   // 표시할 아바타 개수 (최대 4개)
   const displayAvatars = memberAvatars.slice(0, 4);
   const remainingCount = Math.max(0, memberAvatars.length - 4);
+
+  // 시작 시간이 지났는지 확인하는 함수
+  // startTime 형식: "MM/DD 오전/오후 HH:mm" (예: "12/25 오후 03:30")
+  const isStartTimePassed = (startTime: string): boolean => {
+    try {
+      // "MM/DD 오전/오후 HH:mm" 형식 파싱
+      const match = startTime.match(
+        /(\d{2})\/(\d{2})\s+(오전|오후)\s+(\d{2}):(\d{2})/
+      );
+      if (!match) {
+        // 파싱 실패 시 false 반환 (비활성화하지 않음)
+        return false;
+      }
+
+      const [, monthStr, dayStr, period, hourStr, minuteStr] = match;
+      const month = parseInt(monthStr, 10) - 1; // JavaScript Date는 0부터 시작
+      const day = parseInt(dayStr, 10);
+      let hour = parseInt(hourStr, 10);
+      const minute = parseInt(minuteStr, 10);
+
+      // 오전/오후 처리
+      if (period === '오후' && hour !== 12) {
+        hour += 12;
+      } else if (period === '오전' && hour === 12) {
+        hour = 0;
+      }
+
+      // 현재 연도 사용
+      const currentYear = new Date().getFullYear();
+      const startDate = new Date(currentYear, month, day, hour, minute);
+      const now = new Date();
+
+      // 시작 시간이 현재 시간보다 이전인지 확인
+      return startDate < now;
+    } catch (error) {
+      // 파싱 오류 시 false 반환 (비활성화하지 않음)
+      console.error('시작 시간 파싱 오류:', error);
+      return false;
+    }
+  };
+
+  const isDisabled = isStartTimePassed(_categories.startTime);
+
+  // 시작 시간에서 "새벽"을 "오전"으로 변환하는 함수
+  const formatStartTime = (startTime: string): string => {
+    return startTime.replace(/새벽/g, '오전');
+  };
 
   // data-testid 생성
   const cardTestId = partyId ? `party-card-${partyId}` : undefined;
@@ -106,15 +161,48 @@ export default function Card({
     ? `party-card-join-button-${partyId}`
     : undefined;
 
+  const handleDetailClick = () => {
+    // 시작 시간이 지났으면 클릭 무시
+    if (isDisabled) {
+      return;
+    }
+    // onJoinClick이 있으면 먼저 실행
+    if (onJoinClick) {
+      onJoinClick();
+    }
+    // partyId가 있으면 상세 페이지로 이동
+    if (partyId) {
+      router.push(`/party/${partyId}`);
+    }
+  };
+
   return (
     <div className={containerClasses} data-testid={cardTestId}>
       {/* Title 영역 */}
       <div className={styles.cardTitleMemberWrapper}>
         <div className={styles.titleSection}>
           <div className={styles.titleTagWrapper}>
-            <h2 className={styles.cardTitle} data-testid={titleTestId}>
-              {title}
-            </h2>
+            <div className={styles.titleLeaderWrapper}>
+              <h2 className={styles.cardTitle} data-testid={titleTestId}>
+                {title}
+              </h2>
+              {isLeader && (
+                <Tag
+                  style="leader"
+                  className={styles.leaderTag}
+                  data-testid={
+                    partyId ? `party-card-leader-tag-${partyId}` : undefined
+                  }
+                >
+                  <Icon
+                    name="crown"
+                    size={14}
+                    className={styles.leaderTagIcon}
+                  />
+                  파티장
+                </Tag>
+              )}
+            </div>
             <Tag
               style="duotone"
               className={styles.gameTag}
@@ -178,7 +266,7 @@ export default function Card({
               className={styles.categoryValue}
               data-testid={startTimeTestId}
             >
-              {_categories.startTime}
+              {formatStartTime(_categories.startTime)}
             </span>
           </div>
           <div className={styles.categoryItem}>
@@ -201,8 +289,8 @@ export default function Card({
           <div className={styles.categoryItem}>
             <div className={styles.categoryIconLabelWrapper}>
               <Icon
-                key="crown"
-                name="crown"
+                key="stair"
+                name="stair"
                 size={20}
                 className={styles.categoryIcon}
               />
@@ -236,11 +324,12 @@ export default function Card({
 
         {/* Button 영역 */}
         <Button
-          variant="primary"
+          variant={isDisabled ? 'outline' : 'primary'}
           size="m"
           shape="round"
           className={styles.joinButton}
-          onClick={onJoinClick}
+          onClick={handleDetailClick}
+          disabled={isDisabled}
           data-testid={joinButtonTestId}
         >
           상세보기

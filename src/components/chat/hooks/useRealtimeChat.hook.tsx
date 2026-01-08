@@ -7,33 +7,6 @@ import { supabase as baseSupabase } from '@/lib/supabase/client';
 import { useAuth } from '@/commons/providers/auth/auth.provider';
 
 /**
- * 세션 확인 (Realtime 구독 전 인증 확인용)
- *
- * API 기반 세션 관리 방식이므로,
- * /api/auth/session API를 통해 세션을 확인합니다.
- * 기본 supabase 클라이언트를 재사용하여 Multiple GoTrueClient 인스턴스 경고를 방지합니다.
- */
-const checkSession = async () => {
-  try {
-    // API를 통해 현재 세션 확인
-    const sessionResponse = await fetch('/api/auth/session', {
-      method: 'GET',
-      credentials: 'include',
-    });
-
-    if (!sessionResponse.ok) {
-      return null;
-    }
-
-    const sessionData = await sessionResponse.json();
-    return sessionData.user ? sessionData : null;
-  } catch (error) {
-    console.error('Failed to check session:', error);
-    return null;
-  }
-};
-
-/**
  * Realtime 메시지 타입
  */
 export interface RealtimeMessage {
@@ -80,6 +53,7 @@ export const useRealtimeChat = (
   const channelRef = useRef<RealtimeChannel | null>(null);
   const subscribedRoomIdRef = useRef<number | null>(null);
   const onMessageRef = useRef(onMessage);
+  const isSendingRef = useRef(false); // 중복 전송 방지
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -132,22 +106,15 @@ export const useRealtimeChat = (
 
       /**
        * Broadcast 채널 구독 설정
+       * Supabase Realtime은 자동으로 세션을 확인하므로 별도 세션 확인 불필요
        */
       const setupBroadcastSubscription = async () => {
         try {
-          // 세션 확인 (인증 확인용)
-          const sessionData = await checkSession();
-          if (!sessionData) {
-            console.error('Failed to verify session for Realtime');
-            cleanupChannel();
-            return;
-          }
-
           // Broadcast 채널 생성
           const channel = baseSupabase
             .channel(`chat:${roomId}`, {
               config: {
-                broadcast: { self: true },
+                broadcast: { self: false }, // 자기가 보낸 메시지는 받지 않음 (중복 방지)
               },
             })
             .on('broadcast', { event: 'message' }, (payload) => {
@@ -198,6 +165,14 @@ export const useRealtimeChat = (
    */
   const sendMessage = useCallback(
     async (content: string, contentType: string = 'text'): Promise<void> => {
+      // 중복 전송 방지
+      if (isSendingRef.current) {
+        console.warn(
+          'Message is already being sent, ignoring duplicate request'
+        );
+        return;
+      }
+
       // user.id가 없으면 전송하지 않음
       if (!user?.id) {
         throw new Error('User is not authenticated');
@@ -210,6 +185,9 @@ export const useRealtimeChat = (
       if (!roomId || !senderId) {
         throw new Error('Room ID or sender ID is missing');
       }
+
+      // 전송 시작
+      isSendingRef.current = true;
 
       try {
         // 1) API를 통해 메시지 저장 (서버 사이드 Repository 함수 호출)
@@ -260,6 +238,9 @@ export const useRealtimeChat = (
         // API 호출 실패 시 에러 throw
         console.error('Failed to send message:', error);
         throw error;
+      } finally {
+        // 전송 완료
+        isSendingRef.current = false;
       }
     },
     [user?.id]

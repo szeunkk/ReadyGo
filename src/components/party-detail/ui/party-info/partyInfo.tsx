@@ -11,14 +11,20 @@ interface PartyInfoProps {
   data: PartyDetailData | null;
   isLoading: boolean;
   error: Error | null;
+  userRole?: 'leader' | 'member' | null;
   onJoinClick?: () => void;
+  onLeaveClick?: () => void;
+  onGameStartClick?: () => void;
 }
 
 export default function PartyInfo({
   data,
   isLoading,
   error,
+  userRole = null,
   onJoinClick,
+  onLeaveClick,
+  onGameStartClick,
 }: PartyInfoProps) {
   if (isLoading) {
     return (
@@ -98,13 +104,11 @@ export default function PartyInfo({
                   <Icon name="time" size={20} className={styles.infoIcon} />
                   <span className={styles.infoLabel}>시작 시간</span>
                 </div>
-                <span className={styles.infoValue}>
-                  <span data-testid="party-detail-start-date">
-                    {data.start_date}
-                  </span>{' '}
-                  <span data-testid="party-detail-start-time">
-                    {data.start_time}
-                  </span>
+                <span
+                  className={styles.infoValue}
+                  data-testid="party-detail-start-time"
+                >
+                  {data.start_date} {data.start_time}
                 </span>
               </div>
               <div className={styles.infoItem}>
@@ -156,15 +160,41 @@ export default function PartyInfo({
           </div>
         )}
       </div>
-      <Button
-        variant="primary"
-        size="m"
-        shape="round"
-        className={styles.button}
-        onClick={onJoinClick}
-      >
-        참여하기
-      </Button>
+      {userRole === 'leader' ? (
+        <Button
+          variant="primary"
+          size="m"
+          shape="round"
+          className={styles.button}
+          onClick={onGameStartClick}
+          data-testid="party-detail-game-start-button"
+        >
+          <Icon name="play-circle" size={20} />
+          게임시작
+        </Button>
+      ) : userRole === 'member' ? (
+        <Button
+          variant="primary"
+          size="m"
+          shape="round"
+          className={styles.button}
+          onClick={onLeaveClick}
+          data-testid="party-detail-leave-button"
+        >
+          파티 나가기
+        </Button>
+      ) : (
+        <Button
+          variant="primary"
+          size="m"
+          shape="round"
+          className={styles.button}
+          onClick={onJoinClick}
+          data-testid="party-detail-join-button"
+        >
+          참여하기
+        </Button>
+      )}
     </div>
   );
 }

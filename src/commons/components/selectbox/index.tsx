@@ -31,6 +31,7 @@ export interface SelectboxProps {
   className?: string;
   children?: React.ReactNode;
   icon?: string;
+  'data-testid'?: string;
 }
 
 export default function Selectbox({
@@ -45,6 +46,7 @@ export default function Selectbox({
   className = '',
   children,
   icon,
+  'data-testid': dataTestId,
 }: SelectboxProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalState, setInternalState] = useState<SelectboxState>(state);
@@ -151,6 +153,7 @@ export default function Selectbox({
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-disabled={isDisabled}
+        data-testid={dataTestId}
       >
         <div className={styles.content}>
           {children || (
@@ -198,6 +201,9 @@ export default function Selectbox({
                 onClick={() => handleItemClick(item)}
                 role="option"
                 aria-selected={isSelected}
+                data-testid={
+                  dataTestId ? `${dataTestId}-option-${item.id}` : undefined
+                }
               >
                 {isSelected && (
                   <span className={styles.checkIcon}>

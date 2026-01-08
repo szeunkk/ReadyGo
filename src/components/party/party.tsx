@@ -1,35 +1,71 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback } from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
 import Selectbox, { type SelectboxItem } from '@/commons/components/selectbox';
 import Searchbar from '@/commons/components/searchbar';
 import Button from '@/commons/components/button';
 import Icon from '@/commons/components/icon';
 import Card from './ui/card';
+import SkeletonCard from './ui/skeleton-card/skeleton-card';
 import { useLinkModal } from './hooks/index.link.modal.hook';
-import { usePartyListBinding } from './hooks/index.binding.hook';
+import { useInfinitePartyList } from './hooks/index.infinityScroll.hook';
 import { useLinkRouting } from './hooks/index.link.routing.hook';
 import { useFloatButton } from './hooks/index.float.hook';
+import { useFilter } from './hooks/index.filter.hook';
+import { usePartyTab } from './hooks/index.partyTab.hook';
 import styles from './styles.module.css';
 
 export default function Party() {
-  const [selectedGenre, setSelectedGenre] = useState<string | undefined>(
-    undefined
-  );
+  const { activeTab, setActiveTab } = usePartyTab();
+  const { selectedGenre, searchQuery, setSelectedGenre, setSearchQuery } =
+    useFilter();
   const { openPartySubmitModal } = useLinkModal();
-  const { data: partyList, isLoading, error } = usePartyListBinding();
+  const {
+    data: partyList,
+    hasMore,
+    loadMore,
+    isLoading,
+    error,
+  } = useInfinitePartyList(selectedGenre, searchQuery, activeTab);
   const { navigateToPartyDetail } = useLinkRouting();
   const { scrollToTop } = useFloatButton();
+
+  // Layout의 children 영역(.children)의 스크롤을 감지하는 함수
+  const getScrollParent = useCallback(() => {
+    if (typeof document === 'undefined') {
+      return null;
+    }
+    // Layout의 children 영역을 찾기 (main 요소)
+    const childrenElement = document.querySelector('main[class*="children"]');
+    return childrenElement as HTMLElement | null;
+  }, []);
+
   const genreItems: SelectboxItem[] = [
-    { id: 'all', value: '모든 게임 장르' },
-    { id: 'action', value: '액션' },
-    { id: 'rpg', value: 'RPG' },
-    { id: 'strategy', value: '전략' },
-    { id: 'sports', value: '스포츠' },
+    { id: 'all', value: '전체' },
+
+    { id: 'Action', value: '액션' },
+    { id: 'Adventure', value: '모험' },
+    { id: 'Casual', value: '캐주얼' },
+    { id: 'Early Access', value: '얼리 액세스' },
+    { id: 'Free To Play', value: '무료 플레이' },
+    { id: 'Indie', value: '인디' },
+    { id: 'Massively Multiplayer', value: 'MMO' },
+    { id: 'Nudity', value: '성인 요소' },
+    { id: 'Racing', value: '레이싱' },
+    { id: 'RPG', value: 'RPG' },
+    { id: 'Simulation', value: '시뮬레이션' },
+    { id: 'Sports', value: '스포츠' },
+    { id: 'Strategy', value: '전략' },
+    { id: 'Violent', value: '폭력성' },
   ];
 
   const handleGenreSelect = (item: SelectboxItem) => {
-    setSelectedGenre(item.id);
+    setSelectedGenre(item.id === 'all' ? undefined : item.id);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   return (
@@ -44,16 +80,20 @@ export default function Party() {
             <div className={styles.filterSelect}>
               <Selectbox
                 items={genreItems}
-                selectedId={selectedGenre}
+                selectedId={selectedGenre || 'all'}
                 onSelect={handleGenreSelect}
                 placeholder="모든 게임 장르"
                 className={styles.selectboxWidth}
+                data-testid="party-genre-select"
               />
             </div>
             <div className={styles.searchInput}>
               <Searchbar
                 placeholder="게임 이름으로 검색하기"
                 className={styles.searchbarWidth}
+                value={searchQuery}
+                onChange={handleSearchChange}
+                data-testid="party-search-input"
               />
             </div>
           </div>
@@ -70,27 +110,69 @@ export default function Party() {
             </Button>
           </div>
         </div>
-        <div className={styles.mainArea}>
-          {isLoading ? (
-            <div>로딩 중...</div>
-          ) : error ? (
-            <div>데이터를 불러오는 중 오류가 발생했습니다.</div>
-          ) : partyList.length === 0 ? (
-            <div>파티가 없습니다</div>
-          ) : (
-            partyList.map((party) => (
-              <Card
-                key={party.partyId || party.title}
-                {...party}
-                onJoinClick={() => {
-                  if (party.partyId) {
-                    navigateToPartyDetail(party.partyId);
-                  }
-                }}
-              />
-            ))
-          )}
+        <div className={styles.tabArea}>
+          <button
+            className={`${styles.tab} ${activeTab === 'all' ? '' : styles.tabInactive}`}
+            onClick={() => setActiveTab('all')}
+            data-testid="party-tab-all"
+          >
+            전체 파티
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'participating' ? '' : styles.tabInactive}`}
+            onClick={() => setActiveTab('participating')}
+            data-testid="party-tab-participating"
+          >
+            참여 중인 파티
+          </button>
         </div>
+        <InfiniteScroll
+          pageStart={0}
+          loadMore={loadMore}
+          hasMore={hasMore}
+          loader={
+            <div key="loader" className={styles.loader}>
+              로딩 중...
+            </div>
+          }
+          useWindow={false}
+          getScrollParent={getScrollParent}
+          threshold={250}
+          initialLoad={false}
+        >
+          <div className={styles.mainArea} data-testid="party-main-area">
+            {isLoading && partyList.length === 0 ? (
+              <>
+                {[0, 1, 2, 3, 4, 5].map((index) => (
+                  <SkeletonCard key={index} />
+                ))}
+              </>
+            ) : error ? (
+              <div>데이터를 불러오는 중 오류가 발생했습니다.</div>
+            ) : partyList.length === 0 ? (
+              <div>파티가 없습니다</div>
+            ) : (
+              <>
+                {partyList.map((party) => (
+                  <Card
+                    key={party.partyId || party.title}
+                    {...party}
+                    onJoinClick={() => {
+                      if (party.partyId) {
+                        navigateToPartyDetail(party.partyId);
+                      }
+                    }}
+                  />
+                ))}
+                {!hasMore && partyList.length > 0 && (
+                  <div className={styles.statusMessage}>
+                    마지막 게시물입니다
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </InfiniteScroll>
       </div>
       <button
         className={styles.floatButton}

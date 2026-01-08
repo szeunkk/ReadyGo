@@ -1,0 +1,259 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import type { CookieOptions } from '@supabase/ssr';
+import type { Database } from '@/types/supabase';
+import { checkUserProfile } from '@/services/auth/checkUserProfile';
+import { createUserProfile } from '@/services/auth/createUserProfile';
+import { updateUserStatusOnline } from '@/services/auth/updateUserStatusOnline';
+/**
+ * OAuth 세션 설정 API
+ * POST /api/auth/oauth/session
+ *
+ * 클라이언트에서 받은 OAuth 세션 토큰을 서버 쿠키에 설정합니다.
+ */
+export const POST = async function (request: NextRequest) {
+  // eslint-disable-next-line no-console
+  console.log('=== OAuth Session API Called ===', {
+    url: request.url,
+    method: request.method,
+    timestamp: new Date().toISOString(),
+  });
+
+  try {
+    const body = await request.json();
+    const { access_token: accessToken, refresh_token: refreshToken } = body;
+
+    // eslint-disable-next-line no-console
+    console.log('OAuth session API - received tokens', {
+      hasAccessToken: !!accessToken,
+      hasRefreshToken: !!refreshToken,
+      accessTokenLength: accessToken?.length,
+      refreshTokenLength: refreshToken?.length,
+    });
+
+    if (!accessToken || !refreshToken) {
+      // eslint-disable-next-line no-console
+      console.error('OAuth session API - missing tokens');
+      return NextResponse.json(
+        { error: '토큰이 필요합니다.' },
+        { status: 400 }
+      );
+    }
+
+    // ✅ Supabase가 설정한 쿠키를 임시 저장
+    const supabaseCookies: Array<{
+      name: string;
+      value: string;
+      options: CookieOptions;
+    }> = [];
+
+    // ✅ Supabase 클라이언트: 쿠키를 배열에 저장
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(
+            cookiesToSet: {
+              name: string;
+              value: string;
+              options: CookieOptions;
+            }[]
+          ) {
+            // 쿠키를 배열에 저장 (나중에 응답에 추가)
+            supabaseCookies.push(...cookiesToSet);
+
+            // eslint-disable-next-line no-console
+            console.log('Supabase cookies captured:', {
+              count: cookiesToSet.length,
+              names: cookiesToSet.map((c) => c.name),
+            });
+          },
+        },
+      }
+    );
+
+    // 세션 설정 (쿠키가 supabaseCookies 배열에 저장됨)
+    // eslint-disable-next-line no-console
+    console.log('OAuth session API - setting session...');
+    const { data, error } = await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+
+    // eslint-disable-next-line no-console
+    console.log('OAuth session API - setSession result', {
+      hasData: !!data,
+      hasSession: !!data?.session,
+      hasUser: !!data?.user,
+      error: error?.message,
+    });
+
+    if (error || !data.session || !data.user) {
+      // eslint-disable-next-line no-console
+      console.error('OAuth session API - Failed to set session:', error);
+      return NextResponse.json(
+        { error: '세션 설정에 실패했습니다.' },
+        { status: 401 }
+      );
+    }
+
+    // eslint-disable-next-line no-console
+    console.log('OAuth session API - Session set successfully', {
+      userId: data.user.id,
+      email: data.user.email,
+      createdAt: data.user.created_at,
+      lastSignInAt: data.user.last_sign_in_at,
+      cookiesCaptured: supabaseCookies.length,
+    });
+
+    // user_status를 online으로 업데이트
+    await updateUserStatusOnline(data.user.id);
+
+    // 프로필 확인
+    const hasProfile = await checkUserProfile(supabase, data.user.id);
+
+    // 사용자 생성 시점과 마지막 로그인 시점 비교로 신규 유저 판단
+    const userCreatedAt = new Date(data.user.created_at);
+    const lastSignInAt = data.user.last_sign_in_at
+      ? new Date(data.user.last_sign_in_at)
+      : null;
+
+    // 생성 시점과 마지막 로그인 시점이 같거나 매우 가까우면 신규 유저로 판단 (5초 이내)
+    const isNewUserByTime =
+      !lastSignInAt || lastSignInAt.getTime() - userCreatedAt.getTime() < 5000;
+
+    // 프로필이 없거나, 생성 시점이 최근이면 신규 유저
+    const isNewUser = !hasProfile || isNewUserByTime;
+
+    // eslint-disable-next-line no-console
+    console.log('OAuth session API - Profile check result', {
+      userId: data.user.id,
+      hasProfile,
+      userCreatedAt: userCreatedAt.toISOString(),
+      lastSignInAt: lastSignInAt?.toISOString() || null,
+      isNewUserByTime,
+      isNewUser,
+    });
+
+    // 신규 유저면 프로필 생성
+    if (isNewUser && !hasProfile) {
+      try {
+        // eslint-disable-next-line no-console
+        console.log('OAuth session API - Creating profile for new user');
+        await createUserProfile(supabase, data.user.id);
+
+        // 프로필 생성 성공
+        const response = NextResponse.json({
+          success: true,
+          isNewUser: true,
+          user: {
+            id: data.user.id,
+            email: data.user.email,
+          },
+        });
+
+        // ✅ Supabase가 설정한 쿠키를 응답에 추가
+        supabaseCookies.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
+
+        // eslint-disable-next-line no-console
+        console.log('OAuth session API - Returning new user response', {
+          cookiesIncluded: supabaseCookies.length,
+        });
+        return response;
+      } catch (profileError: unknown) {
+        // 중복 키 에러는 이미 프로필이 생성된 것으로 간주 (race condition)
+        const error = profileError as { code?: string };
+        if (error?.code === '23505') {
+          // eslint-disable-next-line no-console
+          console.log(
+            'OAuth session API - Profile already exists (race condition)'
+          );
+          // 프로필이 이미 있으므로 다시 확인
+          const hasProfileAfterError = await checkUserProfile(
+            supabase,
+            data.user.id
+          );
+
+          if (hasProfileAfterError) {
+            // 프로필이 있으면 기존 유저로 처리
+            const response = NextResponse.json({
+              success: true,
+              isNewUser: false,
+              user: {
+                id: data.user.id,
+                email: data.user.email,
+              },
+            });
+
+            // ✅ Supabase가 설정한 쿠키를 응답에 추가
+            supabaseCookies.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options);
+            });
+
+            // eslint-disable-next-line no-console
+            console.log(
+              'OAuth session API - Returning existing user response (after race condition)',
+              {
+                cookiesIncluded: supabaseCookies.length,
+              }
+            );
+            return response;
+          }
+        }
+
+        // eslint-disable-next-line no-console
+        console.error(
+          'OAuth session API - Profile creation error:',
+          profileError
+        );
+        return NextResponse.json(
+          { error: '프로필 생성에 실패했습니다.' },
+          { status: 500 }
+        );
+      }
+    }
+
+    // 기존 유저 또는 프로필이 있는 경우
+    // 프로필이 이미 있으면 무조건 기존 유저로 처리
+    const finalIsNewUser = hasProfile ? false : isNewUser;
+
+    // eslint-disable-next-line no-console
+    console.log('OAuth session API - Returning response', {
+      isNewUser,
+      hasProfile,
+      finalIsNewUser,
+    });
+    const response = NextResponse.json({
+      success: true,
+      isNewUser: finalIsNewUser,
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+      },
+    });
+
+    // ✅ Supabase가 설정한 쿠키를 응답에 추가
+    supabaseCookies.forEach(({ name, value, options }) => {
+      response.cookies.set(name, value, options);
+    });
+
+    // eslint-disable-next-line no-console
+    console.log('OAuth session API - Response prepared', {
+      cookiesIncluded: supabaseCookies.length,
+    });
+    return response;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('OAuth session API error:', error);
+    return NextResponse.json(
+      { error: '서버 오류가 발생했습니다.' },
+      { status: 500 }
+    );
+  }
+};

@@ -3,7 +3,7 @@
 .profileSection {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 16px;
   width: 408px;
   min-width: 408px;
   max-width: 408px;

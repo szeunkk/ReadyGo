@@ -62,45 +62,24 @@ export type Database = {
         }
         Relationships: []
       }
-      chat_blocks: {
-        Row: {
-          blocked_user_id: string | null
-          created_at: string | null
-          id: number
-          user_id: string | null
-        }
-        Insert: {
-          blocked_user_id?: string | null
-          created_at?: string | null
-          id?: number
-          user_id?: string | null
-        }
-        Update: {
-          blocked_user_id?: string | null
-          created_at?: string | null
-          id?: number
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       chat_message_reads: {
         Row: {
           id: number
-          message_id: number | null
+          message_id: number
           read_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           id?: number
-          message_id?: number | null
+          message_id: number
           read_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           id?: number
-          message_id?: number | null
+          message_id?: number
           read_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -710,6 +689,33 @@ export type Database = {
         }
         Relationships: []
       }
+      steam_user_stats: {
+        Row: {
+          active_time_slots: string[]
+          avg_weekly_playtime: number
+          main_genres: string[]
+          play_style: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_time_slots?: string[]
+          avg_weekly_playtime?: number
+          main_genres?: string[]
+          play_style: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_time_slots?: string[]
+          avg_weekly_playtime?: number
+          main_genres?: string[]
+          play_style?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tags: {
         Row: {
           created_at: string | null
@@ -772,6 +778,27 @@ export type Database = {
           current_tier?: string | null
           id?: number
           previous_tier?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_blocks: {
+        Row: {
+          blocked_user_id: string | null
+          created_at: string | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          blocked_user_id?: string | null
+          created_at?: string | null
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          blocked_user_id?: string | null
+          created_at?: string | null
+          id?: number
           user_id?: string | null
         }
         Relationships: []

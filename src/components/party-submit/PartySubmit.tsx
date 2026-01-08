@@ -2,9 +2,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Controller } from 'react-hook-form';
-import { DatePicker } from 'antd';
-import type { DatePickerProps } from 'antd';
 import dayjs from 'dayjs';
+import { DatePicker } from '@/components/ui/date-picker';
 import styles from './styles.module.css';
 import Searchbar from '@/commons/components/searchbar';
 import Input from '@/commons/components/input';
@@ -16,14 +15,30 @@ import { useLinkModalClose } from './hooks/index.link.modal.close.hook';
 
 interface PartySubmitProps {
   onClose?: () => void;
+  isEdit?: boolean;
+  partyId?: number;
+  onRefetch?: () => Promise<void>;
 }
 
-export default function PartySubmit({ onClose }: PartySubmitProps) {
-  const { form, onSubmit, isSubmitting, isValid, errors } = usePartySubmit();
+export default function PartySubmit({
+  onClose,
+  isEdit = false,
+  partyId,
+  onRefetch,
+}: PartySubmitProps) {
+  const { form, onSubmit, isSubmitting, isValid, errors, isLoadingPartyData } =
+    usePartySubmit({
+      isEdit,
+      partyId,
+      onRefetch,
+    });
   const { control, setValue } = form;
   const { openCancelModal } = useLinkModalClose();
   const [gameSearchQuery, setGameSearchQuery] = useState('');
   const [isGameOptionsOpen, setIsGameOptionsOpen] = useState(false);
+  const [gameList, setGameList] = useState<SelectboxItem[]>([]);
+  const [isLoadingGames, setIsLoadingGames] = useState(true);
+  const [gameLoadError, setGameLoadError] = useState<string | null>(null);
   const gameSearchRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
 
@@ -34,25 +49,67 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
   const voiceChat = watchedValues.voice_chat;
   const description = watchedValues.description || '';
 
+  // game_title이 변경될 때 gameSearchQuery 동기화
+  useEffect(() => {
+    if (watchedValues.game_title) {
+      setGameSearchQuery(watchedValues.game_title);
+    }
+  }, [watchedValues.game_title]);
+
+  // API를 통해 게임 목록 가져오기 (SSR 방식)
+  useEffect(() => {
+    const fetchGames = async () => {
+      setIsLoadingGames(true);
+      try {
+        const response = await fetch('/api/steam/games', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          const errorMessage =
+            errorData.message || errorData.detail || response.statusText;
+          console.error('게임 목록 조회 실패:', errorMessage);
+
+          // 인증 오류인 경우 특별 처리
+          if (response.status === 401) {
+            setGameLoadError('로그인이 필요합니다.');
+          } else {
+            setGameLoadError('게임 목록을 불러올 수 없습니다.');
+          }
+
+          // 에러 발생 시 빈 배열로 설정하여 UI가 깨지지 않도록 함
+          setGameList([]);
+          return;
+        }
+
+        const result = await response.json();
+
+        // data가 없거나 빈 배열인 경우도 처리
+        setGameList(result.data || []);
+        setGameLoadError(null); // 성공 시 에러 메시지 초기화
+      } catch (error) {
+        console.error('게임 목록 조회 중 오류 발생:', error);
+        setGameLoadError('게임 목록을 불러오는 중 오류가 발생했습니다.');
+        // 에러 발생 시 빈 배열로 설정하여 UI가 깨지지 않도록 함
+        setGameList([]);
+      } finally {
+        setIsLoadingGames(false);
+      }
+    };
+
+    fetchGames();
+  }, []);
+
   // 폼 유효성 확인
   const isFormValid = isValid;
 
-  // 게임 목업 데이터
-  const gameMockData: SelectboxItem[] = [
-    { id: 'overwatch', value: '오버워치' },
-    { id: 'overcooked', value: '오버쿡드' },
-    { id: 'squid-game', value: '오징어게임' },
-    { id: 'oriental', value: '오리엔탈' },
-    { id: 'orienteering', value: '오리엔티어링' },
-    { id: 'ozone', value: '오존' },
-    { id: 'office-simulator', value: '오피스시뮬레이터' },
-    { id: 'league-of-legends', value: '리그 오브 레전드' },
-    { id: 'valorant', value: '발로란트' },
-    { id: 'apex-legends', value: '에이펙스 레전드' },
-  ];
-
   // 검색어에 따라 필터링된 게임 목록
-  const filteredGames = gameMockData.filter((game) =>
+  const filteredGames = gameList.filter((game) =>
     game.value.toLowerCase().includes(gameSearchQuery.toLowerCase())
   );
 
@@ -76,15 +133,30 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
     };
   }, [isGameOptionsOpen]);
 
-  // 게임 검색어 변경 핸들러
+  // 게임 검색어 변경 핸들러 (작성 모드에서만 동작)
   const handleGameSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isEdit) {
+      return; // 수정 모드에서는 변경 불가
+    }
     const { value } = e.target;
     setGameSearchQuery(value);
-    setIsGameOptionsOpen(value.length > 0 && filteredGames.length > 0);
+
+    // 검색어가 있고 게임 목록이 로드되었을 때만 옵션 표시
+    if (value.length > 0 && !isLoadingGames) {
+      const filtered = gameList.filter((game) =>
+        game.value.toLowerCase().includes(value.toLowerCase())
+      );
+      setIsGameOptionsOpen(filtered.length > 0);
+    } else {
+      setIsGameOptionsOpen(false);
+    }
   };
 
-  // 게임 선택 핸들러
+  // 게임 선택 핸들러 (작성 모드에서만 동작)
   const handleGameSelect = (game: SelectboxItem) => {
+    if (isEdit) {
+      return; // 수정 모드에서는 변경 불가
+    }
     setValue('game_title', game.value, { shouldValidate: true });
     setGameSearchQuery(game.value);
     setIsGameOptionsOpen(false);
@@ -140,19 +212,23 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
   };
 
   // 날짜 제한: 과거 날짜 선택 차단
-  const disabledDate: DatePickerProps['disabledDate'] = (current) => {
-    return current && current.isBefore(dayjs().startOf('day'));
+  const disabledDate = (date: Date) => {
+    return dayjs(date).isBefore(dayjs().startOf('day'));
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="party-submit-modal">
       {/* 헤더 영역 */}
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.headerText}>
-            <h1 className={styles.title}>새 파티 만들기</h1>
+            <h1 className={styles.title} data-testid="party-submit-modal-title">
+              {isEdit ? '파티 수정하기' : '새 파티 만들기'}
+            </h1>
             <p className={styles.subtitle}>
-              파티 정보를 입력하고 멤버를 모집하세요
+              {isEdit
+                ? '파티 정보를 수정하고 저장하세요'
+                : '파티 정보를 입력하고 멤버를 모집하세요'}
             </p>
           </div>
           <button
@@ -168,297 +244,357 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
 
       {/* 본문 영역 */}
       <div className={styles.body} ref={bodyRef}>
-        {/* 파티 정보 섹션 */}
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>파티 정보</h2>
+        {isLoadingPartyData ? (
+          <div className={styles.loadingContainer}>
+            <p data-testid="party-submit-loading">
+              파티 데이터를 불러오는 중...
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* 파티 정보 섹션 */}
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>파티 정보</h2>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>
-              게임
-              <span className={styles.required}>*</span>
-            </label>
-            <div className={styles.gameSearchWrapper} ref={gameSearchRef}>
-              <Searchbar
-                size="l"
-                icon="right"
-                placeholder="게임 검색"
-                value={gameSearchQuery}
-                onChange={handleGameSearchChange}
-                onFocus={() => {
-                  if (gameSearchQuery.length > 0 && filteredGames.length > 0) {
-                    setIsGameOptionsOpen(true);
-                  }
-                }}
-              />
-              {isGameOptionsOpen && filteredGames.length > 0 && (
-                <div className={styles.gameOptionsGroup}>
-                  {filteredGames.map((game) => {
-                    const isSelected = watchedValues.game_title === game.value;
-                    return (
-                      <div
-                        key={game.id}
-                        className={`${styles.gameOptionItem} ${
-                          isSelected ? styles.selected : ''
-                        }`}
-                        onClick={() => handleGameSelect(game)}
-                        role="option"
-                        aria-selected={isSelected}
-                      >
-                        {isSelected && (
-                          <span className={styles.checkIcon}>
-                            <Icon name="check" size={20} />
-                          </span>
-                        )}
-                        <span className={styles.gameOptionValue}>
-                          {game.value}
-                        </span>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>
+                  게임
+                  <span className={styles.required}>*</span>
+                </label>
+                {isEdit ? (
+                  <Controller
+                    name="game_title"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <Input
+                        {...field}
+                        label=""
+                        size="l"
+                        placeholder="게임"
+                        readOnly
+                        state={fieldState.error ? 'error' : 'Default'}
+                        additionalInfo={fieldState.error?.message}
+                        data-testid="party-submit-game-title"
+                      />
+                    )}
+                  />
+                ) : (
+                  <div className={styles.gameSearchWrapper} ref={gameSearchRef}>
+                    <Searchbar
+                      size="l"
+                      icon="right"
+                      placeholder="게임 검색"
+                      value={gameSearchQuery}
+                      onChange={handleGameSearchChange}
+                      onFocus={() => {
+                        if (
+                          gameSearchQuery.length > 0 &&
+                          !isLoadingGames &&
+                          filteredGames.length > 0
+                        ) {
+                          setIsGameOptionsOpen(true);
+                        }
+                      }}
+                    />
+                    {isGameOptionsOpen && filteredGames.length > 0 && (
+                      <div className={styles.gameOptionsGroup}>
+                        {filteredGames.map((game) => {
+                          const isSelected =
+                            watchedValues.game_title === game.value;
+                          return (
+                            <div
+                              key={game.id}
+                              className={`${styles.gameOptionItem} ${
+                                isSelected ? styles.selected : ''
+                              }`}
+                              onClick={() => handleGameSelect(game)}
+                              role="option"
+                              aria-selected={isSelected}
+                            >
+                              {isSelected && (
+                                <span className={styles.checkIcon}>
+                                  <Icon name="check" size={20} />
+                                </span>
+                              )}
+                              <span className={styles.gameOptionValue}>
+                                {game.value}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-              {errors?.game_title && (
-                <span className={styles.errorMessage}>
-                  {errors.game_title.message}
-                </span>
-              )}
-            </div>
-          </div>
+                    )}
+                    {gameLoadError && (
+                      <span className={styles.errorMessage}>
+                        {gameLoadError}
+                      </span>
+                    )}
+                    {errors?.game_title && (
+                      <span className={styles.errorMessage}>
+                        {errors.game_title.message}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
 
-          <div className={styles.formGroup}>
-            <Controller
-              name="party_title"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Input
-                  {...field}
-                  label="파티 제목"
-                  required
-                  size="l"
-                  placeholder="파티 제목을 입력해 주세요."
-                  state={fieldState.error ? 'error' : 'Default'}
-                  additionalInfo={fieldState.error?.message}
-                />
-              )}
-            />
-          </div>
-
-          <div className={styles.row}>
-            <div className={styles.col}>
               <div className={styles.formGroup}>
                 <Controller
-                  name="start_date"
+                  name="party_title"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <Input
+                      {...field}
+                      label="파티 제목"
+                      required
+                      size="l"
+                      placeholder="파티 제목을 입력해 주세요."
+                      state={fieldState.error ? 'error' : 'Default'}
+                      additionalInfo={fieldState.error?.message}
+                      data-testid="party-submit-party-title"
+                    />
+                  )}
+                />
+              </div>
+
+              <div className={styles.row}>
+                <div className={styles.col}>
+                  <div className={styles.formGroup}>
+                    <Controller
+                      name="start_date"
+                      control={control}
+                      render={({ field, fieldState }) => (
+                        <>
+                          <label className={styles.label}>
+                            시작일
+                            <span className={styles.required}>*</span>
+                          </label>
+                          <DatePicker
+                            value={field.value}
+                            onChange={(date) => {
+                              field.onChange(date);
+                            }}
+                            disabledDate={disabledDate}
+                            state={fieldState.error ? 'error' : 'default'}
+                            placeholder="날짜 선택"
+                          />
+                          {fieldState.error && (
+                            <span className={styles.errorMessage}>
+                              {fieldState.error.message}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className={styles.col}>
+                  <Controller
+                    name="start_time"
+                    control={control}
+                    render={({ field, fieldState }) => {
+                      const selectedTimeItem = timeOptions.find(
+                        (item) => item.value === field.value
+                      );
+                      return (
+                        <>
+                          <Selectbox
+                            label="시작시간"
+                            size="l"
+                            required
+                            placeholder="시간 선택"
+                            items={timeOptions}
+                            selectedId={selectedTimeItem?.id || undefined}
+                            onSelect={(item) => {
+                              field.onChange(item.value); // value를 저장 ("오전 09:00" 형식)
+                            }}
+                            state={fieldState.error ? 'error' : 'default'}
+                          />
+                          {fieldState.error && (
+                            <span className={styles.errorMessage}>
+                              {fieldState.error.message}
+                            </span>
+                          )}
+                        </>
+                      );
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <Controller
+                  name="description"
                   control={control}
                   render={({ field, fieldState }) => (
                     <>
-                      <label className={styles.label}>
-                        시작일
-                        <span className={styles.required}>*</span>
-                      </label>
-                      <DatePicker
-                        className={styles.datePicker}
-                        placeholder="날짜 선택"
-                        value={field.value}
-                        onChange={(date) => {
-                          field.onChange(date);
-                        }}
-                        format="YYYY-MM-DD"
-                        disabledDate={disabledDate}
-                        suffixIcon={<Icon name="calendar" size={20} />}
-                        getPopupContainer={(trigger) => {
-                          return (
-                            bodyRef.current ||
-                            trigger.parentElement ||
-                            document.body
-                          );
-                        }}
-                        popupClassName={styles.datePickerPopup}
+                      <Input
+                        {...field}
+                        label="설명"
+                        required
+                        size="l"
+                        placeholder="파티 모집과 관련된 상세 내용을 입력해 주세요."
+                        state={fieldState.error ? 'error' : 'Default'}
+                        additionalInfo={fieldState.error?.message}
+                        data-testid="party-submit-description"
                       />
-                      {fieldState.error && (
-                        <span className={styles.errorMessage}>
-                          {fieldState.error.message}
-                        </span>
-                      )}
+                      <div className={styles.charCount}>
+                        {description.length}/100
+                      </div>
                     </>
                   )}
                 />
               </div>
             </div>
-            <div className={styles.col}>
-              <Controller
-                name="start_time"
-                control={control}
-                render={({ field, fieldState }) => {
-                  const selectedTimeItem = timeOptions.find(
-                    (item) => item.value === field.value
-                  );
-                  return (
-                    <>
-                      <Selectbox
-                        label="시작시간"
-                        size="l"
-                        required
-                        placeholder="시간 선택"
-                        items={timeOptions}
-                        selectedId={selectedTimeItem?.id || undefined}
-                        onSelect={(item) => {
-                          field.onChange(item.value); // value를 저장 ("오전 09:00" 형식)
-                        }}
-                        state={fieldState.error ? 'error' : 'default'}
-                      />
-                      {fieldState.error && (
-                        <span className={styles.errorMessage}>
-                          {fieldState.error.message}
-                        </span>
-                      )}
-                    </>
-                  );
-                }}
-              />
-            </div>
-          </div>
 
-          <div className={styles.formGroup}>
-            <Controller
-              name="description"
-              control={control}
-              render={({ field, fieldState }) => (
-                <>
-                  <Input
-                    {...field}
-                    label="설명"
-                    required
-                    size="l"
-                    placeholder="파티 모집과 관련된 상세 내용을 입력해 주세요."
-                    state={fieldState.error ? 'error' : 'Default'}
-                    additionalInfo={fieldState.error?.message}
-                  />
-                  <div className={styles.charCount}>
-                    {description.length}/100
+            {/* 파티 조건 섹션 */}
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>파티 조건</h2>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>
+                  파티 인원
+                  <span className={styles.required}>*</span>
+                </label>
+                <div className={styles.partyCountInput}>
+                  <div className={styles.partyCountInputField}>
+                    <span className={styles.partyCountLabel}>최대 인원</span>
+                    <div className={styles.partyCountControls}>
+                      <button
+                        type="button"
+                        className={styles.countButton}
+                        onClick={handlePartyCountDecrease}
+                      >
+                        <Icon name="minus" size={16} />
+                      </button>
+                      <span
+                        className={styles.countValue}
+                        data-testid="party-submit-max-members"
+                      >
+                        {maxMembers}
+                      </span>
+                      <button
+                        type="button"
+                        className={styles.countButton}
+                        onClick={handlePartyCountIncrease}
+                      >
+                        <Icon name="plus" size={16} />
+                      </button>
+                    </div>
                   </div>
-                </>
-              )}
-            />
-          </div>
-        </div>
+                </div>
+              </div>
 
-        {/* 파티 조건 섹션 */}
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>파티 조건</h2>
+              <div className={styles.row}>
+                <div className={styles.col}>
+                  <Controller
+                    name="control_level"
+                    control={control}
+                    render={({ field, fieldState }) => {
+                      const selectedItem = controlLevelOptions.find(
+                        (item) => item.value === field.value
+                      );
+                      return (
+                        <>
+                          <Selectbox
+                            size="l"
+                            label="컨트롤 수준"
+                            required
+                            placeholder="옵션 선택"
+                            items={controlLevelOptions}
+                            selectedId={selectedItem?.id || undefined}
+                            onSelect={(item) => {
+                              field.onChange(item.value);
+                            }}
+                            state={fieldState.error ? 'error' : 'default'}
+                          />
+                          {fieldState.error && (
+                            <span className={styles.errorMessage}>
+                              {fieldState.error.message}
+                            </span>
+                          )}
+                        </>
+                      );
+                    }}
+                  />
+                </div>
+                <div className={styles.col}>
+                  <Controller
+                    name="difficulty"
+                    control={control}
+                    render={({ field, fieldState }) => {
+                      const selectedItem = difficultyOptions.find(
+                        (item) => item.value === field.value
+                      );
+                      return (
+                        <>
+                          <Selectbox
+                            size="l"
+                            label="난이도"
+                            required
+                            placeholder="난이도 선택"
+                            items={difficultyOptions}
+                            selectedId={selectedItem?.id || undefined}
+                            onSelect={(item) => {
+                              field.onChange(item.value);
+                            }}
+                            state={fieldState.error ? 'error' : 'default'}
+                          />
+                          {fieldState.error && (
+                            <span className={styles.errorMessage}>
+                              {fieldState.error.message}
+                            </span>
+                          )}
+                        </>
+                      );
+                    }}
+                  />
+                </div>
+              </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>
-              파티 인원
-              <span className={styles.required}>*</span>
-            </label>
-            <div className={styles.partyCountInput}>
-              <div className={styles.partyCountInputField}>
-                <span className={styles.partyCountLabel}>최대 인원</span>
-                <div className={styles.partyCountControls}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>보이스챗 사용</label>
+                <div className={styles.voiceChatGroup}>
                   <button
                     type="button"
-                    className={styles.countButton}
-                    onClick={handlePartyCountDecrease}
+                    className={`${styles.voiceChatButton} ${
+                      voiceChat === 'required' ? styles.active : ''
+                    }`}
+                    onClick={() => handleVoiceChatToggle('required')}
                   >
-                    <Icon name="minus" size={16} />
+                    필수 사용
                   </button>
-                  <span className={styles.countValue}>{maxMembers}</span>
                   <button
                     type="button"
-                    className={styles.countButton}
-                    onClick={handlePartyCountIncrease}
+                    className={`${styles.voiceChatButton} ${
+                      voiceChat === 'optional' ? styles.active : ''
+                    }`}
+                    onClick={() => handleVoiceChatToggle('optional')}
                   >
-                    <Icon name="plus" size={16} />
+                    선택적 사용
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div className={styles.row}>
-            <div className={styles.col}>
-              <Controller
-                name="control_level"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Selectbox
-                    size="l"
-                    label="컨트롤 수준"
-                    required
-                    placeholder="옵션 선택"
-                    items={controlLevelOptions}
-                    selectedId={field.value || undefined}
-                    onSelect={(item) => {
-                      field.onChange(item.id);
-                    }}
-                    state={fieldState.error ? 'error' : 'default'}
-                  />
-                )}
-              />
-            </div>
-            <div className={styles.col}>
-              <Controller
-                name="difficulty"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Selectbox
-                    size="l"
-                    label="난이도"
-                    required
-                    placeholder="난이도 선택"
-                    items={difficultyOptions}
-                    selectedId={field.value || undefined}
-                    onSelect={(item) => {
-                      field.onChange(item.id);
-                    }}
-                    state={fieldState.error ? 'error' : 'default'}
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>보이스챗 사용</label>
-            <div className={styles.voiceChatGroup}>
-              <button
-                type="button"
-                className={`${styles.voiceChatButton} ${
-                  voiceChat === 'required' ? styles.active : ''
-                }`}
-                onClick={() => handleVoiceChatToggle('required')}
-              >
-                필수 사용
-              </button>
-              <button
-                type="button"
-                className={`${styles.voiceChatButton} ${
-                  voiceChat === 'optional' ? styles.active : ''
-                }`}
-                onClick={() => handleVoiceChatToggle('optional')}
-              >
-                선택적 사용
-              </button>
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <Controller
-              name="tags"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Input
-                  {...field}
-                  label="태그"
-                  size="l"
-                  placeholder="#태그 입력"
-                  state={fieldState.error ? 'error' : 'Default'}
-                  additionalInfo={fieldState.error?.message}
+              <div className={styles.formGroup}>
+                <Controller
+                  name="tags"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <Input
+                      {...field}
+                      label="태그"
+                      size="l"
+                      placeholder="#태그 입력"
+                      state={fieldState.error ? 'error' : 'Default'}
+                      additionalInfo={fieldState.error?.message}
+                    />
+                  )}
                 />
-              )}
-            />
-          </div>
-        </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* 하단 버튼 영역 */}
@@ -479,7 +615,7 @@ export default function PartySubmit({ onClose }: PartySubmitProps) {
           disabled={!isFormValid || isSubmitting}
           data-testid="party-submit-button"
         >
-          파티 만들기
+          {isEdit ? '수정하기' : '파티 만들기'}
         </Button>
       </div>
     </div>

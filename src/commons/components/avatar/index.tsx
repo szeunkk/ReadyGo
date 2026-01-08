@@ -5,9 +5,18 @@ import styles from './styles.module.css';
 import { AnimalType, getAnimalAssets } from '@/commons/constants/animal';
 
 export type AvatarSize = 's' | 'm' | 'L';
-export type AvatarStatus = 'online' | 'away' | 'ban' | 'offline';
+export type AvatarStatus = 'online' | 'away' | 'dnd' | 'offline';
 
 export interface AvatarProps {
+  /**
+   * 아바타 이미지 URL (우선순위 1)
+   * 유틸리티 함수(getAvatarImagePath)에서 계산된 최종 이미지 경로를 전달
+   */
+  imageUrl?: string;
+  /**
+   * 동물 타입 (우선순위 2, imageUrl이 없을 때 사용)
+   * 하위 호환성을 위해 유지
+   */
   animalType?: AnimalType;
   alt?: string;
   size?: AvatarSize;
@@ -23,6 +32,7 @@ export interface AvatarProps {
 }
 
 export default function Avatar({
+  imageUrl,
   animalType,
   size = 'm',
   status = 'offline',
@@ -33,9 +43,13 @@ export default function Avatar({
   const [imageError] = useState(false);
   const defaultImage = '/images/bird.svg';
 
-  // 이미지 경로 결정: animalType > defaultImage
+  // 이미지 경로 결정: imageUrl > animalType > defaultImage
+  // 우선순위 분별은 유틸리티 함수(getAvatarImagePath)에서 처리하므로,
+  // 여기서는 imageUrl이 있으면 우선 사용하고, 없으면 기존 로직 유지
   let imageSrc = defaultImage;
-  if (animalType && !imageError) {
+  if (imageUrl) {
+    imageSrc = imageUrl;
+  } else if (animalType && !imageError) {
     const animalAssets = getAnimalAssets(animalType);
     imageSrc = animalAssets.avatar;
   }
@@ -62,8 +76,8 @@ export default function Avatar({
         return '온라인';
       case 'away':
         return '자리비움';
-      case 'ban':
-        return '차단됨';
+      case 'dnd':
+        return '방해 금지';
       case 'offline':
         return '오프라인';
       default:
